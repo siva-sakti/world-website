@@ -64,7 +64,7 @@ A **private, single-user spatial notebook** — a place to **grow ideas, not jus
 **Goal:** the soul — make bits *about* something, *findable*, and *connected*, so ideas **accumulate and grow.** Built **beautifully** (researched) and **with real content flowing in.** **Success check:** the ~3-week return test above.
 
 **Steps:**
-0. **Research + design pass** *(I'll do this — you greenlit it):* study how Obsidian / Roam / Tana handle **tags, backlinks, unlinked mentions, forward-links, and the tag→page→graph UX**; decide what to adopt and what to do better; design the tag+link model + interactions so they feel *effortless* (tap-not-type, **no `[[ ]]` syntax**). Output: a short "knowledge-layer design" doc before we build.
+0. **Research + design pass — ✅ DONE → `research-knowledge-layer.md`** (cited; key calls in D-054): flat tags · linking without `[[]]` via two gestures (a tap `@`-picker + a bespoke drag-to-connect overlay, both writing to the `links` table) · topic-pages as query-time views · local-neighborhood graph via `react-force-graph` · growth mechanic = backlinks panel + `stage` (no new feature). **Read that doc before building Phase 2.**
 1. **Tag a bit / a board** — a tap-existing + create-new picker, recent-first; tags always optional (D-039).
 2. **Frictionless "quick add"** — paste a note → it becomes a bit — so you **seed a real cluster of your Apple Notes** as you go (manual, deliberate — truer to "grow, don't hoard").
 3. **Links both directions** — **forward-links** (this idea → that idea) *and* **backlinks** (what points here), surfaced on every bit and board.
