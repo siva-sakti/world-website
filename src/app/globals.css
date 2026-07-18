@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* Quiet, white, one typeface. Expression comes from the owner's own content,
+   not from chrome (see draft-claudemd.md → Design stance). */
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── compose prototype ─────────────────────────────────────────────── */
+.compose-board {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  background: #faf8f3; /* paper ground for the prototype */
+  overflow: hidden;
+  touch-action: none;
+}
+.compose-empty {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translateX(-50%);
+  color: #a89f92;
+  font-size: 14px;
+  pointer-events: none;
+}
+.compose-card-inner {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 40px;
+  background: #fffdfa;
+  border: 1px solid #e7e1d5;
+  border-radius: 6px;
+  padding: 0.5em 0.7em; /* em → scales with the note's font size (corner-scale) */
+  cursor: default;
+}
+.compose-card.is-selected .compose-card-inner {
+  outline: 2px solid #365a8c;
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.compose-card-inner.is-image {
+  padding: 0;
+  overflow: hidden;
+}
+.compose-card-inner.is-doodle {
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+}
+.compose-doodle-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.compose-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+  pointer-events: none;
+  user-select: none;
+}
+/* Text corner-scale handle (bottom-right): filled blue, so it reads as a
+   different gesture than the hollow white reshape dots on the sides. */
+.compose-scale-handle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  background: #365a8c;
+  border: 1.5px solid #fffdfa;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.tiptap,
+.tiptap .ProseMirror {
+  outline: none;
+}
+.tiptap p {
+  margin: 0;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  content: "note…";
+  color: #b9b1a4;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.compose-toolbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  display: flex;
+  gap: 8px;
+}
+.compose-btn {
+  font-size: 14px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  background: #fffdfa;
+  color: #1c1813;
+  border: 1px solid #d8d2c6;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.compose-btn:hover {
+  border-color: #365a8c;
+}
+.compose-btn:active {
+  background: #f3efe7;
+}
+.compose-btn.is-primary {
+  background: #365a8c;
+  color: #fffdfa;
+  border-color: #365a8c;
+}
+.compose-btn.is-primary:active {
+  background: #2c4a75;
+}
+
+/* ── pen mode ──────────────────────────────────────────────────────── */
+.compose-draw-surface {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: 9000;
+  cursor: crosshair;
+  touch-action: none;
+}
+.compose-draw-actions {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10001;
+  display: flex;
+  gap: 8px;
+}
