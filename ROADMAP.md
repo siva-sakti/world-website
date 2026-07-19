@@ -65,7 +65,7 @@ A **private, single-user spatial notebook** — a place to **grow ideas, not jus
 
 **Steps:**
 0. **Research + design pass — ✅ DONE → `research-knowledge-layer.md`** (cited; key calls in D-054): flat tags · linking without `[[]]` via two gestures (a tap `@`-picker + a bespoke drag-to-connect overlay, both writing to the `links` table) · topic-pages as query-time views · local-neighborhood graph via `react-force-graph` · growth mechanic = backlinks panel + `stage` (no new feature). **Read that doc before building Phase 2.**
-1. **Tag a bit / a board** — a tap-existing + create-new picker, recent-first; tags always optional (D-039).
+1. **Tag a bit / a board** — a tap-existing + create-new picker, recent-first; tags always optional (D-039). **Detailed build plan → `draft-plan-tags.md`** (steps A–G; typed `#`/`[[` triggers now welcome as a keyboard bonus, D-055).
 2. **Frictionless "quick add"** — paste a note → it becomes a bit — so you **seed a real cluster of your Apple Notes** as you go (manual, deliberate — truer to "grow, don't hoard").
 3. **Links both directions** — **forward-links** (this idea → that idea) *and* **backlinks** (what points here), surfaced on every bit and board.
 4. **Topic-page per tag** — everything about a tag in one place = the "topic-home"; designed as a **living surface you write *into* and watch accumulate** (this is the growth mechanic, not just a backlink list).
