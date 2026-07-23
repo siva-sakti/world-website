@@ -124,6 +124,24 @@ try {
   r = await sb.from("bit").select("id").eq("id", bitId).is("deleted_at", null);
   (r.data?.length === 1) ? ok("delete-tag cascades applications; the bit survives (§3e)") : fail("delete-tag harmed the bit");
 
+  // bug-3 guard: a tag word containing a LIKE wildcard (%) must resolve to ITSELF,
+  // not a sibling. applyTag escapes % / _ before the ilike lookup — verify the
+  // escaped pattern is literal, while the naive pattern over-matches.
+  const wpre = "pct-" + Math.random().toString(36).slice(2, 6);
+  const plain = await sb.from("tag").insert({ word: wpre + "50" }).select("id").single();
+  const pct = await sb.from("tag").insert({ word: wpre + "50%" }).select("id").single();
+  const esc = (wpre + "50%").replace(/[\\%_]/g, (m) => "\\" + m);
+  r = await sb.from("tag").select("word").ilike("word", esc);
+  const words = (r.data ?? []).map((x) => x.word);
+  (words.length === 1 && words[0] === wpre + "50%")
+    ? ok("a % tag word resolves to itself (wildcard escaped)")
+    : fail("escaped ilike over/under-matched: " + JSON.stringify(words));
+  r = await sb.from("tag").select("word").ilike("word", wpre + "50%");
+  ((r.data ?? []).length >= 2)
+    ? ok("naive % pattern over-matches — the bug the escape fixes")
+    : fail("naive pattern didn't over-match as expected");
+  await sb.from("tag").delete().in("id", [plain.data.id, pct.data.id]);
+
   // --- increment 4: a drawing with per-stroke pen widths round-trips (jsonb) ---
   const drawId = crypto.randomUUID();
   const drawing = { strokes: [[[0, 0, 0.5], [10, 10, 0.6]]], sizes: [13] };

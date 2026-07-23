@@ -62,7 +62,11 @@ export async function applyTag(
   const ins = await supabase.from("tag").insert({ word }).select("id, word").single();
   if (ins.error) {
     if (ins.error.code === "23505") {
-      const sel = await supabase.from("tag").select("id, word").ilike("word", word).limit(1).single();
+      // Existing word (CI-unique index). Escape LIKE metacharacters so a word
+      // containing % or _ matches literally, not as a wildcard — otherwise the
+      // wrong tag could attach (or .single() throws on multiple matches).
+      const pat = word.replace(/[\\%_]/g, (m) => "\\" + m);
+      const sel = await supabase.from("tag").select("id, word").ilike("word", pat).limit(1).single();
       if (sel.error) throw sel.error;
       tag = sel.data as Tag;
     } else {

@@ -21,6 +21,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   const [all, setAll] = useState<TagChoice[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
   const targetId = "bitId" in target ? target.bitId : target.boardId;
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   async function add(word: string) {
     const w = word.trim();
     setDraft("");
+    setErr(null);
     if (!w || tags.some((t) => t.word.toLowerCase() === w.toLowerCase())) return;
     try {
       const tag = await applyTag(supabase, { ...target, word: w });
@@ -54,15 +56,19 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
       );
     } catch (e) {
       console.error("tag failed:", e);
+      setErr("Couldn't add that tag — try again.");
     }
   }
 
   async function remove(tag: Tag) {
+    setErr(null);
     setTags((ts) => ts.filter((t) => t.id !== tag.id));
     try {
       await removeTag(supabase, { ...target, tagId: tag.id });
     } catch (e) {
       console.error("untag failed:", e);
+      setTags((ts) => (ts.some((t) => t.id === tag.id) ? ts : [...ts, tag])); // put it back
+      setErr("Couldn't remove that tag — try again.");
     }
   }
 
@@ -94,6 +100,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
           {s.word}
         </button>
       ))}
+      {err && <span className="text-xs text-red-700">{err}</span>}
     </div>
   );
 }

@@ -62,6 +62,14 @@ export function BoardSurface({
     new Map<string, { bitId: string; placement: PlacementPatch; body?: string }>(),
   );
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  // Each card's create promise — a debounced move/edit must wait for the row to
+  // exist before writing (a placement update to a not-yet-created row silently
+  // updates 0 rows, so the move would be lost).
+  const creates = useRef(new Map<string, Promise<unknown>>());
+  function trackCreate(placementId: string, p: Promise<unknown>) {
+    creates.current.set(placementId, p);
+    p.finally(() => creates.current.delete(placementId));
+  }
 
   function onErr(e: unknown) {
     console.error("board save failed:", e);
@@ -150,6 +158,8 @@ export function BoardSurface({
     pending.current.delete(placementId);
     timers.current.delete(placementId);
     if (!p) return;
+    const create = creates.current.get(placementId);
+    if (create) await create; // the row must exist before we update it
     try {
       if (Object.keys(p.placement).length)
         await updatePlacement(supabase, placementId, p.placement);
@@ -191,7 +201,8 @@ export function BoardSurface({
     ]);
     setSelectedId(placementId);
     setEditingId(placementId);
-    createTextBit(supabase, { bitId, placementId, boardId, body: "<p></p>", x, y, width: 240, z }).catch(onErr);
+    const p = createTextBit(supabase, { bitId, placementId, boardId, body: "<p></p>", x, y, width: 240, z }).catch(onErr);
+    trackCreate(placementId, p);
   }
 
   // Pen "Done": convert the session's strokes (screen space) into world space,
@@ -216,12 +227,13 @@ export function BoardSurface({
       { placementId, bitId, type: "drawing", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
     ]);
     setSelectedId(placementId);
-    createDrawingBit(supabase, {
+    const p = createDrawingBit(supabase, {
       bitId, placementId, boardId, drawing: relDrawing,
       x: b.minX, y: b.minY, width: w, height: h, z,
     })
       .then(() => setWordsFor({ bitId, kind: "drawing" }))
       .catch(onErr);
+    trackCreate(placementId, p);
   }
 
   function importImageFile(file: File, wx: number, wy: number) {
@@ -230,7 +242,7 @@ export function BoardSurface({
     // HEIC decoding takes a few seconds; only then does it show a notice.
     const heic = isHeic(file);
     if (heic) setConverting(true);
-    importImage(file)
+    const chain = importImage(file)
       .then(async (img) => {
         const dispScale = Math.min(1, MAX_DISP / img.width);
         const w = Math.max(1, Math.round(img.width * dispScale));
@@ -261,6 +273,7 @@ export function BoardSurface({
       .finally(() => {
         if (heic) setConverting(false);
       });
+    trackCreate(placementId, chain);
   }
 
   function onBoardDrop(e: React.DragEvent) {
@@ -432,6 +445,7 @@ export function BoardSurface({
               selected={selectedId === c.placementId}
               editing={editingId === c.placementId}
               scale={cam.scale}
+              offeringWords={wordsFor?.bitId === c.bitId}
               onSelect={() => select(c.placementId, c.bitId)}
               onEdit={() => {
                 setSelectedId(c.placementId);

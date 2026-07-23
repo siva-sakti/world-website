@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
@@ -57,6 +57,7 @@ export function Card({
   selected,
   editing,
   scale,
+  offeringWords,
   onSelect,
   onEdit,
   onChange,
@@ -66,6 +67,7 @@ export function Card({
   selected: boolean;
   editing: boolean;
   scale: number; // the canvas zoom — react-rnd needs it so drag/resize deltas stay true
+  offeringWords?: boolean; // the "add a few words?" prompt owns the caption right now
   onSelect: () => void;
   onEdit: () => void;
   onChange: (patch: Partial<CardVM>) => void;
@@ -150,7 +152,7 @@ export function Card({
         {card.type === "drawing" && card.drawing && (
           <DoodleBit drawing={card.drawing} />
         )}
-        {!isText && selected && (
+        {!isText && selected && !offeringWords && (
           <ContentLine
             value={card.content ?? ""}
             placeholder="add a few words — optional"
@@ -180,14 +182,25 @@ function ContentLine({
   onSave: (v: string) => void;
 }) {
   const [draft, setDraft] = useState(value);
+  const focused = useRef(false);
+  // Keep the field in sync when the saved value changes elsewhere (e.g. the
+  // "add a few words?" prompt saving the same caption) — but never overwrite what
+  // the owner is actively typing here.
+  useEffect(() => {
+    if (!focused.current) setDraft(value);
+  }, [value]);
   return (
     <input
       value={draft}
       placeholder={placeholder}
       className={className}
       onChange={(e) => setDraft(e.target.value)}
+      onFocus={() => (focused.current = true)}
       onPointerDown={(e) => e.stopPropagation()} // don't start a drag from the input
-      onBlur={() => draft.trim() !== value.trim() && onSave(draft)}
+      onBlur={() => {
+        focused.current = false;
+        if (draft.trim() !== value.trim()) onSave(draft);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") (e.target as HTMLInputElement).blur();
         if (e.key === "Escape") setDraft(value);
