@@ -1,0 +1,38 @@
+INSERT 0 4
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 4
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:71: NOTICE:  S1 ✓ private board · face = body/content/URL-fallback · pull = tagged bit + the board · flicked-off chip stays out
+DO
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:89: NOTICE:  S3 ✓ thought born PUBLIC by default → one-tap PRIVATE takes · the room stays locked either way
+DO
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:108: NOTICE:  S4 ✓ wordless ink: no face, invisible to text search, STILL on the ledger (reachable by date)
+DO
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:138: NOTICE:  S5 ✓ bare image invisible to text / found by type → told → searchable · call-in = 2nd placement, one live bit
+DO
+psql:verification/scenarios.sql:150: NOTICE:  S6 ✓ last-arrival wins whole-record (no per-field merge) · the tombstone race = 1c's FOR SHARE probe
+DO
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:200: NOTICE:  S7a ✓ trash hides the photo AND its arrow (not destroyed) · restore brings both back exactly
+psql:verification/scenarios.sql:200: NOTICE:  S7b ✓ un-place: arrow killed, ROW KEPT (travel shows the leg), card absent · call-in re-homes on Practices
+DO
+INSERT 0 1
+INSERT 0 1
+psql:verification/scenarios.sql:221: NOTICE:  I-G1 ✓ all eight record kinds present for export (+ the dormant ninth, empty by design)
+DO
+psql:verification/scenarios.sql:263: NOTICE:  REGRESSION ✓ re-place reuses the row (arrived_at preserved); delete-and-reinsert stays refused
+psql:verification/scenarios.sql:263: NOTICE:  TRIPWIRE ✓ zero orphans in the real state · proven to catch a planted one
+DO

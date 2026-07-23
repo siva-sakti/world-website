@@ -9,7 +9,7 @@ The methodical tracker of every **Element** (noun/data), **Surface** (screen), a
 4. Flip its status to 🟢.
 5. Next.
 
-**Status:** 🟢 settled · 🟡 partly settled · 🔴 open. Resolutions flow *out* of here into `SPEC.md` / `draft-highlevel.md`.
+**Status:** 🟢 settled · 🟡 partly settled · 🔴 open. Resolutions flow *out* of here into `SPEC.md` / `highlevel.md`.
 
 ---
 
@@ -64,7 +64,7 @@ The methodical tracker of every **Element** (noun/data), **Surface** (screen), a
 - The portfolio → impact pipeline is personal motivation, **not** an app feature.
 - **Assemble a page = collage of manually-placed discrete boxes (model B).** Each text block wraps inside its own box (plain DOM, no special engine). Placement is manual ("it's on me"), with drag/resize. A **wrap-around-a-doodle text box (model A)** is a *later, occasional* special box type — **pretext** is the candidate tool for that one feature, **not** a v1 dependency.
 
-### Replan pass (external review → reconciled). Authoritative plan now lives in `draft-highlevel.md`; decisions in `PROGRESS.md` (D-017…D-024).
+### Replan pass (external review → reconciled). Authoritative plan now lives in `highlevel.md`; decisions in `PROGRESS.md` (D-017…D-024).
 
 - **Build order is now CAPTURE-FIRST** (was compose-first): foundation → cloud deploy → capture → browse+resurface → data safety → tagging → compose. Ingestion & revisiting move to the front; graph demoted.
 - **Fragment is the atom, placement-optional** — capture makes a bare fragment; nothing is forced onto a board. (Ontology conflict resolved; SPEC §0/§5 fixed.)

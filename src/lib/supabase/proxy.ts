@@ -8,16 +8,10 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  // Prototype: the compose board is the whole app for now, so the homepage goes
-  // straight to it. (Later, "/" becomes the browse/feed home.)
-  if (path === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/compose";
-    return NextResponse.redirect(url);
-  }
-  // Public routes skip the auth round-trip entirely. /compose is the localStorage
-  // prototype (no Supabase), so it must load without a DB running.
-  if (path === "/login" || path.startsWith("/auth") || path.startsWith("/compose")) {
+  // v1 is a private notebook: everything requires the owner to be signed in.
+  // Only the sign-in flow is public. (The localStorage prototype at /compose is
+  // gone — the real compose is /board/[id], behind this wall.)
+  if (path === "/login" || path.startsWith("/auth") || path.startsWith("/vendor/")) {
     return NextResponse.next({ request });
   }
 

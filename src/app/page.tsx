@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
-import { newBoard } from "./actions";
+import { newBoard, trashBoardAction } from "./actions";
 import { logout } from "./login/actions";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,22 @@ export default async function Home() {
       <header className="mb-10 flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">world</h1>
         <div className="flex items-baseline gap-5 text-sm">
+          <Link href="/find" className="underline underline-offset-4 hover:no-underline">
+            find
+          </Link>
+          <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            tags
+          </Link>
+          <Link href="/trash" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            trash
+          </Link>
+          <a
+            href="/api/export"
+            className="text-neutral-500 underline underline-offset-4 hover:no-underline"
+            title="Download all your data"
+          >
+            export
+          </a>
           <form action={newBoard}>
             <button className="underline underline-offset-4 hover:no-underline">
               new board
@@ -35,13 +51,22 @@ export default async function Home() {
       ) : (
         <ul className="space-y-3">
           {boards.map((c) => (
-            <li key={c.id}>
+            <li key={c.id} className="flex items-baseline justify-between gap-4">
               <Link
                 href={`/board/${c.id}`}
                 className="underline underline-offset-4 hover:no-underline"
               >
                 {c.title || "untitled board"}
               </Link>
+              <form action={trashBoardAction}>
+                <input type="hidden" name="id" value={c.id} />
+                <button
+                  className="text-xs text-neutral-400 hover:text-neutral-700"
+                  title="Trash this board (its bits stay in your collection; restorable)"
+                >
+                  trash
+                </button>
+              </form>
             </li>
           ))}
         </ul>

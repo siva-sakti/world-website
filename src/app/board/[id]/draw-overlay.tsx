@@ -1,33 +1,34 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { strokeToPath } from "./stroke";
-import type { Stroke } from "./types";
+import { useEffect, useRef, useState } from "react";
+import { strokeToPath, PEN_WIDTHS, DEFAULT_PEN } from "@/lib/stroke";
+import type { Stroke, Drawing } from "@/lib/types";
 
 const INK = "#1c1813";
 
-// Pen-mode draw surface. Live drawing happens on a <canvas> — we just paint the
-// ink onto a bitmap, throttled to one repaint per animation frame. The earlier
-// version rebuilt the whole drawing as an SVG on EVERY pointer sample, which was
-// too heavy for the tablet's browser and crashed it mid-stroke. Strokes are
-// still kept as vector data and handed to onDone; the finished doodle bit is
-// rendered as crisp, scalable SVG once (cheap). Palm rejection: pen/mouse only,
-// one pointer at a time.
+// Pen-mode draw surface. Live drawing paints onto a <canvas> (a bitmap),
+// throttled to one repaint per animation frame — the earlier per-sample SVG
+// rebuild crashed the tablet mid-stroke. Strokes are kept as vector data with a
+// pen width recorded per stroke (so one drawing can mix fine + bold), handed to
+// onDone. Palm rejection: pen/mouse only, one pointer at a time.
 export function DrawOverlay({
   onDone,
   onCancel,
 }: {
-  onDone: (strokes: Stroke[]) => void;
+  onDone: (drawing: Drawing) => void;
   onCancel: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dprRef = useRef(1);
   const strokes = useRef<Stroke[]>([]);
+  const sizes = useRef<number[]>([]);
   const current = useRef<Stroke | null>(null);
   const activeId = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const [pen, setPen] = useState(DEFAULT_PEN);
+  const penRef = useRef(DEFAULT_PEN);
+  penRef.current = pen; // the size a stroke gets is the one live when it started
 
-  // Size the canvas bitmap to its box × device-pixel-ratio (crisp ink).
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -40,6 +41,8 @@ export function DrawOverlay({
     if (ctx) ctx.scale(dpr, dpr);
   }, []);
 
+  const activeSize = useRef(DEFAULT_PEN); // size of the in-progress stroke
+
   function redraw() {
     rafRef.current = null;
     const canvas = canvasRef.current;
@@ -48,8 +51,8 @@ export function DrawOverlay({
     const dpr = dprRef.current;
     ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     ctx.fillStyle = INK;
-    for (const s of strokes.current) paint(ctx, s);
-    if (current.current) paint(ctx, current.current);
+    strokes.current.forEach((s, i) => paint(ctx, s, sizes.current[i]));
+    if (current.current) paint(ctx, current.current, activeSize.current);
   }
   function schedule() {
     if (rafRef.current == null) rafRef.current = requestAnimationFrame(redraw);
@@ -68,6 +71,7 @@ export function DrawOverlay({
     const p = toPoint(e);
     if (!p) return;
     activeId.current = e.pointerId;
+    activeSize.current = penRef.current;
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
@@ -88,16 +92,16 @@ export function DrawOverlay({
     activeId.current = null;
     if (current.current) {
       strokes.current = [...strokes.current, current.current];
+      sizes.current = [...sizes.current, activeSize.current];
       current.current = null;
     }
     schedule();
   }
 
   function done() {
-    const all = current.current
-      ? [...strokes.current, current.current]
-      : strokes.current;
-    onDone(all);
+    const s = current.current ? [...strokes.current, current.current] : strokes.current;
+    const z = current.current ? [...sizes.current, activeSize.current] : sizes.current;
+    onDone({ strokes: s, sizes: z });
   }
 
   return (
@@ -111,6 +115,18 @@ export function DrawOverlay({
         onPointerCancel={end}
       />
       <div className="compose-draw-actions">
+        <div className="compose-pen-widths">
+          {PEN_WIDTHS.map((w) => (
+            <button
+              key={w.size}
+              className={`compose-pen-dot${pen === w.size ? " is-on" : ""}`}
+              style={{ ["--dot" as string]: `${Math.max(6, w.size + 3)}px` }}
+              title={w.label}
+              onClick={() => setPen(w.size)}
+              aria-label={`${w.label} pen`}
+            />
+          ))}
+        </div>
         <button className="compose-btn" onClick={onCancel}>
           ✕ cancel
         </button>
@@ -122,9 +138,9 @@ export function DrawOverlay({
   );
 }
 
-// Paint one stroke as a single filled outline (same perfect-freehand path the
-// saved SVG bit uses, so live ink and the final doodle look identical).
-function paint(ctx: CanvasRenderingContext2D, stroke: Stroke) {
-  const d = strokeToPath(stroke);
+// Paint one stroke as a single filled outline at its pen width (same
+// perfect-freehand path the saved SVG bit uses — live ink matches the result).
+function paint(ctx: CanvasRenderingContext2D, stroke: Stroke, size: number) {
+  const d = strokeToPath(stroke, size);
   if (d) ctx.fill(new Path2D(d));
 }

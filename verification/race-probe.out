@@ -1,0 +1,12 @@
+=== Part 1: WITHOUT the lock — reproduce the silent land ===
+A: target live at check-time = true
+
+REPRODUCED ✓ the write landed silently on a tombstone (this is the bug FOR SHARE kills)
+=== Part 2: WITH FOR SHARE — the delete must WAIT ===
+A: FOR SHARE sees live = true
+
+BLOCKED ✓ the soft-delete waited 3s for the lock; the write landed on a LIVE target first
+          (legitimate order: the later delete's confirm-count includes this application — §3e)
+=== Part 3: delete-first order — the check must SEE the tombstone ===
+SEEN ✓ FOR SHARE read the tombstone (physics); on that result the db-module fires the keep-by-default prompt (discipline); no write lands
+--- race probe complete: bug reproduced without the lock, killed with it ---

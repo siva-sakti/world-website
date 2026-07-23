@@ -1,0 +1,3 @@
+-- Seeds live inside the migration (the four thought-words + five subtype chips,
+-- idempotent) so they land identically on throwaway, local, and cloud. This
+-- file exists only because config.toml references it; intentionally empty.

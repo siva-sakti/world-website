@@ -1,0 +1,100 @@
+#!/bin/bash
+# ============================================================================
+# race-probe.sh — Stage 1c: the I-D1 two-session race probe (§2h, D-075)
+# ============================================================================
+# Proves BOTH halves of the ruled mechanism, with real concurrent sessions:
+#   Part 1 — WITHOUT the lock: reproduce the silent land (a write passes its
+#            liveness check, a soft-delete commits in the gap, the write lands
+#            on a fresh tombstone with no prompt — the READ COMMITTED race).
+#   Part 2 — WITH `SELECT … FOR SHARE`: the concurrent soft-delete BLOCKS
+#            until the writing transaction commits (measured), so the write
+#            lands on a live target — the legitimate serialization.
+#   Part 3 — delete-first order: the FOR SHARE check SEES the tombstone,
+#            so the app-side prompt fires instead of a write.
+#
+# SCOPE (verifier note, D-084): this probe covers the SOFT-delete tombstone
+# race — the only SILENT one. A HARD-deleted vocabulary word is caught loudly
+# by its foreign key (the write errors, the app prompts, keep = recreate-by-name
+# per I-D6) — no silent land is possible there, so it needs no race probe.
+# Cleans up after itself. Output captured to verification/race-probe.out (3d).
+# ============================================================================
+set -euo pipefail
+
+DB_CONTAINER=$(docker ps --filter name=supabase_db --format '{{.Names}}' | head -1)
+[ -n "$DB_CONTAINER" ] || { echo "FAIL: no supabase_db container running"; exit 1; }
+P() { docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -qtA "$@"; }
+
+BIT='ab000000-0000-0000-0000-000000000001'
+TAG='cb000000-0000-0000-0000-000000000001'
+
+cleanup() {
+  P -c "delete from tag_application where tag_id='$TAG';
+        delete from tag where id='$TAG';
+        delete from bit where id='$BIT';" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+cleanup
+
+P -c "insert into bit (id, type, body) values ('$BIT','text','race target');
+      insert into tag (id, word) values ('$TAG','astro');" >/dev/null
+
+echo "=== Part 1: WITHOUT the lock — reproduce the silent land ==="
+P <<SQL &
+begin;
+select 'A: target live at check-time = ' || (deleted_at is null) from bit where id='$BIT';
+select pg_sleep(4);
+insert into tag_application (tag_id, target_bit_id) values ('$TAG','$BIT');
+commit;
+SQL
+A_PID=$!
+sleep 1
+P -c "update bit set deleted_at = now() where id='$BIT';" >/dev/null   # B: soft-delete commits inside A's gap
+wait "$A_PID"
+LANDED=$(P -c "select count(*) from tag_application ta join bit b on b.id = ta.target_bit_id
+               where ta.tag_id='$TAG' and b.deleted_at is not null;")
+if [ "$LANDED" = "1" ]; then
+  echo "REPRODUCED ✓ the write landed silently on a tombstone (this is the bug FOR SHARE kills)"
+else
+  echo "PROBE INVALID ✗ the race did not reproduce — timing assumptions wrong, rerun"; exit 1
+fi
+
+# reset for part 2
+P -c "delete from tag_application where tag_id='$TAG';
+      update bit set deleted_at = null where id='$BIT';" >/dev/null
+
+echo "=== Part 2: WITH FOR SHARE — the delete must WAIT ==="
+P <<SQL &
+begin;
+select 'A: FOR SHARE sees live = ' || (deleted_at is null) from bit where id='$BIT' for share;
+select pg_sleep(4);
+insert into tag_application (tag_id, target_bit_id) values ('$TAG','$BIT');
+commit;
+SQL
+A_PID=$!
+sleep 1
+T0=$(date +%s)
+P -c "update bit set deleted_at = now() where id='$BIT';" >/dev/null   # B: must block on A's FOR SHARE
+T1=$(date +%s)
+wait "$A_PID"
+BLOCKED=$((T1 - T0))
+ORDERED=$(P -c "select count(*) from tag_application ta join bit b on b.id = ta.target_bit_id
+                where ta.tag_id='$TAG' and ta.created_at < b.deleted_at;")
+if [ "$BLOCKED" -ge 2 ] && [ "$ORDERED" = "1" ]; then
+  echo "BLOCKED ✓ the soft-delete waited ${BLOCKED}s for the lock; the write landed on a LIVE target first"
+  echo "          (legitimate order: the later delete's confirm-count includes this application — §3e)"
+else
+  echo "FAIL ✗ blocked=${BLOCKED}s ordered=${ORDERED} — the lock did not serialize"; exit 1
+fi
+
+# reset for part 3 (target already trashed by part 2's delete)
+P -c "delete from tag_application where tag_id='$TAG';" >/dev/null
+
+echo "=== Part 3: delete-first order — the check must SEE the tombstone ==="
+SEEN=$(P -c "begin; select (deleted_at is not null) from bit where id='$BIT' for share; rollback;")
+if [ "$SEEN" = "t" ]; then
+  echo "SEEN ✓ FOR SHARE read the tombstone (physics); on that result the db-module fires the keep-by-default prompt (discipline); no write lands"
+else
+  echo "FAIL ✗ the check missed the tombstone"; exit 1
+fi
+
+echo "--- race probe complete: bug reproduced without the lock, killed with it ---"

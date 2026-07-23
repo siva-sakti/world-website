@@ -1,194 +1,64 @@
-# SPEC
+# SPEC — the technical manual
 
-The detailed **what**. Companion docs: `draft-philosophy.md` (why), `draft-highlevel.md` (model/glossary), `draft-claudemd.md` (how we work), `PROGRESS.md` (where we are). Living draft — supersedes `initial-spec.md` (kept as history). Where this and PHILOSOPHY disagree about *intent*, PHILOSOPHY wins and you flag it.
-
----
-
-## 0. Definitions
-
-*Naming note: this uses the code's current terms `bit` / `canvas`; the owner's words are **fragment** (= bit) and **board** (= canvas). Rename pending.*
-
-| Term | Meaning |
-|---|---|
-| **bit** (fragment) | The **atom**: one small unit — `text`, `image`, `doodle`, `audio`, `link`, or `pdf`; something consumed *or* thought. Independent, taggable, dated, retrievable. **Lives on its own in the grid; needs no canvas.** |
-| **canvas** (board) | A place to gather and think. **Two modes, same canvas:** *collection* (grouped bits, no spatial layout — quick, any device) → *canvas mode* (those bits given positions, arranged spatially — the sit-down act). Has a `stage`. |
-| **placement** | A bit on a canvas. Its position (x/y/w/h/z) is **optional** — absent = collection mode, present = canvas mode. Live reference, never a copy. A bit may have **zero, one, or many** placements. |
-| **topical tag** | What a bit is *about*. Open, growable vocabulary; a **linkable topic-node** — each topic has a page collecting everything about it (backlinks), tapped from a picker (never typed as syntax). Many per bit. |
-| **kind** *(categorization)* | A bit's *nature*: `learned` · `noticed` · `wondered` · `theorized`. Fixed set, one per bit, **optional**, set while tending. |
-| **stage** *(categorization)* | A canvas's *maturity*, ordered (~3–4). Drives "which boards want tending." |
-| **pull** | Filter by a tag → a *designed* grid of bit previews (order may be random). |
-| **backlink** | The reverse of a placement / topical tag / link — "what contains / is about / points at this." |
-| **graph** | Mostly the **topical web** (bits connected through shared topics). Scoped views later; backlinks are the near-term value. |
-
-**Single user** (one writer; a read-only key may be shared later; product not designed out). **Build order is capture-first — see §12 and `PROGRESS.md`.** `kind`/`stage` are not yet in the applied migration (written during the superseded "no attributes" phase); a new migration adds them.
+**What this is:** the **technical *what*** — how the proven schema is built and how the app is wired to it, so a builder can implement any feature without reopening the agreements. **Rebuilt from the closed model at the translation step (Stage 1f, D-085);** it *describes* what is upstream and never re-derives it (guidelines rule 8). The derivation chain is one-way: `agreements.md` (the ruled model) → `supabase/migrations/20260721000001_init.sql` (the proven schema) → this SPEC → `ROADMAP.md`. Where this and the agreements ever disagree, **the agreements win** — raise it, don't paper over it. Words are the `lexicon.md` words. The old SPEC is retired to `old/` (its model prose was superseded; its technical sections are carried forward here, proven-schema-accurate).
 
 ---
 
-## 1. Stack (fixed unless owner changes)
+## 1. The five moving pieces
 
-- Next.js App Router + TypeScript strict
-- Supabase: Postgres + Storage + Auth — **local via Docker in dev**
-- Tailwind (layout utilities only)
-- Pre-approved libs: `dnd-kit`, `react-rnd`, `tiptap`, `pdf.js`, `zod`. Anything else needs approval.
+1. **The screen** (Next.js App Router, TS strict) — renders bits and boards; never talks to the database directly.
+2. **The one door** (`lib/db`) — every read and write goes through this single module. It is where the rules marked *app* in `invariants.md` live (the content write-guard I-R1, the un-place transaction, the keep-by-default prompt I-D1, the confirm-builders I-T2). One `lib/storage` module is the twin door for files. **Never call Supabase from a component.**
+3. **The database** (Supabase Postgres 17) — holds the eight record kinds + the dormant ninth, and does as much of the work as physics can (constraints, generated columns, views). Proven: `verification/`.
+4. **The file store** (Supabase Storage) — the actual image bytes (later: pdf, audio). A media bit is two halves: its row (facts + address) and its file.
+5. **RLS** (§3) — the security boundary, enforced by the database on every request, not by the query layer.
 
----
+Pipe: **screen → `lib/db` → Postgres** (+ `lib/storage` → file store), every row filtered by **RLS**. A board is never stored as a whole — it is one row assembled from its placements at load time (two indexed queries; the only slow thing in the product is image bytes on the network, mitigated by downscaling + thumbnails).
 
-## 2. Data model
+## 2. The schema, described
 
-Exact intent, not final SQL. All ids are uuid; all tables have `created_at` and `updated_at` (auto, see §2.3).
+The authority is the migration; this is the map. **Eight record kinds in three families + the dormant ninth** (agreements §7; lexicon):
 
-- **canvases** — `id`, `title` (nullable — canvases can be untitled), `visibility` (`private`|`shared`|`public`, default `private`), `is_home` (bool, at most one true), `width` (int, coordinate-space width), `created_at`, `updated_at`.
-- **bits** — `id`, `type` (`text`|`image`|`doodle`|`audio`|`link`|`pdf`), `text` (body for text bits; caption otherwise), `storage_path` (image/doodle/audio/pdf object key — **path, not a signed URL**, see §9), `link_url` (link bits), plus media metadata (`image_w`, `image_h`, `thumb_path`, `file_name`, `mime`, `byte_size`), `visibility` (default `private`), `created_at`, `updated_at`.
-- **placements** — `id`, `canvas_id` → canvases, `bit_id` → bits, `x`, `y`, `w`, `h`, `z`, `rotation`, `created_at`, `updated_at`.
-- **tags** — `id`, `name` (unique), `created_at`.
-- **bit_tags** — (`bit_id`, `tag_id`), pk both.
-- **canvas_tags** — (`canvas_id`, `tag_id`), pk both.
-- **links** — `id`, `from_bit_id`, `to_bit_id`, `created_at`. (Canvas↔canvas links: later; extend then.)
-- **search** — `bits` carries a generated `tsvector` over text; GIN index. (§7)
+- **things** — **`bit`** (the atom: `type` ∈ text·drawing·image·bookmark; owner-only `content`; a text bit's `body`; a drawing's `strokes`; a bookmark's `url` + captured-once `captured_title`; media facts + `storage_path`/`thumb_path`; `subtype_word_id`; `visibility` **public**-default; `deleted_at` freeze; the generated **`face`** + `search_tsv`). **`board`** (`title` nullable; `visibility` **private**-default; `deleted_at`; generated `search_tsv`).
+- **acts** (each a timestamped row) — **`tag_application`** (a word on a bit *or* a board, exactly one, at a time) · **`placement`** (a bit *or* a board on a board; `x`/`y`/`width`/`height`/`z`/`display_size`; `arrived_at` = first arrival & birth; `left_at` empty = here now) · **`connector`** (an arrow between two placements on one board; `arrowhead`).
+- **vocabulary** (id-referenced, renames free) — **`tag`** (`word`, optional `category_id`) · **`category`** · **`subtype_word`**.
+- **dormant** — the nameless ninth (§6): two bit refs + when; ships empty, never dropped, never written in v1.
 
-Indexes: `placements(canvas_id)`, `placements(bit_id)`, `bit_tags(tag_id)`, `bits(created_at desc)`, `links(to_bit_id)`, bits FTS GIN.
+**What the database does itself** (so app code can't get it wrong): the **`face`** is a *generated column* — the display headline, `content ∥ per-type fallback`, one rule in `bit_face()`, no sync code (§4.4/D-074). **Search is a separate, wider generated column** (`bit_search_text`, D-088): it indexes *all* a bit's words — content + body + captured-title + URL — never just the face, so titling a note never hides its body from find. **Nine views** are the computed surfaces, each a saved question (`the_pull` · `the_ledger` · `home` · `trash_listing` · `bit_travel` · `board_cards` · `board_connectors` · `tag_counts` · `subtype_word_counts`); **find** is these blocks + the owner's filters, composed in the app, and its empty query is `the_ledger`. **One trigger** stamps `updated_at`; everything else is visible constraints. The key refusals, all proven (`verification/attacks.out`): twice-tagging impossible (→ merge can't duplicate), a cross-board arrow unrepresentable, one membership row per (thing, board) reused on re-place, exactly-one-target on placements & applications, per-type substance coherence, case-insensitive vocabulary twins refused, every destroy cascade total-and-self-contained.
 
-### 2.1 Invariants
+## 3. Security — RLS, the ruled composition (replaces the old §3, which leaked)
 
-- **I1 — Tags by id only.** Never store a tag name on a bit or canvas. No denormalisation, ever.
-- **I2 — Placements render live bits.** Never copy a bit's content into a placement. Editing the bit updates every placement.
-- **I3 — Deleting a placement never deletes its bit.** Deleting a bit sets nothing to a copy; its placements are removed and any links to it are cleaned up. A bit can be deleted only deliberately.
-- **I4 — Dates are auto (§2.3).** Application code never sets `updated_at`.
-- **I5 — Every table is in the export (§10).** Add a table → update the export.
-- **I6 — RLS is the security boundary (§3), never the query layer.**
+The browser holds the anon key; query filtering is not security. **RLS on every table.**
 
-### 2.2 Seed data
+- **v1:** owner-only on all nine tables (`for all to authenticated using (true) with check (true)`), **no anon policies at all** — nothing is visible to another human until sharing ships (agreements §2a). The single authenticated user *is* the owner (one login record); "only the owner has an account" is the load-bearing wall — enforced by the absence of any signup path + the Stage-2a login wall.
+- **The future guest layer (drafted now as comments beside each table, gradient-ready — §4.8):** a guest sees a bit **iff** its surface is reachable **AND** the bit itself is public — **reachability AND visibility, never an `OR`** (the old §3's `OR` is exactly the leak this closes: a private bit placed on a public board must **not** show). A private card renders **absent** (the guest never learns something was withheld). Sharing lands as pure addition — the composition, the per-board publish preview, and the guest-pull scope (parked A4) are decided when the sharing phase is real.
+- **Storage** mirrors this: two buckets (`public`, `private`); private objects via signed URLs through `lib/storage` only; never a private object in the public bucket.
+- **Service-role key:** server-only, never `NEXT_PUBLIC_`, never in the client bundle.
 
-Seed a small starter tag set (idempotent, `on conflict (name) do nothing`) — owner's real vocabulary lands over time. No tag "kinds"; tags are flat (hierarchy is an open question, not v1).
+## 4. Media pipeline (carried forward, proven-schema-accurate)
 
-### 2.3 Timestamps
+- **Transport rule (app-wide):** media uploads go **client → Supabase Storage directly** (authenticated + storage RLS), **never through a Vercel function** — serverless bodies cap ~4.5 MB; iPhone photos are 3–8 MB.
+- **Images/drawings:** client-side before upload — reject > 25 MB; read intrinsic `media_width`/`media_height`; downscale long edge ≤ 2400px → `storage_path`; 600px thumb → `thumb_path`; strip EXIF and **honor EXIF orientation on decode**. **Encode JPEG on iOS** (Safari cannot `toBlob('image/webp')` — known, not a runtime check); WebP where supported.
+- **HEIC:** via `<input type=file>` iOS auto-transcodes; via the Shortcut needs an explicit convert step. **The HEIC/unreadable-image message ships in the port batch (parked C2)** — a *silent* failure violates the error-state norm; the message is one line.
+- **Columns hold storage *paths*, not URLs** — signed URLs are generated at read time by `lib/storage` (they expire; never persist them). All storage access goes through `lib/storage` (so the backend can move later). *(pdf · audio are parked B7 — same two-halves storage when they land, no rework.)*
 
-`created_at default now()`. `updated_at` maintained by a trigger on update for every table — not by app code. For canvases, moving/adding/removing a placement counts as editing the canvas (touch `updated_at`).
+## 5. Operations
 
----
+- **Env** (`.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only).
+- **Migrations:** `supabase/migrations/`, numbered, **never edited after applying** — new change = new file.
+- **Export & data safety** (from day one of real data): **`/export` = one tap → every truth row + every file** — including travel history and all vocabulary (**I-G1**, proven in 1d). The **nightly backup is a GitHub Actions cron** (`pg_dump` + storage sync to a private artifact) — a Vercel Hobby cron would outgrow serverless limits as media accumulates. **This cron doubles as the keep-alive ping** (free-tier Supabase pauses after ~a week idle — which would kill capture exactly when you return from a trip). **Trash is a soft-delete freeze** (`deleted_at`); the one true destroy is emptying trash, which cascades totally (§2g).
+- **Empty & error states everywhere** — every list can be empty, every upload can fail; each is a short sentence, never a spinner-forever or blank screen.
 
-## 3. Security — RLS required
+## 6. Capture (Phase 5 — the critical path when it lands; §4b carried, now constrained by §2h)
 
-The anon key ships to the browser; query filtering is not security. RLS on **every** table.
+- **iOS path = a Shortcut → `/api/capture`** (Web Share Target absent on iOS Safari); the Shortcut carries no session cookie, so it authenticates with a **bearer capture-token** (`CAPTURE_TOKEN`; the route validates then uses the service-role client — a deliberate, narrow bypass). Media: resize before POST, or exchange the token for a signed upload URL; convert HEIC explicitly.
+- **The offline outbox is births-only (§2h/I-D2):** it may carry only *creations* (new bits, their tag applications, newly-typed tag words — inserts with fresh IDs that cannot conflict), **never an edit**. iOS has no Background Sync; queued captures flush **when the app is next opened** (IndexedDB; photos as blobs). **Born-at = the act's moment, not the flush's** (I-D4 — the outbox carries the timestamp; else recency/resurfacing inherit day-late lies).
+- **No automatic edit replay (I-D3):** an edit reaches the database only through a live save with the owner present; a failed compose save fails visibly and retries in memory, never durably queued. (A device-local crash-guard draft may restore into the editor only — parked A12.)
+- **Sync state is visible** ("N waiting to sync"); latency budget tap → keyboard ≤ ~1.5s; the capture shell is a precached client route; `serwist` (SW) is a **new dep needing approval** at phase start; the phase opens with a one-day on-device spike.
 
-- Owner is an authenticated Supabase user → policies `for all to authenticated using (true) with check (true)` on every table.
-- Anonymous (`anon`) may `select` only rows reachable as public: `canvases` where `visibility='public'`; `bits` that have a placement on a public canvas (or `visibility='public'`); `placements` whose canvas is public; `bit_tags`/`canvas_tags` for public rows; `tags` readable (flat labels, non-sensitive).
-- `shared` tier (password key) enforced later; until then only `private`/`public` exist and everything is `private` by default.
-- **Storage:** two buckets — `public`, `private`. Private objects served via signed URLs through `lib/storage` only. Never a private object in the public bucket. Storage RLS mirrors the above.
-- Service-role key: server-only, never `NEXT_PUBLIC_`, never in the client bundle.
-- **Verify:** logged out, hitting the REST endpoint with the anon key returns no private rows.
+## 7. The invariant → enforcement map (which rule lives where)
 
----
+Full list + "kept by" tags in `invariants.md`; this is where each lands in the build:
 
-## 4. Surfaces / routes
-
-| Route | Auth | Purpose |
-|---|---|---|
-| `/` | public-filtered | Home: a few random old fragments + recent captures (the return loop) |
-| `/capture` | owner | Instant capture: text + photo, optional quick tags. Precached, offline-capable |
-| `/api/capture` | capture-token | Endpoint for the iOS Shortcut (see §4b) |
-| `/c/[id]` | public-filtered | A canvas: collection view; canvas view; edit if owner (touch or mouse) |
-| `/pull` | public-filtered | Tag pull → grid of bit previews (`/pull?in=astrology,jupiter&out=theory&q=…`) |
-| `/b/[id]` | public-filtered | A bit: full view + edit; its backlinks (canvases it's on, tags it shares) |
-| `/tags` | owner | Tag manager (create/rename/merge/delete; renames need no data migration, I1) |
-| `/graph` | public-filtered | The connection graph (later, scoped) |
-| `/login` | public | Single-user sign-in |
-| `/export` | owner | Download everything |
-
-**public-filtered** = logged out sees only public rows; logged in sees all. Same component, different rows via RLS.
-
-## 4b. Capture (phase 2 — the critical path)
-
-- **Transport rule: media uploads go client → Supabase Storage directly** (authenticated + storage RLS), **never through a Vercel function** — serverless bodies cap at 4.5 MB (server actions default 1 MB); iPhone photos are 3–8 MB. This rule applies app-wide.
-- **iOS path is a Shortcut → `/api/capture`** (Web Share Target does not exist on iOS Safari). The Shortcut carries **no session cookie**, so it authenticates with a **bearer capture-token** (`CAPTURE_TOKEN` env; server route validates it, then uses the service-role client — a deliberate, narrow RLS bypass). Media: the Shortcut resizes before POST, or exchanges the token for a **signed upload URL**. Decide in the spike; convert HEIC explicitly in the Shortcut.
-- **Offline outbox — honest guarantee:** iOS has **no Background Sync**; queued captures (IndexedDB; photos as blobs) flush **when the app is next opened**, not in the background. Spec'd as such; never imply more.
-- **Sync state is visible:** "N waiting to sync" — no did-it-save anxiety.
-- **Latency budget: tap icon → keyboard up in ≤ ~1.5s.** The capture shell is a **precached client route** that renders without the server auth round-trip (the proxy guard's `getUser()` must not gate it when offline).
-- **Service worker:** requires `serwist` (or hand-rolled SW) — **new dependency, needs owner approval at phase 2 start.**
-- **First act of phase 2 is a one-day end-to-end spike** on the real iPhone: token flow, the 4.5 MB reality, tap→saved latency, paused-project behavior. Its findings shape the rest of the phase.
-
----
-
-## 5. Canvas + bits
-
-- **Two modes.** A canvas is first a **collection** (grouped bits, no positions — quick, works on any device). It becomes a **spatial canvas** when you place bits: a fixed-width coordinate space (`width`, default ~1200), landscape; below `width`, scale with `transform: scale()` — do not reflow.
-- **Capture never forces a board.** Capturing a bit creates a **bare bit — no placement**. A placement is created only when you drop a bit onto a board; a bit can live on zero boards.
-- **Compose targets: the Daylight (touch, landscape) and desktop** — *not* mouse-only. Phone = capture + browse, not compose. **Touch** drag/resize is a v1 requirement. **On phones, a board renders in collection mode** (a 1200-wide canvas at 390pt is a squint, not a view).
-- **Placement — one owner per gesture:** **`react-rnd` owns on-canvas drag *and* resize** (it does both; wiring dnd-kit to the same box double-handles pointer events). **`dnd-kit` owns pulling a fragment from the grid/tray onto a board.** Under `transform: scale()`, react-rnd's `scale` prop **must** be wired to the canvas scale or pixel deltas drift. Bring-to-front on select (persist `z`); autosave on release (debounce ~400ms). **No rotation in v1.**
-- **Undo/redo**, canvas-scoped, in-memory, last ~50 placement mutations (move/resize/add/delete); Cmd/Ctrl+Z / +Shift+Z; cleared on navigation.
-- **Bit types in v1:** `text` (Tiptap rich text, stored as HTML) and `image`. Others per the queue.
-- **Add-bit menu:** text, image (upload), and (later) doodle/audio/pdf/link, plus "insert existing bit" (search → place → new placement, live).
-- **Delete a placement:** select → Delete → removed, undoable, no confirm (I3). **Delete a bit:** from `/b/[id]` → **soft-delete to trash** (recoverable), naming how many boards it's on. Hard-delete only from trash (data safety, §10).
-
----
-
-## 6. Tagging
-
-- Tags are **tapped from the existing list only** — no free-text/syntax tag entry anywhere. Pickers order by recent use, then alphabetical.
-- Per-**bit** tags in v1; canvases taggable too. Adding/removing is one function, called from every path.
-- Tag manager (`/tags`): list with counts; rename (I1 makes it free); merge A→B (repoint `bit_tags`/`canvas_tags`, delete A, one transaction); delete (confirm with count; things survive).
-
----
-
-## 7. Pull (search + filter)
-
-- Filter by tags: a bit matches if it has **every** included tag and **none** excluded. State in the querystring (`in=`, `out=`, `q=`); the URL is the state; bookmarkable.
-- Full-text: Postgres FTS over bit text (`websearch_to_tsquery`), rank by `ts_rank` then `created_at desc`.
-- Result = **grid of bit preview units**: image → thumb; text → snippet; audio → player; link → card; pdf → first-page thumb. Auto-arranged (not a canvas). Empty result → a short sentence, never a spinner or blank.
-- Paginate (e.g. 60/pull, cursor on `(created_at, id)`); filters in the query, never client-side after fetch. Respects RLS automatically.
-
----
-
-## 8. Links, backlinks, graph (queue item 5)
-
-- A bit can link to another bit; the target shows its backlinks ("referenced by…"). Placements and shared tags are *implicit* backlinks surfaced on `/b/[id]` (canvases it's on; bits sharing its tags).
-- `/graph`: nodes = bits/canvases, edges = links + placements + shared tags; filterable by tag; for wandering, not querying.
-
----
-
-## 9. Media pipeline
-
-- **Images/doodles:** client-side before upload — reject > 25MB; read intrinsic `image_w/h`; downscale long edge ≤ 2400px → `storage_path`; 600px thumb → `thumb_path`; strip EXIF (canvas re-encode does this) and **honor EXIF orientation on decode**. **Encode: JPEG on iOS** (Safari cannot `toBlob('image/webp')` — this is known, not a runtime check); WebP where supported (Chrome/Android). HEIC via `<input type=file>` is auto-transcoded by iOS; HEIC via the Shortcut needs an explicit convert step (§4b). **Note: photo capture pulls this whole pipeline into phase 2**, including creating the storage buckets.
-- **Doodles (v1):** imported PNG, same pipeline. In-app finger-draw is later.
-- **PDF:** store as-is (`file_name`), reject > 50MB; render first page rasterised **once at insert** → stored image used as the bit's preview (pdf.js). Click → open full PDF new tab.
-- **Audio (v1):** attach file, store as-is, preview = a small player. In-app recording later.
-- **Columns hold storage paths, not URLs** — signed URLs are generated at read time by `lib/storage` (they expire; never persist them). All storage access goes through `lib/storage` so the backend can move to R2 later. Never call the Supabase storage SDK from a component.
-
----
-
-## 10. Operations
-
-- **Env** (`.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only), local-Supabase values for dev.
-- **Migrations:** `supabase/migrations/`, numbered, never edited after applying — new change = new file.
-- **Export & data safety** (from day one of real data): `/export` = a zip of one JSON per table (full rows) + every storage object. **The automated backup is a GitHub Actions nightly cron**: `pg_dump` + storage sync to a private repo artifact (or R2) — a Vercel Hobby cron would outgrow serverless duration/memory as media accumulates. **This cron doubles as the keep-alive ping: free-tier Supabase pauses after ~a week idle**, which would otherwise kill capture exactly when you return from a trip. **Soft-delete (trash)** for bits (`deleted_at`) — deletes are recoverable; hard-delete only from trash. Note the serverless size ceiling on `/export`; stream if large.
-- **Empty & loading states everywhere:** zero canvases, zero bits, empty pull, a bit that fails to load — each a short sentence, never a spinner-forever or blank screen. Skeletons on grids, progress on upload.
-
----
-
-## 11. Design constraints
-
-- Quiet, white/warm, fast. No brand/aesthetic decisions made for the owner — **except the browse/feed surface, whose presentation (image-forward, density, rhythm) must be deliberately designed, or "returning" fails.** Elsewhere, expression comes from the owner's own content. *Considered*-quiet, never careless-ugly. Layout inspiration: indie-web "vibes" pages.
-- One typeface set once. No gradients/shadows/accent colours/hero sections/emoji in UI unless the owner brings them. Violating this is a bug.
-
----
-
-## 12. Build sequence (CAPTURE-FIRST; mirrors `PROGRESS.md`)
-
-1. Foundation + **cloud Supabase + deploy** (so a phone can reach it) — critical path
-2. **Capture loop** — **first act: the one-day iOS end-to-end spike (§4b)**; then bare-fragment capture (text + photo), Shortcut → endpoint, offline outbox, visible sync state. **Pen-feel spike on the Daylight runs alongside** (one throwaway day — its outcome reshapes post-phase-6 plans).
-3. **Browse + resurface** — designed fragment grid (the **text preview card is the primary designed object** — the corpus is mostly text at first) + random-old-fragments on home
-4. **Fragment detail + edit + soft-delete + backlinks + automated backup (GH Actions cron)**
-5. **Tagging** — tap-existing + create-new; topic-pages; `kind` optional; tag-filter on grid; **an "untagged recent" strip on home** (else the topical web never gets fed)
-6. **Boards** — collection mode → canvas (model B, touch/landscape, no rotation); `stage` column added in this phase's migration
-7. **Stage + boards-by-stage / tending view**
-8. **Privacy tiers**
-9. Later/maybe: scoped graph, in-app pen (if the spike passed), audio/pdf, wrap-box
-
----
-
-## 13. Open questions
-
-- Exact iOS capture path to try first (Shortcut vs email-in vs paste).
-- Naming: adopt fragment/board (rename from bit/canvas)?
-- Stage: how many steps, named/numbered? Kind: fixed at the four?
-- New migration for `kind`/`stage` (not in the applied `init`).
+- **Database constraint** (physics — the DB refuses the write): I-P1 (visibility columns+defaults) · I-L1 (`UNIQUE(board,target)`) · I-L4/I-L9 (connector FKs + composite same-board key) · I-L6/I-L10 (destroy cascades) · I-R4 (vocabulary FKs) · I-R7 (`UNIQUE(tag,target)`) · I-D6 (case-insensitive unique) · the substance & target-pair CHECKs. *All attacked in `verification/attacks.sql`.*
+- **Generated / computed** (can't drift): I-R2 (the face) · I-G2/I-G3 (surfaces computed, one clock) · I-P2–P5 (the guest composition, as RLS) · I-L3/I-L5b/I-L8 (render rules, as views) · I-T1/I-T5 (the ledger & pull floors) · I-T4 (the three surface domains).
+- **The one door** (`lib/db`, enforced in one place): I-R1 (content write-guard) · I-R3 (captured-once title) · I-D1 (the `FOR SHARE` tombstone check + keep-by-default prompt) · I-D2/I-D3/I-D4 (births-only, no edit replay, born-at) · I-T2 (confirm-builders count the frozen) · I-T3 (vocabulary ops reach frozen rows) · **the un-place transaction** (stamp `left_at` + delete every connector touching the placement — from *or* to — together; guarded by the orphan tripwire) · I-G1 (export completeness) · I-G4 (only acts apply meaning) · I-W1 (un-place vs trash are two labeled acts on every removal surface).

@@ -1,0 +1,99 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import {
+  listTags,
+  getThingTags,
+  applyTag,
+  removeTag,
+  type Tag,
+  type TagChoice,
+  type TagTarget,
+} from "@/lib/db/tags";
+
+// The tag editor for a selected note OR the board itself (§3a — anything is
+// taggable; §3c — guided, never gating: tap an existing chip or type a new word;
+// tap a chip to remove it).
+export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: string }) {
+  const [supabase] = useState(() => createClient());
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [all, setAll] = useState<TagChoice[]>([]);
+  const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(true);
+  const targetId = "bitId" in target ? target.bitId : target.boardId;
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    Promise.all([getThingTags(supabase, target), listTags(supabase)])
+      .then(([bt, at]) => {
+        if (!alive) return;
+        setTags(bt);
+        setAll(at);
+        setLoading(false);
+      })
+      .catch(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetId, supabase]);
+
+  async function add(word: string) {
+    const w = word.trim();
+    setDraft("");
+    if (!w || tags.some((t) => t.word.toLowerCase() === w.toLowerCase())) return;
+    try {
+      const tag = await applyTag(supabase, { ...target, word: w });
+      setTags((ts) => (ts.some((t) => t.id === tag.id) ? ts : [...ts, tag]));
+      setAll((a) =>
+        a.some((x) => x.id === tag.id)
+          ? a
+          : [{ id: tag.id, word: tag.word, count: 1, lastUsed: new Date().toISOString() }, ...a],
+      );
+    } catch (e) {
+      console.error("tag failed:", e);
+    }
+  }
+
+  async function remove(tag: Tag) {
+    setTags((ts) => ts.filter((t) => t.id !== tag.id));
+    try {
+      await removeTag(supabase, { ...target, tagId: tag.id });
+    } catch (e) {
+      console.error("untag failed:", e);
+    }
+  }
+
+  const onBit = new Set(tags.map((t) => t.id));
+  const q = draft.trim().toLowerCase();
+  const suggestions = all
+    .filter((a) => !onBit.has(a.id) && (!q || a.word.toLowerCase().includes(q)))
+    .slice(0, 10);
+
+  return (
+    <div className="tag-bar" onPointerDown={(e) => e.stopPropagation()}>
+      <span className="tag-bar-label">{label}</span>
+      {tags.map((t) => (
+        <button key={t.id} className="tag-chip is-on" onClick={() => remove(t)} title="remove tag">
+          {t.word} <span aria-hidden>×</span>
+        </button>
+      ))}
+      <input
+        className="tag-bar-input"
+        value={draft}
+        placeholder={loading ? "loading…" : "type to tag · Enter to create"}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") add(draft);
+        }}
+      />
+      {suggestions.map((s) => (
+        <button key={s.id} className="tag-chip" onClick={() => add(s.word)} title="add tag">
+          {s.word}
+        </button>
+      ))}
+    </div>
+  );
+}

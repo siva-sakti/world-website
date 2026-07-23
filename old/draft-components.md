@@ -52,4 +52,4 @@
 ## The hardest part to hit (flagged early)
 Matching **Freeform's resize/drag smoothness in a browser** is the single toughest piece of the frontend. **tldraw** is the proof it's achievable and the first thing the research nails down — because if we can't get *close* to that feel, the compose surface won't satisfy, and we want to know early.
 
-*Related: `draft-highlevel.md` (the plan) · `SPEC.md` (detailed rules) · `draft-map.md` (status) · `PROGRESS.md` (decisions).*
+*Related: `highlevel.md` (the plan) · `SPEC.md` (detailed rules) · `map.md` (status) · `PROGRESS.md` (decisions).*

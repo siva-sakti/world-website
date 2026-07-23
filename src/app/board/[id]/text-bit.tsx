@@ -4,8 +4,8 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect } from "react";
 
-// A text bit's content: a Tiptap editor. Editable only while its card is in
-// edit mode; otherwise it's static text the card drags around.
+// A text bit's words: a Tiptap editor (stored as the bit's `body`). Editable
+// only while its card is in edit mode; otherwise it's static text the card drags.
 export function TextBit({
   html,
   editing,

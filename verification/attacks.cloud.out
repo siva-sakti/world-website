@@ -1,0 +1,54 @@
+BEGIN
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 1
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A1 unknown bit type
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A2 bit visibility 'shared' (v1)
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A3 text bit with a URL
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A4 drawing without strokes
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A5 image without storage_path
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A6 bookmark without URL
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A7 media facts on a text bit
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A8 board visibility 'shared' (v1)
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A9 tag on both a bit and a board at once
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A10 tag on nothing
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A11 same word twice on one bit
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A12 same word twice on one board
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A13 Retreat/retreat twin (tag)
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A14 category twin (owner-ruled)
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A15 subtype-word twin
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A16 placement with two targets
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A17 board placed on itself
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A18 x without y
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A19 display_size 'tiny'
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A20 second row, same bit + board
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A20b re-insert refused even after the card LEFT (re-place must reuse)
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A21 arrow to itself
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A22 cross-board arrow
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A23 arrow to a phantom card
+psql:verification/attacks.sql:235: NOTICE:  REFUSED ✓ A24 tagging with a phantom word
+DO
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C6 face: body-words · content overrides · clear reverts · captured title
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C6b bookmark with no captured title falls back to its URL (auth-walled Drive, S1)
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C6c search indexes ALL words (title + body + captured-title + URL); face stays the headline
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C7 tag_counts split: 1 in world + 1 in trash — "3 things + 2 in trash" made real
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C8 world hides trash · trash listing shows it · travel indifferent · restore instant
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ Cc arrow hides when an endpoint is trashed, is not destroyed, revives on restore
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C1 bit-destroy: placements + arrows + applications gone, nothing else touched
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C2 board-destroy: its arrangement gone, every bit untouched
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C3 word-delete sweeps in-world AND frozen; things survive
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C4 dissolve frees words (the DB blanks the slot itself)
+psql:verification/attacks.sql:395: NOTICE:  HOLDS ✓ C5 subtype delete: SET NULL reaches the frozen bit
+DO
+SET
+psql:verification/attacks.sql:413: NOTICE:  HOLDS ✓ C9 logged-out sees zero rows via RLS (public bits included — v1 wall)
+DO
+RESET
+ROLLBACK
+--- attacks.sql complete: every refusal refused, every assertion held ---

@@ -1,80 +1,449 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { createTextBit } from "@/lib/db/bits";
-import type { Bit, Board, PlacedBit } from "@/lib/types";
+import {
+  createTextBit,
+  createDrawingBit,
+  createImageBit,
+  updatePlacement,
+  updateBitBody,
+  updateBitContent,
+  unplaceBit,
+  trashBit,
+} from "@/lib/db/bits";
+import { uploadObject } from "@/lib/storage";
+import { importImage, MediaError } from "@/lib/media";
+import { strokesBounds } from "@/lib/stroke";
+import type { Drawing } from "@/lib/types";
+import { Card, type CardVM } from "./card";
+import { DrawOverlay } from "./draw-overlay";
+import { TagBar } from "./tag-bar";
 
-// v1 board: renders bits at their stored positions and can add a text bit.
-// Drag / resize / rotate (dnd-kit + react-rnd), undo, and viewport scaling are
-// the next step — deliberately not built until the DB is running so they can be
-// verified rather than guessed (see PROGRESS.md).
+const MAX_DISP = 320; // an image card's initial on-board width
+const MIN_ZOOM = 0.2;
+const MAX_ZOOM = 3;
+
+type Camera = { x: number; y: number; scale: number };
+
+// The board's compose surface, on real data, on an infinite canvas. Local state
+// drives the canvas for a snappy feel; every change mirrors to the database
+// (debounced) through the one door. A camera (pan + zoom) sits over an endless
+// world of cards — drag empty space to pan, scroll to zoom. Card coordinates are
+// world-space; creation/pen map screen → world so things land where you point.
 export function BoardSurface({
-  board,
-  placed,
+  boardId,
+  initialCards,
 }: {
-  board: Board;
-  placed: PlacedBit[];
+  boardId: string;
+  initialCards: CardVM[];
 }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
-  const [busy, setBusy] = useState(false);
+  const [cards, setCards] = useState<CardVM[]>(initialCards);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [drawMode, setDrawMode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" } | null>(null);
+  const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
+  const camRef = useRef(cam);
+  camRef.current = cam; // latest camera for imperative reads (wheel, pen)
 
-  async function addText() {
-    setBusy(true);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
+  const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
+  const [supabase] = useState(() => createClient());
+
+  // Debounced persistence: coalesce a card's rapid moves/keystrokes into one
+  // write per ~350ms, per card.
+  type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number };
+  const pending = useRef(
+    new Map<string, { bitId: string; placement: PlacementPatch; body?: string }>(),
+  );
+  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+
+  function onErr(e: unknown) {
+    console.error("board save failed:", e);
+    setError(
+      e instanceof MediaError
+        ? e.message
+        : "Couldn't save that — check your connection. Your work is still here.",
+    );
+  }
+
+  // ---- camera ----
+  function screenToWorld(clientX: number, clientY: number) {
+    const r = boardRef.current!.getBoundingClientRect();
+    const c = camRef.current;
+    return { x: (clientX - r.left - c.x) / c.scale, y: (clientY - r.top - c.y) / c.scale };
+  }
+
+  // Zoom toward the cursor (native listener so we can preventDefault the scroll).
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    function onWheel(e: WheelEvent) {
+      e.preventDefault();
+      const r = el!.getBoundingClientRect();
+      const px = e.clientX - r.left;
+      const py = e.clientY - r.top;
+      setCam((c) => {
+        const scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, c.scale * Math.exp(-e.deltaY * 0.0015)));
+        const k = scale / c.scale;
+        return { scale, x: px - (px - c.x) * k, y: py - (py - c.y) * k };
+      });
+    }
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // ---- persistence ----
+  function schedule(placementId: string, bitId: string, patch: Partial<CardVM>) {
+    const cur = pending.current.get(placementId) ?? { bitId, placement: {} };
+    if (patch.x !== undefined) cur.placement.x = patch.x;
+    if (patch.y !== undefined) cur.placement.y = patch.y;
+    if (patch.w !== undefined) cur.placement.width = patch.w;
+    if (patch.h !== undefined) cur.placement.height = patch.h;
+    if (patch.z !== undefined) cur.placement.z = patch.z;
+    if (patch.body !== undefined) cur.body = patch.body;
+    pending.current.set(placementId, cur);
+    const existing = timers.current.get(placementId);
+    if (existing) clearTimeout(existing);
+    timers.current.set(placementId, setTimeout(() => flush(placementId), 350));
+  }
+
+  async function flush(placementId: string) {
+    const p = pending.current.get(placementId);
+    pending.current.delete(placementId);
+    timers.current.delete(placementId);
+    if (!p) return;
     try {
-      const supabase = createClient();
-      await createTextBit(supabase, { boardId: board.id, text: "new note" });
-      startTransition(() => router.refresh());
-    } finally {
-      setBusy(false);
+      if (Object.keys(p.placement).length)
+        await updatePlacement(supabase, placementId, p.placement);
+      if (p.body !== undefined) await updateBitBody(supabase, p.bitId, p.body);
+    } catch (e) {
+      onErr(e);
     }
   }
 
-  return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-4">
-        <button
-          onClick={addText}
-          disabled={busy || pending}
-          className="text-sm underline underline-offset-4 hover:no-underline disabled:opacity-50"
-        >
-          add text
-        </button>
-      </div>
+  function patchCard(placementId: string, bitId: string, patch: Partial<CardVM>) {
+    setCards((cs) => cs.map((c) => (c.placementId === placementId ? { ...c, ...patch } : c)));
+    schedule(placementId, bitId, patch);
+  }
 
-      <div
-        className="relative border border-neutral-200"
-        style={{ width: board.width, minHeight: 640 }}
-      >
-        {placed.length === 0 && (
-          <p className="p-6 text-neutral-500">Empty board — add a text bit.</p>
+  function saveContent(placementId: string, bitId: string, value: string) {
+    setCards((cs) =>
+      cs.map((c) => (c.placementId === placementId ? { ...c, content: value.trim() || undefined } : c)),
+    );
+    updateBitContent(supabase, bitId, value).catch(onErr);
+  }
+
+  function nextZ() {
+    return cards.reduce((m, c) => Math.max(m, c.z), 0) + 1;
+  }
+
+  function select(placementId: string, bitId: string) {
+    setSelectedId(placementId);
+    patchCard(placementId, bitId, { z: nextZ() });
+  }
+
+  // ---- create ----
+  function createNote(x: number, y: number) {
+    const bitId = crypto.randomUUID();
+    const placementId = crypto.randomUUID();
+    const z = nextZ();
+    setCards((cs) => [
+      ...cs,
+      { placementId, bitId, type: "text", x, y, w: 240, h: 60, z, body: "<p></p>" },
+    ]);
+    setSelectedId(placementId);
+    setEditingId(placementId);
+    createTextBit(supabase, { bitId, placementId, boardId, body: "<p></p>", x, y, width: 240, z }).catch(onErr);
+  }
+
+  // Pen "Done": convert the session's strokes (screen space) into world space,
+  // bundle into ONE drawing bit at their bounding box (widths kept). Empty → nothing.
+  function finishDoodle(drawing: Drawing) {
+    setDrawMode(false);
+    if (!drawing.strokes.length) return;
+    const c = camRef.current;
+    const world = drawing.strokes.map((s) =>
+      s.map(([px, py, pr]) => [(px - c.x) / c.scale, (py - c.y) / c.scale, pr]),
+    );
+    const b = strokesBounds(world);
+    const w = Math.max(1, b.w);
+    const h = Math.max(1, b.h);
+    const rel = world.map((s) => s.map(([px, py, pr]) => [px - b.minX, py - b.minY, pr]));
+    const relDrawing: Drawing = { strokes: rel, sizes: drawing.sizes };
+    const bitId = crypto.randomUUID();
+    const placementId = crypto.randomUUID();
+    const z = nextZ();
+    setCards((cs) => [
+      ...cs,
+      { placementId, bitId, type: "drawing", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
+    ]);
+    setSelectedId(placementId);
+    createDrawingBit(supabase, {
+      bitId, placementId, boardId, drawing: relDrawing,
+      x: b.minX, y: b.minY, width: w, height: h, z,
+    })
+      .then(() => setWordsFor({ bitId, kind: "drawing" }))
+      .catch(onErr);
+  }
+
+  function importImageFile(file: File, wx: number, wy: number) {
+    const bitId = crypto.randomUUID();
+    const placementId = crypto.randomUUID();
+    importImage(file)
+      .then(async (img) => {
+        const dispScale = Math.min(1, MAX_DISP / img.width);
+        const w = Math.max(1, Math.round(img.width * dispScale));
+        const h = Math.max(1, Math.round(img.height * dispScale));
+        const z = nextZ();
+        const localUrl = URL.createObjectURL(img.blob);
+        setCards((cs) => [
+          ...cs,
+          { placementId, bitId, type: "image", x: wx, y: wy, w, h, z, imageUrl: localUrl },
+        ]);
+        setSelectedId(placementId);
+        const storagePath = `images/${bitId}.jpg`;
+        const thumbPath = `thumbs/${bitId}.jpg`;
+        await uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" });
+        await uploadObject(supabase, { path: thumbPath, body: img.thumb, contentType: "image/jpeg" });
+        await createImageBit(supabase, {
+          bitId, placementId, boardId, storagePath, thumbPath,
+          mediaWidth: img.width, mediaHeight: img.height,
+          mime: "image/jpeg", byteSize: img.blob.size, fileName: file.name,
+          x: wx, y: wy, width: w, height: h, z,
+        });
+        setWordsFor({ bitId, kind: "image" });
+      })
+      .catch((e) => {
+        setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        onErr(e);
+      });
+  }
+
+  function onBoardDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const w = screenToWorld(e.clientX, e.clientY);
+      importImageFile(file, w.x, w.y);
+    }
+  }
+
+  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const r = boardRef.current!.getBoundingClientRect();
+      const w = screenToWorld(r.left + 80, r.top + 120);
+      importImageFile(file, w.x, w.y);
+    }
+    e.target.value = "";
+  }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith("image/"));
+      if (file) {
+        const r = boardRef.current!.getBoundingClientRect();
+        const w = screenToWorld(r.left + 100, r.top + 140);
+        importImageFile(file, w.x, w.y);
+      }
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cards.length]);
+
+  // ---- pan + tap on empty space ----
+  function onBoardPointerDown(e: React.PointerEvent) {
+    if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
+    pan.current = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false };
+    setSelectedId(null);
+    setEditingId(null);
+  }
+
+  function onBoardPointerMove(e: React.PointerEvent) {
+    const p = pan.current;
+    if (!p) return;
+    const dx = e.clientX - p.sx;
+    const dy = e.clientY - p.sy;
+    if (!p.moved && Math.hypot(dx, dy) < 4) return;
+    p.moved = true;
+    setCam((c) => ({ ...c, x: p.cx + dx, y: p.cy + dy }));
+  }
+
+  function onBoardPointerUp(e: React.PointerEvent) {
+    const p = pan.current;
+    pan.current = null;
+    if (!p || p.moved) return; // a pan, not a tap
+    const w = screenToWorld(e.clientX, e.clientY);
+    const now = performance.now();
+    const prev = lastTap.current;
+    if (prev && now - prev.t < 340 && Math.hypot(w.x - prev.x, w.y - prev.y) < 28 / cam.scale) {
+      lastTap.current = null;
+      createNote(w.x, w.y);
+    } else {
+      lastTap.current = { t: now, x: w.x, y: w.y };
+    }
+  }
+
+  // ---- remove (I-W1: two distinct, labeled acts) ----
+  function clearCard(placementId: string) {
+    setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+    setSelectedId(null);
+    setEditingId(null);
+  }
+  // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
+  function unplaceSelected(placementId: string) {
+    clearCard(placementId);
+    unplaceBit(supabase, placementId).catch(onErr);
+  }
+  // Trash the whole bit — hidden everywhere, restorable from /trash.
+  function trashSelected(bitId: string) {
+    setCards((cs) => cs.filter((c) => c.bitId !== bitId));
+    setSelectedId(null);
+    setEditingId(null);
+    trashBit(supabase, bitId).catch(onErr);
+  }
+
+  function addNote() {
+    const r = boardRef.current?.getBoundingClientRect();
+    const w = r
+      ? screenToWorld(r.left + r.width / 2, r.top + Math.min(160, r.height / 2))
+      : { x: 40, y: 84 };
+    createNote(w.x, w.y);
+  }
+
+  const selectedBit = cards.find((c) => c.placementId === selectedId);
+
+  return (
+    <>
+      <div className="compose-toolbar">
+        <button className="compose-btn" onClick={addNote}>+ note</button>
+        <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
+        <button className="compose-btn" onClick={() => setDrawMode(true)}>✎ pen</button>
+        <span className="compose-zoom">
+          <button className="compose-btn" onClick={() => setCam({ x: 0, y: 0, scale: 1 })} title="reset view">
+            {Math.round(cam.scale * 100)}%
+          </button>
+        </span>
+        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+        {error && (
+          <span className="text-sm text-red-700">
+            {error} <button className="underline" onClick={() => setError(null)}>ok</button>
+          </span>
         )}
-        {placed.map((p) => (
-          <div
-            key={p.id}
-            className="absolute rounded-sm border border-neutral-200 bg-white p-3 text-sm"
-            style={{
-              // unplaced (collection-mode) placements render at origin for now;
-              // the collection view is queue item 6
-              left: p.x ?? 0,
-              top: p.y ?? 0,
-              width: p.w,
-              minHeight: p.h,
-            }}
-          >
-            <BitView bit={p.bit} />
-          </div>
-        ))}
       </div>
-    </div>
+      {selectedBit && (
+        <div className="selected-bar">
+          <TagBar key={selectedBit.bitId} target={{ bitId: selectedBit.bitId }} />
+          <div className="selected-actions">
+            <button
+              className="compose-btn subtle"
+              onClick={() => unplaceSelected(selectedBit.placementId)}
+              title="Take this card off this board — the note itself stays in your collection"
+            >
+              remove from board
+            </button>
+            <button
+              className="compose-btn subtle"
+              onClick={() => trashSelected(selectedBit.bitId)}
+              title="Move this note to the trash — hidden everywhere, restorable"
+            >
+              trash
+            </button>
+          </div>
+        </div>
+      )}
+      <div
+        ref={boardRef}
+        className={`compose-board${pan.current ? " is-panning" : ""}`}
+        onPointerDown={onBoardPointerDown}
+        onPointerMove={onBoardPointerMove}
+        onPointerUp={onBoardPointerUp}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onBoardDrop}
+      >
+        {cards.length === 0 && (
+          <p className="compose-empty">Tap &ldquo;+ note&rdquo;, or double-tap anywhere, to start.</p>
+        )}
+        <div
+          className="compose-world"
+          style={{
+            transform: `translate(${cam.x}px, ${cam.y}px) scale(${cam.scale})`,
+            transformOrigin: "0 0",
+          }}
+        >
+          {cards.map((c) => (
+            <Card
+              key={c.placementId}
+              card={c}
+              selected={selectedId === c.placementId}
+              editing={editingId === c.placementId}
+              scale={cam.scale}
+              onSelect={() => select(c.placementId, c.bitId)}
+              onEdit={() => {
+                setSelectedId(c.placementId);
+                setEditingId(c.placementId);
+              }}
+              onChange={(patch) => patchCard(c.placementId, c.bitId, patch)}
+              onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
+            />
+          ))}
+        </div>
+        {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
+        {wordsFor && (
+          <WordsOffer
+            key={wordsFor.bitId}
+            kind={wordsFor.kind}
+            onSave={(v) => {
+              const card = cards.find((c) => c.bitId === wordsFor.bitId);
+              if (card) saveContent(card.placementId, card.bitId, v);
+              else updateBitContent(supabase, wordsFor.bitId, v).catch(onErr);
+              setWordsFor(null);
+            }}
+            onSkip={() => setWordsFor(null)}
+          />
+        )}
+      </div>
+    </>
   );
 }
 
-function BitView({ bit }: { bit: Bit }) {
-  if (bit.type === "text") {
-    return <div className="whitespace-pre-wrap">{bit.text || "…"}</div>;
-  }
-  return <div className="text-neutral-400">[{bit.type}]</div>;
+// The one-line, one-tap-to-skip words offer (S5 — the highest-leverage
+// findability surface for a screenshot-heavy owner). Enter saves; skip is a tap.
+function WordsOffer({
+  kind,
+  onSave,
+  onSkip,
+}: {
+  kind: "image" | "drawing";
+  onSave: (v: string) => void;
+  onSkip: () => void;
+}) {
+  const [value, setValue] = useState("");
+  return (
+    <div className="compose-words-offer">
+      <input
+        autoFocus
+        value={value}
+        placeholder={
+          kind === "image"
+            ? "add a few words so you can find this image later?"
+            : "add a few words to make this drawing findable?"
+        }
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") value.trim() ? onSave(value) : onSkip();
+          if (e.key === "Escape") onSkip();
+        }}
+      />
+      <button className="compose-btn" onClick={() => (value.trim() ? onSave(value) : onSkip())}>
+        {value.trim() ? "save" : "skip"}
+      </button>
+    </div>
+  );
 }

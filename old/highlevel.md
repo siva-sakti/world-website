@@ -1,10 +1,10 @@
 # The Plan (High-Level)
 
-*The consolidated, evaluatable plan — objective, constraints, model, approach, build order, open questions. Sits between `draft-philosophy.md` (the **why**) and `SPEC.md` (the detailed **what**); `draft-map.md` tracks per-item status. Living draft.*
+*The consolidated, evaluatable plan — objective, constraints, model, approach, build order, open questions. Sits between `philosophy.md` (the **why**) and `SPEC.md` (the detailed **what**); `map.md` tracks per-item status. Living draft.*
 
 ## Objective
 
-A private, spatial notebook that **holds the flood of what you consume and think, and turns it into something you return to and grow** — instead of a flat pile you never reopen. It unites the **spatial freedom + doodle of paper**, the **memory / search / links of digital** (Obsidian), and enough **visual pleasure that you actually come back** (Pinterest / Tumblr). Built for how your brain works — visual, spatial, non-linear. A place to *think*, not a product. (Full why: `draft-philosophy.md`.)
+A private, spatial notebook that **holds the flood of what you consume and think, and turns it into something you return to and grow** — instead of a flat pile you never reopen. It unites the **spatial freedom + doodle of paper**, the **memory / search / links of digital** (Obsidian), and enough **visual pleasure that you actually come back** (Pinterest / Tumblr). Built for how your brain works — visual, spatial, non-linear. A place to *think*, not a product. (Full why: `philosophy.md`.)
 
 ## Constraints
 
