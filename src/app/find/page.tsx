@@ -2,21 +2,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { findBits, type FindResult } from "@/lib/db/find";
 import { listTags } from "@/lib/db/tags";
+import { bitLabel } from "@/lib/labels";
 import { logout } from "@/app/login/actions";
 import { SearchBox } from "./search-box";
 
 export const dynamic = "force-dynamic";
-
-const TYPE_FALLBACK: Record<string, string> = {
-  drawing: "✎ a drawing",
-  image: "🖼 an image",
-  bookmark: "🔖 a saved page",
-  text: "a note",
-};
-
-function faceOf(b: FindResult): string {
-  return b.face?.trim() || TYPE_FALLBACK[b.type] || "(untitled)";
-}
 
 export default async function FindPage({
   searchParams,
@@ -105,7 +95,7 @@ export default async function FindPage({
                 href={`/bit/${b.id}`}
                 className={`hover:underline underline-offset-4 ${b.face ? "" : "italic text-neutral-500"}`}
               >
-                {faceOf(b)}
+                {bitLabel(b.type, b.face)}
               </Link>
               <span className="flex shrink-0 items-baseline gap-2">
                 {b.tags.map((t) => (

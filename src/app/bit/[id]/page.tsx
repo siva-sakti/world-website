@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
+import { getThingTags } from "@/lib/db/tags";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
+import { bitLabel, boardLabel } from "@/lib/labels";
 import { logout } from "@/app/login/actions";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
-import type { Bit } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -26,23 +28,14 @@ export default async function BitPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: bit } = await supabase
-    .from("bit")
-    .select("*")
-    .eq("id", id)
-    .is("deleted_at", null)
-    .maybeSingle();
-  if (!bit) notFound();
-  const b = bit as Bit;
+  const b = await getBit(supabase, id);
+  if (!b) notFound();
 
-  const [tagRes, boardRes, travelRes] = await Promise.all([
-    supabase.from("tag_application").select("tag:tag(id, word)").eq("target_bit_id", id),
-    supabase.from("placement").select("board:board(id, title)").eq("target_bit_id", id).is("left_at", null),
-    supabase.from("bit_travel").select("board_id, board_title, arrived_at, left_at").eq("bit_id", id),
+  const [tags, boards, travel] = await Promise.all([
+    getThingTags(supabase, { bitId: id }),
+    getBitBoards(supabase, id),
+    getBitTravel(supabase, id),
   ]);
-  const tags = (tagRes.data ?? []).map((r) => r.tag as unknown as { id: string; word: string }).filter(Boolean);
-  const boards = (boardRes.data ?? []).map((r) => r.board as unknown as { id: string; title: string | null }).filter(Boolean);
-  const travel = (travelRes.data ?? []) as { board_id: string; board_title: string | null; arrived_at: string; left_at: string | null }[];
 
   let imageUrl: string | undefined;
   if (b.type === "image" && b.storage_path) {
@@ -55,7 +48,7 @@ export default async function BitPage({
   const drawing = b.type === "drawing" ? normalizeDrawing(b.strokes) : null;
   const dBounds = drawing ? strokesBounds(drawing.strokes) : null;
 
-  const heading = b.face?.trim() || (b.type === "text" ? "untitled note" : `a ${b.type}`);
+  const heading = bitLabel(b.type, b.face);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
@@ -130,7 +123,7 @@ export default async function BitPage({
             {boards.map((bd) => (
               <li key={bd.id}>
                 <Link href={`/board/${bd.id}`} className="underline underline-offset-4 hover:no-underline">
-                  {bd.title || "untitled board"}
+                  {boardLabel(bd.title)}
                 </Link>
               </li>
             ))}
@@ -144,7 +137,7 @@ export default async function BitPage({
         <ul className="space-y-1 text-sm text-neutral-600">
           {travel.map((t, i) => (
             <li key={i}>
-              <span className="text-neutral-800">{t.board_title || "untitled board"}</span>
+              <span className="text-neutral-800">{boardLabel(t.board_title)}</span>
               {" · arrived "}
               {fmt(t.arrived_at)}
               {t.left_at ? ` · left ${fmt(t.left_at)}` : " · here now"}

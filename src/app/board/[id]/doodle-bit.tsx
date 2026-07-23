@@ -1,9 +1,7 @@
 "use client";
 
-import { strokeToPath, strokesBounds } from "@/lib/stroke";
+import { strokeToPath, strokesBounds, INK } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
-
-const INK = "#1c1813";
 
 // A finished doodle: each stroke drawn as an SVG path at its own pen width. The
 // viewBox stays the ink's native size while the <svg> fills the card, so

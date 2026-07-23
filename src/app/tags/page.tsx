@@ -1,22 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { listManagedTags } from "@/lib/db/tags";
 import { logout } from "@/app/login/actions";
-import { TagManager, type ManagedTag } from "./tag-manager";
+import { TagManager } from "./tag-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function TagsPage() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("tag_counts")
-    .select("tag_id, word, world_count, trash_count")
-    .order("word");
-  const tags: ManagedTag[] = (data ?? []).map((r) => ({
-    id: r.tag_id as string,
-    word: r.word as string,
-    world: (r.world_count as number) ?? 0,
-    trash: (r.trash_count as number) ?? 0,
-  }));
+  const tags = await listManagedTags(supabase);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">

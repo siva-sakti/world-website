@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBoard, getBoardCards } from "@/lib/db/boards";
+import { getBitContents } from "@/lib/db/bits";
 import { normalizeDrawing } from "@/lib/stroke";
 import { signedUrl } from "@/lib/storage";
 import { logout } from "@/app/login/actions";
@@ -26,11 +27,7 @@ export default async function BoardPage({
   // The board_cards view exposes the computed face, not raw `content` — the
   // title editor needs the raw column, so fetch it in one indexed query.
   const bitIds = rows.filter((r) => r.target_bit_id).map((r) => r.target_bit_id!);
-  const contents = new Map<string, string | null>();
-  if (bitIds.length) {
-    const { data } = await supabase.from("bit").select("id,content").in("id", bitIds);
-    for (const b of data ?? []) contents.set(b.id, b.content);
-  }
+  const contents = await getBitContents(supabase, bitIds);
 
   // Map view rows to the client card model; images resolve a signed URL
   // (the 600px thumb where present — plenty at card size, faster to load).

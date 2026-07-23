@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { strokeToPath, PEN_WIDTHS, DEFAULT_PEN } from "@/lib/stroke";
+import { strokeToPath, PEN_WIDTHS, DEFAULT_PEN, INK } from "@/lib/stroke";
 import type { Stroke, Drawing } from "@/lib/types";
-
-const INK = "#1c1813";
 
 // Pen-mode draw surface. Live drawing paints onto a <canvas> (a bitmap),
 // throttled to one repaint per animation frame — the earlier per-sample SVG

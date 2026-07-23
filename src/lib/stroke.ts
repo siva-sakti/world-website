@@ -18,6 +18,9 @@ export const PEN_WIDTHS: { label: string; size: number }[] = [
   { label: "medium", size: 7 },
   { label: "bold", size: 13 },
 ];
+
+// The one pen/text ink color (mirrored as --ink in globals.css).
+export const INK = "#1c1813";
 export const DEFAULT_PEN = 7;
 
 // One stroke → one SVG path string (a single filled outline, not stacked blobs).

@@ -6,8 +6,6 @@ import {
   createTextBit,
   createDrawingBit,
   createImageBit,
-  updatePlacement,
-  updateBitBody,
   updateBitContent,
   unplaceBit,
   trashBit,
@@ -19,6 +17,8 @@ import type { Drawing } from "@/lib/types";
 import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
+import { WordsOffer } from "./words-offer";
+import { usePersistence } from "./use-persistence";
 
 const MAX_DISP = 320; // an image card's initial on-board width
 const MIN_ZOOM = 0.2;
@@ -55,22 +55,6 @@ export function BoardSurface({
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
 
-  // Debounced persistence: coalesce a card's rapid moves/keystrokes into one
-  // write per ~350ms, per card.
-  type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number };
-  const pending = useRef(
-    new Map<string, { bitId: string; placement: PlacementPatch; body?: string }>(),
-  );
-  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
-  // Each card's create promise — a debounced move/edit must wait for the row to
-  // exist before writing (a placement update to a not-yet-created row silently
-  // updates 0 rows, so the move would be lost).
-  const creates = useRef(new Map<string, Promise<unknown>>());
-  function trackCreate(placementId: string, p: Promise<unknown>) {
-    creates.current.set(placementId, p);
-    p.finally(() => creates.current.delete(placementId));
-  }
-
   function onErr(e: unknown) {
     console.error("board save failed:", e);
     setError(
@@ -79,6 +63,10 @@ export function BoardSurface({
         : "Couldn't save that — check your connection. Your work is still here.",
     );
   }
+
+  // Debounced persistence through the one door (moves/edits coalesced; a move
+  // waits for its card's create to land before writing).
+  const { patchCard, saveContent, trackCreate } = usePersistence(supabase, setCards, onErr);
 
   // ---- camera ----
   function screenToWorld(clientX: number, clientY: number) {
@@ -137,49 +125,6 @@ export function BoardSurface({
     if (initialCards.length) fitView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ---- persistence ----
-  function schedule(placementId: string, bitId: string, patch: Partial<CardVM>) {
-    const cur = pending.current.get(placementId) ?? { bitId, placement: {} };
-    if (patch.x !== undefined) cur.placement.x = patch.x;
-    if (patch.y !== undefined) cur.placement.y = patch.y;
-    if (patch.w !== undefined) cur.placement.width = patch.w;
-    if (patch.h !== undefined) cur.placement.height = patch.h;
-    if (patch.z !== undefined) cur.placement.z = patch.z;
-    if (patch.body !== undefined) cur.body = patch.body;
-    pending.current.set(placementId, cur);
-    const existing = timers.current.get(placementId);
-    if (existing) clearTimeout(existing);
-    timers.current.set(placementId, setTimeout(() => flush(placementId), 350));
-  }
-
-  async function flush(placementId: string) {
-    const p = pending.current.get(placementId);
-    pending.current.delete(placementId);
-    timers.current.delete(placementId);
-    if (!p) return;
-    const create = creates.current.get(placementId);
-    if (create) await create; // the row must exist before we update it
-    try {
-      if (Object.keys(p.placement).length)
-        await updatePlacement(supabase, placementId, p.placement);
-      if (p.body !== undefined) await updateBitBody(supabase, p.bitId, p.body);
-    } catch (e) {
-      onErr(e);
-    }
-  }
-
-  function patchCard(placementId: string, bitId: string, patch: Partial<CardVM>) {
-    setCards((cs) => cs.map((c) => (c.placementId === placementId ? { ...c, ...patch } : c)));
-    schedule(placementId, bitId, patch);
-  }
-
-  function saveContent(placementId: string, bitId: string, value: string) {
-    setCards((cs) =>
-      cs.map((c) => (c.placementId === placementId ? { ...c, content: value.trim() || undefined } : c)),
-    );
-    updateBitContent(supabase, bitId, value).catch(onErr);
-  }
 
   function nextZ() {
     return cards.reduce((m, c) => Math.max(m, c.z), 0) + 1;
@@ -472,40 +417,5 @@ export function BoardSurface({
         )}
       </div>
     </>
-  );
-}
-
-// The one-line, one-tap-to-skip words offer (S5 — the highest-leverage
-// findability surface for a screenshot-heavy owner). Enter saves; skip is a tap.
-function WordsOffer({
-  kind,
-  onSave,
-  onSkip,
-}: {
-  kind: "image" | "drawing";
-  onSave: (v: string) => void;
-  onSkip: () => void;
-}) {
-  const [value, setValue] = useState("");
-  return (
-    <div className="compose-words-offer">
-      <input
-        autoFocus
-        value={value}
-        placeholder={
-          kind === "image"
-            ? "add a few words so you can find this image later?"
-            : "add a few words to make this drawing findable?"
-        }
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") value.trim() ? onSave(value) : onSkip();
-          if (e.key === "Escape") onSkip();
-        }}
-      />
-      <button className="compose-btn" onClick={() => (value.trim() ? onSave(value) : onSkip())}>
-        {value.trim() ? "save" : "skip"}
-      </button>
-    </div>
   );
 }

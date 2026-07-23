@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listTrash } from "@/lib/db/boards";
+import { boardLabel } from "@/lib/labels";
 import { restoreBitAction, restoreBoardAction } from "@/app/actions";
 import { logout } from "@/app/login/actions";
 
@@ -41,7 +42,7 @@ export default async function TrashPage() {
           {items.map((it) => (
             <li key={`${it.thing}-${it.id}`} className="flex items-baseline justify-between gap-4 py-3">
               <span className={it.label ? "" : "italic text-neutral-500"}>
-                {it.label || (it.thing === "board" ? "untitled board" : "a note")}
+                {it.thing === "board" ? boardLabel(it.label) : it.label || "a note"}
                 <span className="ml-2 text-xs text-neutral-400">{it.thing}</span>
               </span>
               <form action={it.thing === "board" ? restoreBoardAction : restoreBitAction}>

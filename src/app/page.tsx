@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
+import { boardLabel } from "@/lib/labels";
 import { newBoard, trashBoardAction } from "./actions";
 import { logout } from "./login/actions";
 
@@ -56,7 +57,7 @@ export default async function Home() {
                 href={`/board/${c.id}`}
                 className="underline underline-offset-4 hover:no-underline"
               >
-                {c.title || "untitled board"}
+                {boardLabel(c.title)}
               </Link>
               <form action={trashBoardAction}>
                 <input type="hidden" name="id" value={c.id} />

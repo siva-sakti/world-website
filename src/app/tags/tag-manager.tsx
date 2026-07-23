@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { renameTag, mergeTags, deleteTag } from "@/lib/db/tags";
-
-export type ManagedTag = { id: string; word: string; world: number; trash: number };
+import { renameTag, mergeTags, deleteTag, type ManagedTag } from "@/lib/db/tags";
 
 // The tag manager (§3e): rename (free, follows everywhere), merge (dedupes by
 // construction), delete (with a count that reckons with the frozen — I-T2).

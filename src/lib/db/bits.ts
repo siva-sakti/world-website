@@ -161,3 +161,53 @@ export async function restoreBit(
     .eq("id", bitId);
   if (error) throw error;
 }
+
+// ---- reads (the bit page + the board's raw-content need) ----
+
+/** One bit for its page — null if missing or trashed. */
+export async function getBit(supabase: SupabaseClient, id: string): Promise<Bit | null> {
+  const { data } = await supabase
+    .from("bit").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
+  return (data as Bit) ?? null;
+}
+
+/** The boards a bit is on right now (placement present). */
+export async function getBitBoards(
+  supabase: SupabaseClient,
+  bitId: string,
+): Promise<{ id: string; title: string | null }[]> {
+  const { data, error } = await supabase
+    .from("placement").select("board:board(id, title)")
+    .eq("target_bit_id", bitId).is("left_at", null);
+  if (error) throw error;
+  return (data ?? [])
+    .map((r) => r.board as unknown as { id: string; title: string | null })
+    .filter(Boolean);
+}
+
+/** A bit's travel — every board it has visited, arrived/left (bit_travel view). */
+export type BitTravelLeg = {
+  board_id: string; board_title: string | null; arrived_at: string; left_at: string | null;
+};
+export async function getBitTravel(
+  supabase: SupabaseClient,
+  bitId: string,
+): Promise<BitTravelLeg[]> {
+  const { data, error } = await supabase
+    .from("bit_travel").select("board_id, board_title, arrived_at, left_at").eq("bit_id", bitId);
+  if (error) throw error;
+  return (data ?? []) as BitTravelLeg[];
+}
+
+/** Raw owner content for a set of bits — the board_cards view exposes only the
+ * computed face, but the title editor needs the raw column. */
+export async function getBitContents(
+  supabase: SupabaseClient,
+  ids: string[],
+): Promise<Map<string, string | null>> {
+  const out = new Map<string, string | null>();
+  if (!ids.length) return out;
+  const { data } = await supabase.from("bit").select("id, content").in("id", ids);
+  for (const b of data ?? []) out.set(b.id as string, (b.content as string | null) ?? null);
+  return out;
+}
