@@ -201,8 +201,11 @@ export function BoardSurface({
         setSelectedId(placementId);
         const storagePath = `images/${bitId}.jpg`;
         const thumbPath = `thumbs/${bitId}.jpg`;
-        await uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" });
-        await uploadObject(supabase, { path: thumbPath, body: img.thumb, contentType: "image/jpeg" });
+        // The two uploads are independent — send them together, not one-then-two.
+        await Promise.all([
+          uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" }),
+          uploadObject(supabase, { path: thumbPath, body: img.thumb, contentType: "image/jpeg" }),
+        ]);
         await createImageBit(supabase, {
           bitId, placementId, boardId, storagePath, thumbPath,
           mediaWidth: img.width, mediaHeight: img.height,

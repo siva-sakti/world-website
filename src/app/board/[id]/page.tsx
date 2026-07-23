@@ -29,39 +29,43 @@ export default async function BoardPage({
   const bitIds = rows.filter((r) => r.target_bit_id).map((r) => r.target_bit_id!);
   const contents = await getBitContents(supabase, bitIds);
 
-  // Map view rows to the client card model; images resolve a signed URL
-  // (the 600px thumb where present — plenty at card size, faster to load).
-  const cards: CardVM[] = [];
-  for (const r of rows) {
-    if (r.thing !== "bit" || !r.type) continue;
-    if (r.type !== "text" && r.type !== "drawing" && r.type !== "image") continue;
-    const type = r.type;
-    let imageUrl: string | undefined;
-    if (type === "image") {
-      const path = r.thumb_path ?? r.storage_path;
-      if (path) {
-        try {
-          imageUrl = await signedUrl(supabase, path);
-        } catch {
-          imageUrl = undefined;
+  // Map view rows to the client card model; images resolve a signed URL (the
+  // 600px thumb where present). Each row's URL is signed concurrently (Promise.all)
+  // — a board of photos would otherwise wait on N sequential storage round-trips.
+  const cards = (
+    await Promise.all(
+      rows.map(async (r): Promise<CardVM | null> => {
+        if (r.thing !== "bit" || !r.type) return null;
+        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image") return null;
+        const type = r.type;
+        let imageUrl: string | undefined;
+        if (type === "image") {
+          const path = r.thumb_path ?? r.storage_path;
+          if (path) {
+            try {
+              imageUrl = await signedUrl(supabase, path);
+            } catch {
+              imageUrl = undefined;
+            }
+          }
         }
-      }
-    }
-    cards.push({
-      placementId: r.placement_id,
-      bitId: r.target_bit_id!,
-      type,
-      x: r.x ?? 40,
-      y: r.y ?? 40,
-      w: r.width ?? (type === "text" ? 240 : 220),
-      h: r.height ?? (type === "text" ? 60 : 220),
-      z: r.z ?? 0,
-      body: r.body ?? undefined,
-      drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,
-      imageUrl,
-      content: contents.get(r.target_bit_id!) ?? undefined,
-    });
-  }
+        return {
+          placementId: r.placement_id,
+          bitId: r.target_bit_id!,
+          type,
+          x: r.x ?? 40,
+          y: r.y ?? 40,
+          w: r.width ?? (type === "text" ? 240 : 220),
+          h: r.height ?? (type === "text" ? 60 : 220),
+          z: r.z ?? 0,
+          body: r.body ?? undefined,
+          drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,
+          imageUrl,
+          content: contents.get(r.target_bit_id!) ?? undefined,
+        };
+      }),
+    )
+  ).filter((c): c is CardVM => c !== null);
 
   return (
     <main className="px-6 py-6">
