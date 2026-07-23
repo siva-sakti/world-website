@@ -48,6 +48,14 @@ body {
 }
 .compose-zoom {
   margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.compose-zoom-pct {
+  color: #a89f92;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 .compose-empty {
   position: absolute;
@@ -57,6 +65,29 @@ body {
   color: #a89f92;
   font-size: 14px;
   pointer-events: none;
+}
+.compose-converting {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #ece7de;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(60, 50, 35, 0.06);
+  color: #4a443c;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 20;
+}
+.compose-converting span {
+  color: #a89f92;
+  font-size: 12px;
 }
 .compose-card-inner {
   position: relative;

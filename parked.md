@@ -57,7 +57,7 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | # | thing | note | source |
 |---|---|---|---|
 | C1 | **Crop** (non-destructive) | needs an owner call: small dep (`react-easy-crop`) vs hand-built | D-016 / D-043 |
-| C2 | **HEIC support + unreadable-image message** | ⚠ reslotted to the **port batch** (2026-07-20): a *silent* failure violates the error-state norm — the message is one line, and the port rebuilds the media path anyway. (Full HEIC *conversion* stays a treat.) | PROGRESS |
+| C2 | ~~**HEIC support + unreadable-image message**~~ | ✅ **DONE (2026-07-23, D-091).** HEIC now converts client-side via `heic-to` (modern libheif) with a "Converting your photo…" notice; the one-line message survives as the fallback. Root cause of the old failure: `heic2any` bundled an ancient libheif that threw `ERR_LIBHEIF format not supported` on ordinary iPhone HEVC HEICs — proven on the owner's real file, then proven fixed on it. | PROGRESS |
 | C3 | **Rich-text formatting UI** (bubble menu; headings/bold/lists) | multi-*font* tension with the one-typeface stance = owner's explicit call | D-046 |
 | C4 | **Rotation** | cut from v1 (no approved lib) | D-023 |
 | C5 | **Wrap-box / text flowing around shapes** | the parked dream | D-044 · §6b |

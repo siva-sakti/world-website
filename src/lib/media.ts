@@ -20,26 +20,35 @@ export type ImportedImage = {
 const HEIC = /image\/hei[cf]/i;
 const IMAGE_EXT = /\.(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/i;
 
-// heic2any is an old UMD library that Turbopack's module interop mangles (the
-// `import()` came back as the wrong shape). It works flawlessly loaded as a
-// plain script (verified: it converts a real HEIC in ~280ms), so we load the
-// vendored dist on demand — only when a HEIC actually appears — via window.
-type Heic2Any = (o: { blob: Blob; toType?: string; quality?: number }) => Promise<Blob | Blob[]>;
-let heic2anyLoad: Promise<Heic2Any> | null = null;
-function loadHeic2any(): Promise<Heic2Any> {
-  const w = window as unknown as { heic2any?: Heic2Any };
-  if (w.heic2any) return Promise.resolve(w.heic2any);
-  if (heic2anyLoad) return heic2anyLoad;
-  heic2anyLoad = new Promise((resolve, reject) => {
+// Is this a HEIC/HEIF? Sync check (name + MIME, which HEICs often leave blank) —
+// the one source of truth for both the decoder path and the UI's "converting…"
+// notice, so they can never disagree.
+export function isHeic(file: File): boolean {
+  return HEIC.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+}
+
+// heic-to (a maintained wrapper over a CURRENT libheif) is the decoder. The old
+// heic2any bundled an ancient libheif that threw "ERR_LIBHEIF format not
+// supported" on ordinary iPhone HEVC HEICs — every real photo failed. We load
+// heic-to's IIFE build as a plain script (verified: it converts a real 12MP
+// iPhone HEIC to JPEG), on demand — only when a HEIC actually appears, so its
+// ~3MB never weighs on normal use. Its worker uses eval; fine with no CSP today.
+type HeicTo = (o: { blob: Blob; type?: string; quality?: number }) => Promise<Blob | Blob[]>;
+let heicLoad: Promise<HeicTo> | null = null;
+function loadHeicDecoder(): Promise<HeicTo> {
+  const w = window as unknown as { HeicTo?: HeicTo };
+  if (w.HeicTo) return Promise.resolve(w.HeicTo);
+  if (heicLoad) return heicLoad;
+  heicLoad = new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = "/vendor/heic2any.min.js";
+    s.src = "/vendor/heic-to.js";
     s.async = true;
     s.onload = () =>
-      w.heic2any ? resolve(w.heic2any) : reject(new Error("heic2any not present after load"));
+      w.HeicTo ? resolve(w.HeicTo) : reject(new Error("HeicTo not present after load"));
     s.onerror = () => reject(new Error("could not load the HEIC decoder script"));
     document.head.appendChild(s);
   });
-  return heic2anyLoad;
+  return heicLoad;
 }
 
 export async function importImage(file: File): Promise<ImportedImage> {
@@ -63,16 +72,15 @@ export async function importImage(file: File): Promise<ImportedImage> {
 }
 
 // Decode a file to a bitmap. HEIC (which Chrome + the Daylight can't read
-// natively) is first converted to JPEG by heic2any — loaded ONLY when a HEIC
-// actually appears (dynamic import, so its ~1.4MB never weighs on normal use).
+// natively) is first converted to JPEG by heic-to — loaded ONLY when a HEIC
+// actually appears (on-demand script, so its ~3MB never weighs on normal use).
 // Anything still undecodable throws the plain one-line message (C2).
 async function decodeToBitmap(file: File): Promise<ImageBitmap> {
-  const isHeic = HEIC.test(file.type) || /\.(heic|heif)$/i.test(file.name);
   let source: Blob = file;
-  if (isHeic) {
+  if (isHeic(file)) {
     try {
-      const convert = await loadHeic2any();
-      const out = await convert({ blob: file, toType: "image/jpeg", quality: 0.92 });
+      const convert = await loadHeicDecoder();
+      const out = await convert({ blob: file, type: "image/jpeg", quality: 0.92 });
       source = Array.isArray(out) ? out[0] : (out as Blob);
     } catch (e) {
       console.error("[media] HEIC conversion failed:", e); // real error in the browser console

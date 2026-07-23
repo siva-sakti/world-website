@@ -13,7 +13,7 @@ import {
   trashBit,
 } from "@/lib/db/bits";
 import { uploadObject } from "@/lib/storage";
-import { importImage, MediaError } from "@/lib/media";
+import { importImage, isHeic, MediaError } from "@/lib/media";
 import { strokesBounds } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
 import { Card, type CardVM } from "./card";
@@ -43,6 +43,7 @@ export function BoardSurface({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
   const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" } | null>(null);
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
   const camRef = useRef(cam);
@@ -95,6 +96,38 @@ export function BoardSurface({
     }
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // Frame every card in view — the "where am I?" rescue on an endless canvas.
+  // No cards → home to the origin. Never magnifies past 100%.
+  function fitView() {
+    const el = boardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (!cards.length) {
+      setCam({ x: 0, y: 0, scale: 1 });
+      return;
+    }
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const c of cards) {
+      minX = Math.min(minX, c.x);
+      minY = Math.min(minY, c.y);
+      maxX = Math.max(maxX, c.x + c.w);
+      maxY = Math.max(maxY, c.y + c.h);
+    }
+    const bw = Math.max(1, maxX - minX);
+    const bh = Math.max(1, maxY - minY);
+    const pad = 80;
+    const scale = Math.max(MIN_ZOOM, Math.min(1, (r.width - pad) / bw, (r.height - pad) / bh));
+    const cx = minX + bw / 2;
+    const cy = minY + bh / 2;
+    setCam({ x: r.width / 2 - cx * scale, y: r.height / 2 - cy * scale, scale });
+  }
+
+  // On open, frame the board's content so you never land on blank canvas.
+  useEffect(() => {
+    if (initialCards.length) fitView();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---- persistence ----
@@ -194,6 +227,9 @@ export function BoardSurface({
   function importImageFile(file: File, wx: number, wy: number) {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
+    // HEIC decoding takes a few seconds; only then does it show a notice.
+    const heic = isHeic(file);
+    if (heic) setConverting(true);
     importImage(file)
       .then(async (img) => {
         const dispScale = Math.min(1, MAX_DISP / img.width);
@@ -221,6 +257,9 @@ export function BoardSurface({
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
         onErr(e);
+      })
+      .finally(() => {
+        if (heic) setConverting(false);
       });
   }
 
@@ -326,9 +365,12 @@ export function BoardSurface({
         <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
         <button className="compose-btn" onClick={() => setDrawMode(true)}>✎ pen</button>
         <span className="compose-zoom">
-          <button className="compose-btn" onClick={() => setCam({ x: 0, y: 0, scale: 1 })} title="reset view">
-            {Math.round(cam.scale * 100)}%
+          <button className="compose-btn" onClick={fitView} title="Bring all your cards into view">
+            ⊹ fit
           </button>
+          <span className="compose-zoom-pct" title="current zoom">
+            {Math.round(cam.scale * 100)}%
+          </span>
         </span>
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
         {error && (
@@ -367,8 +409,14 @@ export function BoardSurface({
         onDragOver={(e) => e.preventDefault()}
         onDrop={onBoardDrop}
       >
-        {cards.length === 0 && (
+        {cards.length === 0 && !converting && (
           <p className="compose-empty">Tap &ldquo;+ note&rdquo;, or double-tap anywhere, to start.</p>
+        )}
+        {converting && (
+          <div className="compose-converting" role="status">
+            Converting your photo…
+            <span>HEICs take a few seconds</span>
+          </div>
         )}
         <div
           className="compose-world"
