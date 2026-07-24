@@ -67,6 +67,40 @@ body {
   font-size: 14px;
   pointer-events: none;
 }
+/* The graph surface — the deliberately-designed browse view. */
+.graph-canvas {
+  position: relative;
+  width: 100%;
+  height: calc(100dvh - 150px);
+  min-height: 380px;
+  background: #fffdfa;
+  border: 1px solid #ece7de;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.graph-legend {
+  position: absolute;
+  left: 16px;
+  bottom: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: #6b6257;
+  pointer-events: none;
+}
+.graph-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.graph-hint {
+  color: #b3a998;
+}
 .compose-converting {
   position: absolute;
   left: 50%;

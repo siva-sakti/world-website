@@ -36,6 +36,9 @@ export default async function FindPage({
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             tags
           </Link>
+          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            graph
+          </Link>
         </div>
         <form action={logout}>
           <button className="text-sm text-neutral-500 underline underline-offset-4 hover:no-underline">

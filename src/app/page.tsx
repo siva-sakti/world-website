@@ -22,6 +22,9 @@ export default async function Home() {
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             tags
           </Link>
+          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            graph
+          </Link>
           <Link href="/trash" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             trash
           </Link>

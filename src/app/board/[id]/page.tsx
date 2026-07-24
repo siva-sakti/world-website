@@ -80,6 +80,9 @@ export default async function BoardPage({
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             tags
           </Link>
+          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            graph
+          </Link>
         </span>
         <BoardTitle boardId={board.id} title={board.title} />
         <form action={logout} className="shrink-0">
