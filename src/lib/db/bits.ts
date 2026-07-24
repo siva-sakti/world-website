@@ -176,8 +176,11 @@ export async function getBitBoards(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<{ id: string; title: string | null }[]> {
+  // A placement links to board TWO ways (board_id = the board it's on;
+  // target_board_id = a board placed as a card). Name the FK so the embed isn't
+  // ambiguous — we want the board this bit sits on.
   const { data, error } = await supabase
-    .from("placement").select("board:board(id, title)")
+    .from("placement").select("board:board!placement_board_id_fkey(id, title)")
     .eq("target_bit_id", bitId).is("left_at", null);
   if (error) throw error;
   return (data ?? [])

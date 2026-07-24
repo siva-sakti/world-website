@@ -142,6 +142,12 @@ try {
     : fail("naive pattern didn't over-match as expected");
   await sb.from("tag").delete().in("id", [plain.data.id, pct.data.id]);
 
+  // bit-page guard: the "boards a bit is on" embed must name its FK — placement
+  // links to board TWO ways (board_id + target_board_id), so a bare board:board()
+  // embed errors "more than one relationship". This crashed the bit page.
+  r = await sb.from("placement").select("board:board!placement_board_id_fkey(id, title)").eq("target_bit_id", bitId).is("left_at", null);
+  (!r.error) ? ok("bit-page: getBitBoards embed is unambiguous (no crash)") : fail("getBitBoards embed error: " + r.error?.message);
+
   // --- increment 4: a drawing with per-stroke pen widths round-trips (jsonb) ---
   const drawId = crypto.randomUUID();
   const drawing = { strokes: [[[0, 0, 0.5], [10, 10, 0.6]]], sizes: [13] };
