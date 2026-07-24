@@ -51,6 +51,7 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | B6 | **`shared` visibility tier + the whole guest layer** (incl. publish preview shipping) | sharing phase | §2a |
 | B7 | **pdf · audio bit types** (+ their metadata-title faces) | later | §2a / §2b |
 | B8 | **Handwriting recognition** — strokes stored as vectors, "recognition-ready someday" | someday | §2a |
+| B9 | **Connections — gather + the reference graph** ("pull a bit into a thought" via `[[` · stored `reference` rows · "gathered into" surface · graph rebuilt on deliberate ties). **Parked 2026-07-24 (D-098) pre-revision** — plan drafted (`connections-build-plan.md`), fully reviewed, NOT built; **§6 stands unmodified**, the dormant ninth still sleeps. Owner intent on record: *"I do want this for sure"* + ruled **graph = read-only v1** | **the owner's word** (want-driven, not evidence-gated). Resumption procedure + all findings/questions: `connections-review-and-resumption-notes.md` — resume THERE, not from the plan alone | D-098 · §6 |
 
 ## C. Build-level treats (real, not next — D-053)
 
