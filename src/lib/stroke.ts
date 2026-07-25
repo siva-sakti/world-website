@@ -14,14 +14,26 @@ const OPTIONS = {
 
 // The pen widths the owner can pick (nib size feeds perfect-freehand's `size`).
 export const PEN_WIDTHS: { label: string; size: number }[] = [
+  { label: "extra fine", size: 1.8 },
   { label: "fine", size: 3.5 },
   { label: "medium", size: 7 },
-  { label: "bold", size: 13 },
+  { label: "bold", size: 12 },
+  { label: "extra bold", size: 20 },
 ];
 
-// The one pen/text ink color (mirrored as --ink in globals.css).
+// The one pen/text ink color (mirrored as --ink in globals.css); the default.
 export const INK = "#1c1813";
 export const DEFAULT_PEN = 7;
+
+// The pen colors — a quiet, natural, ink-like palette (the owner's expression).
+export const PEN_COLORS: { label: string; color: string }[] = [
+  { label: "ink", color: INK },
+  { label: "indigo", color: "#3b3f72" },
+  { label: "cerulean", color: "#2b6f8c" },
+  { label: "forest", color: "#4e6b4a" },
+  { label: "terracotta", color: "#9c5744" },
+  { label: "ochre", color: "#b07d2b" },
+];
 
 // One stroke → one SVG path string (a single filled outline, not stacked blobs).
 export function strokeToPath(points: Stroke, size: number = DEFAULT_PEN): string {
@@ -43,19 +55,23 @@ export function strokeToPath(points: Stroke, size: number = DEFAULT_PEN): string
 // bit.strokes was a bare Stroke[] (no per-stroke width → all DEFAULT_PEN).
 export function normalizeDrawing(raw: unknown): Drawing {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
-    const r = raw as { strokes?: Stroke[]; sizes?: number[] };
+    const r = raw as { strokes?: Stroke[]; sizes?: number[]; colors?: string[] };
     const strokes = Array.isArray(r.strokes) ? r.strokes : [];
     const sizes =
       Array.isArray(r.sizes) && r.sizes.length === strokes.length
         ? r.sizes
         : strokes.map(() => DEFAULT_PEN);
-    return { strokes, sizes };
+    const colors =
+      Array.isArray(r.colors) && r.colors.length === strokes.length
+        ? r.colors
+        : strokes.map(() => INK);
+    return { strokes, sizes, colors };
   }
   if (Array.isArray(raw)) {
     const strokes = raw as Stroke[];
-    return { strokes, sizes: strokes.map(() => DEFAULT_PEN) };
+    return { strokes, sizes: strokes.map(() => DEFAULT_PEN), colors: strokes.map(() => INK) };
   }
-  return { strokes: [], sizes: [] };
+  return { strokes: [], sizes: [], colors: [] };
 }
 
 // Bounding box of all points across strokes (in their own coord space).

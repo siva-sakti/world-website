@@ -63,7 +63,7 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | C4 | **Rotation** | cut from v1 (no approved lib) | D-023 |
 | C5 | **Wrap-box / text flowing around shapes** | the parked dream | D-044 · §6b |
 | C6 | **Infinite canvas camera** (pan/zoom) | additive wrapper; `screenToWorld()` centralization when it lands | D-048 |
-| C7 | **Pen types / colors** | one pen v1 | PROGRESS (pen model) |
+| C7 | ~~**Pen types / colors**~~ | ✅ **DONE (2026-07-25, D-099)** — per-stroke **color** (natural palette: ink · indigo · cerulean · forest · terracotta · ochre) + wider **size** range (extra-fine → extra-bold) + **eraser** (undo + drag-to-rub-out). Stored in the drawing jsonb (additive; old doodles default to ink; `normalizeDrawing` reads all shapes). | PROGRESS |
 | C8 | **JSON Canvas export** (interop) | optional idea from research | research-canvas.md |
 | C9 | **Handwritten board title — where the hand lives** | flagged at Checkpoint A (2026-07-21): "my hand on top, the typed shadow beneath" (§5) ruled the *look*, never the storage. Default lean: an ordinary drawing bit placed on the board (zero schema); a dedicated slot is additive if the port finds that wanting. Decide at the port, by feel | §5 · deliberations (D-083 feedback round) |
 

@@ -163,7 +163,7 @@ export function BoardSurface({
     const w = Math.max(1, b.w);
     const h = Math.max(1, b.h);
     const rel = world.map((s) => s.map(([px, py, pr]) => [px - b.minX, py - b.minY, pr]));
-    const relDrawing: Drawing = { strokes: rel, sizes: drawing.sizes };
+    const relDrawing: Drawing = { strokes: rel, sizes: drawing.sizes, colors: drawing.colors };
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     const z = nextZ();

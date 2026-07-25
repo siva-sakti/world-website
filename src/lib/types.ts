@@ -10,10 +10,11 @@ export type DisplaySize = "full" | "small";
 // A pen stroke = an ordered list of [x, y, pressure] points (vector, tiny).
 export type Point = number[];
 export type Stroke = Point[];
-// A drawing bit's ink: its strokes + a pen width per stroke (so one drawing can
-// mix fine and bold). Stored in bit.strokes (jsonb). Old drawings were a bare
-// Stroke[] — normalizeDrawing() reads both shapes.
-export type Drawing = { strokes: Stroke[]; sizes: number[] };
+// A drawing bit's ink: its strokes + a pen width AND color per stroke (so one
+// drawing can mix fine/bold and ink/indigo/etc). Stored in bit.strokes (jsonb).
+// Old drawings were a bare Stroke[] or lacked colors — normalizeDrawing() reads
+// all shapes (missing width → default; missing color → ink).
+export type Drawing = { strokes: Stroke[]; sizes: number[]; colors: string[] };
 
 /** A thing that exists (§7 "things"). */
 export type Bit = {

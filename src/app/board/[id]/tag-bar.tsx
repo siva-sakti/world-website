@@ -22,6 +22,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false); // suggestions collapse until you tap in
   const targetId = "bitId" in target ? target.bitId : target.boardId;
 
   useEffect(() => {
@@ -86,20 +87,34 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
           {t.word} <span aria-hidden>×</span>
         </button>
       ))}
-      <input
-        className="tag-bar-input"
-        value={draft}
-        placeholder={loading ? "loading…" : "type to tag · Enter to create"}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") add(draft);
-        }}
-      />
-      {suggestions.map((s) => (
-        <button key={s.id} className="tag-chip" onClick={() => add(s.word)} title="add tag">
-          {s.word}
-        </button>
-      ))}
+      <span className="tag-bar-field">
+        <input
+          className="tag-bar-input"
+          value={draft}
+          placeholder={loading ? "loading…" : "＋ tag"}
+          onChange={(e) => setDraft(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 120)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") add(draft);
+          }}
+        />
+        {focused && suggestions.length > 0 && (
+          <div className="tag-suggest">
+            {suggestions.map((s) => (
+              <button
+                key={s.id}
+                className="tag-chip"
+                onMouseDown={(e) => e.preventDefault()} // keep the input focused on pick
+                onClick={() => add(s.word)}
+                title="add tag"
+              >
+                {s.word}
+              </button>
+            ))}
+          </div>
+        )}
+      </span>
       {err && <span className="text-xs text-red-700">{err}</span>}
     </div>
   );

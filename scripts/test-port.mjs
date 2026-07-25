@@ -150,11 +150,11 @@ try {
 
   // --- increment 4: a drawing with per-stroke pen widths round-trips (jsonb) ---
   const drawId = crypto.randomUUID();
-  const drawing = { strokes: [[[0, 0, 0.5], [10, 10, 0.6]]], sizes: [13] };
+  const drawing = { strokes: [[[0, 0, 0.5], [10, 10, 0.6]]], sizes: [13], colors: ["#3b3f72"] };
   r = await sb.from("bit").insert({ id: drawId, type: "drawing", strokes: drawing }).select("strokes").single();
   if (r.error) fail("drawing insert: " + r.error.message);
-  else (r.data.strokes?.sizes?.[0] === 13 && r.data.strokes?.strokes?.length === 1)
-    ? ok("drawing stores strokes + per-stroke pen width (jsonb round-trip)")
+  else (r.data.strokes?.sizes?.[0] === 13 && r.data.strokes?.colors?.[0] === "#3b3f72" && r.data.strokes?.strokes?.length === 1)
+    ? ok("drawing stores strokes + per-stroke pen width AND color (jsonb round-trip)")
     : fail("drawing shape wrong: " + JSON.stringify(r.data.strokes));
   await sb.from("bit").delete().eq("id", drawId);
   ok("drawing test bit cleaned");

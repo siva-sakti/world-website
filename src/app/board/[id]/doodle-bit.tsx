@@ -25,7 +25,7 @@ export function DoodleBit({ drawing }: { drawing: Drawing }) {
       preserveAspectRatio="none"
     >
       {paths.map((d, i) => (
-        <path key={i} d={d} fill={INK} />
+        <path key={i} d={d} fill={drawing.colors[i] ?? INK} />
       ))}
     </svg>
   );
