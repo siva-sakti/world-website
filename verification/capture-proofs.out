@@ -1,0 +1,29 @@
+BEGIN
+INSERT 0 1
+psql:verification/capture-proofs.sql:67: NOTICE:  HOLDS ✓ 1 source round-trips off the bit row · export (direct select *) is free · the_inbox carries source, the_ledger's frozen select * does NOT (Slice-4 view-refresh flagged)
+DO
+ROLLBACK
+BEGIN
+psql:verification/capture-proofs.sql:113: NOTICE:  HOLDS ✓ 2a THE FLIP: a bookmark carrying a preview file is now ACCEPTED (was refused pre-migration)
+psql:verification/capture-proofs.sql:113: NOTICE:  REFUSED ✓ 2b text still refuses a stray storage_path
+psql:verification/capture-proofs.sql:113: NOTICE:  REFUSED ✓ 2c drawing still refuses a stray storage_path
+psql:verification/capture-proofs.sql:113: NOTICE:  REFUSED ✓ 2d image still refuses a stray url
+psql:verification/capture-proofs.sql:113: NOTICE:  REFUSED ✓ 2e bookmark still refuses a body (only storage_path was relaxed)
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 5
+UPDATE 1
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+INSERT 0 1
+psql:verification/capture-proofs.sql:171: NOTICE:  HOLDS ✓ 3 the_inbox = EXACTLY the loose set: never-placed IN · live-board OUT · un-placed IN · only-board-trashed IN (the hole) · trashed bit OUT
+DO
+UPDATE 1
+psql:verification/capture-proofs.sql:183: NOTICE:  HOLDS ✓ 3b restore the board → its bit leaves the inbox again (pure symmetry, nothing rebuilt)
+DO
+ROLLBACK
+--- capture-proofs.sql complete: source round-trips · the flip is surgical · the inbox is exactly the loose set ---

@@ -90,7 +90,7 @@ Non-destructive crop · full HEIC conversion · pen brushes/colours/eraser · **
 
 - **Stack:** Next.js (App Router, TS strict) · React · Supabase (Postgres/Storage/Auth) · Tailwind (layout only) · pre-approved libs `dnd-kit`, `react-rnd`, `tiptap`, `pdf.js`, `zod`, `perfect-freehand`. New deps need approval.
 - **Security = RLS, never the query layer.** Service-role key server-only. Storage via `lib/storage` + signed URLs. Only the owner ever has an account (the load-bearing wall).
-- **The schema (proven — `SPEC.md` §2):** the eight record kinds in three families — **things** `bit` · `board` · **acts** `tag_application` · `placement` · `connector` · **vocabulary** `tag` · `category` · `subtype_word` — plus the dormant ninth. Retrieval is computed (nine views); the face is a generated column; one clock, one trigger.
+- **The schema (proven — `SPEC.md` §2):** the eight record kinds in three families — **things** `bit` · `board` · **acts** `tag_application` · `placement` · `connector` · **vocabulary** `tag` · `category` · `subtype_word` — plus the dormant ninth and one derived index (`reference`). Retrieval is computed (ten views); the face is a generated column; one clock, one trigger.
 - **Naming:** the `lexicon.md` words. Code = `bit` + `board`; the owner's word *fragment* = bit; "canvas" = a board's spatial **mode**, never a synonym for a board.
 
 ---

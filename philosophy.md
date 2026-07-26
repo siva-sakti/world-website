@@ -32,7 +32,7 @@ Thoughts connect through what they **share** — a word, or a place:
 - **Tags** — what something is *about*. Tapped from what already exists, never typed as syntax. On every bit, and on the board itself. Every tag is automatically a gathering: pull the word, and everything that ever carried it is there.
 - **Boards** — thoughts placed together belong together; and because one bit can live on many boards, one thought can sit in many constellations at once.
 
-From these come the **web**: everything about an idea in one pull, and a **graph** I can wander — my bits and boards joined through the words and places they share, the whole shape of my thinking made visible. The knowledge is a connected web, not a pile. *(A direct thread from one thought to another may come someday — the first time I genuinely miss it. I haven't yet.)*
+From these come the **web**: everything about an idea in one pull, and a **graph** I can wander — my bits and boards joined through the words and places they share, the whole shape of my thinking made visible. The knowledge is a connected web, not a pile. **And now a third way, tied by hand:** as I write, I can draw a thread straight from this thought to another bit — *gathering* it into the sentence. So thoughts connect three ways: shared words, shared places, and threads I tie on purpose. <!-- placeholder (2026-07-25), spirit only — owner to rewrite in their own voice -->
 
 ## Returning is the point
 

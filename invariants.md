@@ -44,7 +44,7 @@
 - **I-R3 — Captured-once titles.** A bookmark's captured title is written exactly once, at save, then immutable — it is *truth* (storage test: not rebuildable from stored truth; the live page isn't ours). → `app`.
 - **I-R4 — Vocabulary is id-referenced.** Tag words, categories, subtype words are their own rows; everything points by id; a rename touches one row. → `constraint` (FKs).
 - **I-R5 — Vocabulary is not content.** Categories and subtype words are never taggable, placeable, or bits. → structural.
-- **I-R6 — Eight kinds, everywhere.** Storage map, lexicon, and export enumerate the same eight record kinds (+ the dormant table). → `app` + the I-G1 test.
+- **I-R6 — The stored kinds match everywhere.** Storage map, lexicon, and export enumerate the same set — the eight record kinds (+ the dormant table) **+ the `reference` derived index** (gather, §6 amendment; in the export per I-Ref7). → `app` + the I-G1 test.
 - **I-R7 — One application per (tag, thing).** At most one tag application of a given word on a given thing — so merge A→B *dedupes by construction* (closes the below-the-line "merge duplicates applications" finding). → `constraint` (`UNIQUE (tag, target)`).
 ## Cluster 4 — two devices & collisions · LOCKED (D-075)
 
@@ -66,3 +66,28 @@
 ## From the walkthrough · LOCKED (D-079, 2026-07-21)
 
 - **I-W1 — Un-place and trash are never one button.** Every removal surface presents them as two distinct, labeled acts — *"Remove from this board"* (this board only; confirms when arrows would die) vs *"Move to trash"* (the bit, everywhere; restorable) — never a lone ambiguous "Delete." The model keeps these acts safe (§2g); only a muddled menu can lose data, so the menu is bound here. → design + review on every removal surface.
+
+## Cluster 6 — capture: source & looseness · LOCKED (D-100)
+
+**Source (I-S):**
+- **I-S1 — Source is optional.** Any bit may carry `source_url`/`source_title`; both blank = self-made. → `constraint` (nullable columns; the substance rule never names them).
+- **I-S2 — Source is frozen at capture.** Read once when caught, never re-read — a dead or edited page can't change what you filed (same principle as a bookmark's captured title). → `app` (the one write path).
+- **I-S3 — A bookmark's source is itself.** A whole-page bookmark stores its title once (`captured_title`) and leaves `source_*` blank; only clips carry source. What shows as the source = `source_url` if present, else the bookmark's own `url`. → `app`.
+- **I-S4 — A bookmark may carry a preview; the target stays `url`.** A bookmark may hold a preview picture (`storage_path`) while `url` stays what it points at; the relaxation is surgical — the other three kinds still refuse a stray file. → `constraint` (the substance rule).
+
+**Looseness / the inbox / call-in (I-N):**
+- **I-N1 — Loose is computed, never stored.** A bit is loose ⇔ it is live **and** no board actually shows it (no un-departed placement on a non-trashed board — the exact rule boards already use). No flag, no column. → `computed`.
+- **I-N2 — The inbox is the loose surface.** Every loose bit appears in the inbox, newest-first; a computed surface, not saved state (loose bits' guaranteed way-back, as the ledger is for everything live). → `computed`.
+- **I-N3 — A bit whose only board is trashed is loose.** It returns to the inbox (its placement stays "not departed"; the board-not-trashed test catches it). By symmetry: un-placing a last board and trashing a last board both return it; restoring the board removes it — nothing to rebuild. → `computed`.
+- **I-N4 — Call-in reuses the membership row.** Putting a bit back on a board it once left **clears the departure** on the existing row (never a second — I-L1); a called-in bit lands where you drop it, center by default. → `app` + `constraint` (the existing `UNIQUE`).
+
+## Cluster 7 — gather: references · LOCKED (D-101)
+
+- **I-Ref1 — A reference is directed.** It goes from a source bit to a target bit; forward ("what this gathers") and backward ("gathered into") are one row read from two ends. → `constraint` (two columns, `from`/`to`).
+- **I-Ref2 — One tie per ordered pair.** At most one reference for a given (from, to); the same target mentioned twice in a body reconciles to one row (both chips still render); the reverse pair is a distinct tie. → `constraint` (`reference_once` unique).
+- **I-Ref3 — The source is a text bit.** Only writing originates a reference, so `from` is always a text bit — a CHECK can't see another row's type without a trigger, and the schema allows exactly the one `updated_at` trigger. → `app` (the one write door).
+- **I-Ref4 — References are grown from the body, never hand-authored.** The body is the single source of truth; the reference rows are its derived index, reconciled on save. There is no "delete a reference" act. → design + `app`.
+- **I-Ref5 — Removal is traceless.** Delete the chip and save; the row falls away, leaving no record it existed — like un-tagging. → `app` (reconcile-on-save).
+- **I-Ref6 — Destroy cascades both ways.** Destroying a bit removes every reference where it is the source *and* every one where it is the target; other bits are untouched. → `constraint` (`on delete cascade` on both columns).
+- **I-Ref7 — References are in the export.** A reference is a stored record kind, so it joins `/export` and the completeness check — or "you own everything" silently breaks (I-G1). → `app` + the I-G1 test.
+- **I-Ref8 — The chip caches the target's face for search/labels, refreshed lazily.** A chip stores a copy of the target's face so notes are findable by what they reference and list-labels read naturally; the copy self-heals on the note's next save/view — no rename fan-out. A **knowing carve to Principle 9** (agreements §1 carve / §6 amendment), recorded as a trade. → `app` (lazy reconcile-on-read).

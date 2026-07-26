@@ -16,7 +16,10 @@ export default async function Home() {
       <header className="mb-10 flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">world</h1>
         <div className="flex items-baseline gap-5 text-sm">
-          <Link href="/find" className="underline underline-offset-4 hover:no-underline">
+          <Link href="/inbox" className="underline underline-offset-4 hover:no-underline">
+            inbox
+          </Link>
+          <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             find
           </Link>
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">

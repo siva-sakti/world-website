@@ -78,6 +78,77 @@
 
 ---
 
+## Feature traces (added 2026-07-25 — the built model on paper, doubling as G2/G3 fixtures)
+
+*These extend the seven life scenes above with two feature-level record traces — **capture Slice 1** (applied, D-100) and **gather G1** (applied, D-101) — folded in when each checkpoint was recorded. Same trace style, same "no blank cells" discipline; they are also the capture-Slice/G2/G3 test fixtures.*
+
+### S8 — Capture: a clipped quote and the loose pile *(source · looseness · the inbox)*
+
+**The scene:** you clip a quote out of an article — it should remember *"from …"* and, since you're not in the mood to file it, land in a **loose pile** (the inbox) you can arrange later.
+
+**Grid A — a captured bit (a quote clipped from an article, carrying its source):**
+
+| step | what happens to the record |
+|---|---|
+| **create** | one **text bit**: `body` = the quote, `source_url` + `source_title` set and **frozen**. Born on no board → it's **loose**, so it shows in the inbox. |
+| **edit** | you rename it (write your own `content`) → its face becomes your words; **source is untouched** — a changed or dead page never rewrites what you filed. Editing the quote body edits the body only. |
+| **place / call-in** | you call it onto a board → one **placement** row (reusing the old membership row if it was ever there). Source travels on the bit itself — one bit, same source on every board. |
+| **un-place** | you take it off that board → the placement is marked *departed* (row **kept** as travel history); the bit returns to the inbox. Source unchanged. |
+| **trash** | you trash the **bit** → it vanishes from every board **and** from the inbox (trash is outside the world). Its source sits frozen on the row, ready to return. |
+| **restore** | you un-trash it → it comes back exactly, source intact; if it's on no live board, it's back in the inbox. |
+| **destroy** | you empty the trash → the bit row and its placements/tags/preview file are gone completely; the source dies with the row (it lived nowhere else). Nothing else is touched. |
+
+**Grid B — looseness (is the bit in the inbox?) — includes the trashed-board scene:**
+
+| step | in the inbox? |
+|---|---|
+| **create** (no board) | **IN.** A bit made without a board is loose immediately — this finally honors "the bit needs no board." |
+| **edit** | **unchanged.** Looseness is about boards, not words — editing never moves a bit in or out of the inbox. |
+| **place / call-in** (live board) | **OUT.** Now a board shows it, so it's not loose. |
+| **un-place** (its last board) | **IN, automatically.** Off its last board → loose again, nothing to set by hand. |
+| **trash the bit** | **OUT** (but restorable) — trashed things are outside the world. |
+| **trash its *only board*** *(the hole the review caught)* | **IN.** The board is trashed but the bit's placement still says "not departed"; the board-not-trashed test catches it and returns it to the inbox. |
+| **restore that board** | **OUT.** The board shows the bit again → it leaves the inbox. Pure symmetry, nothing rebuilt. |
+| **destroy the bit** | **gone** — not in the inbox, not anywhere. |
+
+**Verdict: FITS.** Both grids are proven by `verification/capture-proofs.sql` §3 (the inbox cases) and hold against the existing placement/trash rules (the rest). Invariants **I-S1–I-S4 · I-N1–I-N4**.
+
+### S9 — Gather: a tie through its life *(reference · gathered-into · the lazy label)*
+
+**The scene:** while writing a thought you type `[[`, pick a doodle, and a **chip** drops into the sentence; later, standing on the doodle, its page shows **"gathered into: [that thought]"** for free.
+
+**Grid A — a gathered tie, through every step** ("the thought" is a text bit; "the doodle" is the bit it gathers):
+
+| step | what happens to the record |
+|---|---|
+| **gather a bit** | inside the thought's writing you type `[[`, pick the doodle → a chip drops into the sentence. On **save**, the app reads the chips and makes the references match → **one `reference` row**: `from` = the thought, `to` = the doodle, `when` = now. |
+| **remove the chip** | you delete the chip and save → the reconcile sees it is gone → **the row falls away, traceless.** No "delete a reference" button ever existed; you edit your writing, the index follows. |
+| **rename the target** | you rename the doodle → **nothing rewrites anywhere.** The doodle's own page and any card show the new name **live**; a thought that references it and that you *haven't opened* still shows the **old** name in its list-label until you next open or save it — then it **self-heals**. The `reference` row is unchanged (it only ever held ids). |
+| **trash the target** | you trash the doodle → its "gathered into" and its chips **hide** (trash is outside the world), but **the `reference` row stays** — a freeze, not an erase. The chip in your thought shows a muted "(removed)" until you edit. |
+| **restore the target** | you un-trash the doodle → everything comes back exactly; the row was never gone, so "gathered into" is whole again with nothing to rebuild. |
+| **destroy the target** | you empty the trash → the doodle's row is gone, and **every reference pointing at it cascades away** (proven, gather-proofs §4). The dead id may sit in the thought's HTML until you next edit it; the chip renders "(removed)", and the next save drops the dead id (which the database would reject anyway — proven §5). |
+| **trash / restore the source thought** | trashing the thought hides it (so it stops appearing under the doodle's "gathered into," which only lists live sources); the `reference` row is kept, and restoring brings it back. |
+
+**Grid B — a mixed-sentence thought through the pull (the lazy-label window, seen not felt later):** *"For the retreat, remember — see `[[fire doodle]]` for the order of the ceremony."*
+
+| where you look | what you see, and why |
+|---|---|
+| **the thought's own page / a board card** | the chip resolves the doodle's face **live** → *"see **fire doodle** for the order."* Always current — rich surfaces look the id up fresh. |
+| **the doodle's page** ("gathered into") | lists this thought as a source (its face, click to jump back). Free — computed from the `reference` row's other end. |
+| **find / the `[[` picker (list-labels)** | these read the **stored copy** of the name inside the note → the thought is **findable by typing "fire doodle."** |
+| **the lazy-lag window (the honest part)** | rename "fire doodle" → "ceremony sketch," then look at a referencing thought *without opening it*: its list-label still says "fire doodle" and it's briefly unfindable by the new name — **until you next open or save it**, which heals it. Usually current; always self-heals on touch; may lag on untouched notes. |
+
+**Grid C — two devices (free coherence):**
+
+| step | what happens |
+|---|---|
+| **edit the same thought on phone and laptop** | the body is resolved **last-arrival-wins, whole-record** (the existing §2d rule) — one body wins. |
+| **the references** | because references are **grown from the winning body** on save, they can never disagree with it — the losing edit's chips simply aren't in the body that won, so they aren't in the index. **Free coherence, nothing special to reconcile.** |
+
+**Verdict: FITS.** Grid A's destroy/cascade + FK cells are proven by `verification/gather-proofs.sql` (§4–5); round-trip and directedness by §1; the owner-only wall by §6. The rename/lazy-label and two-device cells are **design consequences** (built at G2/G3), traced here so the model is whole on paper. Invariants **I-Ref1–I-Ref8**.
+
+---
+
 ## Watch-list results (parked.md A2 · A1 · A10)
 
 - **A2 (pairwise link): no trip.** Every relatedness in the owner's material had a natural shared room or word (diagram↔section: same board; TCM↔article: a tag). No board-of-two, no single-use tag.

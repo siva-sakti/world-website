@@ -452,3 +452,148 @@ body {
   max-width: calc(100vw - 24px);
   gap: 8px;
 }
+
+/* ── the inbox — the loose pile, a deliberately-designed browse surface (D-100) ── */
+.inbox-quickadd {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.inbox-quickadd-input {
+  flex: 1;
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 1px solid #e2ddd2;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: var(--ink);
+  outline: none;
+}
+.inbox-quickadd-input::placeholder {
+  color: #b7aea0;
+}
+.inbox-quickadd-input:focus {
+  border-color: #365a8c;
+  box-shadow: 0 0 0 3px rgba(54, 90, 140, 0.1);
+}
+.inbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.inbox-card {
+  display: flex;
+  flex-direction: column;
+  background: #fffdfa;
+  border: 1px solid #ece7de;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+}
+.inbox-card:hover {
+  border-color: #d8d2c6;
+  box-shadow: 0 4px 14px rgba(60, 50, 35, 0.08);
+  transform: translateY(-1px);
+}
+.inbox-card-body {
+  display: flex;
+  flex: 1;
+  min-height: 92px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.inbox-card-media {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  background: #f3efe7;
+}
+.inbox-card-media--empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 150px;
+  color: #b7aea0;
+  font-size: 13px;
+}
+.inbox-card-bookmark,
+.inbox-card-note {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px;
+  width: 100%;
+}
+.inbox-card-note--drawing {
+  background: #fbfaf6;
+}
+.inbox-card-site {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #8a8175;
+}
+.inbox-card-favicon {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+}
+.inbox-card-title,
+.inbox-card-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.inbox-card-title {
+  -webkit-line-clamp: 3;
+}
+.inbox-card-text {
+  -webkit-line-clamp: 5;
+  color: #3a352d;
+}
+.inbox-card-text--empty {
+  color: #b7aea0;
+  font-style: italic;
+}
+.inbox-card-kind {
+  font-size: 12px;
+  color: #a89f92;
+}
+.inbox-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  border-top: 1px solid #f1ece3;
+  font-size: 12px;
+}
+.inbox-card-open {
+  color: #365a8c;
+  text-decoration: none;
+}
+.inbox-card-open:hover {
+  text-decoration: underline;
+}
+.inbox-card-kind-tag {
+  color: #b3a998;
+}
+.inbox-card-trash {
+  color: #b3a998;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+}
+.inbox-card:hover .inbox-card-trash {
+  opacity: 1;
+}
+.inbox-card-trash:hover {
+  color: #9c5744;
+}

@@ -24,12 +24,12 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 
 | # | parked thing | re-entry condition | source |
 |---|---|---|---|
-| A1 | **Document mode** — a board rendered as a vertical text-first flow | the text-forward want shows up in real use; entry gate = the pre-designed checklist (split/merge semantics · bit-birth-at-enter · mode permanence) | §6b |
-| A2 | **The pairwise link** — a direct bit↔bit tie (the dormant table) | the first real miss: standing on a bit, another belongs with it, no shared tag feels true, no board feels warranted (symptoms: a board-of-two, a single-use tag) → built that week, small + symmetric | §6 |
+| A1 | **Document mode** — a board rendered as a vertical text-first flow | ✅ **RE-ENTRY FIRED BY OWNER 2026-07-25** — pulled into v1 (Plan E, last slot in the A→B→D→C→E queue). **The entry gate is honored, not skipped:** Plan E *opens* with the §6b design round (split/merge semantics · bit-birth-at-enter · mode permanence) before any build. Plan written fresh at its start (anti-staleness rule) | §6b |
+| A2 | **The pairwise link** — a direct bit↔bit tie (the dormant table) | the first real miss: standing on a bit, another belongs with it, no shared tag feels true, no board feels warranted (symptoms: a board-of-two, a single-use tag) → built that week, small + symmetric. **UNCHANGED by gather (2026-07-25, D-101):** gather's `reference` is *directed and grown from writing* — it does **not** cover A2's *symmetric, writing-less* pair-tie (two doodles that relate with no sentence to hang the tie on); the dormant table keeps sleeping under this condition (§6 amendment). *(Contrast A6, which capture absorbed.)* | §6 |
 | A3 | **Contextual bit-privacy** — born in a private board → born private | publish previews prove tedious in real use | §2a |
 | A4 | **Guest-pull scope** — "open to them" = globally-public vs share-scoped | decide when sharing is real; principle already ruled (a tag opens nothing) | §4 |
 | A5 | **Board-side history** — "everything ever placed here" | the first time you stand on a board wondering what left it | §5 / I-T6 |
-| A6 | **Loose-bits drawer** — a "not on any board" filter in find | if wanted; the reachability floor (the ledger) doesn't need it | §7 |
+| A6 | **Loose-bits drawer** — a "not on any board" filter in find | ✅ **ABSORBED (2026-07-25, D-100)** — **the inbox *is* the loose surface** (every live bit no board shows, newest-first, computed as `the_inbox`); supersedes the "if wanted" note. *Quick-add (jot a note / paste a link → born loose) lands with the inbox in capture Slice 2.* | §7 / capture-slice1-checkpoint-A.md |
 | A7 | **Visit-by-visit travel timeline** — full entry/exit log per board | additive later; v1 keeps the durable membership row only (last departure overwritten on re-place) | §2c |
 | A8 | **Multi-home categories** — one tag word in 2+ categories | if one-home-per-tag ever genuinely blocks | §3b |
 | A9 | **`stage` / ordered board maturity** | if genuinely missed; meanwhile maturity rides ordinary tags (`#seed`, `#fruit`) | §5 / D-070 |
@@ -38,6 +38,10 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | A12 | **Crash-guard draft** — device-local editor restore after a crash | additive anytime; must restore *into the editor* only — never auto-replay to the DB (I-D3) | §2h |
 | A13 | **Dedicated speak-button** for dictation | only if the keyboard-mic two-tap path proves slow | §2b |
 | A14 | **Video as a stored type** — v1+ answer: video = a *reference* (bookmark to Drive/YouTube; the owner's own want, D-079/S1). Storing files means real infrastructure: transcoding for cross-browser playback (iPhone HEVC won't play in Chrome/Daylight), 100MB–1GB files, bandwidth cost | the day a video feels like a *bit* — something to place, tag, grow on a board rather than point at — or a linked video dies and it hurts. Additive when it fires: a `video` type = the same two-halves storage as images, no rework | D-079 · §2a |
+| A15 | **Board-gathering** — gathering a bit *into a board* (not just from writing) | named now so it can't surprise: if it ever fires, `to_bit_id` becomes the house exactly-one-target pair (`to_bit_id`/`to_board_id` + a CHECK) — a small migration then, no rework | gather-g1-checkpoint-A §9 |
+| A16 | **Active rename-propagation** — fan-out rewriting every referencing note when a gathered bit is renamed | rejected in the Principle 9 carve (the chip self-heals lazily instead — §6 amendment / I-Ref8); re-enter only if the lazy staleness ever genuinely annoys | gather §7/§9 |
+| A17 | **"(removed)" reveals a trashed bit exists** — a muted chip shows that a referenced bit is trashed | fine owner-only now; revisit at the sharing phase (a guest must not learn a withheld thing exists) | gather §9 |
+| A18 | **Storage format for word-forward writing** (Markdown vs HTML) | decided *with* document mode (A1 / Plan E); gather is built format-agnostic so it carries over either way | gather §9 / §6b |
 
 ## B. Phase-scheduled promises — deferred by choice to a named phase (re-blessed by the owner)
 
@@ -49,9 +53,9 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | B4 | **Doodled home** — a hand-made home board | build-it-yourself anytime; it's just another board | §5a |
 | B5 | **The graph view** — local-neighborhood first; `react-force-graph` needs dep approval | Phase 3 | D-054 · lexicon |
 | B6 | **`shared` visibility tier + the whole guest layer** (incl. publish preview shipping) | sharing phase | §2a |
-| B7 | **pdf · audio bit types** (+ their metadata-title faces) | later | §2a / §2b |
+| B7 | **pdf · audio bit types** (+ their metadata-title faces) | ✅ **FIRED BY OWNER 2026-07-25** — voice memos + PDFs are v1 (Plan C: the media-types migration round — two new types + face/substance/search branches + **search-by-source**, absorbed from the capture plan's deferred list). Plan written fresh at its start | §2a / §2b |
 | B8 | **Handwriting recognition** — strokes stored as vectors, "recognition-ready someday" | someday | §2a |
-| B9 | **Connections — gather + the reference graph** ("pull a bit into a thought" via `[[` · stored `reference` rows · "gathered into" surface · graph rebuilt on deliberate ties). **Parked 2026-07-24 (D-098) pre-revision** — plan drafted (`connections-build-plan.md`), fully reviewed, NOT built; **§6 stands unmodified**, the dormant ninth still sleeps. Owner intent on record: *"I do want this for sure"* + ruled **graph = read-only v1** | **the owner's word** (want-driven, not evidence-gated). Resumption procedure + all findings/questions: `connections-review-and-resumption-notes.md` — resume THERE, not from the plan alone | D-098 · §6 |
+| B9 | **Connections — gather + the reference graph.** ✅ **HALF-FIRED BY OWNER 2026-07-25 — the split the owner actually meant:** yesterday's "retire graph view" had parked *both* halves; the owner clarified they want the **linking**. **Gather (stages 1–4: `[[` · `reference` rows · "gathered into") returns to v1 as Plan B**, per the resumption procedure in `connections-review-and-resumption-notes.md`. **The graph *picture* (stage 5) stays parked** — its one open decision (layers vs swap) waits with it | graph picture: the owner's word. Everything else: in v1 now | D-098 · §6 |
 
 ## C. Build-level treats (real, not next — D-053)
 

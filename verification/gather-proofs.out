@@ -1,0 +1,46 @@
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+psql:verification/gather-proofs.sql:77: NOTICE:  HOLDS ✓ 1 reference round-trips off its row · export (direct select *) is free · the reverse pair is a distinct directed tie · the DB does NOT enforce "from is text" (app-layer guard, by design)
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+psql:verification/gather-proofs.sql:96: NOTICE:  REFUSED ✓ 2 reference_not_self: a bit cannot gather itself
+DO
+ROLLBACK
+BEGIN
+INSERT 0 2
+INSERT 0 1
+psql:verification/gather-proofs.sql:122: NOTICE:  REFUSED ✓ 3 reference_once: the same target mentioned twice reconciles to ONE row
+DO
+ROLLBACK
+BEGIN
+INSERT 0 3
+INSERT 0 2
+psql:verification/gather-proofs.sql:155: NOTICE:  HOLDS ✓ 4 destroy a bit → its references vanish BOTH ways (as from and as to); other bits untouched
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+psql:verification/gather-proofs.sql:183: NOTICE:  REFUSED ✓ 5 a reference to a phantom TARGET is FK-rejected (derive-on-save can skip dead ids safely)
+psql:verification/gather-proofs.sql:183: NOTICE:  REFUSED ✓ 5b a reference from a phantom SOURCE is FK-rejected
+DO
+ROLLBACK
+BEGIN
+INSERT 0 2
+INSERT 0 1
+SET
+SET
+psql:verification/gather-proofs.sql:209: NOTICE:  HOLDS ✓ 6 owner (jwt sub = owner uid) reads all reference rows
+DO
+RESET
+SET
+SET
+psql:verification/gather-proofs.sql:228: NOTICE:  REFUSED ✓ 6b a stranger uid cannot write a reference (WITH CHECK owner clause)
+psql:verification/gather-proofs.sql:228: NOTICE:  HOLDS ✓ 6 a stranger uid reads zero reference rows (owner-scoped wall)
+DO
+RESET
+ROLLBACK
+--- gather-proofs.sql complete: reference round-trips (directed) · not-self + once refused · cascade both ways · phantom endpoints rejected · owner-scoped RLS holds ---
