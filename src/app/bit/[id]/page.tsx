@@ -2,12 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
-import { getThingTags } from "@/lib/db/tags";
+import { getBitSource } from "@/lib/db/sources";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
 import { logout } from "@/app/login/actions";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
+import { TagBar } from "@/app/board/[id]/tag-bar";
+import { SourcePicker } from "@/app/board/[id]/source-picker";
+import { TextWorkspace } from "./text-workspace";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +34,10 @@ export default async function BitPage({
   const b = await getBit(supabase, id);
   if (!b) notFound();
 
-  const [tags, boards, travel] = await Promise.all([
-    getThingTags(supabase, { bitId: id }),
+  const [boards, travel, source] = await Promise.all([
     getBitBoards(supabase, id),
     getBitTravel(supabase, id),
+    getBitSource(supabase, id),
   ]);
 
   let imageUrl: string | undefined;
@@ -71,13 +74,18 @@ export default async function BitPage({
       <p className="text-xs uppercase tracking-wide text-neutral-400">{b.type}</p>
       <h1 className="mt-1 text-2xl font-semibold tracking-tight">{heading}</h1>
 
-      {/* The bit itself */}
+      {/* Source — the "from …" provenance, editable (single-select), near the
+          heading; it travels with the bit (P8). Universal, so shown for any type. */}
+      <div className="mt-3">
+        <SourcePicker bitId={b.id} initial={source} />
+      </div>
+
+      {/* The bit itself — a workspace for text (editable rich text, rendered
+          through the tiptap pipeline so links/chips render — finding #6); media
+          stays read-only for now. Bookmark is retired (D-102), so no such branch. */}
       <div className="mt-6">
-        {b.type === "text" && b.body && (
-          <div
-            className="tiptap rounded-md border border-neutral-200 p-4"
-            dangerouslySetInnerHTML={{ __html: b.body }}
-          />
+        {b.type === "text" && (
+          <TextWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
         )}
         {b.type === "image" && imageUrl && (
           <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
@@ -90,28 +98,12 @@ export default async function BitPage({
             <DoodleBit drawing={drawing} />
           </div>
         )}
-        {b.type === "bookmark" && b.url && (
-          <a href={b.url} target="_blank" rel="noreferrer" className="text-blue-700 underline break-all">
-            {b.url}
-          </a>
-        )}
       </div>
 
-      {/* Tags */}
-      <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">tags</h2>
-        {tags.length === 0 ? (
-          <p className="text-sm text-neutral-500">No tags yet.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((t) => (
-              <Link key={t.id} href={`/find?tag=${t.id}`} className="tag-chip">
-                {t.word}
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Tags — editable (any bit, loose or placed — §3a, §7). */}
+      <div className="mt-6">
+        <TagBar target={{ bitId: b.id }} />
+      </div>
 
       {/* Boards it's on now */}
       <section className="mt-8">

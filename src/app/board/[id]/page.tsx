@@ -62,6 +62,8 @@ export default async function BoardPage({
           drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,
           imageUrl,
           content: contents.get(r.target_bit_id!) ?? undefined,
+          sourceName: r.source_name ?? undefined,
+          sourceUrl: r.source_url ?? undefined,
         };
       }),
     )

@@ -92,4 +92,6 @@ export type BoardCard = {
   storage_path: string | null;
   thumb_path: string | null;
   target_visibility: Visibility | null;
+  source_name: string | null; // "from …" — the bit's source travels with it (P8)
+  source_url: string | null; // the source's optional clickable link
 };

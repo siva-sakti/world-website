@@ -23,6 +23,8 @@ export type CardVM = {
   drawing?: Drawing; // drawing (strokes + per-stroke pen width)
   imageUrl?: string; // image (resolved storage URL)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
+  sourceName?: string; // "from …" — the bit's source (travels with it, P8)
+  sourceUrl?: string; // the source's optional clickable link
 };
 
 const DOT = {
@@ -140,6 +142,25 @@ export function Card({
             editing={editing}
             onChange={(body) => onChange({ body })}
           />
+        )}
+        {/* "from …" — the bit's source travels with it (P8). Quiet, below the
+            words; hidden while editing to keep the writing surface clean. */}
+        {isText && !editing && card.sourceName && (
+          <div className="compose-source-line">
+            from {card.sourceName}
+            {card.sourceUrl && (
+              <a
+                href={card.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="compose-source-open"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
+                ↗
+              </a>
+            )}
+          </div>
         )}
         {card.type === "image" && card.imageUrl && (
           <img
