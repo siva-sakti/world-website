@@ -1,0 +1,41 @@
+psql:verification/source-proofs.sql:70: NOTICE:  HOLDS ✓ 1 zero bookmark rows survive · the seeded bookmark is now a TEXT bit with a non-null link body + a source (name = its captured title, url kept)
+DO
+psql:verification/source-proofs.sql:91: NOTICE:  HOLDS ✓ 2 name-fallback: a clip whose title-fetch failed (source_title NULL) got a source named after its URL · a self-made bit got none
+DO
+BEGIN
+INSERT 0 1
+psql:verification/source-proofs.sql:107: NOTICE:  REFUSED ✓ 3 source_name_ci: a case-duplicate source name is refused at birth (like tags)
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+psql:verification/source-proofs.sql:139: NOTICE:  REFUSED ✓ 4a source_id FK: a bit cannot point at a non-existent source
+psql:verification/source-proofs.sql:139: NOTICE:  HOLDS ✓ 4 source_id FK rejects a phantom · deleting a source sets its bits' source_id NULL (the bit survives, loses the stamp)
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 3
+psql:verification/source-proofs.sql:158: NOTICE:  HOLDS ✓ 5 grouping (where source_id = X) returns exactly that source's bits — "everything from this source" assembles itself
+DO
+ROLLBACK
+BEGIN
+psql:verification/source-proofs.sql:174: NOTICE:  REFUSED ✓ 6 type='bookmark' is now refused (bit_type_allowed retired it)
+DO
+ROLLBACK
+BEGIN
+INSERT 0 1
+SET
+SET
+psql:verification/source-proofs.sql:195: NOTICE:  HOLDS ✓ 7 owner (jwt sub = owner uid) reads source rows
+DO
+RESET
+SET
+SET
+psql:verification/source-proofs.sql:213: NOTICE:  REFUSED ✓ 7b a stranger cannot write a source (WITH CHECK owner clause)
+psql:verification/source-proofs.sql:213: NOTICE:  HOLDS ✓ 7 a stranger reads zero source rows (owner-scoped wall)
+DO
+RESET
+ROLLBACK
+--- source-proofs.sql complete: zero bookmarks survive · conversion + name-fallback clean · name_ci refuses dups · FK set-null · grouping exact · bookmark refused · owner-scoped RLS holds ---

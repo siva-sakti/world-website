@@ -44,7 +44,7 @@
 - **I-R3 — Captured-once titles.** A bookmark's captured title is written exactly once, at save, then immutable — it is *truth* (storage test: not rebuildable from stored truth; the live page isn't ours). → `app`.
 - **I-R4 — Vocabulary is id-referenced.** Tag words, categories, subtype words are their own rows; everything points by id; a rename touches one row. → `constraint` (FKs).
 - **I-R5 — Vocabulary is not content.** Categories and subtype words are never taggable, placeable, or bits. → structural.
-- **I-R6 — The stored kinds match everywhere.** Storage map, lexicon, and export enumerate the same set — the eight record kinds (+ the dormant table) **+ the `reference` derived index** (gather, §6 amendment; in the export per I-Ref7). → `app` + the I-G1 test.
+- **I-R6 — The stored kinds match everywhere.** Storage map, lexicon, and export enumerate the same set — the nine record kinds (+ the dormant table) **+ the `reference` derived index** (gather, §6 amendment; in the export per I-Ref7). → `app` + the I-G1 test.
 - **I-R7 — One application per (tag, thing).** At most one tag application of a given word on a given thing — so merge A→B *dedupes by construction* (closes the below-the-line "merge duplicates applications" finding). → `constraint` (`UNIQUE (tag, target)`).
 ## Cluster 4 — two devices & collisions · LOCKED (D-075)
 
@@ -67,13 +67,19 @@
 
 - **I-W1 — Un-place and trash are never one button.** Every removal surface presents them as two distinct, labeled acts — *"Remove from this board"* (this board only; confirms when arrows would die) vs *"Move to trash"* (the bit, everywhere; restorable) — never a lone ambiguous "Delete." The model keeps these acts safe (§2g); only a muddled menu can lose data, so the menu is bound here. → design + review on every removal surface.
 
-## Cluster 6 — capture: source & looseness · LOCKED (D-100)
+## Cluster 6 — capture: source & looseness · LOCKED (D-100; the source set re-cut to I-Src by D-102)
 
-**Source (I-S):**
-- **I-S1 — Source is optional.** Any bit may carry `source_url`/`source_title`; both blank = self-made. → `constraint` (nullable columns; the substance rule never names them).
-- **I-S2 — Source is frozen at capture.** Read once when caught, never re-read — a dead or edited page can't change what you filed (same principle as a bookmark's captured title). → `app` (the one write path).
-- **I-S3 — A bookmark's source is itself.** A whole-page bookmark stores its title once (`captured_title`) and leaves `source_*` blank; only clips carry source. What shows as the source = `source_url` if present, else the bookmark's own `url`. → `app`.
-- **I-S4 — A bookmark may carry a preview; the target stays `url`.** A bookmark may hold a preview picture (`storage_path`) while `url` stays what it points at; the relaxation is surgical — the other three kinds still refuse a stray file. → `constraint` (the substance rule).
+**Source (I-Src) · LOCKED (D-102 — supersedes the D-100 I-S set):**
+- **I-Src1 — Source is optional, one per bit.** Any bit may carry a single `source_id`; blank = self-made. A bit has *many* tags but at most *one* "where it came from." (Supersedes I-S1.) → `constraint` (a nullable single FK; the substance rule never names it).
+- **I-Src2 — Source is a named vocabulary citizen.** A source is its own row — a `name` (never blank) + an optional `url` — id-referenced like a tag or subtype word; near-duplicate names refused case-insensitively at birth. → `constraint` (the `source` table + `source_name_ci` unique).
+- **I-Src3 — Rename-once; read once, machine never re-reads.** A source is created at capture (or picked from the list) from the page's title, and the machine **never re-fetches it** — a dead or edited page can't rewrite it. Only a deliberate rename changes it, and a rename touches **one row** so every note pointing at it re-labels instantly (id-referenced, P9). **Re-homes the old I-S2** ("frozen at capture"): the machine still never re-reads; the owner may now rename. → `constraint` (the FK) + `app` (the one rename fn).
+- **I-Src4 — Delete-source sets null; the note survives.** Deleting a source lets its notes live on, losing only the stamp — never the words (like deleting a subtype word). → `constraint` (`on delete set null`).
+- **I-Src5 — Source travels with the bit, and groups it.** Source lives on the bit, so placing a note on a board carries its "from…" along (Principle 8); and *"everything from this source"* is just `where source_id = X` — it assembles itself. → `constraint` (the FK + `bit_source` index) + `computed` (the `board_cards`/`the_ledger` join).
+
+**Retired / moot with the bookmark (D-102, part of the same edit so the doc doesn't drift):**
+- **I-S3** ("a bookmark's source is itself") · **I-S4** ("a bookmark may carry a preview") — **retired**: there are no bookmarks, and I-S4's preview relax is reverted by the migration.
+- **I-R3** ("captured-once titles") — **moot** for live rows (no bookmarks); the `captured_title` column persists, unused.
+- **I-R2**'s per-type face fallback still lists a `bookmark:` branch — a **dead but harmless** branch in `bit_face()` (it never matches; kept on purpose). Note it as dead; **no function edit.**
 
 **Looseness / the inbox / call-in (I-N):**
 - **I-N1 — Loose is computed, never stored.** A bit is loose ⇔ it is live **and** no board actually shows it (no un-departed placement on a non-trashed board — the exact rule boards already use). No flag, no column. → `computed`.

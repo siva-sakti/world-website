@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { createLooseTextBit, createBookmarkBit, trashBit } from "@/lib/db/bits";
+import { createLooseTextBit, trashBit } from "@/lib/db/bits";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
 
 function escapeHtml(s: string): string {
@@ -19,12 +19,14 @@ export async function quickAdd(formData: FormData) {
   if (!raw) return;
   const supabase = await createClient();
   if (looksLikeUrl(raw)) {
+    // A pasted link becomes a NOTE whose body is a clickable link — bookmark is
+    // retired (D-102: a URL is not its own kind of bit). Stage 2 adds the full
+    // source-based intake; this bridge keeps the inbox working meanwhile.
     const url = normalizeUrl(raw);
-    // https pages get a title; the bookmark saves either way (fail-safe).
     const meta = await fetchPageMeta(url);
-    await createBookmarkBit(supabase, {
-      bitId: randomUUID(), url, capturedTitle: meta?.title ?? null,
-    });
+    const label = meta?.title ?? url;
+    const body = `<p><a href="${escapeHtml(url)}">${escapeHtml(label)}</a></p>`;
+    await createLooseTextBit(supabase, { bitId: randomUUID(), body });
   } else {
     const body = raw.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
     await createLooseTextBit(supabase, { bitId: randomUUID(), body });

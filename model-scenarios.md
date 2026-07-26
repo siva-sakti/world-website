@@ -6,7 +6,7 @@
 
 ---
 
-## S1 — Porting the retreat notes *(make-on-canvas · connectors · bookmark · the pull)*
+## S1 — Porting the retreat notes *(make-on-canvas · connectors · source · the pull)*
 
 **The scene:** first real sit-down. Desktop or Daylight. The retreat notes come in: sectioned text, hand-drawn diagrams, videos living in Google Drive.
 
@@ -14,19 +14,19 @@
 - Create board → one `board` row (title "Retreat — [name]", `visibility` **private** by default, created stamp). Handwritten title welcome later (hand on top, typed shadow beneath).
 - Each section typed → its own **text bit** (`bit` row: type `text`, body; `content` empty here — optional, untitled; a title *can* be written, D-087; face = the body's words) + a `placement` row (this board, dropped position, arrived-stamp = birth: born *on* the board).
 - Each diagram → pen session → ✓ Done → one **drawing bit** (strokes as vectors) + placement. The content line is *offered* at Done ("fire ceremony sequence") — never forced; given words make the hand findable.
-- The videos → **bookmark bits**: one row each holding the Google Drive URL + a **captured title** read once at save. *Reality note:* an auth-walled Drive URL will yield a junk or empty title → the face falls back to the URL (ruled, §2b "else the URL itself") until the owner types content ("day-2 fire ceremony video") — which this owner would.
+- The videos → **text notes each carrying a source** (or a plain link *inside* a note): a short note whose body links the Google Drive URL, with a **source** named for that page. *Reality note:* an auth-walled Drive URL yields a junk or empty title → the source is **named after its link** (name-fallback, D-102) until the owner renames it ("day-2 fire ceremony video") — which this owner would. *(Pre-D-102 these were "bookmark bits"; bookmark is retired — a URL is a source on a note, not a saved page.)*
 - An arrow from a diagram to the section it illustrates → one `connector` row (this board, from-placement, to-placement, when). Arrangement only; feeds nothing.
 - Tag the board `#retreat` (tag word row if new + application row on the *board*). Bits born on the tagged board see `#retreat` as a **pre-lit chip** — confirm or flick off, never silent.
 - Tap `#retreat` later → **the pull**: every tagged bit *and the board itself*, computed, complete.
 
 **Verdict: FITS.** The founding scene traces clean end-to-end; every act writes exactly one legible record.
-**Observed:** ① **`video` is absent even from the "later" media list** (pdf · audio only) — but the owner's *actual want* is a reference, not stored bytes, and `bookmark` serves that exactly. One-line flag for `parked.md`: add video to the later-media note so the absence is chosen, not accidental. ② Watch-list **A1: no trip** — porting existing notes is *arranging*, not writing-downward.
+**Observed:** ① **`video` is absent even from the "later" media list** (pdf · audio only) — but the owner's *actual want* is a reference, not stored bytes, and **a source on a note (or a link in a note) serves that exactly** (D-102; bookmark retired — A14 re-homed in `parked.md`). ② Watch-list **A1: no trip** — porting existing notes is *arranging*, not writing-downward.
 
 ## S2 — The week of tidbits *(the capture reality — the walkthrough's big felt deferral)*
 
 **The scene:** the week as lived: article notes, the TCM screenshot, aesthetic screenshots, the mood-board video, book highlights — **all landing in Apple Notes on the phone**, because the phone is what's always there.
 
-**The trace, honestly (corrected by the owner, 2026-07-21):** in v1 there is no *designed* phone capture (Phase 5, re-blessed twice — F8, audit #12) — **but the deployed site works in a phone browser.** The literal v1 phone path: browser → site → board → *+ note* (type) or *+ image* (photo picker) — real bits, synced. The specific clunk: no share-sheet (screenshot → app-switch → upload, ~6 taps vs Phase 5's ~2), a desktop-sized canvas (drop fine, arrange fiddly), online-only (no-signal moments still belong to Apple Notes), no app icon unless hand-bookmarked. So: **phone = possible, unoptimized; Apple Notes = the speed and no-signal fallback**; the sit-down port (paste text → bits via Phase 2's quick add, screenshots → image bits, the mood-board video link → a bookmark) remains the designed flow.
+**The trace, honestly (corrected by the owner, 2026-07-21):** in v1 there is no *designed* phone capture (Phase 5, re-blessed twice — F8, audit #12) — **but the deployed site works in a phone browser.** The literal v1 phone path: browser → site → board → *+ note* (type) or *+ image* (photo picker) — real bits, synced. The specific clunk: no share-sheet (screenshot → app-switch → upload, ~6 taps vs Phase 5's ~2), a desktop-sized canvas (drop fine, arrange fiddly), online-only (no-signal moments still belong to Apple Notes), no app icon unless hand-bookmarked. So: **phone = possible, unoptimized; Apple Notes = the speed and no-signal fallback**; the sit-down port (paste text → bits via Phase 2's quick add, screenshots → image bits, the mood-board video link → a source/link on a note) remains the designed flow.
 
 **Verdict: AWKWARD — by explicit, twice-re-blessed design. ✅ BLESSED a third time by the owner (2026-07-21), with the picture concrete** ("I'm just gonna have to compose things on my own is what I thought" — their model already matched reality). The return test's corpus (retreat notes + seeded cluster) doesn't depend on phone capture; the plan holds.
 **Observed:** bulk-bringing 10 book highlights = 10 paste-✓ acts — real friction, known and demoted (§2e: splitting is a later nicety). Named here so its demotion is also felt.
@@ -83,6 +83,8 @@
 *These extend the seven life scenes above with two feature-level record traces — **capture Slice 1** (applied, D-100) and **gather G1** (applied, D-101) — folded in when each checkpoint was recorded. Same trace style, same "no blank cells" discipline; they are also the capture-Slice/G2/G3 test fixtures.*
 
 ### S8 — Capture: a clipped quote and the loose pile *(source · looseness · the inbox)*
+
+*(S8's **source** half — the frozen `source_url`/`source_title` fields and I-S1–I-S4 — is **superseded by S10 / D-102** (source is now a first-class table). The **looseness / inbox** half (I-N1–I-N4) stands unchanged.)*
 
 **The scene:** you clip a quote out of an article — it should remember *"from …"* and, since you're not in the mood to file it, land in a **loose pile** (the inbox) you can arrange later.
 
@@ -147,6 +149,20 @@
 
 **Verdict: FITS.** Grid A's destroy/cascade + FK cells are proven by `verification/gather-proofs.sql` (§4–5); round-trip and directedness by §1; the owner-only wall by §6. The rename/lazy-label and two-device cells are **design consequences** (built at G2/G3), traced here so the model is whole on paper. Invariants **I-Ref1–I-Ref8**.
 
+### S10 — Source made first-class (D-102) *(source-as-record · the bookmark conversion · rename · delete · travel)*
+
+**The scene:** where a bit came from is now a real named thing you can pick, rename, and group by — and the old "bookmark" is gone (a URL is a source on a note, not a saved page). *(Applied to cloud — D-102; supersedes S8's D-100 source treatment.)*
+
+| scene | what happens to the record |
+|---|---|
+| **A note captured *with* a source** | you jot a quote from *Deep Work* → one **text bit** (`body` = the quote); you pick/enter the source *"Deep Work"* → a **source row** (if new) and the bit's `source_id` points at it. Born on no board → it's **loose** (the inbox). The card shows *"from Deep Work"*. |
+| **A bookmark converts cleanly** *(the migration itself)* | a saved-URL bit → a **text note** whose body is a clickable link (`<a href="…">A Good Article</a>`), carrying a **source** named *"A Good Article"* with that link; its old bookmark-only fields are cleared, and the `bookmark` type is retired. Proven: checkpoint §2, proof lines 1 & 6. |
+| **Rename a source → every note re-labels** | you rename *"calnewport.com"* → *"Cal Newport"* → **one row changes**; every note pointing at it now reads *"from Cal Newport"* instantly (id-referenced, no fan-out). The notes' own words are untouched. |
+| **Delete a source → notes keep their words, lose the stamp** | you delete *"Deep Work"* from your sources list → its `source_id` on every note is set blank (`on delete set null`); **the notes all survive**, they just no longer show a "from …". Proven: checkpoint §2, proof line 4. |
+| **A note's source travels onto a board** | you place a sourced note on a board → a `placement` row; the source rides on the **bit**, so the card on the board shows *"from Deep Work"* too (`board_cards` now joins source). One note, same source on every board. |
+
+**Verdict: FITS.** Proven on a throwaway copy, then applied — `verification/run-source-native.sh` green (zero bookmarks survive · the bookmark→note conversion + name-fallback · `source_name_ci` refuses dups · FK `set null` on source-delete · grouping exact · `type='bookmark'` refused · owner-scoped RLS). Invariants **I-Src1–I-Src5** (retiring I-S3 · I-S4; I-R3 moot).
+
 ---
 
 ## Watch-list results (parked.md A2 · A1 · A10)
@@ -160,7 +176,7 @@
 1. ~~Owner re-bless~~ **✅ S2 BLESSED (2026-07-21):** phone = browser-possible but unoptimized until Phase 5; Apple Notes stays the speed/no-signal fallback; the sit-down port is the designed flow.
 2. **Build-emphasis notes (no model change):** S5 — the image content-line offer is this owner's highest-leverage findability surface; make it one effortless, dictation-friendly tap. S7 — un-place vs trash must be visually unmistakable.
 3. **Ledger touches:** ✅ done — `video` parked with a named re-entry (parked.md **A14**, 2026-07-21: reference-by-choice; stored-video waits for the day a video feels like a bit); S3 recorded as A3's named future test case (in this doc).
-4. **Reality note for translation:** captured-title fetch will often fail on auth-walled URLs (Drive, Instagram) — the URL fallback is ruled; make the content prompt natural at bookmark-save.
+4. **Reality note for translation:** captured-title fetch will often fail on auth-walled URLs (Drive, Instagram) — the URL fallback is ruled; make the rename prompt natural at source-capture.
 5. **Observed, no action:** OCR question (S5) sits on P1's boundary — logged only. Bulk-paste friction (S2) — known, demoted, felt.
 
 **Overall verdict: the model survives contact with this owner's real week.** Seven scenes, zero MISSING. The two AWKWARDs are both *chosen* deferrals now felt in the flesh (capture) or known optionalities meeting a real habit (bare screenshots) — exactly the two places real use should be watched during the return test.
