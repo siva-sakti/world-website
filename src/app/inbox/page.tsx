@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { listInbox, type InboxItem } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
 import { logout } from "@/app/login/actions";
-import { quickAdd, trashFromInbox } from "./actions";
+import { trashFromInbox } from "./actions";
+import { Intake } from "./intake";
 import { InboxTags } from "./inbox-tags";
 
 export const dynamic = "force-dynamic";
@@ -42,18 +43,10 @@ export default async function InboxPage() {
         Your loose pile — anything not on a board yet. Catch it here; arrange it later.
       </p>
 
-      {/* Quick-add: one box. A pasted link becomes a note with a clickable link;
-          anything else, a note. Full source + rich text live in the workspace. */}
-      <form action={quickAdd} className="inbox-quickadd">
-        <input
-          name="text"
-          className="inbox-quickadd-input"
-          placeholder="Paste a link, or jot a note…"
-          autoComplete="off"
-          aria-label="Add to inbox"
-        />
-        <button className="compose-btn is-primary" type="submit">add</button>
-      </form>
+      {/* Intake: pick a source (sticky across adds), jot pieces under it — each a
+          loose text bit carrying that source. A pasted link stays a clickable-link
+          note; "as a quote" formats it as a blockquote. Full editing → the workspace. */}
+      <Intake />
 
       {bits.length === 0 ? (
         <p className="mt-10 text-neutral-500">

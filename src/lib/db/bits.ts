@@ -110,34 +110,6 @@ export async function createLooseTextBit(
   return data as Bit;
 }
 
-/** A bookmark bit — a saved URL, born loose into the inbox by default (D-100). A
- * bookmark's source IS itself, so source_* stay null and the page title lives in
- * `captured_title` (I-S3). A preview picture (storage_path) may be added later —
- * the substance rule now permits it for bookmarks (D-100). */
-export async function createBookmarkBit(
-  supabase: SupabaseClient,
-  args: {
-    bitId: string; url: string; capturedTitle?: string | null;
-    storagePath?: string | null; thumbPath?: string | null;
-    mediaWidth?: number | null; mediaHeight?: number | null;
-    mime?: string | null; byteSize?: number | null;
-  },
-): Promise<Bit> {
-  const { data, error } = await supabase
-    .from("bit")
-    .insert({
-      id: args.bitId, type: "bookmark", url: args.url,
-      captured_title: args.capturedTitle ?? null,
-      storage_path: args.storagePath ?? null, thumb_path: args.thumbPath ?? null,
-      media_width: args.mediaWidth ?? null, media_height: args.mediaHeight ?? null,
-      mime: args.mime ?? null, byte_size: args.byteSize ?? null,
-    })
-    .select("*")
-    .single();
-  if (error) throw error;
-  return data as Bit;
-}
-
 export async function updatePlacement(
   supabase: SupabaseClient,
   id: string,

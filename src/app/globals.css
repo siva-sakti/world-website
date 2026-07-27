@@ -547,27 +547,62 @@ body {
 }
 
 /* ── the inbox — the loose pile, a deliberately-designed browse surface (D-100) ── */
-.inbox-quickadd {
+/* Intake: a source (sticky) + a note box + the quote toggle — calm, quiet (§5). */
+.intake {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
-}
-.inbox-quickadd-input {
-  flex: 1;
-  font-size: 15px;
-  padding: 11px 14px;
+  padding: 12px;
   border: 1px solid #e2ddd2;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fffdfa;
+}
+.intake-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.intake-note {
+  width: 100%;
+  min-height: 44px;
+  resize: none;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border: 1px solid #eae6dd;
+  border-radius: 9px;
+  background: #fdfcf8;
   color: var(--ink);
   outline: none;
 }
-.inbox-quickadd-input::placeholder {
+.intake-note::placeholder {
   color: #b7aea0;
 }
-.inbox-quickadd-input:focus {
+.intake-note:focus {
   border-color: #365a8c;
   box-shadow: 0 0 0 3px rgba(54, 90, 140, 0.1);
+}
+.intake-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.intake-quote {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #8a8175;
+  cursor: pointer;
+}
+.intake-err {
+  font-size: 12px;
+  color: #9c5744;
+}
+.intake-foot .compose-btn {
+  margin-left: auto;
 }
 .inbox-grid {
   display: grid;

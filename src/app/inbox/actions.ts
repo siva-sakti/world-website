@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createLooseTextBit, trashBit } from "@/lib/db/bits";
+import { setSource } from "@/lib/db/sources";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
 
 function escapeHtml(s: string): string {
@@ -12,26 +13,46 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Quick-add from the inbox: a pasted link → a bookmark; typed prose → a note.
- * Either way the bit is born LOOSE (no board) and lands in the inbox (D-100). */
-export async function quickAdd(formData: FormData) {
-  const raw = String(formData.get("text") ?? "").trim();
-  if (!raw) return;
+export type IntakeInput = {
+  note: string;
+  asQuote?: boolean;
+  sourceName?: string | null; // the sticky source's name (pick-or-create); "" = sourceless
+  sourceUrl?: string | null; // only used when the source is newly created
+};
+
+/** The intake: a note (or a pasted link) → a LOOSE text bit, carrying the sticky
+ * source if one is set (D-102, plan §5 Stage 2). Quote vs. thought is *formatting*
+ * (a blockquote), not a new kind. The source is set via setSource (pick-or-create,
+ * idempotent) so piling several notes under one sticky source just re-finds it. */
+export async function addToInbox(input: IntakeInput): Promise<{ error?: string }> {
+  const note = (input.note ?? "").trim();
+  if (!note) return { error: "Nothing to add." };
   const supabase = await createClient();
-  if (looksLikeUrl(raw)) {
-    // A pasted link becomes a NOTE whose body is a clickable link — bookmark is
-    // retired (D-102: a URL is not its own kind of bit). Stage 2 adds the full
-    // source-based intake; this bridge keeps the inbox working meanwhile.
-    const url = normalizeUrl(raw);
+  const bitId = randomUUID();
+
+  let inner: string;
+  if (looksLikeUrl(note)) {
+    // A bare pasted link stays a NOTE whose body is a clickable link — bookmark is
+    // retired (D-102). It can carry the sticky source like any other note.
+    const url = normalizeUrl(note);
     const meta = await fetchPageMeta(url);
     const label = meta?.title ?? url;
-    const body = `<p><a href="${escapeHtml(url)}">${escapeHtml(label)}</a></p>`;
-    await createLooseTextBit(supabase, { bitId: randomUUID(), body });
+    inner = `<p><a href="${escapeHtml(url)}">${escapeHtml(label)}</a></p>`;
   } else {
-    const body = raw.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
-    await createLooseTextBit(supabase, { bitId: randomUUID(), body });
+    inner = note.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+  }
+  const body = input.asQuote ? `<blockquote>${inner}</blockquote>` : inner;
+
+  try {
+    await createLooseTextBit(supabase, { bitId, body });
+    const name = (input.sourceName ?? "").trim();
+    if (name) await setSource(supabase, bitId, name, input.sourceUrl ?? null);
+  } catch (e) {
+    console.error("addToInbox failed:", e);
+    return { error: "Couldn't add that — try again." };
   }
   revalidatePath("/inbox");
+  return {};
 }
 
 /** Trash a loose bit from the inbox (a freeze; restorable from trash). */

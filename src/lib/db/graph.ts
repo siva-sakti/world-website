@@ -11,7 +11,7 @@ export type GraphNode = {
   id: string; // "tag_<uuid>" | "bit_<uuid>"
   kind: "tag" | "bit";
   label: string; // the word, or the bit's face (with its type fallback)
-  bitType?: string; // for bits: text | drawing | image | bookmark
+  bitType?: string; // for bits: text | drawing | image
   refId: string; // the underlying tag/bit id, for navigation
   degree: number; // number of connections — sizes the dot
 };
