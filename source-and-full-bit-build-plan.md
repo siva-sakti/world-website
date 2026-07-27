@@ -2,6 +2,8 @@
 
 **Supersedes `capture-build-plan.md`** (bookmark-centric — retire to `old/` at Stage 0). Consolidates every decision from the owner–Claude working session of **2026-07-26**. Grounded in the current codebase throughout (§"How it fits").
 
+**Status (2026-07-27): ✅ Stages 0–3 + the source manager DONE + deployed** — Stage 0 (the model fix) = D-102; Stages 1–3 + the manager = D-103. Owed: a source's URL at *intake*-creation (added via the manager for now); place-on-a-board (call-in) + Gather G2/G3 stay their own tracks.
+
 ---
 
 ## 1. What this is — the reframe
