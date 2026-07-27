@@ -110,6 +110,43 @@ export async function createLooseTextBit(
   return data as Bit;
 }
 
+/** Call a loose bit onto a board — the app-layer consumer of I-L1. A loose bit has
+ * no LIVE placement, but it may carry a DEPARTED one on this board (it lived here and
+ * left). So: insert a placement with the caller's optimistic id; if the unique index
+ * refuses it (23505 — `placement_bit_once` covers departed rows too), REVIVE that row
+ * instead — clear left_at, reposition — keeping its original arrived_at (§2c; the
+ * trigger refreshes updated_at). Returns the TRUE placement so the caller can reconcile
+ * its optimistic card to the real id (a revived row keeps its own id, not the guess). */
+export async function callInBit(
+  supabase: SupabaseClient,
+  args: { bitId: string; boardId: string; placementId: string } & Pos,
+): Promise<Placement> {
+  const pos = {
+    x: args.x ?? null,
+    y: args.y ?? null,
+    width: args.width ?? null,
+    height: args.height ?? null,
+    z: args.z ?? 0,
+  };
+  const ins = await supabase
+    .from("placement")
+    .insert({ id: args.placementId, board_id: args.boardId, target_bit_id: args.bitId, ...pos })
+    .select("*")
+    .single();
+  if (!ins.error) return ins.data as Placement;
+  if (ins.error.code !== "23505") throw ins.error;
+  // A departed row for (board, bit) already exists — revive it, never duplicate (I-L1).
+  const { data, error } = await supabase
+    .from("placement")
+    .update({ left_at: null, ...pos })
+    .eq("board_id", args.boardId)
+    .eq("target_bit_id", args.bitId)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as Placement;
+}
+
 export async function updatePlacement(
   supabase: SupabaseClient,
   id: string,

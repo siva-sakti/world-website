@@ -9,15 +9,18 @@ import {
   updateBitContent,
   unplaceBit,
   trashBit,
+  callInBit,
 } from "@/lib/db/bits";
-import { uploadObject } from "@/lib/storage";
+import { uploadObject, signedUrl } from "@/lib/storage";
 import { importImage, isHeic, MediaError } from "@/lib/media";
-import { strokesBounds } from "@/lib/stroke";
+import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
+import type { InboxItem } from "@/lib/db/inbox";
 import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
+import { LooseColumn } from "./loose-column";
 import { usePersistence } from "./use-persistence";
 
 const MAX_DISP = 320; // an image card's initial on-board width
@@ -45,6 +48,7 @@ export function BoardSurface({
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
   const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" } | null>(null);
+  const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
   const camRef = useRef(cam);
   camRef.current = cam; // latest camera for imperative reads (wheel, pen)
@@ -52,6 +56,7 @@ export function BoardSurface({
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
+  const bringInStep = useRef(0); // small cascade so repeated bring-ins don't stack
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
 
@@ -66,7 +71,7 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate } = usePersistence(supabase, setCards, onErr);
+  const { patchCard, saveContent, trackCreate, reconcileId } = usePersistence(supabase, setCards, onErr);
 
   // ---- camera ----
   function screenToWorld(clientX: number, clientY: number) {
@@ -300,6 +305,7 @@ export function BoardSurface({
   function unplaceSelected(placementId: string) {
     clearCard(placementId);
     unplaceBit(supabase, placementId).catch(onErr);
+    setLooseRefresh((n) => n + 1); // it's loose again — let the column show it
   }
   // Trash the whole bit — hidden everywhere, restorable from /trash.
   function trashSelected(bitId: string) {
@@ -315,6 +321,62 @@ export function BoardSurface({
       ? screenToWorld(r.left + r.width / 2, r.top + Math.min(160, r.height / 2))
       : { x: 40, y: 84 };
     createNote(w.x, w.y);
+  }
+
+  // Call-in: bring a loose note onto THIS board, where you're looking. Optimistic like
+  // createNote; callInBit inserts-or-revives and returns the TRUE placement, so we
+  // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
+  async function bringIn(bit: InboxItem) {
+    const type = bit.type;
+    if (type !== "text" && type !== "drawing" && type !== "image") return;
+    const step = (bringInStep.current++ % 6) * 24;
+    const r = boardRef.current?.getBoundingClientRect();
+    const w = r
+      ? screenToWorld(r.left + r.width / 2 + step, r.top + Math.min(200, r.height / 2) + step)
+      : { x: 40 + step, y: 84 + step };
+    const placementId = crypto.randomUUID();
+    const z = nextZ();
+    const width = type === "text" ? 240 : 220;
+    const height = type === "text" ? 60 : 220;
+    let imageUrl: string | undefined;
+    if (type === "image") {
+      const path = bit.thumb_path ?? bit.storage_path;
+      if (path) {
+        try { imageUrl = await signedUrl(supabase, path); } catch {}
+      }
+    }
+    setCards((cs) => [
+      ...cs,
+      {
+        placementId, bitId: bit.id, type,
+        x: w.x, y: w.y, w: width, h: height, z,
+        body: bit.body ?? undefined,
+        drawing: type === "drawing" ? normalizeDrawing(bit.strokes) : undefined,
+        imageUrl,
+        content: bit.content ?? undefined,
+        sourceName: bit.source?.name ?? undefined,
+        sourceUrl: bit.source?.url ?? undefined,
+      },
+    ]);
+    setSelectedId(placementId);
+    const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: w.x, y: w.y, width, height, z })
+      .then((placement) => {
+        if (placement.id !== placementId) {
+          setCards((cs) =>
+            cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
+          );
+          setSelectedId((s) => (s === placementId ? placement.id : s));
+          reconcileId(placementId, placement.id);
+        }
+      })
+      .catch((e) => {
+        setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        setSelectedId((s) => (s === placementId ? null : s));
+        onErr(e);
+        throw e; // let the column restore the note to the pile
+      });
+    trackCreate(placementId, p);
+    return p;
   }
 
   const selectedBit = cards.find((c) => c.placementId === selectedId);
@@ -404,6 +466,7 @@ export function BoardSurface({
             />
           ))}
         </div>
+        <LooseColumn onBringIn={bringIn} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
         {wordsFor && (
           <WordsOffer

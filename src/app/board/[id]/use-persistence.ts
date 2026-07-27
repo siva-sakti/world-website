@@ -20,6 +20,10 @@ export function usePersistence(
   );
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const creates = useRef(new Map<string, Promise<unknown>>());
+  // Call-in may reconcile a card's optimistic placement id to the server's real one
+  // (a revive reuses the departed row's own id). Remember the rename so a flush that
+  // already captured the old key still writes to the real row — never a lost move.
+  const renamed = useRef(new Map<string, string>());
 
   // Remember each card's create so flush can wait for the row to exist.
   function trackCreate(placementId: string, p: Promise<unknown>) {
@@ -48,12 +52,31 @@ export function usePersistence(
     if (!p) return;
     const create = creates.current.get(placementId);
     if (create) await create; // the row must exist before we update it
+    // Resolve the id AFTER the await: a reconcile may have landed while we waited.
+    const realId = renamed.current.get(placementId) ?? placementId;
     try {
       if (Object.keys(p.placement).length)
-        await updatePlacement(supabase, placementId, p.placement);
+        await updatePlacement(supabase, realId, p.placement);
       if (p.body !== undefined) await updateBitBody(supabase, p.bitId, p.body);
     } catch (e) {
       onErr(e);
+    }
+  }
+
+  // Re-point a card's in-flight persistence from its optimistic id to the real one.
+  function reconcileId(oldId: string, newId: string) {
+    if (oldId === newId) return;
+    renamed.current.set(oldId, newId);
+    const p = pending.current.get(oldId);
+    if (p) {
+      pending.current.delete(oldId);
+      pending.current.set(newId, p);
+    }
+    const t = timers.current.get(oldId);
+    if (t) {
+      clearTimeout(t);
+      timers.current.delete(oldId);
+      timers.current.set(newId, setTimeout(() => flush(newId), 350));
     }
   }
 
@@ -69,5 +92,5 @@ export function usePersistence(
     updateBitContent(supabase, bitId, value).catch(onErr);
   }
 
-  return { patchCard, saveContent, trackCreate };
+  return { patchCard, saveContent, trackCreate, reconcileId };
 }
