@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listManagedSources } from "@/lib/db/sources";
 import { logout } from "@/app/login/actions";
+import { SourceManager } from "./source-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -35,42 +36,13 @@ export default async function SourcesPage() {
       </header>
 
       <p className="mb-6 text-sm text-neutral-500">
-        Your reading list — every source you&rsquo;ve noted from, most-used first. Open one to
-        see everything from it.
+        Your reading list — every source you&rsquo;ve noted from, most-used first. Click a name to
+        rename it (every note follows), give it a link, merge two into one, or delete one — its
+        notes stay, they just lose the &ldquo;from …&rdquo; stamp. Open a count to see everything
+        from that source.
       </p>
 
-      {sources.length === 0 ? (
-        <p className="text-neutral-500">
-          No sources yet — set a source on a bit&rsquo;s page (its &ldquo;from …&rdquo;), and it
-          shows up here.
-        </p>
-      ) : (
-        <ul className="divide-y divide-neutral-100">
-          {sources.map((s) => (
-            <li key={s.id} className="flex items-baseline justify-between gap-4 py-3">
-              <Link href={`/source/${s.id}`} className="hover:underline underline-offset-4">
-                {s.name}
-              </Link>
-              <span className="flex shrink-0 items-baseline gap-3">
-                {s.url && (
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-[#365a8c] hover:underline"
-                    title="open source"
-                  >
-                    ↗
-                  </a>
-                )}
-                <span className="text-xs text-neutral-400">
-                  {s.count} {s.count === 1 ? "bit" : "bits"}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <SourceManager initial={sources} />
     </main>
   );
 }

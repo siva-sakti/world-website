@@ -132,14 +132,45 @@ export async function listManagedSources(
     .sort((a, b) => b.count - a.count);
 }
 
-/** Rename a source — free; every bit carrying it follows instantly (P9, id-referenced). */
-export async function renameSource(
+// ---- the source manager (§3e, mirrors the tag manager) ----
+
+/** Edit a source — rename and/or (re)set its url in one update. Name non-empty;
+ *  a case-insensitive collision with ANOTHER source is refused (23505 from the
+ *  source_name_ci index), surfaced to the caller like a tag rename. An empty url
+ *  stores null. Id-referenced, so every bit carrying it re-labels instantly
+ *  (P9, I-Src3 — a deliberate rename, never a machine re-read). */
+export async function editSource(
   supabase: SupabaseClient,
-  sourceId: string,
+  id: string,
   name: string,
+  url?: string | null,
 ): Promise<void> {
   const nm = name.trim();
   if (!nm) throw new Error("empty source name");
-  const { error } = await supabase.from("source").update({ name: nm }).eq("id", sourceId);
+  const { error } = await supabase
+    .from("source")
+    .update({ name: nm, url: url?.trim() || null })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Merge `from` into `into` — every bit stamped `from` is re-stamped `into`
+ *  (a bit carries one source, so nothing to dedupe), then `from` disappears. */
+export async function mergeSources(
+  supabase: SupabaseClient,
+  fromId: string,
+  intoId: string,
+): Promise<void> {
+  if (fromId === intoId) return;
+  const upd = await supabase.from("bit").update({ source_id: intoId }).eq("source_id", fromId);
+  if (upd.error) throw upd.error;
+  const del = await supabase.from("source").delete().eq("id", fromId);
+  if (del.error) throw del.error;
+}
+
+/** Delete a source — the FK's `on delete set null` blanks its bits' source_id
+ *  (I-Src4): the notes survive, losing only the "from…" stamp, never the words. */
+export async function deleteSource(supabase: SupabaseClient, id: string): Promise<void> {
+  const { error } = await supabase.from("source").delete().eq("id", id);
   if (error) throw error;
 }
