@@ -113,7 +113,10 @@ export function SourcePicker({
           placeholder={loading ? "loading…" : current ? "change source" : "＋ source"}
           onChange={(e) => setDraft(e.target.value)}
           onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 120)}
+          // Commit a typed source on blur too — click-away saves, never lingers
+          // un-applied. (Suggestion buttons preventDefault mousedown, so a pick-click
+          // keeps focus and wins; an empty draft is a no-op in pick().)
+          onBlur={() => { pick(draft); setTimeout(() => setFocused(false), 120); }}
           onKeyDown={(e) => {
             if (e.key === "Enter") pick(draft);
           }}

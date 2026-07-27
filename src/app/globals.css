@@ -459,11 +459,30 @@ body {
   touch-action: none;
 }
 /* The selected-note bar: its tag editor + its remove/trash acts (I-W1). */
+.compose-stage {
+  position: relative;
+}
+/* The selection toolbar FLOATS over the canvas (top-left) instead of sitting in
+   flow above it — so selecting a card no longer shoves the board down (layout
+   stability). Kept clear of the loose-notes tab at top-right. */
 .selected-bar {
-  margin-bottom: 10px;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 120px);
+  padding: 6px 8px;
+  background: rgba(255, 253, 250, 0.96);
+  border: 1px solid #e6e0d6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .selected-bar .tag-bar {
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 .selected-actions {
   display: flex;
@@ -837,6 +856,14 @@ body {
   flex-direction: column;
   gap: 6px;
   padding: 8px 12px 2px;
+}
+/* The inline tag editor on an inbox card wears no chrome, so opening "＋ tag"
+   barely changes the card's height — no grid-row jump (layout stability). */
+.inbox-card-meta .tag-bar {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0;
 }
 .inbox-card-from {
   display: inline-flex;

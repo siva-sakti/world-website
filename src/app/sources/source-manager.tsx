@@ -28,16 +28,19 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
 
   async function saveEdit(s: ManagedSource, field: "name" | "url") {
     const val = draft.trim();
-    setEditing(null);
     const name = field === "name" ? val : s.name;
     const url = field === "url" ? val : s.url;
-    if (field === "name" && (!val || val === s.name)) return;
-    if (field === "url" && val === (s.url ?? "")) return;
+    // No change → just close, nothing to save.
+    if ((field === "name" && (!val || val === s.name)) || (field === "url" && val === (s.url ?? ""))) {
+      setEditing(null);
+      return;
+    }
     try {
       await editSource(supabase, s.id, name, url);
       setSources((xs) =>
         xs.map((x) => (x.id === s.id ? { ...x, name, url: url?.trim() || null } : x)),
       );
+      setEditing(null); // close only after a successful save
     } catch (e) {
       const code = (e as { code?: string })?.code;
       setNote(
@@ -45,6 +48,7 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
           ? `“${name}” already exists — use “merge into” instead.`
           : "Couldn't save that source.",
       );
+      // keep the field open so the typed value survives the error
     }
   }
 

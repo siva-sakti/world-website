@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createLooseTextBit, trashBit, callInBit } from "@/lib/db/bits";
 import { setSource } from "@/lib/db/sources";
+import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
 
 function escapeHtml(s: string): string {
@@ -16,8 +17,9 @@ function escapeHtml(s: string): string {
 export type IntakeInput = {
   note: string;
   asQuote?: boolean;
-  sourceName?: string | null; // the sticky source's name (pick-or-create); "" = sourceless
+  sourceName?: string | null; // the source's name (pick-or-create); "" = sourceless
   sourceUrl?: string | null; // only used when the source is newly created
+  tags?: string[]; // tag words to apply to the new note (find-or-create, idempotent)
 };
 
 /** The intake: a note (or a pasted link) → a LOOSE text bit, carrying the sticky
@@ -47,6 +49,10 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     await createLooseTextBit(supabase, { bitId, body });
     const name = (input.sourceName ?? "").trim();
     if (name) await setSource(supabase, bitId, name, input.sourceUrl ?? null);
+    for (const w of input.tags ?? []) {
+      const word = w.trim();
+      if (word) await applyTag(supabase, { bitId, word });
+    }
   } catch (e) {
     console.error("addToInbox failed:", e);
     return { error: "Couldn't add that — try again." };

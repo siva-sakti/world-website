@@ -402,6 +402,7 @@ export function BoardSurface({
           </span>
         )}
       </div>
+      <div className="compose-stage">
       {selectedBit && (
         <div className="selected-bar">
           <TagBar key={selectedBit.bitId} target={{ bitId: selectedBit.bitId }} />
@@ -481,6 +482,7 @@ export function BoardSurface({
             onSkip={() => setWordsFor(null)}
           />
         )}
+      </div>
       </div>
     </>
   );

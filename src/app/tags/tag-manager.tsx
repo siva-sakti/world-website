@@ -21,11 +21,11 @@ export function TagManager({ initial }: { initial: ManagedTag[] }) {
 
   async function saveRename(t: ManagedTag) {
     const w = draft.trim();
-    setEditingId(null);
-    if (!w || w === t.word) return;
+    if (!w || w === t.word) { setEditingId(null); return; }
     try {
       await renameTag(supabase, t.id, w);
       setTags((ts) => ts.map((x) => (x.id === t.id ? { ...x, word: w } : x)));
+      setEditingId(null); // close only after a successful rename
     } catch (e) {
       const code = (e as { code?: string })?.code;
       setNote(
@@ -33,6 +33,7 @@ export function TagManager({ initial }: { initial: ManagedTag[] }) {
           ? `“${w}” already exists — use “merge into” instead of renaming.`
           : "Couldn't rename that tag.",
       );
+      // keep the field open so the typed word survives the error
     }
   }
 

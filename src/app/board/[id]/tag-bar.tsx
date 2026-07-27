@@ -94,7 +94,10 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
           placeholder={loading ? "loading…" : "＋ tag"}
           onChange={(e) => setDraft(e.target.value)}
           onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 120)}
+          // Commit a typed tag on blur too — click-away saves, never lingers
+          // un-applied. (Suggestion buttons preventDefault mousedown, so a pick-click
+          // keeps focus and wins; an empty/dupe draft is a no-op in add().)
+          onBlur={() => { add(draft); setTimeout(() => setFocused(false), 120); }}
           onKeyDown={(e) => {
             if (e.key === "Enter") add(draft);
           }}
