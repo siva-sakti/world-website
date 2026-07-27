@@ -47,8 +47,20 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
 
   try {
     await createLooseTextBit(supabase, { bitId, body });
-    const name = (input.sourceName ?? "").trim();
-    if (name) await setSource(supabase, bitId, name, input.sourceUrl ?? null);
+    const rawName = (input.sourceName ?? "").trim();
+    if (rawName) {
+      let name = rawName;
+      let url = input.sourceUrl ?? null;
+      // A source given as a bare link → fetch its page title (the same plumbing a
+      // pasted-link note uses) so it reads "Title ↗", not a raw URL. A failed fetch
+      // falls back to the URL itself — capture is never blocked by the network.
+      if (!url && looksLikeUrl(rawName)) {
+        url = normalizeUrl(rawName);
+        const meta = await fetchPageMeta(url);
+        name = meta?.title?.trim() || url;
+      }
+      await setSource(supabase, bitId, name, url);
+    }
     for (const w of input.tags ?? []) {
       const word = w.trim();
       if (word) await applyTag(supabase, { bitId, word });

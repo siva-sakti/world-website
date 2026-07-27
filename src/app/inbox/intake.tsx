@@ -112,7 +112,7 @@ export function Intake() {
             <input
               className="tag-bar-input"
               value={draft}
-              placeholder="a book, a site, an author… (optional)"
+              placeholder="a book, a site, an author, or paste a link…"
               autoComplete="off"
               onChange={(e) => setDraft(e.target.value)}
               onFocus={() => setFocused(true)}
