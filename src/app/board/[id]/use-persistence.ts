@@ -25,10 +25,23 @@ export function usePersistence(
   // already captured the old key still writes to the real row — never a lost move.
   const renamed = useRef(new Map<string, string>());
 
-  // Remember each card's create so flush can wait for the row to exist.
+  // Remember each card's create so writes can wait for the row to exist. Stored
+  // settled-safe (.catch): a REJECTED create must not detonate inside flush or a
+  // destructive act — the creator's own .catch already surfaced the error.
   function trackCreate(placementId: string, p: Promise<unknown>) {
-    creates.current.set(placementId, p);
-    p.finally(() => creates.current.delete(placementId));
+    const safe = p.catch(() => {});
+    creates.current.set(placementId, safe);
+    safe.finally(() => creates.current.delete(placementId));
+  }
+
+  /** Wait for this card's create (if in flight) and resolve the REAL placement id
+   * (a call-in revive renames the optimistic one). EVERY write against a card —
+   * flush, un-place, trash, content — goes through here: a write that skips it can
+   * hit a not-yet-created row, match 0 rows, and silently lose the act. */
+  async function settled(placementId: string): Promise<string> {
+    const create = creates.current.get(placementId);
+    if (create) await create;
+    return renamed.current.get(placementId) ?? placementId;
   }
 
   function schedule(placementId: string, bitId: string, patch: Partial<CardVM>) {
@@ -50,10 +63,9 @@ export function usePersistence(
     pending.current.delete(placementId);
     timers.current.delete(placementId);
     if (!p) return;
-    const create = creates.current.get(placementId);
-    if (create) await create; // the row must exist before we update it
-    // Resolve the id AFTER the await: a reconcile may have landed while we waited.
-    const realId = renamed.current.get(placementId) ?? placementId;
+    // The row must exist before we update it; resolve the id AFTER the wait —
+    // a reconcile may have landed meanwhile. (settled never rejects.)
+    const realId = await settled(placementId);
     try {
       if (Object.keys(p.placement).length)
         await updatePlacement(supabase, realId, p.placement);
@@ -89,8 +101,12 @@ export function usePersistence(
     setCards((cs) =>
       cs.map((c) => (c.placementId === placementId ? { ...c, content: value.trim() || undefined } : c)),
     );
-    updateBitContent(supabase, bitId, value).catch(onErr);
+    // Through the door: a title typed on a fresh optimistic card must wait for the
+    // bit row to exist, or the update matches 0 rows and the title vanishes.
+    settled(placementId)
+      .then(() => updateBitContent(supabase, bitId, value))
+      .catch(onErr);
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId };
+  return { patchCard, saveContent, trackCreate, reconcileId, settled };
 }

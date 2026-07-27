@@ -71,7 +71,7 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId } = usePersistence(supabase, setCards, onErr);
+  const { patchCard, saveContent, trackCreate, reconcileId, settled } = usePersistence(supabase, setCards, onErr);
 
   // ---- camera ----
   function screenToWorld(clientX: number, clientY: number) {
@@ -302,17 +302,24 @@ export function BoardSurface({
     setEditingId(null);
   }
   // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
+  // Through the settled-create door: firing while the card's create is still in
+  // flight would match 0 rows and silently lose the removal (review finding #1).
   function unplaceSelected(placementId: string) {
     clearCard(placementId);
-    unplaceBit(supabase, placementId).catch(onErr);
+    settled(placementId)
+      .then((id) => unplaceBit(supabase, id))
+      .catch(onErr);
     setLooseRefresh((n) => n + 1); // it's loose again — let the column show it
   }
-  // Trash the whole bit — hidden everywhere, restorable from /trash.
-  function trashSelected(bitId: string) {
+  // Trash the whole bit — hidden everywhere, restorable from /trash. Same door:
+  // the bit row must exist before the freeze can land.
+  function trashSelected(placementId: string, bitId: string) {
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     setSelectedId(null);
     setEditingId(null);
-    trashBit(supabase, bitId).catch(onErr);
+    settled(placementId)
+      .then(() => trashBit(supabase, bitId))
+      .catch(onErr);
   }
 
   function addNote() {
@@ -362,11 +369,16 @@ export function BoardSurface({
     const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: w.x, y: w.y, width, height, z })
       .then((placement) => {
         if (placement.id !== placementId) {
+          reconcileId(placementId, placement.id);
+          // If a card already renders under the real id (the bit was ALREADY live
+          // here — a stale column), drop the optimistic twin instead of renaming:
+          // two cards must never share a placement id.
           setCards((cs) =>
-            cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
+            cs.some((c) => c.placementId === placement.id)
+              ? cs.filter((c) => c.placementId !== placementId)
+              : cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
           );
           setSelectedId((s) => (s === placementId ? placement.id : s));
-          reconcileId(placementId, placement.id);
         }
       })
       .catch((e) => {
@@ -416,7 +428,7 @@ export function BoardSurface({
             </button>
             <button
               className="compose-btn subtle"
-              onClick={() => trashSelected(selectedBit.bitId)}
+              onClick={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
               title="Move this note to the trash — hidden everywhere, restorable"
             >
               trash

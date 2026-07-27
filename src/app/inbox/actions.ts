@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { createLooseTextBit, trashBit, callInBit } from "@/lib/db/bits";
+import { createLooseTextBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
@@ -45,8 +45,10 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
   }
   const body = input.asQuote ? `<blockquote>${inner}</blockquote>` : inner;
 
+  let created = false;
   try {
     await createLooseTextBit(supabase, { bitId, body });
+    created = true;
     const rawName = (input.sourceName ?? "").trim();
     if (rawName) {
       let name = rawName;
@@ -67,6 +69,10 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     }
   } catch (e) {
     console.error("addToInbox failed:", e);
+    // A late step (source/tag) failed AFTER the bit was born: abort the create so
+    // "try again" starts clean — otherwise the retry duplicates the note (the first
+    // copy sitting in the pile missing its source/tags).
+    if (created) await abortBitCreate(supabase, bitId);
     return { error: "Couldn't add that — try again." };
   }
   revalidatePath("/inbox");
@@ -82,13 +88,21 @@ export async function trashFromInbox(formData: FormData) {
 }
 
 /** Door B (call-in from the inbox): place a loose note onto a board. It lands at a
- * default spot (you're not on the board — its "fit" frames it); callInBit revives the
- * row if the note lived there before, never a duplicate (I-L1). */
+ * default spot (you're not on the board — its "fit" frames it), spread a little by
+ * the bit's own id so several sends don't stack at one exact point; callInBit
+ * revives the row if the note lived there before, never a duplicate (I-L1). */
 export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const seed = Array.from(bitId).reduce((a, c) => a + c.charCodeAt(0), 0);
+  const x = 40 + (seed % 5) * 36;
+  const y = 40 + (seed % 7) * 28;
   try {
-    await callInBit(supabase, { bitId, boardId, placementId: randomUUID(), x: 40, y: 40 });
+    await callInBit(supabase, { bitId, boardId, placementId: randomUUID(), x, y });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : "";
+    revalidatePath("/inbox"); // a stale pile is often the CAUSE (trashed elsewhere) — refresh it
+    if (msg === "TRASHED_BIT") return { error: "That note is in the trash — restore it first." };
+    if (msg === "TRASHED_BOARD") return { error: "That board is in the trash." };
     console.error("placeOnBoard failed:", e);
     return { error: "Couldn't place that on the board." };
   }

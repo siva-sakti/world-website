@@ -12,11 +12,12 @@ import { signedUrl } from "@/lib/storage";
 
 type TypeFilter = "all" | "text" | "image" | "drawing";
 
+// The face comes from the view (bit_face — its ONE home; derive, don't duplicate);
+// fall back to a type label only when the face is blank (an untitled image/sketch).
 function faceOf(it: InboxItem): string {
-  if (it.type === "text")
-    return (it.body ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (it.face) return it.face;
   if (it.type === "image") return it.file_name ?? "image";
-  return "drawing";
+  return it.type === "drawing" ? "drawing" : "";
 }
 
 export function LooseColumn({
@@ -110,6 +111,9 @@ export function LooseColumn({
   });
 
   async function bring(bit: InboxItem) {
+    // Invalidate any in-flight load: its (pre-bring) result would re-list the note
+    // we're placing right now, resurrecting it in the column.
+    loadId.current++;
     setNotes((ns) => (ns ? ns.filter((n) => n.id !== bit.id) : ns));
     try {
       await onBringIn(bit);

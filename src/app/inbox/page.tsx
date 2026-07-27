@@ -46,8 +46,8 @@ export default async function InboxPage() {
         Your loose pile — anything not on a board yet. Catch it here; arrange it later.
       </p>
 
-      {/* Intake: pick a source (sticky across adds), jot pieces under it — each a
-          loose text bit carrying that source. A pasted link stays a clickable-link
+      {/* Intake: jot a note with an optional source + tags; each add makes a loose
+          text bit and the box fully resets. A pasted link stays a clickable-link
           note; "as a quote" formats it as a blockquote. Full editing → the workspace. */}
       <Intake />
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   listSources,
@@ -66,6 +66,15 @@ export function SourcePicker({
       setErr("Couldn't set that source — try again.");
     }
   }
+
+  // Unmount (deselect / card switch) never fires blur — commit the typed source on
+  // unmount too, so it's applied, not silently dropped (mirrors tag-bar).
+  const commitRef = useRef<() => void>(() => {});
+  commitRef.current = () => {
+    const nm = draft.trim();
+    if (nm) void pick(nm);
+  };
+  useEffect(() => () => commitRef.current(), []);
 
   async function clear() {
     setErr(null);

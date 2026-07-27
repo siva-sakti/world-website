@@ -1,18 +1,18 @@
-// Server-side page metadata for a bookmark (capture Slice 2). Fetch the page and
-// pull its title + og:image + favicon. Read ONCE, frozen at capture (I-S2) — a
-// dead or edited page never rewrites what you filed.
+// Server-side page TITLE for a source (D-102: a pasted link is provenance, not a
+// saved page). Fetched ONCE, at intake — the title becomes the source's NAME,
+// owner-editable in the manager afterward; a dead or edited page never rewrites
+// what you filed.
 //
 // SSRF-guarded, because this fetches a USER-SUPPLIED URL from our server:
-//   • https only            • block private / loopback hosts (also AFTER redirect)
-//   • timeout               • content-type must be html   • size cap
-// Proportionate hygiene, not a fortress — worst case a leaked capability makes our
-// server GET a web page (small blast radius on Vercel, per the review).
+//   • https only                    • block IP-literal + private hosts (also AFTER redirect)
+//   • timeout                       • content-type must be html
+//   • size cap even WITHOUT a Content-Length header (streamed read)
+// Proportionate hygiene, not a fortress — DNS-rebinding is consciously not covered
+// (worst case a leaked capability makes our server GET a web page; small blast
+// radius on Vercel, per the review).
 
 export type PageMeta = {
   title: string | null;
-  domain: string;
-  faviconUrl: string;
-  ogImageUrl: string | null; // stored as a real preview in a later slice
 };
 
 const MAX_HTML = 512 * 1024; // read at most ~512 KB of markup
@@ -20,18 +20,13 @@ const TIMEOUT_MS = 6000;
 
 function isPrivateHost(host: string): boolean {
   const h = host.toLowerCase().replace(/^\[|\]$/g, "");
-  if (
-    h === "localhost" || h === "0.0.0.0" || h === "::1" ||
-    h.startsWith("127.") || h.startsWith("10.") ||
-    h.startsWith("192.168.") || h.startsWith("169.254.") ||
-    h.endsWith(".local")
-  ) return true;
-  const m = h.match(/^172\.(\d+)\./); // 172.16–31.x.x is private
-  if (m) { const n = Number(m[1]); if (n >= 16 && n <= 31) return true; }
+  if (h === "localhost" || h.endsWith(".local")) return true;
+  if (h.includes(":")) return true; // any IPv6 literal — never a source URL
+  if (/^\d+(\.\d+){0,3}$/.test(h)) return true; // any bare-IP form (incl. decimal tricks)
   return false;
 }
 
-/** A safe URL for capture, or null if it can't be fetched safely. */
+/** A safe URL for the title fetch, or null if it can't be fetched safely. */
 function safeUrl(raw: string): URL | null {
   let u: URL;
   try { u = new URL(raw); } catch { return null; }
@@ -61,23 +56,26 @@ function extractTitle(html: string): string | null {
   return clean ? clean.slice(0, 300) : null;
 }
 
-function extractOgImage(html: string, base: URL): string | null {
-  const raw =
-    firstMatch(html, /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
-    firstMatch(html, /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-  if (!raw) return null;
-  try {
-    const abs = new URL(decodeEntities(raw), base); // resolve relative → absolute
-    return abs.protocol === "https:" ? abs.toString() : null;
-  } catch { return null; }
+/** Read at most MAX_HTML bytes of the body — capped even when the server sends no
+ * Content-Length (a hostile page must not balloon a serverless function). */
+async function readCapped(res: Response): Promise<string> {
+  if (!res.body) return (await res.text()).slice(0, MAX_HTML);
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let html = "";
+  while (html.length < MAX_HTML) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    html += dec.decode(value, { stream: true });
+  }
+  reader.cancel().catch(() => {});
+  return html.slice(0, MAX_HTML);
 }
 
 export async function fetchPageMeta(rawUrl: string): Promise<PageMeta | null> {
   const u = safeUrl(rawUrl);
   if (!u) return null;
-  const domain = u.hostname.replace(/^www\./, "");
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
-  const fallback: PageMeta = { title: null, domain, faviconUrl, ogImageUrl: null };
+  const fallback: PageMeta = { title: null };
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
@@ -85,19 +83,17 @@ export async function fetchPageMeta(rawUrl: string): Promise<PageMeta | null> {
     const res = await fetch(u.toString(), {
       signal: ctrl.signal,
       redirect: "follow",
-      headers: { "user-agent": "worldbot/1.0 (+bookmark-preview)", accept: "text/html" },
+      headers: { "user-agent": "worldbot/1.0 (+source-title)", accept: "text/html" },
     });
     // a redirect could land on a private host — re-check the FINAL url
     try { if (isPrivateHost(new URL(res.url).hostname)) return fallback; } catch { /* keep */ }
     if (!res.ok) return fallback;
     const ct = res.headers.get("content-type") ?? "";
     if (!ct.includes("text/html")) return fallback;
-    const len = Number(res.headers.get("content-length") ?? "0");
-    if (len && len > 4 * MAX_HTML) return fallback; // absurdly large → skip
-    const html = (await res.text()).slice(0, MAX_HTML);
-    return { title: extractTitle(html), domain, faviconUrl, ogImageUrl: extractOgImage(html, u) };
+    const html = await readCapped(res);
+    return { title: extractTitle(html) };
   } catch {
-    return fallback; // timeout / network / parse — the bookmark still saves
+    return fallback; // timeout / network / parse — the capture still saves
   } finally {
     clearTimeout(timer);
   }

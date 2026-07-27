@@ -8,15 +8,20 @@ export const dynamic = "force-dynamic";
 // record kind as JSON, plus a signed URL per stored file so the images can be
 // pulled too. RLS scopes it to the owner. (A single zip that bundles the image
 // bytes is the next refinement; this already lets you download all your data.)
+// KEEP IN LOCKSTEP WITH THE SCHEMA (I-G1's completeness floor): any migration
+// that adds a table must add it here the same session — source and reference
+// were each missed once; this list is the third place that bug bit.
 const TABLES = [
   "board",
   "bit",
   "placement",
   "tag_application",
   "connector",
+  "reference",
   "tag",
   "category",
   "subtype_word",
+  "source",
   "dormant",
 ] as const;
 

@@ -9,6 +9,20 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type Source = { id: string; name: string; url: string | null };
 
+/** A storable source url, or null. Only http(s) is a source link — anything else
+ * (javascript:, data:, a stray word) is dropped at this ONE write door, which
+ * guards every render site that puts source.url into an href. */
+function sanitizeUrl(raw?: string | null): string | null {
+  const t = (raw ?? "").trim();
+  if (!t) return null;
+  try {
+    const u = new URL(t);
+    return u.protocol === "http:" || u.protocol === "https:" ? t : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Every source, newest first — the picker's menu (and later the reading list). */
 export async function listSources(supabase: SupabaseClient): Promise<Source[]> {
   const { data, error } = await supabase
@@ -61,10 +75,11 @@ export async function setSource(
   const nm = name.trim();
   if (!nm) throw new Error("empty source name");
 
+  const cleanUrl = sanitizeUrl(url);
   let source: Source;
   const ins = await supabase
     .from("source")
-    .insert({ name: nm, url: url?.trim() || null })
+    .insert({ name: nm, url: cleanUrl })
     .select("id, name, url")
     .single();
   if (ins.error) {
@@ -80,6 +95,19 @@ export async function setSource(
         .single();
       if (sel.error) throw sel.error;
       source = sel.data as Source;
+      // Back-fill: the caller brought a url and the existing same-named source has
+      // NONE — record it (a gained fact, not an overwrite). A CONFLICTING url is
+      // never silently replaced (I-Src3: re-URLing is a deliberate edit); surfacing
+      // that collision to the owner is a queued follow-up.
+      if (cleanUrl && !source.url) {
+        const fill = await supabase
+          .from("source")
+          .update({ url: cleanUrl })
+          .eq("id", source.id)
+          .select("id, name, url")
+          .single();
+        if (!fill.error) source = fill.data as Source;
+      }
     } else {
       throw ins.error;
     }
@@ -100,34 +128,43 @@ export async function clearSource(supabase: SupabaseClient, bitId: string): Prom
 
 // ---- the sources-list / reading list (§5c) ----
 
-/** A source with its live-bit count — the reading list's row. */
-export type ManagedSource = { id: string; name: string; url: string | null; count: number };
+/** A source with its carrier counts — live bits AND frozen (trashed) ones. The
+ *  trash count exists so destructive confirms can state their FULL loss (I-T2):
+ *  merge/delete reach frozen carriers too, and the confirm must say so. */
+export type ManagedSource = {
+  id: string; name: string; url: string | null;
+  count: number; // live carriers
+  trash: number; // frozen carriers — reached by merge/delete all the same
+};
 
-/** Every source with how many live bits carry it — your reading list, most-used
- *  first. There's no source_counts view (that'd be a migration), so the count is
- *  tallied here over the loose+placed live bits. Sources arrive newest-first, and a
- *  stable sort by count (ES2019+) keeps that as the tiebreak. */
+/** Every source with how many bits carry it — your reading list, most-used first.
+ *  There's no source_counts view (that'd be a migration), so the tally happens here
+ *  over ALL carriers, split live/trash (mirrors tag_counts' world+trash — I-T2).
+ *  Sources arrive newest-first; a stable sort by live count keeps that tiebreak. */
 export async function listManagedSources(
   supabase: SupabaseClient,
 ): Promise<ManagedSource[]> {
   const [srcRes, bitRes] = await Promise.all([
     supabase.from("source").select("id, name, url").order("created_at", { ascending: false }),
-    supabase.from("bit").select("source_id").is("deleted_at", null).not("source_id", "is", null),
+    supabase.from("bit").select("source_id, deleted_at").not("source_id", "is", null),
   ]);
   if (srcRes.error) throw srcRes.error;
   if (bitRes.error) throw bitRes.error;
 
-  const counts = new Map<string, number>();
+  const live = new Map<string, number>();
+  const frozen = new Map<string, number>();
   for (const r of bitRes.data ?? []) {
     const id = r.source_id as string;
-    counts.set(id, (counts.get(id) ?? 0) + 1);
+    const m = r.deleted_at ? frozen : live;
+    m.set(id, (m.get(id) ?? 0) + 1);
   }
   return (srcRes.data ?? [])
     .map((s) => ({
       id: s.id as string,
       name: s.name as string,
       url: (s.url as string | null) ?? null,
-      count: counts.get(s.id as string) ?? 0,
+      count: live.get(s.id as string) ?? 0,
+      trash: frozen.get(s.id as string) ?? 0,
     }))
     .sort((a, b) => b.count - a.count);
 }
@@ -147,9 +184,13 @@ export async function editSource(
 ): Promise<void> {
   const nm = name.trim();
   if (!nm) throw new Error("empty source name");
+  const clean = sanitizeUrl(url);
+  // A deliberate edit typing something that ISN'T a web address is refused loudly
+  // (silently nulling it would look like a successful save).
+  if ((url ?? "").trim() && !clean) throw new Error("that link isn't a web address");
   const { error } = await supabase
     .from("source")
-    .update({ name: nm, url: url?.trim() || null })
+    .update({ name: nm, url: clean })
     .eq("id", id);
   if (error) throw error;
 }

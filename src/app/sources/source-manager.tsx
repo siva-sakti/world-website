@@ -21,6 +21,14 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
   const isEditing = (id: string, field: "name" | "url") =>
     editing?.id === id && editing.field === field;
 
+  // A destructive confirm states its FULL loss — frozen carriers included (I-T2):
+  // merge/delete reach trashed notes exactly like live ones.
+  function carriers(s: ManagedSource): string {
+    const parts = [`${s.count} ${s.count === 1 ? "note" : "notes"}`];
+    if (s.trash > 0) parts.push(`${s.trash} in the trash`);
+    return parts.join(" + ");
+  }
+
   function begin(id: string, field: "name" | "url", value: string) {
     setEditing({ id, field });
     setDraft(value);
@@ -57,7 +65,7 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
     if (!into) return;
     if (
       !confirm(
-        `Merge “${from.name}” into “${into.name}”? Its ${from.count} ${from.count === 1 ? "note" : "notes"} become “${into.name}”. This can't be undone.`,
+        `Merge “${from.name}” into “${into.name}”? Its ${carriers(from)} become “${into.name}”. This can't be undone.`,
       )
     )
       return;
@@ -66,7 +74,11 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
       setSources((xs) =>
         xs
           .filter((s) => s.id !== from.id)
-          .map((s) => (s.id === into.id ? { ...s, count: s.count + from.count } : s)),
+          .map((s) =>
+            s.id === into.id
+              ? { ...s, count: s.count + from.count, trash: s.trash + from.trash }
+              : s,
+          ),
       );
       setNote(`Merged “${from.name}” into “${into.name}”.`);
     } catch {
@@ -77,7 +89,7 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
   async function doDelete(s: ManagedSource) {
     if (
       !confirm(
-        `Delete this source? Its ${s.count} ${s.count === 1 ? "note stays" : "notes stay"} — they just lose the “from …” stamp.`,
+        `Delete this source? Its ${carriers(s)} ${s.count + s.trash === 1 ? "stays" : "stay"} — they just lose the “from …” stamp.`,
       )
     )
       return;

@@ -11,13 +11,13 @@ import { addToInbox } from "./actions";
 // whether or not you pressed Enter (nothing typed is silently dropped), and the
 // whole box RESETS after each add — note cleared, textarea shrunk, source + tags
 // wiped — so the next note starts fresh. "As a quote" is formatting (a blockquote).
-type Sticky = { name: string; url: string | null };
+type PickedSource = { name: string; url: string | null };
 
 export function Intake() {
   const [supabase] = useState(() => createClient());
   const [sources, setSources] = useState<Source[]>([]);
   const [tagMenu, setTagMenu] = useState<TagChoice[]>([]);
-  const [sticky, setSticky] = useState<Sticky | null>(null);
+  const [sticky, setSticky] = useState<PickedSource | null>(null);
   const [draft, setDraft] = useState(""); // the source input
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState("");
@@ -72,17 +72,24 @@ export function Intake() {
     const sourceName = sticky?.name ?? (draft.trim() || null);
     const sourceUrl = sticky?.url ?? null;
     const tags = tagDraft.trim() ? [...tagWords, tagDraft.trim()] : tagWords;
-    const res = await addToInbox({ note: body, asQuote, sourceName, sourceUrl, tags });
-    setPending(false);
-    if (res.error) { setErr(res.error); return; }
-    // Full reset — a fresh box for the next note (the "better reset").
-    setNote("");
-    setAsQuote(false);
-    setSticky(null);
-    setDraft("");
-    setTagWords([]);
-    setTagDraft("");
-    noteRef.current?.focus();
+    try {
+      const res = await addToInbox({ note: body, asQuote, sourceName, sourceUrl, tags });
+      if (res.error) { setErr(res.error); return; }
+      // Full reset — a fresh box for the next note (the "better reset").
+      setNote("");
+      setAsQuote(false);
+      setSticky(null);
+      setDraft("");
+      setTagWords([]);
+      setTagDraft("");
+      noteRef.current?.focus();
+    } catch {
+      // The action call itself rejected (offline / flaky network — the phone case).
+      // Without this catch, `pending` would stick true and lock the box forever.
+      setErr("Couldn't reach the server — check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
   }
 
   const q = draft.trim().toLowerCase();

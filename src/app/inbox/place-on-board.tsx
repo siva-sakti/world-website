@@ -22,10 +22,15 @@ export function PlaceOnBoard({
     if (!boardId || pending) return;
     setPending(true);
     setErr(false);
-    const res = await placeOnBoard(bitId, boardId);
-    setPending(false);
-    if (res.error) setErr(true);
-    // On success, revalidatePath re-renders the inbox without this note.
+    try {
+      const res = await placeOnBoard(bitId, boardId);
+      if (res.error) setErr(true);
+      // On success, revalidatePath re-renders the inbox without this note.
+    } catch {
+      setErr(true); // network rejection — without this, `pending` sticks forever
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

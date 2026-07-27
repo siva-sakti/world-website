@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   listTags,
@@ -60,6 +60,17 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
       setErr("Couldn't add that tag — try again.");
     }
   }
+
+  // Click-away that UNMOUNTS the bar (deselecting the card, switching cards) never
+  // fires the input's blur — commit the typed word on unmount too, so it's applied,
+  // not silently dropped. Refs keep the latest draft + add (post-unmount setStates
+  // are no-ops; applyTag is idempotent).
+  const commitRef = useRef<() => void>(() => {});
+  commitRef.current = () => {
+    const w = draft.trim();
+    if (w) void add(w);
+  };
+  useEffect(() => () => commitRef.current(), []);
 
   async function remove(tag: Tag) {
     setErr(null);

@@ -119,11 +119,29 @@ export async function createLooseTextBit(
  * its optimistic card to the real id (a revived row keeps its own id, not the guess). */
 export async function callInBit(
   supabase: SupabaseClient,
-  args: { bitId: string; boardId: string; placementId: string } & Pos,
+  args: {
+    bitId: string; boardId: string; placementId: string;
+    x: number; y: number; // always a whole position — no positionless card lands via call-in
+    width?: number | null; height?: number | null; z?: number | null;
+  },
 ): Promise<Placement> {
+  // Liveness guard (I-D1): no write lands on a tombstone. A STALE surface (another
+  // tab's inbox) can offer a bit — or target a board — trashed since it rendered;
+  // refuse loudly instead of planting an invisible placement. (The full ruled clash
+  // mechanism, §2h FOR SHARE + keep-by-default, is the owed follow-up; this narrow
+  // guard covers the call-in door.)
+  const [bitLive, boardLive] = await Promise.all([
+    supabase.from("bit").select("id").eq("id", args.bitId).is("deleted_at", null).maybeSingle(),
+    supabase.from("board").select("id").eq("id", args.boardId).is("deleted_at", null).maybeSingle(),
+  ]);
+  if (bitLive.error) throw bitLive.error;
+  if (boardLive.error) throw boardLive.error;
+  if (!bitLive.data) throw new Error("TRASHED_BIT");
+  if (!boardLive.data) throw new Error("TRASHED_BOARD");
+
   const pos = {
-    x: args.x ?? null,
-    y: args.y ?? null,
+    x: args.x,
+    y: args.y,
     width: args.width ?? null,
     height: args.height ?? null,
     z: args.z ?? 0,
@@ -135,16 +153,27 @@ export async function callInBit(
     .single();
   if (!ins.error) return ins.data as Placement;
   if (ins.error.code !== "23505") throw ins.error;
-  // A departed row for (board, bit) already exists — revive it, never duplicate (I-L1).
-  const { data, error } = await supabase
+  // A row for (board, bit) already exists. Revive ONLY a departed one (left_at set),
+  // never duplicate (I-L1). If the conflicting row is LIVE — a stale-surface
+  // double-place — return it UNTOUCHED: we never yank a live card to a new spot.
+  const rev = await supabase
     .from("placement")
     .update({ left_at: null, ...pos })
     .eq("board_id", args.boardId)
     .eq("target_bit_id", args.bitId)
+    .not("left_at", "is", null)
     .select("*")
+    .maybeSingle();
+  if (rev.error) throw rev.error;
+  if (rev.data) return rev.data as Placement;
+  const cur = await supabase
+    .from("placement")
+    .select("*")
+    .eq("board_id", args.boardId)
+    .eq("target_bit_id", args.bitId)
     .single();
-  if (error) throw error;
-  return data as Placement;
+  if (cur.error) throw cur.error;
+  return cur.data as Placement;
 }
 
 export async function updatePlacement(
@@ -178,28 +207,42 @@ export async function updateBitContent(
 }
 
 /** Un-place: take the card off this board. The membership row is KEPT (travel,
- * §2c) — we stamp left_at, never delete. The bit survives (I-L7). */
+ * §2c) — we stamp left_at, never delete. The bit survives (I-L7). Asserts a row
+ * was actually stamped: a 0-row update means the act silently missed (the review's
+ * lost-removal class) — surface it, never swallow it. */
 export async function unplaceBit(
   supabase: SupabaseClient,
   placementId: string,
 ): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("placement")
     .update({ left_at: new Date().toISOString() })
-    .eq("id", placementId);
+    .eq("id", placementId)
+    .select("id");
   if (error) throw error;
+  if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
-/** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). */
+/** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
+ * row was touched (0 rows = the act missed — surface it). */
 export async function trashBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("bit")
     .update({ deleted_at: new Date().toISOString() })
-    .eq("id", bitId);
+    .eq("id", bitId)
+    .select("id");
   if (error) throw error;
+  if (!data?.length) throw new Error("that note no longer exists — reload");
+}
+
+/** Compensating erase of a bit created MOMENTS ago by a multi-step intake whose
+ * later step failed — an abort of the act, not a destroy of a kept thing (the bit
+ * was never seen). Best-effort: cascades take any placements. */
+export async function abortBitCreate(supabase: SupabaseClient, bitId: string): Promise<void> {
+  await supabase.from("bit").delete().eq("id", bitId);
 }
 
 /** Restore a trashed bit — back to the world exactly, everywhere it was (§2g). */
