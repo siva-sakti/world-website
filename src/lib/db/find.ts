@@ -40,15 +40,38 @@ export async function findBits(
 
   const { data: bits, error } = await query;
   if (error) throw error;
-  const rows = (bits ?? []) as Bit[];
-  if (rows.length === 0) return [];
+  return attachTags(supabase, (bits ?? []) as Bit[]);
+}
 
-  // Attach each bit's tags in one round-trip.
-  const { data: apps, error: tErr } = await supabase
+/** Everything from one source (§5b) — the source view's list. Live bits carrying
+ *  source_id = X, newest first, tags attached. Grouping by id is cheap (I-Src);
+ *  clones the findBits shape so the two lists render identically. */
+export async function bitsFromSource(
+  supabase: SupabaseClient,
+  sourceId: string,
+): Promise<FindResult[]> {
+  const { data, error } = await supabase
+    .from("bit")
+    .select("*")
+    .eq("source_id", sourceId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return attachTags(supabase, (data ?? []) as Bit[]);
+}
+
+/** Attach each bit's tags in one round-trip (the pull, denormalized for a list). */
+async function attachTags(
+  supabase: SupabaseClient,
+  rows: Bit[],
+): Promise<FindResult[]> {
+  if (rows.length === 0) return [];
+  const { data: apps, error } = await supabase
     .from("tag_application")
     .select("target_bit_id, tag:tag(id, word)")
     .in("target_bit_id", rows.map((b) => b.id));
-  if (tErr) throw tErr;
+  if (error) throw error;
   const byBit = new Map<string, { id: string; word: string }[]>();
   for (const a of apps ?? []) {
     const t = a.tag as unknown as { id: string; word: string };
@@ -56,6 +79,5 @@ export async function findBits(
     if (t) arr.push(t);
     byBit.set(a.target_bit_id as string, arr);
   }
-
   return rows.map((b) => ({ ...b, tags: byBit.get(b.id) ?? [] }));
 }

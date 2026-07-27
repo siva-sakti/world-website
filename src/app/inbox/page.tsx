@@ -1,28 +1,22 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { listInbox } from "@/lib/db/inbox";
+import { listInbox, type InboxItem } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
 import { logout } from "@/app/login/actions";
 import { quickAdd, trashFromInbox } from "./actions";
-import type { Bit } from "@/lib/types";
+import { InboxTags } from "./inbox-tags";
 
 export const dynamic = "force-dynamic";
-
-function domainOf(url: string | null): string | null {
-  if (!url) return null;
-  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return null; }
-}
-const faviconOf = (domain: string) =>
-  `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
 
 export default async function InboxPage() {
   const supabase = await createClient();
   const bits = await listInbox(supabase);
 
-  // Resolve display images for image bits + any bookmark previews (later slices).
+  // Resolve display images for image bits (thumb preferred, full as a fallback).
   const imageUrl = new Map<string, string>();
   await Promise.all(
     bits.map(async (b) => {
+      if (b.type !== "image") return;
       const path = b.thumb_path ?? b.storage_path;
       if (!path) return;
       try { imageUrl.set(b.id, await signedUrl(supabase, path)); } catch { /* skip */ }
@@ -37,6 +31,7 @@ export default async function InboxPage() {
           <span className="font-semibold">inbox</span>
           <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">find</Link>
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">tags</Link>
+          <Link href="/sources" className="text-neutral-500 underline underline-offset-4 hover:no-underline">sources</Link>
         </div>
         <form action={logout}>
           <button className="text-sm text-neutral-500 underline underline-offset-4 hover:no-underline">sign out</button>
@@ -47,7 +42,8 @@ export default async function InboxPage() {
         Your loose pile — anything not on a board yet. Catch it here; arrange it later.
       </p>
 
-      {/* Quick-add: one box. A pasted link becomes a bookmark; anything else, a note. */}
+      {/* Quick-add: one box. A pasted link becomes a note with a clickable link;
+          anything else, a note. Full source + rich text live in the workspace. */}
       <form action={quickAdd} className="inbox-quickadd">
         <input
           name="text"
@@ -70,7 +66,7 @@ export default async function InboxPage() {
           </p>
           <ul className="inbox-grid">
             {bits.map((b) => (
-              <InboxCard key={b.id} bit={b} img={imageUrl.get(b.id)} />
+              <InboxCard key={b.id} item={b} img={imageUrl.get(b.id)} />
             ))}
           </ul>
         </>
@@ -79,32 +75,22 @@ export default async function InboxPage() {
   );
 }
 
-function InboxCard({ bit, img }: { bit: Bit; img?: string }) {
-  const domain = domainOf(bit.url);
-  const title = bit.face; // content ?? captured_title ?? url (for a bookmark), first words (text)
+function InboxCard({ item, img }: { item: InboxItem; img?: string }) {
+  const title = item.face; // first words (text) · label (drawing) · content (image)
+  const source = item.source;
 
   return (
-    <li className={`inbox-card inbox-card--${bit.type}`}>
-      <Link href={`/bit/${bit.id}`} className="inbox-card-body" title="open">
-        {bit.type === "image" || (bit.type === "bookmark" && img) ? (
+    <li className={`inbox-card inbox-card--${item.type}`}>
+      {/* Open → the workspace, where full editing / tagging / source live. */}
+      <Link href={`/bit/${item.id}`} className="inbox-card-body" title="open">
+        {item.type === "image" ? (
           img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img} alt={title ?? ""} className="inbox-card-media" />
           ) : (
             <span className="inbox-card-media inbox-card-media--empty">image</span>
           )
-        ) : bit.type === "bookmark" ? (
-          <span className="inbox-card-bookmark">
-            {domain && (
-              <span className="inbox-card-site">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={faviconOf(domain)} alt="" className="inbox-card-favicon" />
-                {domain}
-              </span>
-            )}
-            <span className="inbox-card-title">{title ?? bit.url}</span>
-          </span>
-        ) : bit.type === "drawing" ? (
+        ) : item.type === "drawing" ? (
           <span className="inbox-card-note inbox-card-note--drawing">
             <span className="inbox-card-kind">✎ sketch</span>
             {title && <span className="inbox-card-title">{title}</span>}
@@ -120,14 +106,38 @@ function InboxCard({ bit, img }: { bit: Bit; img?: string }) {
         )}
       </Link>
 
-      <div className="inbox-card-foot">
-        {bit.type === "bookmark" && bit.url ? (
-          <a href={bit.url} target="_blank" rel="noopener noreferrer" className="inbox-card-open">open ↗</a>
-        ) : (
-          <span className="inbox-card-kind-tag">{bit.type}</span>
+      {/* Meta — provenance + a light tag affordance. Interactive, so OUTSIDE the
+          open-link (a bit's "from …" travels with it, P8). */}
+      <div className="inbox-card-meta">
+        {source && (
+          <span className="inbox-card-from">
+            <Link
+              href={`/source/${source.id}`}
+              className="inbox-card-from-name"
+              title="everything from this source"
+            >
+              from {source.name}
+            </Link>
+            {source.url && (
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inbox-card-from-open"
+                title="open source"
+              >
+                ↗
+              </a>
+            )}
+          </span>
         )}
+        <InboxTags bitId={item.id} initialTags={item.tags} />
+      </div>
+
+      <div className="inbox-card-foot">
+        <span className="inbox-card-kind-tag">{item.type}</span>
         <form action={trashFromInbox}>
-          <input type="hidden" name="id" value={bit.id} />
+          <input type="hidden" name="id" value={item.id} />
           <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>
         </form>
       </div>

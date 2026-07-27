@@ -19,6 +19,20 @@ export async function listSources(supabase: SupabaseClient): Promise<Source[]> {
   return (data ?? []) as Source[];
 }
 
+/** One source by id — the source view's heading (name + optional url). */
+export async function getSource(
+  supabase: SupabaseClient,
+  id: string,
+): Promise<Source | null> {
+  const { data, error } = await supabase
+    .from("source")
+    .select("id, name, url")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Source | null) ?? null;
+}
+
 /** The source currently on a bit — null if it carries none. */
 export async function getBitSource(
   supabase: SupabaseClient,
@@ -82,6 +96,40 @@ export async function setSource(
 export async function clearSource(supabase: SupabaseClient, bitId: string): Promise<void> {
   const { error } = await supabase.from("bit").update({ source_id: null }).eq("id", bitId);
   if (error) throw error;
+}
+
+// ---- the sources-list / reading list (§5c) ----
+
+/** A source with its live-bit count — the reading list's row. */
+export type ManagedSource = { id: string; name: string; url: string | null; count: number };
+
+/** Every source with how many live bits carry it — your reading list, most-used
+ *  first. There's no source_counts view (that'd be a migration), so the count is
+ *  tallied here over the loose+placed live bits. Sources arrive newest-first, and a
+ *  stable sort by count (ES2019+) keeps that as the tiebreak. */
+export async function listManagedSources(
+  supabase: SupabaseClient,
+): Promise<ManagedSource[]> {
+  const [srcRes, bitRes] = await Promise.all([
+    supabase.from("source").select("id, name, url").order("created_at", { ascending: false }),
+    supabase.from("bit").select("source_id").is("deleted_at", null).not("source_id", "is", null),
+  ]);
+  if (srcRes.error) throw srcRes.error;
+  if (bitRes.error) throw bitRes.error;
+
+  const counts = new Map<string, number>();
+  for (const r of bitRes.data ?? []) {
+    const id = r.source_id as string;
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return (srcRes.data ?? [])
+    .map((s) => ({
+      id: s.id as string,
+      name: s.name as string,
+      url: (s.url as string | null) ?? null,
+      count: counts.get(s.id as string) ?? 0,
+    }))
+    .sort((a, b) => b.count - a.count);
 }
 
 /** Rename a source — free; every bit carrying it follows instantly (P9, id-referenced). */

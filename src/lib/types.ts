@@ -21,6 +21,7 @@ export type Bit = {
   id: string;
   type: BitType;
   subtype_word_id: string | null;
+  source_id: string | null; // the bit's single source — "where from" (§2, FK → source)
   content: string | null; // owner-authored words; on a text bit, the optional title (D-087)
   body: string | null; // a text bit's rich-text words
   strokes: Stroke[] | null; // a drawing's vectors

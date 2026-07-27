@@ -657,6 +657,59 @@ body {
   font-size: 12px;
   color: #a89f92;
 }
+/* Card meta — provenance + a light tag affordance, between the body and the foot. */
+.inbox-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px 2px;
+}
+.inbox-card-from {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 11px;
+  color: #8a8175;
+}
+.inbox-card-from-name {
+  color: #8a8175;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 168px;
+}
+.inbox-card-from-name:hover {
+  text-decoration: underline;
+}
+.inbox-card-from-open {
+  color: #365a8c;
+  text-decoration: none;
+}
+.inbox-card-from-open:hover {
+  text-decoration: underline;
+}
+.inbox-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.inbox-card-tags .tag-chip {
+  cursor: default; /* collapsed chips are a glance, not a control */
+}
+.inbox-tag-add {
+  font-size: 12px;
+  line-height: 1;
+  color: #b3a998;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+}
+.inbox-tag-add:hover {
+  color: #6f665a;
+}
 .inbox-card-foot {
   display: flex;
   align-items: center;
