@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { createLooseTextBit, trashBit } from "@/lib/db/bits";
+import { createLooseTextBit, trashBit, callInBit } from "@/lib/db/bits";
 import { setSource } from "@/lib/db/sources";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
 
@@ -61,4 +61,19 @@ export async function trashFromInbox(formData: FormData) {
   const supabase = await createClient();
   await trashBit(supabase, id);
   revalidatePath("/inbox");
+}
+
+/** Door B (call-in from the inbox): place a loose note onto a board. It lands at a
+ * default spot (you're not on the board — its "fit" frames it); callInBit revives the
+ * row if the note lived there before, never a duplicate (I-L1). */
+export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  try {
+    await callInBit(supabase, { bitId, boardId, placementId: randomUUID(), x: 40, y: 40 });
+  } catch (e) {
+    console.error("placeOnBoard failed:", e);
+    return { error: "Couldn't place that on the board." };
+  }
+  revalidatePath("/inbox");
+  return {};
 }

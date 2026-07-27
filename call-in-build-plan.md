@@ -1,6 +1,6 @@
 # Call-in — bring a loose note onto a board (build plan)
 
-**Status:** planned, cross-window review folded in. **Ready to build.**
+**Status:** ✅ **built + deployed** — stages ① core loop · ② search · ③ filters (tag/source/type) · ④ polish · ⑤ inbox "place on a board…" door. Re-place regression green (`run-1d-native.sh`); `pnpm build` green. Owner feel-test in progress; the D-log receipt lands after sign-off.
 **Shape:** **app code only — no schema change.** The timestamps, the `placement` table, the "one row per (note, board)" rule, and the inbox view all already exist; call-in just feeds them.
 **Supersedes:** the thin call-in sketch in the old capture plan (`old/`). Owner-driven design session + review, 2026-07-27.
 **Reviewed:** a second-window review was folded in — findings 1–3, a scope note, and six smaller items. Its three checkable claims were **verified against the code** (see §0 and inline).

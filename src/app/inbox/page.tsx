@@ -1,17 +1,20 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listInbox, type InboxItem } from "@/lib/db/inbox";
+import { listBoards } from "@/lib/db/boards";
 import { signedUrl } from "@/lib/storage";
 import { logout } from "@/app/login/actions";
 import { trashFromInbox } from "./actions";
 import { Intake } from "./intake";
 import { InboxTags } from "./inbox-tags";
+import { PlaceOnBoard } from "./place-on-board";
 
 export const dynamic = "force-dynamic";
 
 export default async function InboxPage() {
   const supabase = await createClient();
   const bits = await listInbox(supabase);
+  const boards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
 
   // Resolve display images for image bits (thumb preferred, full as a fallback).
   const imageUrl = new Map<string, string>();
@@ -59,7 +62,7 @@ export default async function InboxPage() {
           </p>
           <ul className="inbox-grid">
             {bits.map((b) => (
-              <InboxCard key={b.id} item={b} img={imageUrl.get(b.id)} />
+              <InboxCard key={b.id} item={b} img={imageUrl.get(b.id)} boards={boards} />
             ))}
           </ul>
         </>
@@ -68,7 +71,15 @@ export default async function InboxPage() {
   );
 }
 
-function InboxCard({ item, img }: { item: InboxItem; img?: string }) {
+function InboxCard({
+  item,
+  img,
+  boards,
+}: {
+  item: InboxItem;
+  img?: string;
+  boards: { id: string; title: string | null }[];
+}) {
   const title = item.face; // first words (text) · label (drawing) · content (image)
   const source = item.source;
 
@@ -129,10 +140,13 @@ function InboxCard({ item, img }: { item: InboxItem; img?: string }) {
 
       <div className="inbox-card-foot">
         <span className="inbox-card-kind-tag">{item.type}</span>
-        <form action={trashFromInbox}>
-          <input type="hidden" name="id" value={item.id} />
-          <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>
-        </form>
+        <span className="inbox-card-actions">
+          <PlaceOnBoard bitId={item.id} boards={boards} />
+          <form action={trashFromInbox}>
+            <input type="hidden" name="id" value={item.id} />
+            <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>
+          </form>
+        </span>
       </div>
     </li>
   );
