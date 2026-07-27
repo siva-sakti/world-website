@@ -20,11 +20,13 @@ A **private, single-user spatial notebook** — a place to **grow ideas, not jus
 
 ---
 
-## 1. Where we are
+## 1. Where we are *(refreshed 2026-07-27 — the previous block predated the port)*
 
-✅ **Compose board built, deployed, validated on the Daylight with a real stylus** — text, image, handwriting as movable cards. Live at `world-website.vercel.app`.
-⚠️ **Prototype only:** localStorage, per-device, **no cloud, no login, no backup**, currently public. That's the port.
-✅ **The model is closed, audited, walked through real scenes, and *translated* to a proven schema** (Stage 1, D-083–D-085) — the migration applies and every rule is proven in `verification/`. Awaiting the advisor's independent pass + Checkpoint B, then the port.
+✅ **The model is closed, audited, walked through real scenes, and *translated* to a proven schema** (Stage 1, D-083–D-085) — the migration applies and every rule is proven in `verification/`.
+✅ **The port is DONE and live** — cloud Supabase + Vercel, login wall, RLS, real data at `world-website.vercel.app` (D-089/D-092). Compose on real rows: text · image · pen (colors/sizes/eraser, D-099) · endless canvas + fit · tags + find + the pull · tag manager · board tagging · trash/restore · export · a bit's own page + travel · a read-only graph view.
+✅ **The full bit + capture-lite** — source made **first-class**, bookmark retired (D-102); rich text; the editable workspace; the inbox + intake (source + tags at capture, smart source links); the source manager; **call-in both doors** (the loose-notes column on a board · "place on…" from the inbox) (D-103–D-105).
+✅ **Gather G1** — the `reference` table applied (D-101); the `[[` picker (G2/G3) is next in that track.
+🔎 **Deep multi-agent review run 2026-07-27** (D-106): 11 confirmed findings all fixed same-night; docs re-synced; proofs green.
 
 ---
 

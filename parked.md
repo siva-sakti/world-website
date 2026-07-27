@@ -42,6 +42,11 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | A16 | **Active rename-propagation** — fan-out rewriting every referencing note when a gathered bit is renamed | rejected in the Principle 9 carve (the chip self-heals lazily instead — §6 amendment / I-Ref8); re-enter only if the lazy staleness ever genuinely annoys | gather §7/§9 |
 | A17 | **"(removed)" reveals a trashed bit exists** — a muted chip shows that a referenced bit is trashed | fine owner-only now; revisit at the sharing phase (a guest must not learn a withheld thing exists) | gather §9 |
 | A18 | **Storage format for word-forward writing** (Markdown vs HTML) | decided *with* document mode (A1 / Plan E); gather is built format-agnostic so it carries over either way | gather §9 / §6b |
+| A19 | **Bulk call-in** — select several loose notes → place together | the natural next want once a big pile builds; re-enter when the one-at-a-time gesture starts to feel slow | call-in plan §12 · D-104 |
+| A20 | **The multi-board call-in door** — reach an *already-placed* bit and put it on a second board, live (the D-036 differentiator). `callInBit` is already capable; only the door is unbuilt — both current doors surface loose notes only | re-enter deliberately (a conscious v1 scoping — "call-in done" ≠ "the differentiator done"); the gather/source plans gesture at the affordance ("from find and the bit page") | call-in plan §12 · D-104 |
+| A21 | **Drag-to-drop-exact call-in** — drag a loose note from the column to a precise spot (v1 is click → view-center) | pure polish on the working gesture; re-enter if view-center landing ever annoys | call-in plan §12 |
+| A22 | **Server-side loose-note filtering** — the column filters in-memory today | re-enter only if the loose pile grows past snappy (single-writer scale says: not soon) | call-in plan §6/§12 |
+| A23 | **Source URL-conflict surfacing** — pasting a URL whose fetched title matches an existing source keeps the existing source's url; a *conflicting* url is dropped silently after the D-106 back-fill fix (a NULL url now back-fills) | the collision's resolution is the owner's ruling to make (I-Src3: re-URLing is deliberate); re-enter when it first bites | D-106 review |
 
 ## B. Phase-scheduled promises — deferred by choice to a named phase (re-blessed by the owner)
 
@@ -51,7 +56,7 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | B2 | **PWA install** ("feels like *my* app") — a philosophy promise, deferred eyes-open | Phase 5 | audit F8 |
 | B3 | **The feed** — browse/resurface, random-old, image-forward. ⚠ the one surface that must be *deliberately designed* ("or returning fails") | Phase 6 | §5a · CLAUDE.md design stance |
 | B4 | **Doodled home** — a hand-made home board | build-it-yourself anytime; it's just another board | §5a |
-| B5 | **The graph view** — local-neighborhood first; `react-force-graph` needs dep approval | Phase 3 | D-054 · lexicon |
+| B5 | ~~**The graph view** — local-neighborhood first; `react-force-graph` needs dep approval~~ | ✅ **built** — a read-only graph surface is live at `/graph` (nav-linked). *(Marked done retroactively 2026-07-27, deep-review sweep D-106.)* | D-054 · lexicon |
 | B6 | **`shared` visibility tier + the whole guest layer** (incl. publish preview shipping) | sharing phase | §2a |
 | B7 | **pdf · audio bit types** (+ their metadata-title faces) | ✅ **FIRED BY OWNER 2026-07-25** — voice memos + PDFs are v1 (Plan C: the media-types migration round — two new types + face/substance/search branches + **search-by-source**, absorbed from the capture plan's deferred list). Plan written fresh at its start | §2a / §2b |
 | B8 | **Handwriting recognition** — strokes stored as vectors, "recognition-ready someday" | someday | §2a |
@@ -63,10 +68,10 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 |---|---|---|---|
 | C1 | **Crop** (non-destructive) | needs an owner call: small dep (`react-easy-crop`) vs hand-built | D-016 / D-043 |
 | C2 | ~~**HEIC support + unreadable-image message**~~ | ✅ **DONE (2026-07-23, D-091).** HEIC now converts client-side via `heic-to` (modern libheif) with a "Converting your photo…" notice; the one-line message survives as the fallback. Root cause of the old failure: `heic2any` bundled an ancient libheif that threw `ERR_LIBHEIF format not supported` on ordinary iPhone HEVC HEICs — proven on the owner's real file, then proven fixed on it. | PROGRESS |
-| C3 | **Rich-text formatting UI** (bubble menu; headings/bold/lists) | multi-*font* tension with the one-typeface stance = owner's explicit call | D-046 |
+| C3 | ~~**Rich-text formatting UI** (bubble menu; headings/bold/lists)~~ | ✅ **DONE (2026-07-26, D-103 Stage 1)** — a quiet toolbar (bold · italic · lists · quote · link) on every text bit, one typeface kept | D-046 · D-103 |
 | C4 | **Rotation** | cut from v1 (no approved lib) | D-023 |
 | C5 | **Wrap-box / text flowing around shapes** | the parked dream | D-044 · §6b |
-| C6 | **Infinite canvas camera** (pan/zoom) | additive wrapper; `screenToWorld()` centralization when it lands | D-048 |
+| C6 | ~~**Infinite canvas camera** (pan/zoom)~~ | ✅ **DONE (2026-07-22)** — camera over an endless world, `screenToWorld()` centralized, `⊹ fit` (D-090). *(Marked done retroactively 2026-07-27, deep-review sweep D-106.)* | D-048 · D-090 |
 | C7 | ~~**Pen types / colors**~~ | ✅ **DONE (2026-07-25, D-099)** — per-stroke **color** (natural palette: ink · indigo · cerulean · forest · terracotta · ochre) + wider **size** range (extra-fine → extra-bold) + **eraser** (undo + drag-to-rub-out). Stored in the drawing jsonb (additive; old doodles default to ink; `normalizeDrawing` reads all shapes). | PROGRESS |
 | C8 | **JSON Canvas export** (interop) | optional idea from research | research-canvas.md |
 | C9 | **Handwritten board title — where the hand lives** | flagged at Checkpoint A (2026-07-21): "my hand on top, the typed shadow beneath" (§5) ruled the *look*, never the storage. Default lean: an ordinary drawing bit placed on the board (zero schema); a dedicated slot is additive if the port finds that wanting. Decide at the port, by feel | §5 · deliberations (D-083 feedback round) |

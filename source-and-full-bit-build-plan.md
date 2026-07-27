@@ -2,7 +2,8 @@
 
 **Supersedes `capture-build-plan.md`** (bookmark-centric — retire to `old/` at Stage 0). Consolidates every decision from the owner–Claude working session of **2026-07-26**. Grounded in the current codebase throughout (§"How it fits").
 
-**Status (2026-07-27): ✅ Stages 0–3 + the source manager DONE + deployed** — Stage 0 (the model fix) = D-102; Stages 1–3 + the manager = D-103. Owed: a source's URL at *intake*-creation (added via the manager for now); place-on-a-board (call-in) + Gather G2/G3 stay their own tracks.
+**Status (2026-07-27): ✅ Stages 0–3 + the source manager DONE + deployed** — Stage 0 (the model fix) = D-102; Stages 1–3 + the manager = D-103. Both owed items since closed: a source's URL at *intake*-creation ✅ (smart source links — a pasted link fetches its page title, D-105) · place-on-a-board ✅ (call-in, D-104).
+**Superseded detail (D-105):** this plan's *sticky* intake source ("stays across adds") was replaced at the owner's ask by a **full reset after each add** (source + tags + note all clear; whatever's typed is *applied*, never dropped) — the plan text above is history, the reset is the live behavior.
 
 ---
 

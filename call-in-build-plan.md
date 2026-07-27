@@ -1,6 +1,7 @@
 # Call-in — bring a loose note onto a board (build plan)
 
-**Status:** ✅ **built + deployed** — stages ① core loop · ② search · ③ filters (tag/source/type) · ④ polish · ⑤ inbox "place on a board…" door. Re-place regression green (`run-1d-native.sh`); `pnpm build` green. Owner feel-test in progress; the D-log receipt lands after sign-off.
+**Status:** ✅ **built + deployed** — stages ① core loop · ② search · ③ filters (tag/source/type) · ④ polish · ⑤ inbox "place on a board…" door. Re-place regression green (`run-1d-native.sh`); `pnpm build` green. Receipt: **D-104**.
+**Review-hardened (2026-07-27, D-106):** the deep review confirmed and same-night fixed — un-place/trash/content now route through the **settled-create door** (no 0-row silent loss); `callInBit` gained a **liveness guard** (refuses a trashed bit/board — TRASHED_BIT/TRASHED_BOARD, honest messages at door B) and a **departed-only revive** (a live placement is returned untouched, never repositioned; the optimistic twin deduped); door-B landings spread by bit-id; the column invalidates stale loads and reads the face from the view. Named later doors → `parked.md` A19–A23.
 **Shape:** **app code only — no schema change.** The timestamps, the `placement` table, the "one row per (note, board)" rule, and the inbox view all already exist; call-in just feeds them.
 **Supersedes:** the thin call-in sketch in the old capture plan (`old/`). Owner-driven design session + review, 2026-07-27.
 **Reviewed:** a second-window review was folded in — findings 1–3, a scope note, and six smaller items. Its three checkable claims were **verified against the code** (see §0 and inline).

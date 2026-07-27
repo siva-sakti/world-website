@@ -13,7 +13,7 @@
 | # | decision | ruling |
 |---|---|---|
 | 1 | Direction | **Directional.** A tie goes *from* the writing *to* the bit reached for. Forward (what this thought gathers) and backward ("gathered into") are **one tie seen from both ends** — the backward view is free, never authored by hand. |
-| 2 | Where you gather | **A writing act.** You gather by typing `[[` inside a **text bit**; the source of a tie is always writing. The target can be **any** bit (text, image, drawing, bookmark). |
+| 2 | Where you gather | **A writing act.** You gather by typing `[[` inside a **text bit**; the source of a tie is always writing. The target can be **any** bit (text, image, drawing — *bookmark retired, D-102*). |
 | 3 | What the chip shows | the target bit's **face** — resolved **live** on the bit page/cards, **truncated ~30 chars for display only**. The **full face** is also **cached in the chip** (searchable; list labels read it, refreshed lazily on the note's next save/view — Open decision #1). A **pointer, not a paste**: shows the headline + links there, never embeds content. |
 | 4 | Storage format | **HTML today** (how a text bit's `body` is already stored). Built **format-agnostic**: the tie derives from the body regardless of format, so a later move to **Markdown** — the portable, Obsidian-native choice for word-forward writing (`[[ ]]` is literally native Markdown) — is cheap. That switch is a **deferred decision tied to document mode** (see Deferred), not made here. |
 | 5 | The graph | **deferred, parked** (with the union-not-swap finding, below). Gather ships the connecting act; the picture comes later. |
