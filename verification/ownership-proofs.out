@@ -1,0 +1,35 @@
+=== OWNERSHIP PROOFS ===
+BEGIN
+psql:verification/ownership-proofs.sql:27: NOTICE:  BACKFILL ✓ every pre-existing row owned by the owner
+DO
+psql:verification/ownership-proofs.sql:46: NOTICE:  DE-HARDCODE ✓ all 11 owner policies use owner_id; none name a literal uid
+DO
+SET
+SET
+psql:verification/ownership-proofs.sql:57: NOTICE:  OWNER-READ ✓ owner sees 1 board(s)
+DO
+INSERT 0 1
+psql:verification/ownership-proofs.sql:66: NOTICE:  OWNER-INSERT ✓ a new board auto-owned by the inserter (no owner_id supplied)
+DO
+RESET
+SET
+SET
+psql:verification/ownership-proofs.sql:78: NOTICE:  STRANGER-READ ✓ stranger sees zero of the owner's rows
+DO
+INSERT 0 1
+psql:verification/ownership-proofs.sql:89: NOTICE:  STRANGER-INSERT ✓ stranger owns their own row and sees ONLY it
+DO
+UPDATE 0
+DELETE 0
+RESET
+SET
+SET
+psql:verification/ownership-proofs.sql:107: NOTICE:  CROSS-OWNER ✓ the stranger could neither touch nor reveal the owner's data
+DO
+RESET
+SET
+psql:verification/ownership-proofs.sql:118: NOTICE:  ANON ✓ logged-out sees nothing
+DO
+RESET
+ROLLBACK
+=== OWNERSHIP PROOFS PASSED ✓ — backfill · de-hardcode · owner-isolation · stranger-locked-out · anon-blind ===
