@@ -58,22 +58,32 @@ export function Card({
   card,
   selected,
   editing,
+  selectMode,
   scale,
   offeringWords,
   onSelect,
   onEdit,
   onChange,
   onContentSave,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
 }: {
   card: CardVM;
   selected: boolean;
   editing: boolean;
+  selectMode: boolean; // when on, a tap toggles selection (touch-friendly multi-select)
   scale: number; // the canvas zoom — react-rnd needs it so drag/resize deltas stay true
   offeringWords?: boolean; // the "add a few words?" prompt owns the caption right now
-  onSelect: () => void;
+  onSelect: (additive: boolean) => void;
   onEdit: () => void;
   onChange: (patch: Partial<CardVM>) => void;
   onContentSave: (value: string) => void;
+  // Drag reporting for move-together: the board moves the OTHER selected cards; this
+  // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
+  onDragStart?: () => void;
+  onDragMove?: (x: number, y: number) => void;
+  onDragEnd?: (x: number, y: number) => void;
 }) {
   // Two-step: a fresh click selects (shows the resize frame); clicking an
   // already-selected text card enters edit mode.
@@ -98,7 +108,12 @@ export function Card({
       minHeight={28}
       style={{ zIndex: card.z }}
       className={`compose-card${selected ? " is-selected" : ""}`}
-      onDragStop={(_e, d) => onChange({ x: d.x, y: d.y })}
+      onDragStart={() => onDragStart?.()}
+      onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
+      onDragStop={(_e, d) => {
+        onChange({ x: d.x, y: d.y });
+        onDragEnd?.(d.x, d.y);
+      }}
       onResizeStop={(_e, _dir, ref, _delta, pos) =>
         onChange(
           isText
@@ -115,11 +130,19 @@ export function Card({
               ? " is-doodle"
               : ""
         }`}
-        onPointerDown={() => {
+        onPointerDown={(e) => {
           wasSelected.current = selected;
-          if (!selected) onSelect();
+          const additive = selectMode || e.shiftKey || e.metaKey || e.ctrlKey;
+          // Non-additive: select on grab so a drag works in one gesture. Additive:
+          // wait for the click (a tap), so dragging a selected card moves, not toggles.
+          if (!additive && !selected) onSelect(false);
         }}
-        onClick={() => {
+        onClick={(e) => {
+          const additive = selectMode || e.shiftKey || e.metaKey || e.ctrlKey;
+          if (additive) {
+            onSelect(true); // toggle (react-rnd suppresses click after a drag, so a drag won't toggle)
+            return;
+          }
           if (isText && !editing && wasSelected.current) onEdit();
         }}
       >

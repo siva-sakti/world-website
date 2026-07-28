@@ -43,8 +43,12 @@ export function BoardSurface({
   initialCards: CardVM[];
 }) {
   const [cards, setCards] = useState<CardVM[]>(initialCards);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [selectMode, setSelectMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const dragStart = useRef<Map<string, { x: number; y: number }> | null>(null);
+  const selectOne = (id: string) => setSelectedIds(new Set([id]));
+  const clearSelection = () => setSelectedIds(new Set());
   const [drawMode, setDrawMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
@@ -136,9 +140,57 @@ export function BoardSurface({
     return cards.reduce((m, c) => Math.max(m, c.z), 0) + 1;
   }
 
-  function select(placementId: string, bitId: string) {
-    setSelectedId(placementId);
-    patchCard(placementId, bitId, { z: nextZ() });
+  function select(placementId: string, bitId: string, additive: boolean) {
+    patchCard(placementId, bitId, { z: nextZ() }); // the clicked card comes to front
+    setSelectedIds((prev) => {
+      if (!additive) return new Set([placementId]);
+      const next = new Set(prev);
+      if (next.has(placementId)) next.delete(placementId);
+      else next.add(placementId);
+      return next;
+    });
+  }
+
+  // ---- move-together (multi-select drag) ----
+  // Record every selected card's start position, then on drag move ONLY the OTHER
+  // selected cards (the dragged card stays entirely with react-rnd until stop, else
+  // its controlled position fights the internal drag and it stutters — review). On
+  // stop, persist each moved card through the settled-create door (keyed per card).
+  function onCardDragStart(placementId: string) {
+    if (selectedIds.size > 1 && selectedIds.has(placementId)) {
+      const m = new Map<string, { x: number; y: number }>();
+      for (const c of cards) if (selectedIds.has(c.placementId)) m.set(c.placementId, { x: c.x, y: c.y });
+      dragStart.current = m;
+    } else {
+      dragStart.current = null;
+    }
+  }
+  function onCardDragMove(placementId: string, x: number, y: number) {
+    const starts = dragStart.current;
+    if (!starts || !starts.has(placementId)) return;
+    const s = starts.get(placementId)!;
+    const dx = x - s.x;
+    const dy = y - s.y;
+    setCards((cs) =>
+      cs.map((c) => {
+        if (c.placementId === placementId || !starts.has(c.placementId)) return c; // dragged card + non-selected: untouched
+        const p0 = starts.get(c.placementId)!;
+        return { ...c, x: p0.x + dx, y: p0.y + dy };
+      }),
+    );
+  }
+  function onCardDragEnd(placementId: string, x: number, y: number) {
+    const starts = dragStart.current;
+    dragStart.current = null;
+    if (!starts || !starts.has(placementId)) return; // single drag: the card's own onChange persisted it
+    const s = starts.get(placementId)!;
+    const dx = x - s.x;
+    const dy = y - s.y;
+    for (const c of cards) {
+      if (c.placementId === placementId || !starts.has(c.placementId)) continue;
+      const p0 = starts.get(c.placementId)!;
+      patchCard(c.placementId, c.bitId, { x: p0.x + dx, y: p0.y + dy }); // per-card independent save
+    }
   }
 
   // ---- create ----
@@ -150,7 +202,7 @@ export function BoardSurface({
       ...cs,
       { placementId, bitId, type: "text", x, y, w: 240, h: 60, z, body: "<p></p>" },
     ]);
-    setSelectedId(placementId);
+    selectOne(placementId);
     setEditingId(placementId);
     const p = createTextBit(supabase, { bitId, placementId, boardId, body: "<p></p>", x, y, width: 240, z }).catch(onErr);
     trackCreate(placementId, p);
@@ -177,7 +229,7 @@ export function BoardSurface({
       ...cs,
       { placementId, bitId, type: "drawing", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
     ]);
-    setSelectedId(placementId);
+    selectOne(placementId);
     const p = createDrawingBit(supabase, {
       bitId, placementId, boardId, drawing: relDrawing,
       x: b.minX, y: b.minY, width: w, height: h, z,
@@ -204,7 +256,7 @@ export function BoardSurface({
           ...cs,
           { placementId, bitId, type: "image", x: wx, y: wy, w, h, z, imageUrl: localUrl },
         ]);
-        setSelectedId(placementId);
+        selectOne(placementId);
         const storagePath = `images/${bitId}.jpg`;
         const thumbPath = `thumbs/${bitId}.jpg`;
         // The two uploads are independent — send them together, not one-then-two.
@@ -263,11 +315,21 @@ export function BoardSurface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards.length]);
 
+  // Escape clears the selection (and exits edit).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") { clearSelection(); setEditingId(null); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ---- pan + tap on empty space ----
   function onBoardPointerDown(e: React.PointerEvent) {
     if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
     pan.current = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false };
-    setSelectedId(null);
+    clearSelection();
     setEditingId(null);
   }
 
@@ -299,7 +361,7 @@ export function BoardSurface({
   // ---- remove (I-W1: two distinct, labeled acts) ----
   function clearCard(placementId: string) {
     setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-    setSelectedId(null);
+    clearSelection();
     setEditingId(null);
   }
   // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
@@ -323,7 +385,7 @@ export function BoardSurface({
       : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
     if (!window.confirm(msg)) return;
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
-    setSelectedId(null);
+    clearSelection();
     setEditingId(null);
     settled(placementId)
       .then(() => trashBit(supabase, bitId))
@@ -373,7 +435,7 @@ export function BoardSurface({
         sourceUrl: bit.source?.url ?? undefined,
       },
     ]);
-    setSelectedId(placementId);
+    selectOne(placementId);
     const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: w.x, y: w.y, width, height, z })
       .then((placement) => {
         if (placement.id !== placementId) {
@@ -386,12 +448,12 @@ export function BoardSurface({
               ? cs.filter((c) => c.placementId !== placementId)
               : cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
           );
-          setSelectedId((s) => (s === placementId ? placement.id : s));
+          setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); nx.add(placement.id); return nx; });
         }
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        setSelectedId((s) => (s === placementId ? null : s));
+        setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); return nx; });
         onErr(e);
         throw e; // let the column restore the note to the pile
       });
@@ -399,7 +461,7 @@ export function BoardSurface({
     return p;
   }
 
-  const selectedBit = cards.find((c) => c.placementId === selectedId);
+  const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
 
   return (
     <>
@@ -407,6 +469,14 @@ export function BoardSurface({
         <button className="compose-btn" onClick={addNote}>+ note</button>
         <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
         <button className="compose-btn" onClick={() => setDrawMode(true)}>✎ pen</button>
+        <button
+          className={`compose-btn${selectMode ? " is-on" : ""}`}
+          onClick={() => { if (selectMode) clearSelection(); setSelectMode((m) => !m); }}
+          title="Select several cards to move or remove them together"
+        >
+          ⛶ select
+        </button>
+        {selectedIds.size > 1 && <span className="compose-selected">{selectedIds.size} selected</span>}
         <span className="compose-zoom">
           <button className="compose-btn" onClick={fitView} title="Bring all your cards into view">
             ⊹ fit
@@ -473,17 +543,21 @@ export function BoardSurface({
             <Card
               key={c.placementId}
               card={c}
-              selected={selectedId === c.placementId}
+              selected={selectedIds.has(c.placementId)}
               editing={editingId === c.placementId}
+              selectMode={selectMode}
               scale={cam.scale}
               offeringWords={wordsFor?.bitId === c.bitId}
-              onSelect={() => select(c.placementId, c.bitId)}
+              onSelect={(additive) => select(c.placementId, c.bitId, additive)}
               onEdit={() => {
-                setSelectedId(c.placementId);
+                selectOne(c.placementId);
                 setEditingId(c.placementId);
               }}
               onChange={(patch) => patchCard(c.placementId, c.bitId, patch)}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
+              onDragStart={() => onCardDragStart(c.placementId)}
+              onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
+              onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}
             />
           ))}
         </div>
