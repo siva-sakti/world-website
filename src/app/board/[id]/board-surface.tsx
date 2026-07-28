@@ -10,12 +10,13 @@ import {
   unplaceBit,
   trashBit,
   callInBit,
+  getBitBoards,
 } from "@/lib/db/bits";
 import { uploadObject, signedUrl } from "@/lib/storage";
 import { importImage, isHeic, MediaError } from "@/lib/media";
 import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
-import type { InboxItem } from "@/lib/db/inbox";
+import type { PanelBit } from "@/lib/db/inbox";
 import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
@@ -311,9 +312,16 @@ export function BoardSurface({
       .catch(onErr);
     setLooseRefresh((n) => n + 1); // it's loose again — let the column show it
   }
-  // Trash the whole bit — hidden everywhere, restorable from /trash. Same door:
-  // the bit row must exist before the freeze can land.
-  function trashSelected(placementId: string, bitId: string) {
+  // Trash the whole bit — hidden everywhere, restorable from /trash. With multi-board,
+  // trash is the heavy act (off EVERY board), so the confirm is honest about it (F16).
+  // Same door: the bit row must exist before the freeze can land.
+  async function trashSelected(placementId: string, bitId: string) {
+    let n = 1;
+    try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
+    const msg = n > 1
+      ? `This note is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
+      : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
+    if (!window.confirm(msg)) return;
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     setSelectedId(null);
     setEditingId(null);
@@ -333,7 +341,7 @@ export function BoardSurface({
   // Call-in: bring a loose note onto THIS board, where you're looking. Optimistic like
   // createNote; callInBit inserts-or-revives and returns the TRUE placement, so we
   // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
-  async function bringIn(bit: InboxItem) {
+  async function bringIn(bit: PanelBit) {
     const type = bit.type;
     if (type !== "text" && type !== "drawing" && type !== "image") return;
     const step = (bringInStep.current++ % 6) * 24;
@@ -422,9 +430,9 @@ export function BoardSurface({
             <button
               className="compose-btn subtle"
               onClick={() => unplaceSelected(selectedBit.placementId)}
-              title="Take this card off this board — the note itself stays in your collection"
+              title="Take this card off THIS board — the note lives on (on its other boards, and in your notes)"
             >
-              remove from board
+              remove from this board
             </button>
             <button
               className="compose-btn subtle"
@@ -479,7 +487,7 @@ export function BoardSurface({
             />
           ))}
         </div>
-        <LooseColumn onBringIn={bringIn} refreshSignal={looseRefresh} />
+        <LooseColumn boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
         {wordsFor && (
           <WordsOffer

@@ -206,6 +206,46 @@ body {
   font-size: 11px;
   color: #a89f92;
 }
+.loose-scope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 10px 0;
+}
+.loose-scope-tab {
+  font-size: 11px;
+  color: #8a8072;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 2px 9px;
+  cursor: pointer;
+}
+.loose-scope-tab:hover {
+  color: #2b2620;
+}
+.loose-scope-tab.is-on {
+  color: #2b2620;
+  background: #f2ede4;
+  border-color: #e6e0d6;
+}
+.loose-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.loose-boards {
+  font-size: 10px;
+  color: #a89f92;
+}
+.loose-card.is-here {
+  opacity: 0.6;
+  cursor: default;
+}
+.loose-card.is-here:hover {
+  border-color: #ece7de;
+  background: #ffffff;
+}
 /* The graph surface — the deliberately-designed browse view. */
 .graph-canvas {
   position: relative;
