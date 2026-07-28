@@ -1,6 +1,7 @@
 # The all-bits panel + multi-board (Part ①) — build plan · FINAL
 
-**Status:** ✅ decisions locked (owner design session, 2026-07-28). Ready to build **on a branch**.
+**Status:** ✅ **BUILT + deployed (D-109, 2026-07-28)** — all F1–F20 landed; review folded; `pnpm build` green; owner feel-test owed. Part ② (multi-select) held below.
+_(Original planning status: decisions locked at the owner design session, 2026-07-28.)_
 **No schema change** — a `placement` is per (board, bit), so a bit on many boards is already legal; this exposes it. Board-history is already stored (verified: un-place keeps the row, stamped `left_at`; `bit_travel` surfaces it).
 **Part ② (multi-select) is HELD** — its own plan, built after ① (short note at the end).
 
