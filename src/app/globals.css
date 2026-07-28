@@ -68,6 +68,14 @@ body {
   color: #6b6257;
   font-variant-numeric: tabular-nums;
 }
+.marquee-box {
+  position: absolute;
+  z-index: 4;
+  border: 1px solid #365a8c;
+  background: rgba(54, 90, 140, 0.08);
+  border-radius: 2px;
+  pointer-events: none;
+}
 .compose-empty {
   position: absolute;
   left: 50%;

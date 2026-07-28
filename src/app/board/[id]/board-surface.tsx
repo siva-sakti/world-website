@@ -46,7 +46,9 @@ export function BoardSurface({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [selectMode, setSelectMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [marqueeBox, setMarqueeBox] = useState<{ left: number; top: number; w: number; h: number } | null>(null);
   const dragStart = useRef<Map<string, { x: number; y: number }> | null>(null);
+  const marquee = useRef<{ sx: number; sy: number; moved: boolean } | null>(null);
   const selectOne = (id: string) => setSelectedIds(new Set([id]));
   const clearSelection = () => setSelectedIds(new Set());
   const [drawMode, setDrawMode] = useState(false);
@@ -328,12 +330,43 @@ export function BoardSurface({
   // ---- pan + tap on empty space ----
   function onBoardPointerDown(e: React.PointerEvent) {
     if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
+    setEditingId(null);
+    if (selectMode) {
+      // select-mode: empty-space drag draws a marquee (not a pan)
+      marquee.current = { sx: e.clientX, sy: e.clientY, moved: false };
+      setMarqueeBox(null);
+      return;
+    }
     pan.current = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false };
     clearSelection();
-    setEditingId(null);
   }
 
   function onBoardPointerMove(e: React.PointerEvent) {
+    const mq = marquee.current;
+    if (mq) {
+      const dx = e.clientX - mq.sx;
+      const dy = e.clientY - mq.sy;
+      if (!mq.moved && Math.hypot(dx, dy) < 4) return; // a tap, not yet a drag
+      mq.moved = true;
+      const r = boardRef.current!.getBoundingClientRect();
+      setMarqueeBox({
+        left: Math.min(mq.sx, e.clientX) - r.left,
+        top: Math.min(mq.sy, e.clientY) - r.top,
+        w: Math.abs(e.clientX - mq.sx),
+        h: Math.abs(e.clientY - mq.sy),
+      });
+      // hit-test in world space: any card whose bounds intersect the box is selected
+      const a = screenToWorld(mq.sx, mq.sy);
+      const b = screenToWorld(e.clientX, e.clientY);
+      const x0 = Math.min(a.x, b.x), y0 = Math.min(a.y, b.y);
+      const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y);
+      const inside = new Set<string>();
+      for (const c of cards) {
+        if (c.x < x1 && c.x + c.w > x0 && c.y < y1 && c.y + c.h > y0) inside.add(c.placementId);
+      }
+      setSelectedIds(inside);
+      return;
+    }
     const p = pan.current;
     if (!p) return;
     const dx = e.clientX - p.sx;
@@ -344,6 +377,13 @@ export function BoardSurface({
   }
 
   function onBoardPointerUp(e: React.PointerEvent) {
+    const mq = marquee.current;
+    if (mq) {
+      marquee.current = null;
+      setMarqueeBox(null);
+      if (!mq.moved) clearSelection(); // a tap in select-mode clears; a drag = the marquee selection stands
+      return;
+    }
     const p = pan.current;
     pan.current = null;
     if (!p || p.moved) return; // a pan, not a tap
@@ -561,6 +601,12 @@ export function BoardSurface({
             />
           ))}
         </div>
+        {marqueeBox && (
+          <div
+            className="marquee-box"
+            style={{ left: marqueeBox.left, top: marqueeBox.top, width: marqueeBox.w, height: marqueeBox.h }}
+          />
+        )}
         <LooseColumn boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
         {wordsFor && (
