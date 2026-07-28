@@ -517,7 +517,7 @@ body {
    stability). Kept clear of the loose-notes tab at top-right. */
 .selected-bar {
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   left: 8px;
   z-index: 6;
   display: flex;
@@ -533,6 +533,12 @@ body {
 }
 .selected-bar .tag-bar {
   margin-bottom: 0;
+}
+/* Bottom-anchored bar → its tag suggestions open UPWARD, so they aren't clipped
+   at the board's bottom edge. */
+.selected-bar .tag-suggest {
+  top: auto;
+  bottom: calc(100% + 5px);
 }
 .selected-actions {
   display: flex;
