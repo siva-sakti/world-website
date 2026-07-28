@@ -1,0 +1,24 @@
+=== PUBLIC DOOR PROOFS ===
+BEGIN
+INSERT 0 3
+INSERT 0 6
+INSERT 0 5
+SET
+psql:verification/public-door-proofs.sql:48: NOTICE:  GUEST-BOARD ✓ visitor sees only the public, live board
+DO
+psql:verification/public-door-proofs.sql:66: NOTICE:  GUEST-BIT ✓ only the reachable public bit shows; private/unreachable/unplaced/trashed/departed all hidden
+DO
+psql:verification/public-door-proofs.sql:78: NOTICE:  GUEST-PLACEMENT ✓ only the public card's placement shows; the private card leaks no position
+DO
+psql:verification/public-door-proofs.sql:89: NOTICE:  GUEST-CLOSED ✓ references, sources, tags never reach a visitor
+DO
+psql:verification/public-door-proofs.sql:103: NOTICE:  ANON-WRITE ✓ a visitor cannot write
+DO
+RESET
+SET
+SET
+psql:verification/public-door-proofs.sql:116: NOTICE:  OWNER ✓ the owner still sees all 3 boards + 6 bits — the guest door took nothing away
+DO
+RESET
+ROLLBACK
+=== PUBLIC DOOR PROOFS PASSED ✓ — public shows, everything private/unreachable/unplaced/trashed/departed hidden, anon read-only, owner intact ===
