@@ -1,0 +1,51 @@
+name: nightly-backup
+
+# Nightly pg_dump of the production database → a downloadable, offsite artifact.
+# Data safety net (D-029, finally built). Runs only from the default branch.
+#
+# ONE-TIME SETUP (owner): add a repository secret named SUPABASE_DB_URL —
+#   GitHub → repo → Settings → Secrets and variables → Actions → New secret.
+#   Use the SESSION-pooler / direct connection string (port 5432, the one in your
+#   .env.local), NOT the transaction pooler (6543) — pg_dump needs a session.
+# Then trigger once manually (Actions → nightly-backup → Run workflow) to confirm.
+#
+# NOTE: this dumps the DATABASE (every note, board, tag, source — your structure
+# and words). Image BYTES live in Supabase Storage and are not in this dump; a
+# storage sync is a separate follow-up. The DB is the irreplaceable part.
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC daily
+  workflow_dispatch: {} # manual "Run workflow" button, for testing
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Dump the database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGCONNECT_TIMEOUT: "30"
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not set — see the setup note in this workflow file."
+            exit 1
+          fi
+          stamp=$(date -u +%Y%m%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --no-owner --no-privileges \
+            | gzip > "world-backup-$stamp.sql.gz"
+          echo "wrote world-backup-$stamp.sql.gz ($(du -h world-backup-$stamp.sql.gz | cut -f1))"
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-backup-${{ github.run_id }}
+          path: "*.sql.gz"
+          retention-days: 90

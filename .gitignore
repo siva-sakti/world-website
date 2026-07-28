@@ -33,6 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# database backups — real data, NEVER commit (migrations/proofs stay tracked)
+/backups
+*.sql.gz
+*.dump
+
 # vercel
 .vercel
 
