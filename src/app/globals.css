@@ -68,6 +68,11 @@ body {
   color: #6b6257;
   font-variant-numeric: tabular-nums;
 }
+.compose-bulk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
 .marquee-box {
   position: absolute;
   z-index: 4;

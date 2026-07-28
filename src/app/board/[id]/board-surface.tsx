@@ -432,6 +432,36 @@ export function BoardSurface({
       .catch(onErr);
   }
 
+  // ---- bulk acts (multi-select, ②c) — the same I-W1 acts, looped, each through the
+  // settled door (per placement); the trash confirm keeps ①'s multi-board honesty.
+  function bulkUnplace() {
+    const ids = [...selectedIds];
+    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
+    clearSelection();
+    setEditingId(null);
+    for (const pid of ids) settled(pid).then((id) => unplaceBit(supabase, id)).catch(onErr);
+    setLooseRefresh((n) => n + 1);
+  }
+  async function bulkTrash() {
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
+    const bitIds = [...new Set(chosen.map((c) => c.bitId))];
+    let onOtherBoards = 0;
+    try {
+      const counts = await Promise.all(bitIds.map((bid) => getBitBoards(supabase, bid)));
+      onOtherBoards = counts.filter((boards) => boards.length > 1).length;
+    } catch { /* fall back to the plain confirm */ }
+    const n = bitIds.length;
+    const msg =
+      onOtherBoards > 0
+        ? `Trash ${n} note${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
+        : `Trash ${n} note${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
+    if (!window.confirm(msg)) return;
+    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
+    clearSelection();
+    setEditingId(null);
+    for (const c of chosen) settled(c.placementId).then(() => trashBit(supabase, c.bitId)).catch(onErr);
+  }
+
   function addNote() {
     const r = boardRef.current?.getBoundingClientRect();
     const w = r
@@ -516,7 +546,17 @@ export function BoardSurface({
         >
           ⛶ select
         </button>
-        {selectedIds.size > 1 && <span className="compose-selected">{selectedIds.size} selected</span>}
+        {selectedIds.size > 1 && (
+          <span className="compose-bulk">
+            <span className="compose-selected">{selectedIds.size} selected</span>
+            <button className="compose-btn subtle" onClick={bulkUnplace} title="Remove all selected cards from this board">
+              remove from board
+            </button>
+            <button className="compose-btn subtle" onClick={bulkTrash} title="Trash all selected notes">
+              trash
+            </button>
+          </span>
+        )}
         <span className="compose-zoom">
           <button className="compose-btn" onClick={fitView} title="Bring all your cards into view">
             ⊹ fit
