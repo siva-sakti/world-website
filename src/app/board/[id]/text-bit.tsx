@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import { listGatherCandidates, type BitHit } from "@/lib/db/references";
 import { BitRef } from "./bitref";
@@ -69,34 +70,43 @@ export function TextBit({
   // bracket or a cursor move away drops it (the pattern stops matching), so the
   // picker closes itself in the common cases — no separate dismiss needed.
   detectRef.current = (ed) => {
-    const { selection, doc } = ed.state;
-    const { $from, empty } = selection;
-    if (!empty) return setPicker(null);
-    const before = doc.textBetween($from.start(), $from.pos, "\n", "\0");
-    const m = /\[\[([^[\]\n]*)$/.exec(before);
-    if (!m) return setPicker(null);
-    const from = $from.pos - m[0].length;
-    const coords = ed.view.coordsAtPos(from);
-    setPicker({ query: m[1], from, to: $from.pos, left: coords.left, top: coords.bottom });
+    try {
+      const { selection, doc } = ed.state;
+      const { $from, empty } = selection;
+      if (!empty) return setPicker(null);
+      const before = doc.textBetween($from.start(), $from.pos, "\n", "\0");
+      const m = /\[\[([^[\]\n]*)$/.exec(before);
+      if (!m) return setPicker(null);
+      const from = $from.pos - m[0].length;
+      const coords = ed.view.coordsAtPos(from);
+      setPicker({ query: m[1], from, to: $from.pos, left: coords.left, top: coords.bottom });
+    } catch {
+      setPicker(null); // a detection hiccup must NEVER break normal typing
+    }
   };
 
   insertRef.current = (hit) => {
-    if (!editor || !picker) return;
-    let to = picker.to;
-    // Eat an auto-closed `]]` the keyboard may have inserted right after the query.
-    const end = editor.state.doc.content.size;
-    const after = editor.state.doc.textBetween(to, Math.min(to + 2, end), "\n", "\0");
-    if (after === "]]") to += 2;
-    editor
-      .chain()
-      .focus()
-      .insertContentAt(
-        { from: picker.from, to },
-        { type: "bitRef", attrs: { refId: hit.id, label: hit.face || "untitled" } },
-      )
-      .insertContent(" ") // land the cursor after the chip so you keep writing
-      .run();
-    setPicker(null);
+    try {
+      if (!editor || !picker) return;
+      let to = picker.to;
+      // Eat an auto-closed `]]` the keyboard may have inserted right after the query.
+      const end = editor.state.doc.content.size;
+      const after = editor.state.doc.textBetween(to, Math.min(to + 2, end), "\n", "\0");
+      if (after === "]]") to += 2;
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(
+          { from: picker.from, to },
+          { type: "bitRef", attrs: { refId: hit.id, label: hit.face || "untitled" } },
+        )
+        .insertContent(" ") // land the cursor after the chip so you keep writing
+        .run();
+    } catch {
+      /* an insertion hiccup leaves your text untouched */
+    } finally {
+      setPicker(null);
+    }
   };
 
   // Load the candidate list once, the first time a picker opens.
@@ -127,31 +137,36 @@ export function TextBit({
     <>
       {editing && editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} className="tiptap" />
-      {editing && picker && candidates !== null && (
-        <div
-          className="gather-suggest"
-          style={{ position: "fixed", left: picker.left, top: picker.top + 4, zIndex: 60 }}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          {results.length === 0 ? (
-            <div className="gather-suggest-empty">no bits match</div>
-          ) : (
-            results.map((h) => (
-              <button
-                key={h.id}
-                type="button"
-                className="gather-suggest-item"
-                onMouseDown={(e) => e.preventDefault()} // keep the editor's selection
-                onClick={() => insertRef.current(h)}
-                title="gather this bit"
-              >
-                <span className="gather-suggest-face">{h.face || "untitled"}</span>
-                <span className="gather-suggest-type">{h.type}</span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
+      {editing && picker && candidates !== null && typeof document !== "undefined" &&
+        createPortal(
+          // Portaled to <body> so the board's zoom/pan transform can't shift a
+          // position:fixed dropdown off-screen (it'd otherwise anchor to the
+          // transformed canvas, not the viewport).
+          <div
+            className="gather-suggest"
+            style={{ position: "fixed", left: picker.left, top: picker.top + 4, zIndex: 60 }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {results.length === 0 ? (
+              <div className="gather-suggest-empty">no bits match</div>
+            ) : (
+              results.map((h) => (
+                <button
+                  key={h.id}
+                  type="button"
+                  className="gather-suggest-item"
+                  onMouseDown={(e) => e.preventDefault()} // keep the editor's selection
+                  onClick={() => insertRef.current(h)}
+                  title="gather this bit"
+                >
+                  <span className="gather-suggest-face">{h.face || "untitled"}</span>
+                  <span className="gather-suggest-type">{h.type}</span>
+                </button>
+              ))
+            )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
