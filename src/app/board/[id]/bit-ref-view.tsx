@@ -1,13 +1,14 @@
 "use client";
 
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { DoodleBit } from "./doodle-bit";
+import { computePlacement, type AnchorRect, type Placement } from "@/lib/floating";
 import type { Drawing } from "@/lib/types";
 
 // The gather chip's LOOK + PEEK (gather-build-plan.md G3). A chip pointing at an
@@ -81,7 +82,7 @@ export function BitRefView({ node }: NodeViewProps) {
   const refId = node.attrs.refId as string | null;
   const label = (node.attrs.label as string) || "?";
   const [target, setTarget] = useState<Target | null>(null);
-  const [peekAt, setPeekAt] = useState<{ left: number; top: number } | null>(null);
+  const [peekAt, setPeekAt] = useState<AnchorRect | null>(null);
 
   useEffect(() => {
     if (!refId) return;
@@ -102,7 +103,7 @@ export function BitRefView({ node }: NodeViewProps) {
     e.preventDefault();
     e.stopPropagation(); // don't let a board card select/edit under the chip
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setPeekAt({ left: r.left, top: r.bottom });
+    setPeekAt({ left: r.left, top: r.top, right: r.right, bottom: r.bottom });
   };
 
   return (
@@ -153,26 +154,38 @@ function Peek({
   refId: string;
   label: string;
   target: Target | null;
-  at: { left: number; top: number };
+  at: AnchorRect;
   onClose: () => void;
 }) {
   const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [place, setPlace] = useState<Placement>({ left: at.left, top: at.bottom + 4, maxHeight: 320 });
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+  // Screen-edge-aware placement — flip up / slide / cap, so the peek is never cut off
+  // (the shared placer). Re-measures when the target's glimpse loads and resizes it.
+  useLayoutEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const p = computePlacement(at, { width: el.offsetWidth, height: el.offsetHeight });
+    setPlace((prev) =>
+      prev.left === p.left && prev.top === p.top && prev.maxHeight === p.maxHeight ? prev : p,
+    );
+  }, [at, target]);
   if (typeof document === "undefined") return null;
 
   const name = target?.face || label;
-  const left = Math.max(8, Math.min(at.left, window.innerWidth - 256));
 
   return createPortal(
     <>
       <div className="gather-peek-backdrop" onClick={onClose} />
       <div
+        ref={cardRef}
         className="gather-peek"
-        style={{ position: "fixed", left, top: at.top + 4, zIndex: 80 }}
+        style={{ position: "fixed", left: place.left, top: place.top, maxHeight: place.maxHeight, zIndex: 80 }}
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
       >

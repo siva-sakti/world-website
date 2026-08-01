@@ -6,6 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { DoodleBit } from "./doodle-bit";
+import { computePlacement, type Placement } from "@/lib/floating";
 import type { BitHit } from "@/lib/db/references";
 
 // The `[[` gather picker — a SMART ORGANIZED dropdown (gather-picker-plan.md).
@@ -93,23 +94,25 @@ export function GatherPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needKey]);
 
-  // Position: below the caret, or flipped ABOVE when there's no room (writing low on
-  // the page / above the keyboard). Measured before paint (useLayoutEffect), guarded
-  // so it settles rather than loops.
+  // Screen-edge-aware placement (the shared placer): flip up when the bottom is
+  // tight, slide so no side is cut off, cap+scroll if too tall. Measured before paint
+  // (useLayoutEffect), guarded so it settles rather than loops.
   const menuRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ left: number; top: number }>({
+  const [place, setPlace] = useState<Placement>({
     left: anchor.left,
     top: anchor.caretBottom + 4,
+    maxHeight: 240,
   });
   useLayoutEffect(() => {
     const el = menuRef.current;
     if (!el) return;
-    const h = el.offsetHeight;
-    const belowRoom = window.innerHeight - anchor.caretBottom - 4;
-    const above = h > belowRoom && anchor.caretTop > belowRoom;
-    const top = above ? Math.max(4, anchor.caretTop - 4 - h) : anchor.caretBottom + 4;
-    const left = anchor.left;
-    setPos((prev) => (prev.top === top && prev.left === left ? prev : { left, top }));
+    const p = computePlacement(
+      { left: anchor.left, top: anchor.caretTop, right: anchor.left, bottom: anchor.caretBottom },
+      { width: el.offsetWidth, height: el.offsetHeight },
+    );
+    setPlace((prev) =>
+      prev.left === p.left && prev.top === p.top && prev.maxHeight === p.maxHeight ? prev : p,
+    );
   }, [anchor.left, anchor.caretTop, anchor.caretBottom, notesShown.length, visualShown.length, collapsedImages, empty]);
 
   if (typeof document === "undefined") return null;
@@ -118,7 +121,7 @@ export function GatherPicker({
     <div
       ref={menuRef}
       className="gather-suggest"
-      style={{ position: "fixed", left: pos.left, top: pos.top, zIndex: 60 }}
+      style={{ position: "fixed", left: place.left, top: place.top, maxHeight: place.maxHeight, zIndex: 60 }}
       onPointerDown={(e) => e.stopPropagation()}
     >
       {empty ? (
