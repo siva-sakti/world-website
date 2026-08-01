@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { updateBitBody } from "@/lib/db/bits";
+import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { TextBit } from "@/app/board/[id]/text-bit";
 
 // The editable body on the bit workspace — an always-editing TextBit (rich text)
@@ -23,10 +24,15 @@ export function TextWorkspace({
 
   function flush() {
     timer.current = null;
-    updateBitBody(supabase, bitId, latest.current).catch((e) => {
-      console.error("save body failed:", e);
-      setErr("Couldn't save — keep typing, we'll retry.");
-    });
+    const body = latest.current;
+    // Save the body, then reconcile its `[[` chips into `reference` rows (the two-
+    // write step; a failed reconcile self-heals on next save/read — plan risk 1).
+    updateBitBody(supabase, bitId, body)
+      .then(() => reconcileReferences(supabase, bitId, extractRefIds(body)))
+      .catch((e) => {
+        console.error("save body failed:", e);
+        setErr("Couldn't save — keep typing, we'll retry.");
+      });
   }
 
   function onChange(html: string) {
@@ -48,7 +54,7 @@ export function TextWorkspace({
 
   return (
     <div className="rounded-md border border-neutral-200 p-4">
-      <TextBit html={initialBody} editing onChange={onChange} />
+      <TextBit html={initialBody} editing onChange={onChange} selfBitId={bitId} />
       {err && <p className="mt-1 text-xs text-red-700">{err}</p>}
     </div>
   );

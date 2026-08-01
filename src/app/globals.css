@@ -412,6 +412,59 @@ body {
   text-underline-offset: 2px;
   cursor: pointer;
 }
+/* Gather chip — a `[[` reference to another bit, inline in the writing (G2). */
+.gather-chip {
+  padding: 0 0.28em;
+  border-radius: 4px;
+  background: #eef0f7;
+  color: #3e4c86;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* The `[[` picker — floated at the cursor; tap a bit to gather it (source-picker cousin). */
+.gather-suggest {
+  min-width: 12rem;
+  max-width: 20rem;
+  max-height: 15rem;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dcd9d1;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px -10px rgba(32, 34, 43, 0.22);
+  padding: 4px;
+}
+.gather-suggest-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+.gather-suggest-item:hover {
+  background: #f2f1ee;
+}
+.gather-suggest-face {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gather-suggest-type {
+  font-size: 0.72rem;
+  color: #9a9a93;
+}
+.gather-suggest-empty {
+  padding: 6px 8px;
+  color: #9a9a93;
+  font-size: 0.85rem;
+}
 /* The quiet formatting toolbar — shown only while a text bit is editing. */
 .rt-toolbar {
   display: flex;

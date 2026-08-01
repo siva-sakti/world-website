@@ -2,6 +2,7 @@ import { useRef } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { updatePlacement, updateBitBody, updateBitContent } from "@/lib/db/bits";
+import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import type { CardVM } from "./card";
 
 type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number };
@@ -69,7 +70,12 @@ export function usePersistence(
     try {
       if (Object.keys(p.placement).length)
         await updatePlacement(supabase, realId, p.placement);
-      if (p.body !== undefined) await updateBitBody(supabase, p.bitId, p.body);
+      if (p.body !== undefined) {
+        await updateBitBody(supabase, p.bitId, p.body);
+        // Reconcile the note's `[[` chips into `reference` rows (self-heals on a
+        // later save/read if this leg fails — plan risk 1).
+        await reconcileReferences(supabase, p.bitId, extractRefIds(p.body));
+      }
     } catch (e) {
       onErr(e);
     }
