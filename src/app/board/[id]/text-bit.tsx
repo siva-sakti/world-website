@@ -4,10 +4,10 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import { listGatherCandidates, type BitHit } from "@/lib/db/references";
 import { BitRef } from "./bitref";
+import { GatherPicker } from "./gather-picker";
 
 // A text bit's words: a Tiptap editor (stored as the bit's `body`). Rich text —
 // bold · italic · lists · quote · link — one typeface, no headings/color (plan §6).
@@ -23,8 +23,9 @@ import { BitRef } from "./bitref";
 
 type TiptapEditor = NonNullable<ReturnType<typeof useEditor>>;
 
-// The open `[[` picker: what was typed, the doc range to replace, and where to float.
-type Picker = { query: string; from: number; to: number; left: number; top: number };
+// The open `[[` picker: what was typed, the doc range to replace, and the caret's
+// screen box (top+bottom so the dropdown can float below — or flip above when low).
+type Picker = { query: string; from: number; to: number; left: number; caretTop: number; caretBottom: number };
 
 export function TextBit({
   html,
@@ -79,7 +80,14 @@ export function TextBit({
       if (!m) return setPicker(null);
       const from = $from.pos - m[0].length;
       const coords = ed.view.coordsAtPos(from);
-      setPicker({ query: m[1], from, to: $from.pos, left: coords.left, top: coords.bottom });
+      setPicker({
+        query: m[1],
+        from,
+        to: $from.pos,
+        left: coords.left,
+        caretTop: coords.top,
+        caretBottom: coords.bottom,
+      });
     } catch {
       setPicker(null); // a detection hiccup must NEVER break normal typing
     }
@@ -93,12 +101,17 @@ export function TextBit({
       const end = editor.state.doc.content.size;
       const after = editor.state.doc.textBetween(to, Math.min(to + 2, end), "\n", "\0");
       if (after === "]]") to += 2;
+      // The chip's cache/fallback label (the visible thumbnail comes from the
+      // NodeView). A faceless doodle/screenshot caches its kind, not "untitled" —
+      // cleaner search text and a better fallback if the thumbnail can't load.
+      const label =
+        hit.face || (hit.type === "drawing" ? "drawing" : hit.type === "image" ? "image" : "untitled");
       editor
         .chain()
         .focus()
         .insertContentAt(
           { from: picker.from, to },
-          { type: "bitRef", attrs: { refId: hit.id, label: hit.face || "untitled" } },
+          { type: "bitRef", attrs: { refId: hit.id, label } },
         )
         .insertContent(" ") // land the cursor after the chip so you keep writing
         .run();
@@ -128,45 +141,19 @@ export function TextBit({
     else setPicker(null);
   }, [editing, editor]);
 
-  const q = picker?.query.trim().toLowerCase() ?? "";
-  const results = (candidates ?? [])
-    .filter((c) => !q || c.face.toLowerCase().includes(q))
-    .slice(0, 8);
-
   return (
     <>
       {editing && editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} className="tiptap" />
-      {editing && picker && candidates !== null && typeof document !== "undefined" &&
-        createPortal(
-          // Portaled to <body> so the board's zoom/pan transform can't shift a
-          // position:fixed dropdown off-screen (it'd otherwise anchor to the
-          // transformed canvas, not the viewport).
-          <div
-            className="gather-suggest"
-            style={{ position: "fixed", left: picker.left, top: picker.top + 4, zIndex: 60 }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {results.length === 0 ? (
-              <div className="gather-suggest-empty">no bits match</div>
-            ) : (
-              results.map((h) => (
-                <button
-                  key={h.id}
-                  type="button"
-                  className="gather-suggest-item"
-                  onMouseDown={(e) => e.preventDefault()} // keep the editor's selection
-                  onClick={() => insertRef.current(h)}
-                  title="gather this bit"
-                >
-                  <span className="gather-suggest-face">{h.face || "untitled"}</span>
-                  <span className="gather-suggest-type">{h.type}</span>
-                </button>
-              ))
-            )}
-          </div>,
-          document.body,
-        )}
+      {editing && picker && candidates !== null && (
+        <GatherPicker
+          supabase={supabase}
+          candidates={candidates}
+          query={picker.query}
+          anchor={{ left: picker.left, caretTop: picker.caretTop, caretBottom: picker.caretBottom }}
+          onPick={(hit) => insertRef.current(hit)}
+        />
+      )}
     </>
   );
 }

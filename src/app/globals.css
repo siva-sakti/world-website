@@ -465,6 +465,132 @@ body {
   color: #9a9a93;
   font-size: 0.85rem;
 }
+/* Organized picker (gather-picker-plan.md): two sections — notes / images & drawings
+   — with a smart collapse. A muted section head; a wrapping thumbnail grid; and the
+   slim "N images — tap to browse" line when typing has stepped the pictures aside. */
+.gather-sect + .gather-sect {
+  border-top: 1px solid #efece5;
+  margin-top: 2px;
+  padding-top: 2px;
+}
+.gather-sect-head {
+  padding: 4px 8px 2px;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #a8a49b;
+}
+.gather-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 6px;
+}
+.gather-thumb-btn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  line-height: 0;
+}
+.gather-thumb {
+  display: block;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e6e3db;
+}
+.gather-thumb-img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+}
+.gather-thumb-doodle {
+  background: #fff;
+}
+.gather-thumb-blank {
+  width: 44px;
+  height: 44px;
+  background: #f2f1ee;
+}
+.gather-thumb-btn:hover .gather-thumb {
+  border-color: #b9c2dd;
+}
+.gather-more {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7bb0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.gather-more:hover {
+  background: #f2f1ee;
+}
+/* Media gather chip (stage 3) — a gathered image/drawing shows as a tiny picture
+   inline; tap to peek larger. Styles the NodeView only; the saved html is unchanged. */
+.gather-chip-thumb {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  height: 1.5em;
+  max-width: 9em;
+  margin: 0 0.12em;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f2f1ee;
+  cursor: zoom-in;
+  line-height: 0;
+}
+.gather-chip-thumb img {
+  height: 100%;
+  width: auto;
+  display: block;
+  object-fit: cover;
+}
+.gather-chip-doodle {
+  display: inline-block;
+  height: 1.5em;
+  background: #fff;
+}
+.gather-peek-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(28, 24, 19, 0.55);
+}
+.gather-peek {
+  max-width: 78vw;
+  max-height: 82vh;
+  overflow: hidden;
+  padding: 8px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 12px 48px -12px rgba(0, 0, 0, 0.5);
+}
+.gather-peek img {
+  display: block;
+  max-width: 74vw;
+  max-height: 78vh;
+  object-fit: contain;
+}
+.gather-peek-doodle {
+  display: block;
+  width: min(70vw, 520px);
+  max-height: 78vh;
+  background: #fff;
+}
 /* The quiet formatting toolbar — shown only while a text bit is editing. */
 .rt-toolbar {
   display: flex;

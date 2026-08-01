@@ -1,4 +1,5 @@
-import { Node } from "@tiptap/react";
+import { Node, ReactNodeViewRenderer } from "@tiptap/react";
+import { BitRefView } from "./bit-ref-view";
 
 // The gather chip — a `[[`-inserted reference to another bit, living INSIDE a text
 // note's body (gather-build-plan.md G2). An inline ATOM: one indivisible token you
@@ -6,7 +7,11 @@ import { Node } from "@tiptap/react";
 // It carries the TRUTH (`data-ref` = the target bit's id, read back by
 // extractRefIds on save) and a CACHE (its visible text = the target's face), so the
 // note is searchable by what it references (the P9 carve) and reads naturally.
-// No React NodeView in G2 — it renders as styled text; tap-to-peek is G3.
+//
+// A React NodeView (BitRefView) gives an image/drawing target a THUMBNAIL look +
+// tap-to-peek (stage 3). It changes DISPLAY only — `renderHTML`/`renderText` below
+// are unchanged, so the serialized `<span data-ref>label</span>` (and thus
+// extractRefIds, reconcile, search, export) is byte-for-byte what G2 saved.
 
 export const BitRef = Node.create({
   name: "bitRef",
@@ -43,5 +48,9 @@ export const BitRef = Node.create({
 
   renderText({ node }) {
     return node.attrs.label || "";
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(BitRefView);
   },
 });
