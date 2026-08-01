@@ -560,36 +560,73 @@ body {
   height: 1.5em;
   background: #fff;
 }
-.gather-peek-scrim {
+/* Peek (ruled 2026-07-28): tap a chip → a small popover BY the chip previews its
+   target (a glimpse + its name) with "open →". A pointer/preview, never navigation
+   by default — an invisible backdrop catches tap-away. */
+.gather-peek-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 80;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(28, 24, 19, 0.55);
+  z-index: 79;
 }
 .gather-peek {
-  max-width: 78vw;
-  max-height: 82vh;
-  overflow: hidden;
-  padding: 8px;
+  width: 240px;
+  max-width: calc(100vw - 16px);
+  padding: 10px;
   background: #fff;
+  border: 1px solid #dcd9d1;
   border-radius: 10px;
-  box-shadow: 0 12px 48px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 34px -12px rgba(32, 34, 43, 0.3);
 }
-.gather-peek img {
-  display: block;
-  max-width: 74vw;
-  max-height: 78vh;
+.gather-peek-glimpse {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.gather-peek-glimpse img {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 6px;
   object-fit: contain;
 }
 .gather-peek-doodle {
   display: block;
-  width: min(70vw, 520px);
-  max-height: 78vh;
-  background: #fff;
+}
+.gather-peek-text {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #3a352d;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gather-peek-name {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #6b665c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gather-peek-gone {
+  padding: 2px 0;
+  font-size: 0.85rem;
+  color: #9a9a93;
+}
+.gather-peek-open {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #eef0f7;
+  color: #3e4c86;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.gather-peek-open:hover {
+  background: #e2e6f3;
 }
 /* The quiet formatting toolbar — shown only while a text bit is editing. */
 .rt-toolbar {
