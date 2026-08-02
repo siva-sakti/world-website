@@ -27,6 +27,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
 
   useEffect(() => {
     let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the loading flag when the target changes; results follow async
     setLoading(true);
     Promise.all([getThingTags(supabase, target), listTags(supabase)])
       .then(([bt, at]) => {
@@ -66,6 +67,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   // not silently dropped. Refs keep the latest draft + add (post-unmount setStates
   // are no-ops; applyTag is idempotent).
   const commitRef = useRef<() => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the unmount effect below commits the current draft
   commitRef.current = () => {
     const w = draft.trim();
     if (w) void add(w);

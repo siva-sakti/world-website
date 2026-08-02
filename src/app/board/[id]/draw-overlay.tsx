@@ -28,13 +28,17 @@ export function DrawOverlay({
 
   const [pen, setPen] = useState(DEFAULT_PEN);
   const penRef = useRef(DEFAULT_PEN);
-  penRef.current = pen; // the size a stroke gets is the one live when it started
   const [penColor, setPenColor] = useState(INK);
   const colorRef = useRef(INK);
-  colorRef.current = penColor;
   const [erasing, setErasing] = useState(false);
   const erasingRef = useRef(false);
-  erasingRef.current = erasing;
+  // Keep the imperative refs in step with state — a stroke reads the value live when
+  // it started (synced in an effect, not assigned during render).
+  useEffect(() => {
+    penRef.current = pen;
+    colorRef.current = penColor;
+    erasingRef.current = erasing;
+  }, [pen, penColor, erasing]);
 
   const activeSize = useRef(DEFAULT_PEN); // size of the in-progress stroke
   const activeColor = useRef(INK); // color of the in-progress stroke

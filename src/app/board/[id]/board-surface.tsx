@@ -23,18 +23,17 @@ import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
 import { LooseColumn } from "./loose-column";
 import { usePersistence } from "./use-persistence";
+import { useCamera } from "./use-camera";
+import { useMarqueeSelect } from "./use-marquee-select";
+import { BoardToolbar } from "./board-toolbar";
 
 const MAX_DISP = 320; // an image card's initial on-board width
-const MIN_ZOOM = 0.2;
-const MAX_ZOOM = 3;
-
-type Camera = { x: number; y: number; scale: number };
 
 // The board's compose surface, on real data, on an infinite canvas. Local state
 // drives the canvas for a snappy feel; every change mirrors to the database
-// (debounced) through the one door. A camera (pan + zoom) sits over an endless
-// world of cards — drag empty space to pan, scroll to zoom. Card coordinates are
-// world-space; creation/pen map screen → world so things land where you point.
+// (debounced) through the one door. A camera (pan + zoom, useCamera) sits over an
+// endless world of cards — drag empty space to pan, scroll to zoom. Card coordinates
+// are world-space; creation/pen map screen → world so things land where you point.
 export function BoardSurface({
   boardId,
   initialCards,
@@ -46,9 +45,7 @@ export function BoardSurface({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [selectMode, setSelectMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [marqueeBox, setMarqueeBox] = useState<{ left: number; top: number; w: number; h: number } | null>(null);
   const dragStart = useRef<Map<string, { x: number; y: number }> | null>(null);
-  const marquee = useRef<{ sx: number; sy: number; moved: boolean } | null>(null);
   const selectOne = (id: string) => setSelectedIds(new Set([id]));
   const clearSelection = () => setSelectedIds(new Set());
   const [drawMode, setDrawMode] = useState(false);
@@ -56,9 +53,7 @@ export function BoardSurface({
   const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
   const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" } | null>(null);
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
-  const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
-  const camRef = useRef(cam);
-  camRef.current = cam; // latest camera for imperative reads (wheel, pen)
+  const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
 
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -66,6 +61,10 @@ export function BoardSurface({
   const bringInStep = useRef(0); // small cascade so repeated bring-ins don't stack
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
+
+  // Pan/zoom camera and rubber-band select — extracted, behavior unchanged.
+  const { cam, camRef, setCam, screenToWorld, fitView } = useCamera(boardRef);
+  const marquee = useMarqueeSelect(boardRef, screenToWorld, setSelectedIds, clearSelection);
 
   function onErr(e: unknown) {
     console.error("board save failed:", e);
@@ -80,61 +79,10 @@ export function BoardSurface({
   // waits for its card's create to land before writing).
   const { patchCard, saveContent, trackCreate, reconcileId, settled } = usePersistence(supabase, setCards, onErr);
 
-  // ---- camera ----
-  function screenToWorld(clientX: number, clientY: number) {
-    const r = boardRef.current!.getBoundingClientRect();
-    const c = camRef.current;
-    return { x: (clientX - r.left - c.x) / c.scale, y: (clientY - r.top - c.y) / c.scale };
-  }
-
-  // Zoom toward the cursor (native listener so we can preventDefault the scroll).
-  useEffect(() => {
-    const el = boardRef.current;
-    if (!el) return;
-    function onWheel(e: WheelEvent) {
-      e.preventDefault();
-      const r = el!.getBoundingClientRect();
-      const px = e.clientX - r.left;
-      const py = e.clientY - r.top;
-      setCam((c) => {
-        const scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, c.scale * Math.exp(-e.deltaY * 0.0015)));
-        const k = scale / c.scale;
-        return { scale, x: px - (px - c.x) * k, y: py - (py - c.y) * k };
-      });
-    }
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
-
-  // Frame every card in view — the "where am I?" rescue on an endless canvas.
-  // No cards → home to the origin. Never magnifies past 100%.
-  function fitView() {
-    const el = boardRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    if (!cards.length) {
-      setCam({ x: 0, y: 0, scale: 1 });
-      return;
-    }
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const c of cards) {
-      minX = Math.min(minX, c.x);
-      minY = Math.min(minY, c.y);
-      maxX = Math.max(maxX, c.x + c.w);
-      maxY = Math.max(maxY, c.y + c.h);
-    }
-    const bw = Math.max(1, maxX - minX);
-    const bh = Math.max(1, maxY - minY);
-    const pad = 80;
-    const scale = Math.max(MIN_ZOOM, Math.min(1, (r.width - pad) / bw, (r.height - pad) / bh));
-    const cx = minX + bw / 2;
-    const cy = minY + bh / 2;
-    setCam({ x: r.width / 2 - cx * scale, y: r.height / 2 - cy * scale, scale });
-  }
-
   // On open, frame the board's content so you never land on blank canvas.
   useEffect(() => {
-    if (initialCards.length) fitView();
+    // Frame the content once on open — a deliberate one-time init.
+    if (initialCards.length) fitView(initialCards);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -324,7 +272,6 @@ export function BoardSurface({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---- pan + tap on empty space ----
@@ -332,9 +279,7 @@ export function BoardSurface({
     if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
     setEditingId(null);
     if (selectMode) {
-      // select-mode: empty-space drag draws a marquee (not a pan)
-      marquee.current = { sx: e.clientX, sy: e.clientY, moved: false };
-      setMarqueeBox(null);
+      marquee.start(e); // select-mode: empty-space drag draws a marquee (not a pan)
       return;
     }
     pan.current = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false };
@@ -342,50 +287,21 @@ export function BoardSurface({
   }
 
   function onBoardPointerMove(e: React.PointerEvent) {
-    const mq = marquee.current;
-    if (mq) {
-      const dx = e.clientX - mq.sx;
-      const dy = e.clientY - mq.sy;
-      if (!mq.moved && Math.hypot(dx, dy) < 4) return; // a tap, not yet a drag
-      mq.moved = true;
-      const r = boardRef.current!.getBoundingClientRect();
-      setMarqueeBox({
-        left: Math.min(mq.sx, e.clientX) - r.left,
-        top: Math.min(mq.sy, e.clientY) - r.top,
-        w: Math.abs(e.clientX - mq.sx),
-        h: Math.abs(e.clientY - mq.sy),
-      });
-      // hit-test in world space: any card whose bounds intersect the box is selected
-      const a = screenToWorld(mq.sx, mq.sy);
-      const b = screenToWorld(e.clientX, e.clientY);
-      const x0 = Math.min(a.x, b.x), y0 = Math.min(a.y, b.y);
-      const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y);
-      const inside = new Set<string>();
-      for (const c of cards) {
-        if (c.x < x1 && c.x + c.w > x0 && c.y < y1 && c.y + c.h > y0) inside.add(c.placementId);
-      }
-      setSelectedIds(inside);
-      return;
-    }
+    if (marquee.move(e, cards)) return; // a marquee is active — it handled the move
     const p = pan.current;
     if (!p) return;
     const dx = e.clientX - p.sx;
     const dy = e.clientY - p.sy;
     if (!p.moved && Math.hypot(dx, dy) < 4) return;
-    p.moved = true;
+    if (!p.moved) { p.moved = true; setIsPanning(true); }
     setCam((c) => ({ ...c, x: p.cx + dx, y: p.cy + dy }));
   }
 
   function onBoardPointerUp(e: React.PointerEvent) {
-    const mq = marquee.current;
-    if (mq) {
-      marquee.current = null;
-      setMarqueeBox(null);
-      if (!mq.moved) clearSelection(); // a tap in select-mode clears; a drag = the marquee selection stands
-      return;
-    }
+    if (marquee.end()) return; // a marquee was active — it handled the up
     const p = pan.current;
     pan.current = null;
+    setIsPanning(false);
     if (!p || p.moved) return; // a pan, not a tap
     const w = screenToWorld(e.clientX, e.clientY);
     const now = performance.now();
@@ -535,43 +451,21 @@ export function BoardSurface({
 
   return (
     <>
-      <div className="compose-toolbar">
-        <button className="compose-btn" onClick={addNote}>+ note</button>
-        <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
-        <button className="compose-btn" onClick={() => setDrawMode(true)}>✎ pen</button>
-        <button
-          className={`compose-btn${selectMode ? " is-on" : ""}`}
-          onClick={() => { if (selectMode) clearSelection(); setSelectMode((m) => !m); }}
-          title="Select several cards to move or remove them together"
-        >
-          ⛶ select
-        </button>
-        {selectedIds.size > 1 && (
-          <span className="compose-bulk">
-            <span className="compose-selected">{selectedIds.size} selected</span>
-            <button className="compose-btn subtle" onClick={bulkUnplace} title="Remove all selected cards from this board">
-              remove from board
-            </button>
-            <button className="compose-btn subtle" onClick={bulkTrash} title="Trash all selected notes">
-              trash
-            </button>
-          </span>
-        )}
-        <span className="compose-zoom">
-          <button className="compose-btn" onClick={fitView} title="Bring all your cards into view">
-            ⊹ fit
-          </button>
-          <span className="compose-zoom-pct" title="current zoom">
-            {Math.round(cam.scale * 100)}%
-          </span>
-        </span>
-        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
-        {error && (
-          <span className="text-sm text-red-700">
-            {error} <button className="underline" onClick={() => setError(null)}>ok</button>
-          </span>
-        )}
-      </div>
+      <BoardToolbar
+        onAddNote={addNote}
+        onPen={() => setDrawMode(true)}
+        selectMode={selectMode}
+        onToggleSelect={() => { if (selectMode) clearSelection(); setSelectMode((m) => !m); }}
+        selectedCount={selectedIds.size}
+        onBulkUnplace={bulkUnplace}
+        onBulkTrash={bulkTrash}
+        onFit={() => fitView(cards)}
+        zoomPct={cam.scale}
+        fileRef={fileRef}
+        onPickImage={onPickImage}
+        error={error}
+        onDismissError={() => setError(null)}
+      />
       <div className="compose-stage">
       {selectedBit && (
         <div className="selected-bar">
@@ -596,7 +490,7 @@ export function BoardSurface({
       )}
       <div
         ref={boardRef}
-        className={`compose-board${pan.current ? " is-panning" : ""}`}
+        className={`compose-board${isPanning ? " is-panning" : ""}`}
         onPointerDown={onBoardPointerDown}
         onPointerMove={onBoardPointerMove}
         onPointerUp={onBoardPointerUp}
@@ -641,10 +535,10 @@ export function BoardSurface({
             />
           ))}
         </div>
-        {marqueeBox && (
+        {marquee.marqueeBox && (
           <div
             className="marquee-box"
-            style={{ left: marqueeBox.left, top: marqueeBox.top, width: marqueeBox.w, height: marqueeBox.h }}
+            style={{ left: marquee.marqueeBox.left, top: marquee.marqueeBox.top, width: marquee.marqueeBox.w, height: marquee.marqueeBox.h }}
           />
         )}
         <LooseColumn boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />

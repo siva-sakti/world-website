@@ -70,6 +70,7 @@ export function LooseColumn({
 
   // Load on first open, and whenever the board signals the set changed.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- load-on-open sets a loading flag; results arrive async
     if (open) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, refreshSignal]);

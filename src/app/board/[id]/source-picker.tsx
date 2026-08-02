@@ -34,6 +34,7 @@ export function SourcePicker({
 
   useEffect(() => {
     let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the loading flag when the target changes; results follow async
     setLoading(true);
     Promise.all([
       listSources(supabase),
@@ -70,6 +71,7 @@ export function SourcePicker({
   // Unmount (deselect / card switch) never fires blur — commit the typed source on
   // unmount too, so it's applied, not silently dropped (mirrors tag-bar).
   const commitRef = useRef<() => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the unmount effect below commits the current draft
   commitRef.current = () => {
     const nm = draft.trim();
     if (nm) void pick(nm);

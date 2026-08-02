@@ -70,6 +70,7 @@ export function TextBit({
   // Watch the text just before the cursor for a `[[…` still-open trigger. A closing
   // bracket or a cursor move away drops it (the pattern stops matching), so the
   // picker closes itself in the common cases — no separate dismiss needed.
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the editor's one-time config closure must call the current handler
   detectRef.current = (ed) => {
     try {
       const { selection, doc } = ed.state;
@@ -93,6 +94,7 @@ export function TextBit({
     }
   };
 
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref (see detectRef above)
   insertRef.current = (hit) => {
     try {
       if (!editor || !picker) return;
@@ -138,6 +140,7 @@ export function TextBit({
     if (!editor) return;
     editor.setEditable(editing);
     if (editing) editor.commands.focus("end");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- clear the transient picker when the editor leaves edit mode
     else setPicker(null);
   }, [editing, editor]);
 
