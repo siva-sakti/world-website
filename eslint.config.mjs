@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local design-study artifacts (generated HTML/JS), not app code.
+    "design-studies/**",
   ]),
 ]);
 

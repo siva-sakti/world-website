@@ -44,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local design-study artifacts (kept out of the app tree; not app code)
+design-studies/

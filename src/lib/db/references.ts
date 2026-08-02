@@ -123,43 +123,30 @@ export async function listGatherCandidates(
   }));
 }
 
-export type GatheredInto = { fromBitId: string; face: string };
+export type RefTargetRow = {
+  type: string;
+  content: string | null;
+  body: string | null;
+  thumb_path: string | null;
+  storage_path: string | null;
+  strokes: Stroke[] | null;
+  face: string | null;
+  deleted_at: string | null;
+};
 
-/** "Gathered into" — every LIVE note that gathered this bit, newest first, each with
- *  its current face for the label (G-F4, the backward payoff read). Trashed sources
- *  are hidden, like everywhere. Two queries + a JS join — the house shape (there's no
- *  reference-face view; mirrors listManagedSources). Safe to run defensively on a
- *  bit's page (reconcile-on-read, G-F7). */
-export async function listGatheredInto(
+/** The target bit behind a gather chip — read once by the chip's inline thumbnail +
+ *  peek (bit-ref-view). This is the db door for that read; signing the image and
+ *  normalizing the drawing stay in the view (storage/render concerns). Null if the id
+ *  doesn't resolve. (The "gathered into" backward read lands with G3, not built yet.) */
+export async function getRefTarget(
   supabase: SupabaseClient,
   bitId: string,
-): Promise<GatheredInto[]> {
-  const refs = await supabase
-    .from("reference")
-    .select("from_bit_id, created_at")
-    .eq("to_bit_id", bitId)
-    .order("created_at", { ascending: false });
-  if (refs.error) throw refs.error;
-  const rows = refs.data ?? [];
-  if (rows.length === 0) return [];
-
-  const fromIds = [...new Set(rows.map((r) => r.from_bit_id as string))];
-  const bits = await supabase.from("bit").select("id, face, deleted_at").in("id", fromIds);
-  if (bits.error) throw bits.error;
-
-  const liveFace = new Map<string, string>();
-  for (const b of bits.data ?? []) {
-    if (!b.deleted_at) liveFace.set(b.id as string, (b.face as string | null) ?? "");
-  }
-
-  const out: GatheredInto[] = [];
-  const seen = new Set<string>();
-  for (const r of rows) {
-    // rows are already newest-first; dedupe a target mentioned twice, drop trashed sources
-    const id = r.from_bit_id as string;
-    if (seen.has(id) || !liveFace.has(id)) continue;
-    seen.add(id);
-    out.push({ fromBitId: id, face: liveFace.get(id)! });
-  }
-  return out;
+): Promise<RefTargetRow | null> {
+  const { data, error } = await supabase
+    .from("bit")
+    .select("type, content, body, thumb_path, storage_path, strokes, face, deleted_at")
+    .eq("id", bitId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as RefTargetRow | null) ?? null;
 }

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
+import { getRefTarget } from "@/lib/db/references";
 import { DoodleBit } from "./doodle-bit";
 import { computePlacement, type AnchorRect, type Placement } from "@/lib/floating";
 import type { Drawing } from "@/lib/types";
@@ -46,13 +47,14 @@ function resolveTarget(refId: string): Promise<Target> {
   if (hit) return hit;
   const p = (async (): Promise<Target> => {
     const supabase = createClient();
-    const { data, error } = await supabase
-      .from("bit")
-      .select("type, content, body, thumb_path, storage_path, strokes, face, deleted_at")
-      .eq("id", refId)
-      .maybeSingle();
     const dead: Target = { face: "", type: "text", snippet: "", imageUrl: null, drawing: null, gone: true };
-    if (error || !data) return dead;
+    let data;
+    try {
+      data = await getRefTarget(supabase, refId);
+    } catch {
+      return dead; // a failed read → show the plain word chip, not a crash
+    }
+    if (!data) return dead;
     const face = (data.face as string | null) ?? "";
     const type = (data.type as string) ?? "text";
     if (data.deleted_at) return { ...dead, face, type };

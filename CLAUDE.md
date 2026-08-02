@@ -49,7 +49,7 @@ A spatial notebook for one writer: catch what you consume and think as **bits**,
 
 ## Stack
 
-Next.js (App Router, TS strict) + Supabase (Postgres/Storage/Auth) + Tailwind (layout only) + pre-approved libs: `dnd-kit`, `react-rnd`, `tiptap`, `pdf.js`, `zod`, `perfect-freehand` (pen candidate). New deps need approval. **Cloud** Supabase + Vercel for real capture (a phone can't reach localhost).
+Next.js (App Router, TS strict) + Supabase (Postgres/Storage/Auth) + Tailwind (layout only) + libs in use: `react-rnd`, `tiptap`, `perfect-freehand`, `react-force-graph-2d`; pre-approved but not yet installed: `dnd-kit`, `pdf.js`, `zod`. New deps need approval. **Cloud** Supabase + Vercel for real capture (a phone can't reach localhost).
 
 ## How I work (norms)
 
