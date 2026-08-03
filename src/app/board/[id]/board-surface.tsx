@@ -26,6 +26,7 @@ import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
+import { confirm } from "@/components/confirm";
 
 const MAX_DISP = 320; // an image card's initial on-board width
 
@@ -339,7 +340,7 @@ export function BoardSurface({
     const msg = n > 1
       ? `This note is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
       : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
-    if (!window.confirm(msg)) return;
+    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     clearSelection();
     setEditingId(null);
@@ -371,7 +372,7 @@ export function BoardSurface({
       onOtherBoards > 0
         ? `Trash ${n} note${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
         : `Trash ${n} note${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
-    if (!window.confirm(msg)) return;
+    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
     clearSelection();
     setEditingId(null);

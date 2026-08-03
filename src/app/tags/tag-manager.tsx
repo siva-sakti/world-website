@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { renameTag, mergeTags, deleteTag, type ManagedTag } from "@/lib/db/tags";
+import { confirm } from "@/components/confirm";
 
 // The tag manager (§3e): rename (free, follows everywhere), merge (dedupes by
 // construction), delete (with a count that reckons with the frozen — I-T2).
@@ -40,7 +41,7 @@ export function TagManager({ initial }: { initial: ManagedTag[] }) {
   async function doMerge(from: ManagedTag, intoId: string) {
     const into = tags.find((t) => t.id === intoId);
     if (!into) return;
-    if (!confirm(`Merge “${from.word}” into “${into.word}”? Everything tagged “${from.word}” (${countLabel(from)}) will become “${into.word}”. This can't be undone.`))
+    if (!(await confirm({ message: `Merge “${from.word}” into “${into.word}”? Everything tagged “${from.word}” (${countLabel(from)}) will become “${into.word}”. This can't be undone.`, confirmLabel: "Merge", danger: true })))
       return;
     try {
       await mergeTags(supabase, from.id, into.id);
@@ -56,7 +57,7 @@ export function TagManager({ initial }: { initial: ManagedTag[] }) {
   }
 
   async function doDelete(t: ManagedTag) {
-    if (!confirm(`Delete the tag “${t.word}”? ${countLabel(t)} will lose it (the things themselves stay). This can't be undone.`))
+    if (!(await confirm({ message: `Delete the tag “${t.word}”? ${countLabel(t)} will lose it (the things themselves stay). This can't be undone.`, confirmLabel: "Delete", danger: true })))
       return;
     try {
       await deleteTag(supabase, t.id);

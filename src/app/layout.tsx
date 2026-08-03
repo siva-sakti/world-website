@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { ConfirmHost } from "@/components/confirm";
 
 // One typeface, set once (see Design stance). Geist is a neutral default; the
 // visual identity arrives later as the owner's own hand-drawn work.
@@ -22,7 +23,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable} h-full`}>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <ConfirmHost />
+      </body>
     </html>
   );
 }

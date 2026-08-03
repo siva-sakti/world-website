@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { listGatherCandidates, type BitHit } from "@/lib/db/references";
 import { BitRef } from "./bitref";
 import { GatherPicker } from "./gather-picker";
+import { promptText } from "@/components/confirm";
 
 // A text bit's words: a Tiptap editor (stored as the bit's `body`). Rich text —
 // bold · italic · lists · quote · link — one typeface, no headings/color (plan §6).
@@ -189,13 +190,13 @@ function Toolbar({ editor }: { editor: TiptapEditor }) {
   );
 }
 
-function toggleLink(editor: TiptapEditor) {
+async function toggleLink(editor: TiptapEditor) {
   if (editor.isActive("link")) {
     editor.chain().focus().unsetLink().run();
     return;
   }
   const prev = (editor.getAttributes("link").href as string | undefined) ?? "https://";
-  const url = window.prompt("Link URL", prev);
+  const url = await promptText({ message: "Link URL", initial: prev, placeholder: "https://…" });
   if (url === null) return; // cancelled
   if (url.trim() === "") {
     editor.chain().focus().unsetLink().run();

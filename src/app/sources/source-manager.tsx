@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { editSource, mergeSources, deleteSource, type ManagedSource } from "@/lib/db/sources";
+import { confirm } from "@/components/confirm";
 
 // The source manager (mirrors the tag manager, §3e — single-valued): rename +
 // re-URL a source in place (id-referenced, every note follows — I-Src3), merge
@@ -64,9 +65,11 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
     const into = sources.find((s) => s.id === intoId);
     if (!into) return;
     if (
-      !confirm(
-        `Merge “${from.name}” into “${into.name}”? Its ${carriers(from)} become “${into.name}”. This can't be undone.`,
-      )
+      !(await confirm({
+        message: `Merge “${from.name}” into “${into.name}”? Its ${carriers(from)} become “${into.name}”. This can't be undone.`,
+        confirmLabel: "Merge",
+        danger: true,
+      }))
     )
       return;
     try {
@@ -88,9 +91,11 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
 
   async function doDelete(s: ManagedSource) {
     if (
-      !confirm(
-        `Delete this source? Its ${carriers(s)} ${s.count + s.trash === 1 ? "stays" : "stay"} — they just lose the “from …” stamp.`,
-      )
+      !(await confirm({
+        message: `Delete this source? Its ${carriers(s)} ${s.count + s.trash === 1 ? "stays" : "stay"} — they just lose the “from …” stamp.`,
+        confirmLabel: "Delete",
+        danger: true,
+      }))
     )
       return;
     try {
