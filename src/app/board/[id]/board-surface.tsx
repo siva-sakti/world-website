@@ -450,7 +450,7 @@ export function BoardSurface({
   const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
 
   return (
-    <>
+    <div className="compose-stage">
       <BoardToolbar
         onAddNote={addNote}
         onPen={() => setDrawMode(true)}
@@ -466,7 +466,6 @@ export function BoardSurface({
         error={error}
         onDismissError={() => setError(null)}
       />
-      <div className="compose-stage">
       {selectedBit && (
         <div className="selected-bar">
           <TagBar key={selectedBit.bitId} target={{ bitId: selectedBit.bitId }} />
@@ -557,7 +556,6 @@ export function BoardSurface({
           />
         )}
       </div>
-      </div>
-    </>
+    </div>
   );
 }

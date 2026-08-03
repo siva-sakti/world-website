@@ -23,10 +23,19 @@ body {
 }
 
 /* ── compose prototype ─────────────────────────────────────────────── */
+/* The board page fills the dynamic viewport as a column; the surface takes the
+   leftover space (flex:1) so there's no fixed chrome height to guess. */
+.board-page {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 8px;
+  padding: 12px 16px;
+}
 .compose-board {
-  position: relative;
-  width: 100%;
-  height: calc(100dvh - 130px); /* viewport onto the endless world */
+  position: absolute;
+  inset: 0; /* fills the flex:1 stage — no magic-number height to guess */
   background: #faf8f3; /* paper ground */
   overflow: hidden;
   touch-action: none;
@@ -661,12 +670,23 @@ body {
   color: #2c3a63;
 }
 .compose-toolbar {
-  /* In the page flow (was position:fixed, which floated over the header —
-     port punch-list bug (a)). A normal row above the board can't cover it. */
+  /* Floats over the canvas (top-left) so the canvas fills the whole surface and
+     there's no chrome height to subtract. Wraps instead of clipping; leaves the
+     top-right corner clear for the notes tab. pointer-events lets you pan through the
+     gaps between buttons while the buttons themselves stay clickable. */
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  max-width: calc(100% - 96px);
+  z-index: 8;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 10px;
+  pointer-events: none;
+}
+.compose-toolbar > * {
+  pointer-events: auto;
 }
 /* Owner words on a card (§2b): a text bit's optional title / a media caption. */
 .compose-title-input,
@@ -741,6 +761,9 @@ body {
 /* The selected-note bar: its tag editor + its remove/trash acts (I-W1). */
 .compose-stage {
   position: relative;
+  flex: 1;
+  min-height: 0; /* let the flex child actually shrink to fit, not overflow */
+  overflow: hidden;
 }
 /* The selection toolbar FLOATS over the canvas (top-left) instead of sitting in
    flow above it — so selecting a card no longer shoves the board down (layout

@@ -70,8 +70,8 @@ export default async function BoardPage({
   ).filter((c): c is CardVM => c !== null);
 
   return (
-    <main className="px-6 py-6">
-      <header className="mb-4 flex items-baseline justify-between gap-4">
+    <main className="board-page">
+      <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-4">
         <span className="flex shrink-0 items-baseline gap-4 text-sm">
           <Link href="/" className="underline underline-offset-4 hover:no-underline">
             ← boards
@@ -93,7 +93,7 @@ export default async function BoardPage({
           </button>
         </form>
       </header>
-      <div className="mb-2">
+      <div className="shrink-0">
         <TagBar target={{ boardId: board.id }} label="board tags" />
       </div>
       <BoardSurface boardId={board.id} initialCards={cards} />
