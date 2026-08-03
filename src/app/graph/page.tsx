@@ -11,8 +11,8 @@ export default async function GraphPage() {
   const graph = await getWordGraph(supabase);
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-6">
-      <header className="mb-3 flex items-baseline justify-between text-sm">
+    <main className="graph-page mx-auto max-w-6xl">
+      <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-3 text-sm">
         <div className="flex items-baseline gap-5">
           <Link href="/" className="underline underline-offset-4 hover:no-underline">
             ← boards
@@ -32,7 +32,7 @@ export default async function GraphPage() {
         </form>
       </header>
 
-      <p className="mb-3 text-sm text-neutral-500">
+      <p className="shrink-0 text-sm text-neutral-500">
         Your <b className="font-medium text-neutral-700">word web</b> — every tag and the bits that
         carry it. Bigger dots are used more; hover to trace what connects, click a dot to open it.
       </p>
