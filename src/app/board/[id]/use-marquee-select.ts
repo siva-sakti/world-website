@@ -22,6 +22,13 @@ export function useMarqueeSelect(
     setMarqueeBox(null);
   }
 
+  // Abandon an in-progress marquee with NO selection side-effects — a pinch's
+  // second finger (or a pointercancel) must not restart or "tap-clear" it.
+  function cancel() {
+    marquee.current = null;
+    setMarqueeBox(null);
+  }
+
   // Returns true when a marquee is active (so the caller skips pan handling).
   function move(e: React.PointerEvent, cards: CardVM[]): boolean {
     const mq = marquee.current;
@@ -61,5 +68,5 @@ export function useMarqueeSelect(
     return true;
   }
 
-  return { marqueeBox, start, move, end };
+  return { marqueeBox, start, move, end, cancel };
 }

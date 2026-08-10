@@ -63,8 +63,9 @@ export function BoardSurface({
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
 
-  // Pan/zoom camera and rubber-band select — extracted, behavior unchanged.
-  const { cam, camRef, setCam, screenToWorld, fitView } = useCamera(boardRef);
+  // Pan/zoom camera (incl. touch pinch) and rubber-band select.
+  const { cam, camRef, setCam, screenToWorld, fitView, centerOn, pinchDown, pinchMove, pinchUp } =
+    useCamera(boardRef);
   const marquee = useMarqueeSelect(boardRef, screenToWorld, setSelectedIds, clearSelection);
 
   function onErr(e: unknown) {
@@ -81,9 +82,19 @@ export function BoardSurface({
   const { patchCard, saveContent, trackCreate, reconcileId, settled } = usePersistence(supabase, setCards, onErr);
 
   // On open, frame the board's content so you never land on blank canvas.
+  // On a PHONE (the CSS breakpoint, inclusive), fit-all computes a tiny scale —
+  // open instead centered on the last-fronted card at 100%, readable; ⊹ fit is
+  // one tap away for the overview. z ties (inbox-placed cards are all z=0)
+  // resolve to the last in load order — arbitrary but stable (plan finding 8).
   useEffect(() => {
-    // Frame the content once on open — a deliberate one-time init.
-    if (initialCards.length) fitView(initialCards);
+    if (!initialCards.length) return;
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      let top = initialCards[0];
+      for (const c of initialCards) if (c.z >= top.z) top = c;
+      centerOn(top, 1);
+    } else {
+      fitView(initialCards);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -275,10 +286,19 @@ export function BoardSurface({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // ---- pan + tap on empty space ----
+  // ---- pan + pinch + tap on empty space ----
   function onBoardPointerDown(e: React.PointerEvent) {
     if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
     setEditingId(null);
+    if (pinchDown(e)) {
+      // A second finger = a pinch: never a pan, marquee, or tap. Abandon any
+      // in-progress marquee (its anchor must not be stomped — plan finding 7).
+      marquee.cancel();
+      pan.current = null;
+      lastTap.current = null;
+      setIsPanning(false);
+      return;
+    }
     if (selectMode) {
       marquee.start(e); // select-mode: empty-space drag draws a marquee (not a pan)
       return;
@@ -288,6 +308,7 @@ export function BoardSurface({
   }
 
   function onBoardPointerMove(e: React.PointerEvent) {
+    if (pinchMove(e)) return; // an active pinch owns the move
     if (marquee.move(e, cards)) return; // a marquee is active — it handled the move
     const p = pan.current;
     if (!p) return;
@@ -298,7 +319,16 @@ export function BoardSurface({
     setCam((c) => ({ ...c, x: p.cx + dx, y: p.cy + dy }));
   }
 
+  // An interrupted gesture (OS gesture, alert, tab switch) must strand no state.
+  function onBoardPointerCancel(e: React.PointerEvent) {
+    pinchUp(e);
+    marquee.cancel();
+    pan.current = null;
+    setIsPanning(false);
+  }
+
   function onBoardPointerUp(e: React.PointerEvent) {
+    if (pinchUp(e)) return; // a finger lifting out of a pinch is never a tap
     if (marquee.end()) return; // a marquee was active — it handled the up
     const p = pan.current;
     pan.current = null;
@@ -494,6 +524,7 @@ export function BoardSurface({
         onPointerDown={onBoardPointerDown}
         onPointerMove={onBoardPointerMove}
         onPointerUp={onBoardPointerUp}
+        onPointerCancel={onBoardPointerCancel}
         onDragOver={(e) => e.preventDefault()}
         onDrop={onBoardDrop}
       >

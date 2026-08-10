@@ -8,11 +8,23 @@ export type Camera = { x: number; y: number; scale: number };
 
 // The board's pan/zoom camera over an infinite world. Owns the camera state, a
 // latest-value ref for imperative reads (wheel, pen, screen→world), the native
-// wheel-zoom (a non-passive listener so it can preventDefault the page scroll), and
-// fitView. Extracted from board-surface unchanged — same math, same behavior.
+// wheel-zoom (a non-passive listener so it can preventDefault the page scroll),
+// fitView/centerOn, and the touch PINCH — two-finger zoom+pan, the phone's only
+// zoom (the wheel is mouse-only; touch-action:none turns the browser's own pinch
+// off). The board's pointer handlers dispatch to pinchDown/Move/Up exactly like
+// the marquee's start/move/end pattern (board-touch-zoom-plan.md).
 export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
   const camRef = useRef(cam);
+  // Touch pointers currently down on empty board space (touch pointers get
+  // implicit capture, so their moves keep firing here), and the active pinch:
+  // starting finger distance + scale, and the WORLD point under the fingers'
+  // midpoint — held under the moving midpoint, which yields zoom AND two-finger
+  // pan in one gesture. All midpoint math is BOARD-RECT-LOCAL (cam x/y live in
+  // that space — the same rect.left/top subtraction the wheel does; raw client
+  // coords would jump content by the header height — plan review finding 5).
+  const touchPts = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{ d0: number; s0: number; w0: { x: number; y: number } } | null>(null);
   useEffect(() => {
     camRef.current = cam; // latest camera for imperative reads (was assigned in render)
   }, [cam]);
@@ -68,5 +80,71 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
     setCam({ x: r.width / 2 - cx * scale, y: r.height / 2 - cy * scale, scale });
   }
 
-  return { cam, camRef, setCam, screenToWorld, fitView };
+  // Open readable on a small screen: center one card at a chosen zoom (the plan's
+  // phone open — readable 100% on the last-fronted card instead of fit-all-tiny).
+  function centerOn(card: CardVM, scale: number) {
+    const el = boardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const s = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale));
+    setCam({
+      scale: s,
+      x: r.width / 2 - (card.x + card.w / 2) * s,
+      y: r.height / 2 - (card.y + card.h / 2) * s,
+    });
+  }
+
+  /** A touch finger landed on empty board space. Returns true when it makes a
+   *  pinch (the second finger) — the caller then cancels pan/tap/marquee state. */
+  function pinchDown(e: React.PointerEvent): boolean {
+    if (e.pointerType !== "touch") return false;
+    touchPts.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touchPts.current.size !== 2) return false;
+    const el = boardRef.current;
+    if (!el) return false;
+    const [a, b] = [...touchPts.current.values()];
+    const r = el.getBoundingClientRect();
+    const midX = (a.x + b.x) / 2 - r.left; // rect-local, like the wheel
+    const midY = (a.y + b.y) / 2 - r.top;
+    const c = camRef.current;
+    pinchRef.current = {
+      d0: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)),
+      s0: c.scale,
+      w0: { x: (midX - c.x) / c.scale, y: (midY - c.y) / c.scale },
+    };
+    return true;
+  }
+
+  /** Returns true while a pinch owns the move (the caller skips marquee/pan). */
+  function pinchMove(e: React.PointerEvent): boolean {
+    if (e.pointerType === "touch" && touchPts.current.has(e.pointerId)) {
+      touchPts.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    const pz = pinchRef.current;
+    if (!pz || touchPts.current.size < 2) return false;
+    const el = boardRef.current;
+    if (!el) return true;
+    const [a, b] = [...touchPts.current.values()];
+    const r = el.getBoundingClientRect();
+    const midX = (a.x + b.x) / 2 - r.left;
+    const midY = (a.y + b.y) / 2 - r.top;
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    const s = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pz.s0 * (d / pz.d0)));
+    // Keep the recorded world point under the fingers' current midpoint.
+    setCam({ scale: s, x: midX - pz.w0.x * s, y: midY - pz.w0.y * s });
+    return true;
+  }
+
+  /** A touch finger lifted (or the gesture was cancelled). Returns true when it
+   *  belonged to a pinch — never a tap. Below two fingers the pinch ends; the
+   *  remaining finger does NOT resume a pan (no end-of-pinch jump). */
+  function pinchUp(e: React.PointerEvent): boolean {
+    if (e.pointerType !== "touch") return false;
+    const wasPinching = pinchRef.current !== null;
+    touchPts.current.delete(e.pointerId);
+    if (touchPts.current.size < 2) pinchRef.current = null;
+    return wasPinching;
+  }
+
+  return { cam, camRef, setCam, screenToWorld, fitView, centerOn, pinchDown, pinchMove, pinchUp };
 }
