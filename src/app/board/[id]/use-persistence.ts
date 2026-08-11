@@ -114,5 +114,5 @@ export function usePersistence(
       .catch(onErr);
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId, settled };
+  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush };
 }

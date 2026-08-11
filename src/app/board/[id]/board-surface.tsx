@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   createTextBit,
@@ -62,6 +63,7 @@ export function BoardSurface({
   const bringInStep = useRef(0); // small cascade so repeated bring-ins don't stack
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
+  const router = useRouter();
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
   const { cam, camRef, setCam, screenToWorld, fitView, centerOn, pinchDown, pinchMove, pinchUp } =
@@ -79,7 +81,19 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId, settled } = usePersistence(supabase, setCards, onErr);
+  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow } =
+    usePersistence(supabase, setCards, onErr);
+
+  // "open" — the focused writing view (writing-experience-plan v1): the bit's own
+  // page. Gated: the row must exist (a fresh card's insert may be in flight → the
+  // page would 404), and the last keystrokes must be flushed (else the page loads
+  // a stale body and its next save overwrites them — plan review finding 4).
+  function openSelected(placementId: string, bitId: string) {
+    settled(placementId)
+      .then(() => flushNow(placementId))
+      .then(() => router.push(`/bit/${bitId}`))
+      .catch(onErr);
+  }
 
   // On open, frame the board's content so you never land on blank canvas.
   // On a PHONE (the CSS breakpoint, inclusive), fit-all computes a tiny scale —
@@ -501,6 +515,13 @@ export function BoardSurface({
         <div className="selected-bar">
           <TagBar key={selectedBit.bitId} target={{ bitId: selectedBit.bitId }} />
           <div className="selected-actions">
+            <button
+              className="compose-btn subtle"
+              onClick={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
+              title="Open this note full-page — comfortable writing"
+            >
+              open
+            </button>
             <button
               className="compose-btn subtle"
               onClick={() => unplaceSelected(selectedBit.placementId)}

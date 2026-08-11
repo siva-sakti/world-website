@@ -27,22 +27,31 @@ export type CardVM = {
   sourceUrl?: string; // the source's optional clickable link
 };
 
-const DOT = {
-  width: 11,
-  height: 11,
-  borderRadius: 3,
-  background: "#fffdfa",
-  border: "1.5px solid #365a8c",
-  boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-};
-const HANDLE_STYLES = {
-  topLeft: { ...DOT, left: -6, top: -6 },
-  topRight: { ...DOT, right: -6, top: -6 },
-  bottomLeft: { ...DOT, left: -6, bottom: -6 },
-  bottomRight: { ...DOT, right: -6, bottom: -6 },
-  left: { ...DOT, left: -6, top: "50%", marginTop: -5.5 },
-  right: { ...DOT, right: -6, top: "50%", marginTop: -5.5 },
-};
+// Resize dots in two sizes: 11px for a mouse, 22px for a coarse (touch) pointer —
+// a fingertip can't grab an 11px dot (writing-experience-plan v1.4). Offsets scale
+// with the size so the dots stay centered on the edge (plan review finding 9).
+function handleStyles(size: number) {
+  const dot = {
+    width: size,
+    height: size,
+    borderRadius: size < 16 ? 3 : 6,
+    background: "#fffdfa",
+    border: "1.5px solid #365a8c",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+  };
+  const off = -Math.round(size / 2) - 1;
+  const mid = -(size / 2);
+  return {
+    topLeft: { ...dot, left: off, top: off },
+    topRight: { ...dot, right: off, top: off },
+    bottomLeft: { ...dot, left: off, bottom: off },
+    bottomRight: { ...dot, right: off, bottom: off },
+    left: { ...dot, left: off, top: "50%", marginTop: mid },
+    right: { ...dot, right: off, top: "50%", marginTop: mid },
+  };
+}
+const HANDLE_STYLES = handleStyles(11);
+const HANDLE_STYLES_COARSE = handleStyles(22);
 // text → LEFT/RIGHT handles reflow (width); height follows the text.
 // image/drawing → CORNER handles scale, aspect-locked.
 const RESIZE_TEXT = { left: true, right: true };
@@ -88,6 +97,13 @@ export function Card({
   // Two-step: a fresh click selects (shows the resize frame); clicking an
   // already-selected text card enters edit mode.
   const wasSelected = useRef(false);
+  // Coarse pointer (touch) → the fat resize dots. Read after mount: handles only
+  // render once selected (client state), so there's no hydration risk.
+  const [coarse, setCoarse] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time device capability read
+    setCoarse(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
   const isText = card.type === "text";
   const size = isText
     ? { width: card.w, height: "auto" as const }
@@ -101,7 +117,7 @@ export function Card({
       enableResizing={
         selected && !editing ? (isText ? RESIZE_TEXT : RESIZE_SCALE) : false
       }
-      resizeHandleStyles={HANDLE_STYLES}
+      resizeHandleStyles={coarse ? HANDLE_STYLES_COARSE : HANDLE_STYLES}
       lockAspectRatio={!isText}
       scale={scale}
       minWidth={70}
