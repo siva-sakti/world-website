@@ -1,6 +1,6 @@
 # Board touch zoom — pinch + a readable mobile open (plan)
 
-**What this is:** the plan to make the board zoomable on touch (it currently is NOT — owner hit this live on their phone) and to open the board readable on a small screen instead of fit-all-tiny. Planned against the current code, 2026-08-03; **cold-reviewed same day** (findings folded in below). *(Recreated 2026-08-09 in the GitHub working copy after macOS locked the local Documents folder.)*
+**What this is:** the plan to make the board zoomable on touch (it currently is NOT — owner hit this live on their phone) and to open the board readable on a small screen instead of fit-all-tiny. Planned against the current code, 2026-08-03. **Not yet built — for review.**
 
 ## The diagnosis (verified in code)
 - **Zoom exists only on the mouse wheel.** `use-camera.ts` attaches one native `wheel` listener (non-passive, zoom-toward-cursor). There is **no touch path at all**.
@@ -12,8 +12,8 @@
 
 ### 1. Pinch-to-zoom (+ two-finger pan) on the board
 - Track **touch pointers by pointerId** in a Map (touch has implicit pointer capture, so moves keep firing on the board once a finger lands on empty space).
-- **Second finger down → pinch starts:** record the starting distance `d0`, starting scale, and the world point under the fingers' midpoint. Kill `pan.current`, `lastTap`, and `isPanning` — two fingers are never a tap/pan/create.
-- **On move:** new scale = `s0 × d/d0`, clamped to the existing MIN/MAX (0.2–3); reposition so the recorded world point stays under the *current* midpoint — **zoom + two-finger pan in one gesture** (the standard feel).
+- **Second finger down (not in select-mode) → pinch starts:** record the starting distance `d0`, starting camera, and the world point under the fingers' midpoint. Kill `pan.current` and `lastTap` — two fingers are never a tap/pan/create.
+- **On move:** new scale = `cam0.scale × d/d0`, clamped to the existing MIN/MAX (0.2–3); reposition so the recorded world point stays under the *current* midpoint — this gives **zoom + two-finger pan in one gesture** (the standard feel).
 - **On up/cancel:** drop the pointer; below two fingers the pinch ends. The remaining finger does **not** resume a pan (prevents the end-of-pinch jump); lift and touch again to pan.
 - The math mirrors the wheel-zoom's anchor math (same clamp, same world-anchor idea) — one mental model, implemented in `use-camera.ts` as `pinchDown/pinchMove/pinchUp` handlers the board dispatches to, **exactly like the marquee's start/move/end pattern** already in the code.
 - **Rect-local coordinates, stated explicitly (review finding 5):** the camera's x/y live in board-rect space (`screenToWorld` and the wheel handler both subtract `rect.left/top`). The pinch midpoint must too — `x: (midClientX − r.left) − w0.x·s` — or content jumps by the header height on the first pinch move.
@@ -27,9 +27,9 @@
 
 ### Known limits (deliberate, documented)
 - **Pinch needs both fingers on empty board space.** A finger on a card is captured by the card (react-rnd drag). Fixing that means intercepting card gestures — out of scope; empty space is nearly always reachable.
+- **No pinch while in select-mode** (two-finger during a marquee is ignored) — rare, and select-mode is a deliberate mode.
 - **No double-tap-to-zoom:** double-tap already means *create a note* (shipped behavior) — not overloading it.
 - If the **Daylight** reports a width under 640px and trips the zoomed-in open, we tune the threshold on the owner's word.
-- Handle/hit sizes are world-px (inside the canvas transform) — at the phone's 100% open they read true; zoomed out they shrink (the double-tap radius already compensates via `28 / cam.scale`).
 
 ## Verify
 `tsc` + lint + build green; the pinch math is the wheel math (same anchor derivation) — reviewed on paper; real-gesture feel is the **owner's phone test** (pinch, two-finger pan, then one-finger pan, double-tap create still works, ⊹ fit).
