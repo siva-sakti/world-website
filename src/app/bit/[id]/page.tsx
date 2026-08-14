@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
 import { getBitSource } from "@/lib/db/sources";
+import { listGatheredInto } from "@/lib/db/references";
+import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
@@ -34,10 +36,11 @@ export default async function BitPage({
   const b = await getBit(supabase, id);
   if (!b) notFound();
 
-  const [boards, travel, source] = await Promise.all([
+  const [boards, travel, source, gatheredInto] = await Promise.all([
     getBitBoards(supabase, id),
     getBitTravel(supabase, id),
     getBitSource(supabase, id),
+    listGatheredInto(supabase, id),
   ]);
 
   let imageUrl: string | undefined;
@@ -63,16 +66,37 @@ export default async function BitPage({
           <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             boards
           </Link>
+          <Link href="/inbox" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            inbox
+          </Link>
         </div>
-        <form action={logout}>
-          <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
+        <div className="flex items-baseline gap-5">
+          <BitTrash bitId={b.id} />
+          <form action={logout}>
+            <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+              sign out
+            </button>
+          </form>
+        </div>
       </header>
 
-      <p className="text-xs uppercase tracking-wide text-neutral-400">{b.type}</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-tight">{heading}</h1>
+      {/* Type + the date stamps (created · updated) — quiet, always there. */}
+      <p className="text-xs uppercase tracking-wide text-neutral-400">
+        {b.type}
+        <span className="ml-3 normal-case tracking-normal text-neutral-400">
+          {fmt(b.created_at)}
+          {fmt(b.updated_at) !== fmt(b.created_at) && ` · edited ${fmt(b.updated_at)}`}
+        </span>
+      </p>
+      {/* The note's own words — editable here, the same field the board card edits
+          (D-087): a text bit's optional title / a media bit's caption. */}
+      {b.type === "text" ? (
+        <div className="mt-1">
+          <BitTitle bitId={b.id} initial={b.content ?? ""} placeholder="title — optional" />
+        </div>
+      ) : (
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">{heading}</h1>
+      )}
 
       {/* Source — the "from …" provenance, editable (single-select), near the
           heading; it travels with the bit (P8). Universal, so shown for any type. */}
@@ -82,10 +106,13 @@ export default async function BitPage({
 
       {/* The bit itself — a workspace for text (editable rich text, rendered
           through the tiptap pipeline so links/chips render — finding #6); media
-          stays read-only for now. Bookmark is retired (D-102), so no such branch. */}
+          stays read-only for now. Bookmark is retired (D-102), so no such branch.
+          .page-editor = the comfortable document treatment (plan v1.2). */}
       <div className="mt-6">
         {b.type === "text" && (
-          <TextWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
+          <div className="page-editor">
+            <TextWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
+          </div>
         )}
         {b.type === "image" && imageUrl && (
           <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
@@ -98,12 +125,36 @@ export default async function BitPage({
             <DoodleBit drawing={drawing} />
           </div>
         )}
+        {b.type !== "text" && (
+          <div className="mt-3">
+            <BitTitle bitId={b.id} initial={b.content ?? ""} placeholder="add a few words — optional" />
+          </div>
+        )}
       </div>
 
       {/* Tags — editable (any bit, loose or placed — §3a, §7). */}
       <div className="mt-6">
         <TagBar target={{ bitId: b.id }} />
       </div>
+
+      {/* Gathered into — the backward half of gather (plan v1.2): every live
+          thought whose writing reached for this note. Plain links (a page list,
+          not mid-writing — peek is the chip's gesture, not this one's). */}
+      {gatheredInto.length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">gathered into</h2>
+          <ul className="space-y-1 text-sm">
+            {gatheredInto.map((g) => (
+              <li key={g.bitId} className="flex items-baseline gap-3">
+                <Link href={`/bit/${g.bitId}`} className="underline underline-offset-4 hover:no-underline">
+                  {bitLabel(g.type, g.face)}
+                </Link>
+                <span className="text-xs text-neutral-400">{fmt(g.gatheredAt)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Boards it's on now */}
       <section className="mt-8">

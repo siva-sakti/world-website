@@ -1376,3 +1376,36 @@ body {
 .confirm-primary.is-danger:hover {
   background: #f0ddd6;
 }
+
+/* ---- the note's page + /write: the document treatment (plan v1.2) ----
+   Mechanism, not the design pass: a comfortable reading measure, slightly
+   larger type, generous line-height — writing feels like a page, not a card. */
+.page-title-input {
+  display: block;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 2px 0 6px;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  background: transparent;
+  color: var(--ink);
+  outline: none;
+}
+.page-title-input:hover,
+.page-title-input:focus {
+  border-bottom-color: #d8d2c6;
+}
+.page-title-input::placeholder {
+  color: #c4bcae;
+  font-weight: 400;
+}
+.page-editor .tiptap,
+.page-editor .tiptap .ProseMirror {
+  font-size: 17px;
+  line-height: 1.65;
+}
+.page-editor .tiptap p + p {
+  margin-top: 0.6em;
+}

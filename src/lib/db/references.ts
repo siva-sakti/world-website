@@ -123,6 +123,41 @@ export async function listGatherCandidates(
   }));
 }
 
+export type GatheredIntoRow = {
+  bitId: string; // the gathering thought
+  face: string | null;
+  type: string;
+  gatheredAt: string; // the reference row's created_at — when the tie was made
+};
+
+/** "Gathered into" — the backward half (plan v1.2): every LIVE thought whose
+ *  writing `[[`-gathered this bit. Trashed gatherers are excluded by the render
+ *  rule (hidden everywhere); the tie itself survives in the row, so restoring
+ *  the thought brings its entry back for free. Newest tie first. */
+export async function listGatheredInto(
+  supabase: SupabaseClient,
+  bitId: string,
+): Promise<GatheredIntoRow[]> {
+  const { data, error } = await supabase
+    .from("reference")
+    .select("created_at, gatherer:from_bit_id(id, face, type, deleted_at)")
+    .eq("to_bit_id", bitId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  type Row = {
+    created_at: string;
+    gatherer: { id: string; face: string | null; type: string; deleted_at: string | null } | null;
+  };
+  return ((data ?? []) as unknown as Row[])
+    .filter((r) => r.gatherer && r.gatherer.deleted_at === null)
+    .map((r) => ({
+      bitId: r.gatherer!.id,
+      face: r.gatherer!.face,
+      type: r.gatherer!.type,
+      gatheredAt: r.created_at,
+    }));
+}
+
 export type RefTargetRow = {
   type: string;
   content: string | null;
@@ -137,7 +172,7 @@ export type RefTargetRow = {
 /** The target bit behind a gather chip — read once by the chip's inline thumbnail +
  *  peek (bit-ref-view). This is the db door for that read; signing the image and
  *  normalizing the drawing stay in the view (storage/render concerns). Null if the id
- *  doesn't resolve. (The "gathered into" backward read lands with G3, not built yet.) */
+ *  doesn't resolve. */
 export async function getRefTarget(
   supabase: SupabaseClient,
   bitId: string,

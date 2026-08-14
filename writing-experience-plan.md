@@ -55,4 +55,20 @@ Two desktop frictions from real use, named by the owner after living with v1:
 - Out of scope here: the phone write-first fork (open the page on create — still an open owner call); any visual restyle (the owner's design pass).
 - *Build note (proofed):* overlap tests use state `w` but **rendered DOM height** for text cards (state `h` is stale by design, height:auto) — a `data-pid` on the card inner + a query at spawn time; fallback to state h.
 
-**Verify:** build green; on a busy board, five toolbar-creates in a row land without overlap; typing three paragraphs into a fresh note widens it to the cap then grows down; a hand-narrowed note stays narrow while typed into. Feel-test = the owner.
+**Verify:** build green; on a busy board, five toolbar-creates in a row land without overlap; typing three paragraphs into a fresh note widens it to the cap then grows down; a hand-narrowed note stays narrow while typed into. Feel-test = the owner. **✅ BUILT + deployed (D-111).**
+
+---
+
+## v1.2 — the note, table-stakes (owner asks, 2026-08-13: "I can't delete… where do I check a note I wrote… how do I title it")
+
+**Inventory (code-read):** board cards + the inbox are complete (open/remove/trash/title/tags/source ✓). The gaps are **the note's page** (has editor/source/tags/boards/travel — NO trash, NO title editing, NO dates, NO gathered-into) and **/write** (editor only — no title, no pointer to where the note went).
+
+**The pass — one surface, done right:**
+1. **Gathered into** (the backward half of gather, owed since D-110): on the note's page, every *live* thought that `[[`-gathered this note — face + when-gathered stamp, each a plain link to that thought's page (links, not peeks — this is a page list, not mid-writing). New `listGatheredInto` in `lib/db/references` (reference where `to_bit_id = X`, join the gathering bit, trashed gatherers excluded by the render rule). **One mechanism confirmed to the owner:** the tie lives in the writing — card-on-canvas or full page, same chip, same rows; a *board* is not gatherable (parked A15).
+2. **Trash on the page** — the board's honest multi-board confirm (`getBitBoards` count), then `trashBit` → back where you came from. Uses the global in-app confirm.
+3. **Title on the page** — a quiet editable title line (writes `content`, D-087 — same field the board card edits; doubles as the media caption line). The heading stops being read-only.
+4. **Dates on the page** — created · updated (the owner's date-stamp standing wish), quiet, near the type label.
+5. **/write orientation** — once the note is born: the status line becomes doors — **"in your inbox →"** + **"open its page →"**; plus a **title field** (held locally until the note is born on first content, then flushed via `updateBitContent`; title-only never births — body content is the birth trigger, unchanged).
+6. **Page-feel (mechanism, not the design pass)** — the page + /write editors get a comfortable reading measure, slightly larger type, generous line-height (a `.page-editor` treatment). The visual identity stays the owner's.
+
+**Gates:** no schema change (all columns exist: `content`, `created_at/updated_at`, `reference`). Trash routes through the existing one-door acts; title through `updateBitContent`; nothing new stored. Verify: build green + the owner's walk (write → follow "inbox →" → open the note → title it → see dates → gather it from another note → see "gathered into" → trash it → find it in /trash).

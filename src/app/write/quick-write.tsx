@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { createLooseTextBit, updateBitBody } from "@/lib/db/bits";
+import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { TextBit } from "@/app/board/[id]/text-bit";
 
@@ -23,6 +24,24 @@ export function QuickWrite() {
   const create = useRef<Promise<unknown> | null>(null); // set before any await — the sync guard
   const latest = useRef("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The optional title (plan v1.2): held locally until the note is BORN on first
+  // body content (title alone never births — unchanged), then flushed to
+  // bit.content (D-087 — the same field the board card and the note's page edit).
+  const [title, setTitle] = useState("");
+  const titleRef = useRef("");
+  const titleSaved = useRef("");
+
+  function flushTitle() {
+    const id = bitId.current;
+    const t = titleRef.current;
+    if (!id || !create.current || t.trim() === titleSaved.current.trim()) return;
+    create.current.then(() => {
+      if (!bitId.current) return; // the create failed and reset
+      updateBitContent(supabase, id, t)
+        .then(() => (titleSaved.current = t))
+        .catch(() => {}); // retried on the next blur/keystroke flush
+    });
+  }
 
   function onChange(html: string) {
     latest.current = html;
@@ -34,7 +53,10 @@ export function QuickWrite() {
       const id = crypto.randomUUID();
       bitId.current = id;
       create.current = createLooseTextBit(supabase, { bitId: id, body: html })
-        .then(() => setSelfId(id))
+        .then(() => {
+          setSelfId(id);
+          flushTitle(); // a title typed before the note was born lands now
+        })
         .catch((e) => {
           console.error("create note failed:", e);
           bitId.current = null;
@@ -63,12 +85,37 @@ export function QuickWrite() {
 
   return (
     <div>
-      <TextBit html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
+      <input
+        value={title}
+        placeholder="title — optional"
+        className="page-title-input mb-3"
+        onChange={(e) => {
+          setTitle(e.target.value);
+          titleRef.current = e.target.value;
+        }}
+        onBlur={flushTitle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+        }}
+      />
+      <div className="page-editor">
+        <TextBit html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
+      </div>
       <p className="mt-4 text-xs text-neutral-400" role="status">
         {err ? (
           <span className="text-red-700">{err}</span>
         ) : selfId ? (
-          "in your notes — it saves as you write"
+          // Born — orientation doors (plan v1.2): where it lives + its own page.
+          <span>
+            saved —{" "}
+            <Link href="/inbox" className="underline underline-offset-4 hover:no-underline">
+              in your inbox →
+            </Link>{" "}
+            ·{" "}
+            <Link href={`/bit/${selfId}`} className="underline underline-offset-4 hover:no-underline">
+              open its page →
+            </Link>
+          </span>
         ) : (
           "start writing — it saves itself"
         )}
