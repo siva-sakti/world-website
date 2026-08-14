@@ -105,6 +105,22 @@ export function Card({
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
   }, []);
   const isText = card.type === "text";
+  // Auto-widen while typing (writing-experience plan v1.1): a receipt-shaped note
+  // grows WIDER first — stepwise, up to a comfortable measure — then taller as
+  // today. The owner's own resize always wins (userSized, set on resize-stop).
+  // Stored h is stale by design for text (height:auto), so measure the DOM after
+  // each keystroke commits; the same onChange({w}) path as a hand-resize persists it.
+  const userSized = useRef(false);
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!editing || !isText || userSized.current) return;
+    const el = innerRef.current;
+    if (!el) return;
+    if (el.offsetHeight > card.w * 1.5 && card.w < 560) {
+      onChange({ w: Math.min(560, card.w + 80) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-measure per keystroke/width only
+  }, [card.body, card.w, editing, isText]);
   const size = isText
     ? { width: card.w, height: "auto" as const }
     : { width: card.w, height: card.h };
@@ -130,15 +146,18 @@ export function Card({
         onChange({ x: d.x, y: d.y });
         onDragEnd?.(d.x, d.y);
       }}
-      onResizeStop={(_e, _dir, ref, _delta, pos) =>
+      onResizeStop={(_e, _dir, ref, _delta, pos) => {
+        userSized.current = true; // the owner set this width — auto-widen backs off
         onChange(
           isText
             ? { x: pos.x, y: pos.y, w: ref.offsetWidth }
             : { x: pos.x, y: pos.y, w: ref.offsetWidth, h: ref.offsetHeight },
-        )
-      }
+        );
+      }}
     >
       <div
+        ref={innerRef}
+        data-pid={card.placementId}
         className={`compose-card-inner${
           card.type === "image"
             ? " is-image"

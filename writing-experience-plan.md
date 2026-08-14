@@ -34,3 +34,25 @@
 
 ## Scope
 Reuses the text bit, the loose/inbox model, and the existing workspace editor — **likely no schema change**; it's new *doors*, a focused editor surface, and card sizing. Verified by build + owner feel-test (especially on the phone). Visual design is the owner's.
+
+---
+
+## v1.1 — board creation ergonomics (owner feedback on v1, 2026-08-13)
+
+Two desktop frictions from real use, named by the owner after living with v1:
+
+**1. Dumb spawn spot — new things stack.** Code-proofed 2026-08-13 — FOUR spawn paths, three broken: **`+ note`** always lands at view center (stacks); **`+ image` (picker)** always at a fixed corner offset (stacks — missed in the first draft); **pasted images** likewise (missed); **call-in**'s 6-step cascade *cycles*, so the 7th lands on the 1st. Double-tap note / image *drop* / pen doodle land where you acted — deliberate, untouched.
+- **Fix — ONE shared `findClearSpot(rect)` helper** used by all four: start at the natural spot (view center / the door's anchor), hit-test the candidate rect (at the thing's actual default size) against existing cards in world coords, **step down-right in fixed world increments** until clear — capped (~20 tries, then plain cascade). Deterministic, no randomness. Call-in's `bringInStep` cycle is replaced by it.
+
+**2. Receipt mode — the box never adapts its shape.** Fixed width (240px, D-040) + auto-grow height only ⇒ real writing produces a tall skinny ribbon ("a super long receipt") that must be hand-widened every time.
+- **Fix (a) — born wider:** default text-card width **240 → ~400px**. *This supersedes D-040's 240px — the owner has called the default too small three times in real use (2026-08-03 phone, 2026-08-13 desktop ×2); ruling falls on the owner's word, recorded here.*
+- **Fix (b) — auto-widen while typing:** while a card is being **actively edited** and its shape goes receipt-like (height ≳ 1.5× width), the card **widens itself stepwise up to a comfortable measure (~560px)**, then grows taller as today. **The owner's own resize always wins** — a manually-set width (this session) turns auto-widen off for that card; width changes persist through the normal debounced door. *Mechanics (code-proofed):* the stored `h` is stale by design for text (height:auto) — the card must measure its **rendered** DOM height; auto-widen lives in `Card` (it owns editing + the DOM), emitting the same `onChange({w})` patch as a hand-resize; the resize-stop handler sets the per-card "user sized" flag. Also: **text call-ins get the same 400 default** on a fresh insert (revives keep their true stored width).
+**3. Adjacent, swept + ruled (owner, 2026-08-13):**
+- **(A) Empty-note litter — IN.** The board's create births the row instantly (unlike /write's born-on-first-content), so a stray double-tap leaves a blank note on the board. Fix: a fresh board-born note that ends its edit with still-no-real-content (the /write `hasContent` test: no text, no chip) **evaporates** — removed from the board and its row deleted through the settled-create door (the existing compensating-delete). Once it has ever held real content, it stays (matches /write). Old notes emptied by hand are left alone (a deliberate act).
+- **(B) Stay in view — IN.** `findClearSpot` prefers candidates fully inside the current viewport (world-converted); only if no in-view spot is clear does it fall back to the first clear spot beyond, then plain cascade. A new note must never seem to not-appear.
+- **(D) Paste text → a note — IN.** ⌘V of text on the board (NOT while editing a note or focused in any input — the guard) → one new text note holding the pasted text (lines → paragraphs, HTML-escaped), at a clear spot. One paste, one note, no cleverness (distinct from the rejected auto-chunking, D-log).
+- **(C) Zoom-on-create — REJECTED (owner):** auto-zoom on `+ note` while zoomed out would feel like the app grabbing the wheel. Not re-proposed.
+- Out of scope here: the phone write-first fork (open the page on create — still an open owner call); any visual restyle (the owner's design pass).
+- *Build note (proofed):* overlap tests use state `w` but **rendered DOM height** for text cards (state `h` is stale by design, height:auto) — a `data-pid` on the card inner + a query at spawn time; fallback to state h.
+
+**Verify:** build green; on a busy board, five toolbar-creates in a row land without overlap; typing three paragraphs into a fresh note widens it to the cap then grows down; a hand-narrowed note stays narrow while typed into. Feel-test = the owner.

@@ -12,6 +12,7 @@ import {
   trashBit,
   callInBit,
   getBitBoards,
+  abortBitCreate,
 } from "@/lib/db/bits";
 import { uploadObject, signedUrl } from "@/lib/storage";
 import { importImage, isHeic, MediaError } from "@/lib/media";
@@ -60,7 +61,9 @@ export function BoardSurface({
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
-  const bringInStep = useRef(0); // small cascade so repeated bring-ins don't stack
+  const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
+  const freshEmpty = useRef(new Set<string>()); // board-born notes that never held content (evaporate on edit-end)
+  const prevEditing = useRef<string | null>(null);
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
   const router = useRouter();
@@ -170,19 +173,92 @@ export function BoardSurface({
   }
 
   // ---- create ----
-  function createNote(x: number, y: number) {
+
+  // The /write test, board-side: real content = visible text or a gather chip.
+  function hasRealContent(html: string): boolean {
+    return html.replace(/<[^>]+>/g, "").trim() !== "" || html.includes("data-ref");
+  }
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate
+  // against every card on the board, step down-right until clear — preferring a
+  // spot fully IN VIEW (a new thing must never seem to not-appear). Text heights
+  // in state are stale by design (height:auto), so measure the rendered card via
+  // data-pid and fall back to state. Deterministic; last resort = plain cascade.
+  function findClearSpot(w0: number, h0: number): { x: number; y: number } {
+    const r = boardRef.current?.getBoundingClientRect();
+    if (!r) {
+      const s = (spawnStep.current++ % 8) * 28;
+      return { x: 40 + s, y: 84 + s };
+    }
+    const anchor = screenToWorld(r.left + r.width / 2, r.top + Math.min(200, r.height / 2));
+    const tl = screenToWorld(r.left, r.top);
+    const br = screenToWorld(r.left + r.width, r.top + r.height);
+    const rects = cards.map((c) => {
+      const el = c.type === "text" ? document.querySelector(`[data-pid="${c.placementId}"]`) : null;
+      return { x: c.x, y: c.y, w: c.w, h: el instanceof HTMLElement ? el.offsetHeight : c.h };
+    });
+    const MARGIN = 12;
+    const start = { x: anchor.x - w0 / 2, y: anchor.y };
+    let firstClear: { x: number; y: number } | null = null;
+    for (let i = 0; i < 24; i++) {
+      const x = start.x + i * 36;
+      const y = start.y + i * 36;
+      const taken = rects.some(
+        (q) => x < q.x + q.w + MARGIN && x + w0 + MARGIN > q.x && y < q.y + q.h + MARGIN && y + h0 + MARGIN > q.y,
+      );
+      if (taken) continue;
+      if (x >= tl.x && y >= tl.y && x + w0 <= br.x && y + h0 <= br.y) return { x, y }; // clear AND visible
+      if (!firstClear) firstClear = { x, y };
+    }
+    if (firstClear) return firstClear;
+    const s = (spawnStep.current++ % 8) * 28;
+    return { x: start.x + s, y: start.y + s };
+  }
+
+  function createNote(x: number, y: number, opts?: { body?: string; edit?: boolean }) {
+    const body = opts?.body ?? "<p></p>";
+    const edit = opts?.edit ?? true;
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     const z = nextZ();
     setCards((cs) => [
       ...cs,
-      { placementId, bitId, type: "text", x, y, w: 240, h: 60, z, body: "<p></p>" },
+      { placementId, bitId, type: "text", x, y, w: 400, h: 60, z, body },
     ]);
     selectOne(placementId);
-    setEditingId(placementId);
-    const p = createTextBit(supabase, { bitId, placementId, boardId, body: "<p></p>", x, y, width: 240, z }).catch(onErr);
+    if (edit) setEditingId(placementId);
+    if (!hasRealContent(body)) freshEmpty.current.add(placementId); // evaporates if it stays empty
+    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch(onErr);
     trackCreate(placementId, p);
   }
+
+  // Evaporate (plan v1.1-A): a board-born note whose edit ends with still-no-real-
+  // content quietly un-exists — no blank-note litter from a stray double-tap. Once
+  // it has ever held content it stays (matches /write's born-on-first-content).
+  // Through the settled door: the create may still be in flight.
+  useEffect(() => {
+    const prev = prevEditing.current;
+    if (prev === editingId) return;
+    prevEditing.current = editingId;
+    if (!prev || !freshEmpty.current.has(prev)) return;
+    freshEmpty.current.delete(prev);
+    const c = cards.find((x) => x.placementId === prev);
+    if (!c || hasRealContent(c.body ?? "")) return;
+    setCards((cs) => cs.filter((x) => x.placementId !== prev));
+    setSelectedIds((s) => {
+      if (!s.has(prev)) return s;
+      const nx = new Set(s);
+      nx.delete(prev);
+      return nx;
+    });
+    settled(prev)
+      .then(() => abortBitCreate(supabase, c.bitId))
+      .catch(onErr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fires on edit-end only; guarded against re-entry
+  }, [editingId, cards]);
 
   // Pen "Done": convert the session's strokes (screen space) into world space,
   // bundle into ONE drawing bit at their bounding box (widths kept). Empty → nothing.
@@ -270,26 +346,35 @@ export function BoardSurface({
   function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const r = boardRef.current!.getBoundingClientRect();
-      const w = screenToWorld(r.left + 80, r.top + 120);
-      importImageFile(file, w.x, w.y);
+      const p = findClearSpot(320, 260); // dims unknown until decode — a sensible estimate
+      importImageFile(file, p.x, p.y);
     }
     e.target.value = "";
   }
 
+  // Paste onto the board: an image → an image card; TEXT → a note holding it
+  // (plan v1.1-D — one paste, one note, no cleverness). Never while an editor or
+  // input has focus: those own their own paste.
   useEffect(() => {
     function onPaste(e: ClipboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
       const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith("image/"));
       if (file) {
-        const r = boardRef.current!.getBoundingClientRect();
-        const w = screenToWorld(r.left + 100, r.top + 140);
-        importImageFile(file, w.x, w.y);
+        const p = findClearSpot(320, 260);
+        importImageFile(file, p.x, p.y);
+        return;
       }
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      if (!text.trim()) return;
+      const html = text.split(/\r?\n/).map((ln) => `<p>${escapeHtml(ln)}</p>`).join("");
+      const p = findClearSpot(400, 160);
+      createNote(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
     }
     window.addEventListener("paste", onPaste);
     return () => window.removeEventListener("paste", onPaste);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cards.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-bind on cards so findClearSpot sees live positions
+  }, [cards]);
 
   // Escape clears the selection (and exits edit).
   useEffect(() => {
@@ -424,11 +509,8 @@ export function BoardSurface({
   }
 
   function addNote() {
-    const r = boardRef.current?.getBoundingClientRect();
-    const w = r
-      ? screenToWorld(r.left + r.width / 2, r.top + Math.min(160, r.height / 2))
-      : { x: 40, y: 84 };
-    createNote(w.x, w.y);
+    const p = findClearSpot(400, 140);
+    createNote(p.x, p.y);
   }
 
   // Call-in: bring a loose note onto THIS board, where you're looking. Optimistic like
@@ -437,15 +519,13 @@ export function BoardSurface({
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
     if (type !== "text" && type !== "drawing" && type !== "image") return;
-    const step = (bringInStep.current++ % 6) * 24;
-    const r = boardRef.current?.getBoundingClientRect();
-    const w = r
-      ? screenToWorld(r.left + r.width / 2 + step, r.top + Math.min(200, r.height / 2) + step)
-      : { x: 40 + step, y: 84 + step };
+    const width = type === "text" ? 400 : 220;
+    const height = type === "text" ? 60 : 220;
+    // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
+    // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate.
+    const w = findClearSpot(width, type === "text" ? 120 : height);
     const placementId = crypto.randomUUID();
     const z = nextZ();
-    const width = type === "text" ? 240 : 220;
-    const height = type === "text" ? 60 : 220;
     let imageUrl: string | undefined;
     if (type === "image") {
       const path = bit.thumb_path ?? bit.storage_path;
@@ -579,7 +659,12 @@ export function BoardSurface({
                 selectOne(c.placementId);
                 setEditingId(c.placementId);
               }}
-              onChange={(patch) => patchCard(c.placementId, c.bitId, patch)}
+              onChange={(patch) => {
+                // First real content → the note is truly born; it no longer evaporates.
+                if (patch.body !== undefined && freshEmpty.current.has(c.placementId) && hasRealContent(patch.body))
+                  freshEmpty.current.delete(c.placementId);
+                patchCard(c.placementId, c.bitId, patch);
+              }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
               onDragStart={() => onCardDragStart(c.placementId)}
               onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
