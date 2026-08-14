@@ -66,8 +66,8 @@ export default async function BitPage({
           <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             boards
           </Link>
-          <Link href="/inbox" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            inbox
+          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            notes
           </Link>
         </div>
         <div className="flex items-baseline gap-5">

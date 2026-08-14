@@ -32,8 +32,8 @@ export default async function FindPage({
           <Link href="/" className="underline underline-offset-4 hover:no-underline">
             ← boards
           </Link>
-          <Link href="/inbox" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            inbox
+          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            notes
           </Link>
           <span className="font-semibold">find</span>
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">

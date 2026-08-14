@@ -79,7 +79,7 @@ export function BitTrash({ bitId }: { bitId: string }) {
     setBusy(true);
     try {
       await trashBit(supabase, bitId);
-      router.push("/inbox");
+      router.push("/notes");
       router.refresh();
     } catch {
       setBusy(false);

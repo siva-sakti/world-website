@@ -34,7 +34,7 @@
 | **a bit's page** | one bit + everything connected to it (its content, tags, the boards it's on — **and its travel**: has been on, arrived, left). |
 | **the graph** | dots (bits · boards · tags) joined by shared words + shared places. Local-neighborhood first. *(later phase)* |
 | **the publish preview** | when you make a board public: *exactly what a guest will see* — visible cards, withheld (private) cards, and any public boards it links into. Computed at publish; not a maintained surface. *(sharing phase)* |
-| **the inbox** | your **loose** pile — every live bit that **no live board shows**, newest-first. Computed, never stored: put a loose bit on a board and it leaves; take it off its last board — or trash that board — and it returns, with nothing to keep in sync. A loose bit's guaranteed way-back, the way the ledger is for everything live. *(capture)* |
+| **notes** *(the surface — formerly "the inbox," renamed D-113)* | your **loose** pile — every live bit that **no live board shows**, newest-first. Computed, never stored: put a loose bit on a board and it leaves; take it off its last board — or trash that board — and it returns, with nothing to keep in sync. A loose bit's guaranteed way-back, the way the ledger is for everything live. **The owner's ruling (2026-08-13): "inbox" miscast an authored note as incoming mail — this is where your *notes live*, a first-class receptacle beside boards (home shows both).** The computed view keeps its technical name `the_inbox`; only the surface is renamed. *(capture)* |
 | **gathered into** | standing on a bit, every live thought that **gathered** it — computed from its `reference` rows read backward; free, never maintained. *(gather)* |
 | **the sources-list** | your **reading list** — every `source` you've made, with rename/merge/delete (clones the tags page). A computed listing over the `source` table, not saved state. *(source · D-102)* |
 
@@ -72,7 +72,7 @@ The boundary governs **surfaces only** — destructive acts always *count* froze
 
 ## The acts (verbs)
 
-**make / jot** a bit · **tag** it · **place** it (→ a placement) · **un-place** it (take a card off a board — kept in travel history) · **pull** a tag (→ the pull) · **connect** two cards (→ a connector) · **call in** an existing bit onto a board (reuses its membership row — clears the departure, never a second row) · **clip** a quote or image out of a page (keeps its **source**) · **gather** a bit from inside your writing (type `[[`, pick it → a **reference**) · **trash / restore** a bit **or board** (freeze / unfreeze — §2g). A bit **no live board shows** is **loose** (adjective) → the inbox.
+**make / jot** a bit · **tag** it · **place** it (→ a placement) · **un-place** it (take a card off a board — kept in travel history) · **pull** a tag (→ the pull) · **connect** two cards (→ a connector) · **call in** an existing bit onto a board (reuses its membership row — clears the departure, never a second row) · **clip** a quote or image out of a page (keeps its **source**) · **gather** a bit from inside your writing (type `[[`, pick it → a **reference**) · **trash / restore** a bit **or board** (freeze / unfreeze — §2g). A bit **no live board shows** is **loose** (adjective) → **notes** (the surface; formerly "the inbox," D-113).
 
 ## Retired — do NOT use (these cause drift)
 

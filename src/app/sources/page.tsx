@@ -17,8 +17,8 @@ export default async function SourcesPage() {
           <Link href="/" className="underline underline-offset-4 hover:no-underline">
             ← boards
           </Link>
-          <Link href="/inbox" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            inbox
+          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+            notes
           </Link>
           <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             find

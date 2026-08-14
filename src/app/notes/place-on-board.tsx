@@ -9,9 +9,11 @@ import { placeOnBoard } from "./actions";
 export function PlaceOnBoard({
   bitId,
   boards,
+  onPlaced,
 }: {
   bitId: string;
   boards: { id: string; title: string | null }[];
+  onPlaced?: () => void; // /write uses this for its "placed ✓" line; the notes page relies on revalidate
 }) {
   const [pending, setPending] = useState(false);
   const [err, setErr] = useState(false);
@@ -25,7 +27,8 @@ export function PlaceOnBoard({
     try {
       const res = await placeOnBoard(bitId, boardId);
       if (res.error) setErr(true);
-      // On success, revalidatePath re-renders the inbox without this note.
+      else onPlaced?.();
+      // On success, revalidatePath re-renders the notes page without this note.
     } catch {
       setErr(true); // network rejection — without this, `pending` sticks forever
     } finally {

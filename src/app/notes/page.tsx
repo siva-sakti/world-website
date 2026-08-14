@@ -32,7 +32,7 @@ export default async function InboxPage() {
       <header className="mb-6 flex items-baseline justify-between">
         <div className="flex items-baseline gap-5 text-sm">
           <Link href="/" className="underline underline-offset-4 hover:no-underline">← boards</Link>
-          <span className="font-semibold">inbox</span>
+          <span className="font-semibold">notes</span>
           <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">find</Link>
           <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">tags</Link>
           <Link href="/sources" className="text-neutral-500 underline underline-offset-4 hover:no-underline">sources</Link>
