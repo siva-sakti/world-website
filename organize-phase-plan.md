@@ -30,7 +30,7 @@
 
 ## 3 · Phase O — ORGANIZE (now, in order)
 - **O1 · Home = the shelf.** The three-tier home (rooms big · lenses small · housekeeping footer · acts beside their rooms) **built WITH groups + pins from birth** (schema: `board.group_name` + `board.pinned_at` — additive, throwaway-proven, owner-gated to cloud). One group per board *(assumed; flip if wanted)*.
-- **O2 · Notes = the bit-first view.** Tabs **loose (default, current page unchanged) | all** (placed ones labeled "on 〈board〉") + newest/oldest sort. Reuses the panel/ledger machinery.
+- **O2 · Notes = the bit-first view.** *(Owner ruled 2026-08-21: FULL view — search + type filters like the board panel; sorts = newest · oldest · recently edited.)* **Detailed plan (code-proofed):** the page stays server-rendered but fetches `listAllBits` (the loose page already derives from it — F19, one definition) + pre-signs image thumbs, and hands everything to a new client `NotesBrowser`: **tabs loose (default, the current grid unchanged) | all** (`?view=all`, linkable) · in-memory **search** (face + body + source + tag words — the panel's ruled A22 pattern) · **type filters** (notes / images / sketches) · **sorts** newest (default) / oldest / recently-edited (`updated_at`). On "all," placed bits show **"on 〈board〉" links**; **place-on shows only for loose bits** (offering it on placed bits = the multi-board door, deliberately parked A20); trash works everywhere; the jot box stays on top of both tabs. Reuses `InboxCard` (a `showBoards` prop) + the panel's tab CSS. *Scale note: images pre-signed for the whole set — fine at one-writer scale, revisit with A22.*
 - **O3 · ✎ write shows its superpower.** The quiet `[[` hint + verify the gather button is in the toolbar (thumb-reachable on the Daylight).
 - **O4 · Terminology sweep** — every label/confirm/empty-state consistent with §2; per-page navs mirror the home hierarchy.
 - **O5 · Internal-health check** — verify "the mess is only surface-level" (file ceilings, dead code, doc drift) rather than assert it.
@@ -44,5 +44,15 @@
 
 **The design track runs in parallel** (aesthetics-phase.md): bold ONE-direction identity (owner leans indigo/Gzhel; awaiting her pick + images); chrome design in her design window.
 
-## 5 · How we work the queue (the rhythm)
-Each item: **plan (this doc names it) → owner nod (cross-window review if she wants) → build → prove (build green + flow trace; schema = throwaway first, cloud on "go") → deploy → owner feel-test → record (D-log + docs same-session).** The owner's only standing jobs: answer "needs owner" items, feel-test deploys, and dump ideas — filing them is Claude's job.
+## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
+For EVERY queue item, in order, no skipping:
+1. **Pull** the next item from this doc.
+2. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades).
+3. **Plan in detail** — written down (here or the item's own doc).
+4. **Check the plan** — proof it against the current code (read, don't assume).
+5. **Clarify again** — anything the proof surfaced.
+6. **Build per plan** — improvise nothing.
+7. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go."
+8. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
+
+The owner's only standing jobs: answer clarifying questions + "needs owner" calls, feel-test, and dump ideas — filing them is Claude's job.

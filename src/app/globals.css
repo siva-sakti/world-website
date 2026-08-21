@@ -1409,3 +1409,45 @@ body {
 .page-editor .tiptap p + p {
   margin-top: 0.6em;
 }
+
+/* ---- notes: the bit-first view (organize plan O2) ---- */
+.notes-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.notes-search {
+  flex: 1 1 160px;
+  min-width: 140px;
+  font-size: 13px;
+  padding: 5px 10px;
+  border: 1px solid #e2ddd2;
+  border-radius: 999px;
+  background: #fffdfa;
+  color: var(--ink);
+  outline: none;
+}
+.notes-search:focus {
+  border-color: #cfc7b6;
+}
+.notes-sort {
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid #e2ddd2;
+  border-radius: 6px;
+  background: #fffdfa;
+  color: #6b6257;
+}
+.inbox-card-boards {
+  font-size: 11px;
+  color: #8a8072;
+}
+.inbox-card-board-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: #6b6257;
+}
+.inbox-card-board-link:hover {
+  text-decoration: none;
+}

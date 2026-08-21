@@ -1,0 +1,145 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type { PanelBit } from "@/lib/db/inbox";
+import { NoteCard } from "./note-card";
+
+// The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
+// search + type filters + sorts — the board panel's ruled pattern (A22) on its
+// own landing page. The loose tab IS the old page, unchanged.
+type View = "loose" | "all";
+type Sort = "new" | "old" | "edited";
+type Kind = "text" | "image" | "drawing";
+
+export function NotesBrowser({
+  items,
+  imgs,
+  boards,
+  initialView,
+}: {
+  items: PanelBit[];
+  imgs: Record<string, string>;
+  boards: { id: string; title: string | null }[];
+  initialView: View;
+}) {
+  const [view, setView] = useState<View>(initialView);
+  const [q, setQ] = useState("");
+  const [kind, setKind] = useState<Kind | null>(null);
+  const [sort, setSort] = useState<Sort>("new");
+
+  function switchView(v: View) {
+    setView(v);
+    // Keep the URL linkable without a server round-trip.
+    window.history.replaceState(null, "", v === "all" ? "/notes?view=all" : "/notes");
+  }
+
+  const shown = useMemo(() => {
+    let xs = view === "loose" ? items.filter((b) => b.boards.length === 0) : items;
+    if (kind) xs = xs.filter((b) => b.type === kind);
+    const needle = q.trim().toLowerCase();
+    if (needle) {
+      xs = xs.filter((b) => {
+        const hay = [
+          b.face ?? "",
+          b.content ?? "",
+          (b.body ?? "").replace(/<[^>]+>/g, " "),
+          b.source?.name ?? "",
+          ...b.tags.map((t) => t.word),
+        ]
+          .join(" ")
+          .toLowerCase();
+        return hay.includes(needle);
+      });
+    }
+    const by = {
+      new: (a: PanelBit, z: PanelBit) => z.created_at.localeCompare(a.created_at),
+      old: (a: PanelBit, z: PanelBit) => a.created_at.localeCompare(z.created_at),
+      edited: (a: PanelBit, z: PanelBit) => z.updated_at.localeCompare(a.updated_at),
+    }[sort];
+    return [...xs].sort(by);
+  }, [items, view, kind, q, sort]);
+
+  const looseCount = items.filter((b) => b.boards.length === 0).length;
+
+  return (
+    <div className="mt-7">
+      {/* Tabs + controls */}
+      <div className="notes-controls">
+        <div className="loose-scope" role="tablist" aria-label="which bits">
+          <button
+            role="tab"
+            aria-selected={view === "loose"}
+            className={`loose-scope-tab${view === "loose" ? " is-on" : ""}`}
+            onClick={() => switchView("loose")}
+          >
+            loose · {looseCount}
+          </button>
+          <button
+            role="tab"
+            aria-selected={view === "all"}
+            className={`loose-scope-tab${view === "all" ? " is-on" : ""}`}
+            onClick={() => switchView("all")}
+          >
+            all · {items.length}
+          </button>
+        </div>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="search these…"
+          className="notes-search"
+          aria-label="search bits"
+        />
+        <div className="loose-scope" role="group" aria-label="type filter">
+          {(["text", "image", "drawing"] as Kind[]).map((k) => (
+            <button
+              key={k}
+              className={`loose-scope-tab${kind === k ? " is-on" : ""}`}
+              onClick={() => setKind(kind === k ? null : k)}
+            >
+              {k === "text" ? "notes" : k === "image" ? "images" : "sketches"}
+            </button>
+          ))}
+        </div>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as Sort)}
+          className="notes-sort"
+          aria-label="sort"
+        >
+          <option value="new">newest first</option>
+          <option value="old">oldest first</option>
+          <option value="edited">recently edited</option>
+        </select>
+      </div>
+
+      {shown.length === 0 ? (
+        <p className="mt-8 text-neutral-500">
+          {q || kind
+            ? "Nothing matches — clear the search or filters."
+            : view === "loose"
+              ? "Nothing loose right now. Paste a link or jot a note above, and it lands here."
+              : "Nothing here yet — jot a note above, or catch things on a board."}
+        </p>
+      ) : (
+        <>
+          <p className="mt-4 mb-3 text-sm text-neutral-500">
+            {shown.length} {shown.length === 1 ? "bit" : "bits"}
+            {view === "loose" ? " · loose" : " · everything"}
+          </p>
+          <ul className="inbox-grid">
+            {shown.map((b) => (
+              <NoteCard
+                key={b.id}
+                item={b}
+                img={imgs[b.id]}
+                boards={boards}
+                showBoards={view === "all"}
+              />
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
