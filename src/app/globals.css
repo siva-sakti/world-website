@@ -1451,3 +1451,67 @@ body {
 .inbox-card-board-link:hover {
   text-decoration: none;
 }
+
+/* list view (O2 extension) */
+.notes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ece7de;
+}
+.notes-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 4px;
+  border-bottom: 1px solid #ece7de;
+  font-size: 13.5px;
+}
+.notes-row-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.notes-row-title:hover { text-decoration: none; }
+.notes-row-title > span { overflow: hidden; text-overflow: ellipsis; }
+.notes-row-thumb {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e7e1d5;
+  flex: 0 0 auto;
+}
+.notes-row-empty { color: #a89f92; font-style: italic; }
+.notes-row-source {
+  flex: 0 1 auto;
+  font-size: 12px;
+  color: #8a8072;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+.notes-row-source:hover { text-decoration: none; }
+.notes-row-date {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: #a89f92;
+  font-variant-numeric: tabular-nums;
+}
+.notes-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { PanelBit } from "@/lib/db/inbox";
 import { NoteCard } from "./note-card";
+import { NoteRow } from "./note-row";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
 // search + type filters + sorts — the board panel's ruled pattern (A22) on its
@@ -26,6 +27,7 @@ export function NotesBrowser({
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<Kind | null>(null);
   const [sort, setSort] = useState<Sort>("new");
+  const [layout, setLayout] = useState<"cards" | "list">("cards");
 
   function switchView(v: View) {
     setView(v);
@@ -111,6 +113,22 @@ export function NotesBrowser({
           <option value="old">oldest first</option>
           <option value="edited">recently edited</option>
         </select>
+        <div className="loose-scope" role="group" aria-label="layout">
+          <button
+            className={`loose-scope-tab${layout === "cards" ? " is-on" : ""}`}
+            onClick={() => setLayout("cards")}
+            title="card view"
+          >
+            ⊞
+          </button>
+          <button
+            className={`loose-scope-tab${layout === "list" ? " is-on" : ""}`}
+            onClick={() => setLayout("list")}
+            title="list view"
+          >
+            ☰
+          </button>
+        </div>
       </div>
 
       {shown.length === 0 ? (
@@ -127,16 +145,26 @@ export function NotesBrowser({
             {shown.length} {shown.length === 1 ? "bit" : "bits"}
             {view === "loose" ? " · loose" : " · everything"}
           </p>
-          <ul className="inbox-grid">
-            {shown.map((b) => (
-              <NoteCard
-                key={b.id}
-                item={b}
-                img={imgs[b.id]}
-                boards={boards}
-                showBoards={view === "all"}
-              />
-            ))}
+          <ul className={layout === "cards" ? "inbox-grid" : "notes-list"}>
+            {shown.map((b) =>
+              layout === "cards" ? (
+                <NoteCard
+                  key={b.id}
+                  item={b}
+                  img={imgs[b.id]}
+                  boards={boards}
+                  showBoards={view === "all"}
+                />
+              ) : (
+                <NoteRow
+                  key={b.id}
+                  item={b}
+                  img={imgs[b.id]}
+                  boards={boards}
+                  showBoards={view === "all"}
+                />
+              ),
+            )}
           </ul>
         </>
       )}
