@@ -186,6 +186,10 @@ function Toolbar({ editor }: { editor: TiptapEditor }) {
       {btn(editor.isActive("orderedList"), "1.", () => editor.chain().focus().toggleOrderedList().run(), "numbered list")}
       {btn(editor.isActive("blockquote"), "❝", () => editor.chain().focus().toggleBlockquote().run(), "quote")}
       {btn(editor.isActive("link"), "link", () => toggleLink(editor), "link")}
+      {/* Gather by button (O3): inserts the `[[` trigger at the caret — the same
+          watcher that handles typed `[[` opens the picker, so touch/stylus (the
+          Daylight) reaches gather without a keyboard mode-switch. One code path. */}
+      {btn(false, "[[", () => editor.chain().focus().insertContent("[[").run(), "gather a note into your writing")}
     </div>
   );
 }

@@ -135,7 +135,11 @@ export function QuickWrite({ boards }: { boards: { id: string; title: string | n
             )}
           </span>
         ) : (
-          "start writing — it saves itself"
+          // The gather hint (O3): the page's superpower shouldn't be a secret.
+          <span>
+            start writing — it saves itself · type <code className="rounded bg-neutral-100 px-1">[[</code> to
+            gather a note into your writing
+          </span>
         )}
       </p>
     </div>
