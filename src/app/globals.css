@@ -1515,3 +1515,34 @@ body {
   align-items: center;
   gap: 8px;
 }
+
+
+/* the shelf (O1) */
+.shelf-picker {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid #e2ddd2;
+  border-radius: 6px;
+  background: #fffdfa;
+  color: #6b6257;
+  max-width: 130px;
+}
+.shelf-pin {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #b3a58c;
+  padding: 0 2px;
+}
+.shelf-pin:hover { color: #8a6f4d; }
+.shelf-move {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: #b3a58c;
+  padding: 0 3px;
+}
+.shelf-move:disabled { opacity: 0.3; cursor: default; }
+.shelf-move:hover:not(:disabled) { color: #8a6f4d; }

@@ -1,10 +1,41 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { pinBit } from "@/lib/db/shelf";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { InboxTags } from "./inbox-tags";
 import { PlaceOnBoard } from "./place-on-board";
+
+// The ★/☆ pin toggle (O1) — shared by the card and the row.
+export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean }) {
+  const [supabase] = useState(() => createClient());
+  const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  return (
+    <button
+      className="shelf-pin"
+      disabled={busy}
+      title={pinned ? "unpin" : "pin to the top"}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await pinBit(supabase, bitId, !pinned);
+          router.refresh();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      {pinned ? "★" : "☆"}
+    </button>
+  );
+}
 
 // One bit in the notes grid (client — the browser filters/sorts around it).
 // On the "all" tab (showBoards) a placed bit shows its board links; place-on
@@ -100,6 +131,7 @@ export function NoteCard({
       <div className="inbox-card-foot">
         <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
         <span className="inbox-card-actions">
+          <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
           {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
           <form action={trashFromInbox}>
             <input type="hidden" name="id" value={item.id} />

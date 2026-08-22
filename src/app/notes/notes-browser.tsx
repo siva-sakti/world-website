@@ -58,7 +58,12 @@ export function NotesBrowser({
       old: (a: PanelBit, z: PanelBit) => a.created_at.localeCompare(z.created_at),
       edited: (a: PanelBit, z: PanelBit) => z.updated_at.localeCompare(a.updated_at),
     }[sort];
-    return [...xs].sort(by);
+    const sorted = [...xs].sort(by);
+    // Pinned floats to the top (O1), keeping the chosen sort within each half.
+    return [
+      ...sorted.filter((b) => b.pinned_at),
+      ...sorted.filter((b) => !b.pinned_at),
+    ];
   }, [items, view, kind, q, sort]);
 
   const looseCount = items.filter((b) => b.boards.length === 0).length;

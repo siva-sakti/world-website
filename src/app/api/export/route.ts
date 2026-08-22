@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 // that adds a table must add it here the same session — source and reference
 // were each missed once; this list is the third place that bug bit.
 const TABLES = [
+  "shelf_group",
   "board",
   "bit",
   "placement",

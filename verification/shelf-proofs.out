@@ -1,0 +1,41 @@
+SET
+SET
+INSERT 0 2
+psql:verification/shelf-proofs.sql:19: NOTICE:  PROOF 1 ok — two groups created, owner_id defaulted
+DO
+psql:verification/shelf-proofs.sql:29: NOTICE:  PROOF 2 ok — duplicate name refused
+DO
+INSERT 0 1
+UPDATE 1
+psql:verification/shelf-proofs.sql:39: NOTICE:  PROOF 3 ok — board grouped; home view carries group_id
+DO
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+psql:verification/shelf-proofs.sql:51: NOTICE:  PROOF 4 ok — board + bit pinned
+DO
+DELETE 1
+psql:verification/shelf-proofs.sql:61: NOTICE:  PROOF 5 ok — group deleted; the board survives, ungrouped
+DO
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+psql:verification/shelf-proofs.sql:67: NOTICE:  PROOF 6 ok — positions reorder freely
+DO
+RESET
+SET
+SET
+psql:verification/shelf-proofs.sql:79: NOTICE:  PROOF 7 ok — stranger sees zero foreign groups
+DO
+UPDATE 0
+psql:verification/shelf-proofs.sql:88: NOTICE:  PROOF 8 ok — stranger's writes land on zero rows
+DO
+psql:verification/shelf-proofs.sql:99: NOTICE:  PROOF 9 ok — cross-owner insert refused
+DO
+RESET
+SET
+SET
+psql:verification/shelf-proofs.sql:110: NOTICE:  PROOF 10 ok — anon blind to the shelf
+DO
+RESET
+ALL SHELF PROOFS PASSED

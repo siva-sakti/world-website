@@ -39,12 +39,15 @@ export type Bit = {
   created_at: string;
   updated_at: string;
   face: string | null; // computed headline (read-only)
+  pinned_at: string | null; // the shelf (O1): pinned floats atop notes; null = unpinned
 };
 
 export type Board = {
   id: string;
   title: string | null;
   visibility: Visibility;
+  group_id: string | null; // the shelf (O1): which home section this board sits in
+  pinned_at: string | null; // pinned floats to the top of the shelf; null = unpinned
   deleted_at: string | null;
   created_at: string;
   updated_at: string;

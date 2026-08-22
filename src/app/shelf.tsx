@@ -1,0 +1,143 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import type { HomeBoard } from "@/lib/types";
+import { boardLabel } from "@/lib/labels";
+import {
+  type ShelfGroup,
+  createGroup,
+  setBoardGroup,
+  moveGroup,
+  pinBoard,
+} from "@/lib/db/shelf";
+import { promptText } from "@/components/confirm";
+import { trashBoardAction } from "./actions";
+
+// The shelf (O1): pinned boards float in a ★ section; groups in the owner's own
+// order (↑/↓); ungrouped below. Grouping is a quiet per-row picker — groups
+// exist because boards name them (the owner's ruling; no manage screen).
+export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGroup[] }) {
+  const [supabase] = useState(() => createClient());
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  async function act(fn: () => Promise<unknown>) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fn();
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function reshelve(boardId: string, value: string) {
+    if (value === "__new__") {
+      const name = await promptText({ message: "New group", placeholder: "name the section…" });
+      if (!name || !name.trim()) return;
+      await act(async () => {
+        const g = await createGroup(supabase, name);
+        await setBoardGroup(supabase, boardId, g.id);
+      });
+      return;
+    }
+    await act(() => setBoardGroup(supabase, boardId, value === "" ? null : value));
+  }
+
+  const pinned = boards
+    .filter((b) => b.pinned_at)
+    .sort((a, z) => (z.pinned_at ?? "").localeCompare(a.pinned_at ?? ""));
+  const unpinned = boards.filter((b) => !b.pinned_at);
+  const ungrouped = unpinned.filter((b) => !b.group_id);
+  const byGroup = (gid: string) => unpinned.filter((b) => b.group_id === gid);
+
+  function row(b: HomeBoard) {
+    return (
+      <li key={b.id} className="flex items-baseline justify-between gap-4">
+        <Link href={`/board/${b.id}`} className="underline underline-offset-4 hover:no-underline">
+          {boardLabel(b.title)}
+        </Link>
+        <span className="flex items-baseline gap-3">
+          <select
+            className="shelf-picker"
+            value={b.group_id ?? ""}
+            disabled={busy}
+            onChange={(e) => reshelve(b.id, e.target.value)}
+            aria-label="group"
+            title="which shelf section"
+          >
+            <option value="">no group</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+            <option value="__new__">+ new group…</option>
+          </select>
+          <button
+            className="shelf-pin"
+            disabled={busy}
+            title={b.pinned_at ? "unpin" : "pin to the top"}
+            onClick={() => act(() => pinBoard(supabase, b.id, !b.pinned_at))}
+          >
+            {b.pinned_at ? "★" : "☆"}
+          </button>
+          <form action={trashBoardAction}>
+            <input type="hidden" name="id" value={b.id} />
+            <button
+              className="text-xs text-neutral-400 hover:text-neutral-700"
+              title="Trash this board (its bits stay in your collection; restorable)"
+            >
+              trash
+            </button>
+          </form>
+        </span>
+      </li>
+    );
+  }
+
+  if (boards.length === 0)
+    return <p className="text-neutral-500">Nothing here yet — make your first board.</p>;
+
+  return (
+    <div className="space-y-8">
+      {pinned.length > 0 && (
+        <section>
+          <h3 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">★ pinned</h3>
+          <ul className="space-y-3">{pinned.map(row)}</ul>
+        </section>
+      )}
+      {groups.map((g, i) => {
+        const members = byGroup(g.id);
+        return (
+          <section key={g.id}>
+            <h3 className="mb-2 flex items-baseline gap-2 text-xs uppercase tracking-wide text-neutral-400">
+              {g.name}
+              <span className="normal-case tracking-normal">
+                <button className="shelf-move" disabled={busy || i === 0} title="move up"
+                  onClick={() => act(() => moveGroup(supabase, g.id, "up"))}>↑</button>
+                <button className="shelf-move" disabled={busy || i === groups.length - 1} title="move down"
+                  onClick={() => act(() => moveGroup(supabase, g.id, "down"))}>↓</button>
+              </span>
+            </h3>
+            {members.length === 0 ? (
+              <p className="text-xs text-neutral-400">empty — pick this group on a board to shelve it here</p>
+            ) : (
+              <ul className="space-y-3">{members.map(row)}</ul>
+            )}
+          </section>
+        );
+      })}
+      <section>
+        {(groups.length > 0 || pinned.length > 0) && (
+          <h3 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">boards</h3>
+        )}
+        <ul className="space-y-3">{ungrouped.map(row)}</ul>
+      </section>
+    </div>
+  );
+}

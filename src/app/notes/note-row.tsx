@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
+import { PinToggle } from "./note-card";
 
 // The list-view row (O2 extension): one line per bit — denser than the card,
 // same doors. Place-on stays loose-only (A20), trash everywhere.
@@ -59,6 +60,7 @@ export function NoteRow({
       )}
       <span className="notes-row-date">{date}</span>
       <span className="notes-row-actions">
+        <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
         {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
         <form action={trashFromInbox}>
           <input type="hidden" name="id" value={item.id} />

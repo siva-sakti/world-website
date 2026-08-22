@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
-import { boardLabel } from "@/lib/labels";
-import { newBoard, trashBoardAction } from "./actions";
+import { listGroups } from "@/lib/db/shelf";
+import { newBoard } from "./actions";
 import { logout } from "./login/actions";
+import { Shelf } from "./shelf";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const supabase = await createClient();
   const boards = await listBoards(supabase);
+  const groups = await listGroups(supabase);
   // The loose-pile count for the notes receptacle line — cheap (head-only).
   let looseCount: number | null = null;
   try {
@@ -68,33 +70,7 @@ export default async function Home() {
       </header>
 
       <h2 className="mb-3 text-xs uppercase tracking-wide text-neutral-400">boards</h2>
-      {boards.length === 0 ? (
-        <p className="text-neutral-500">
-          Nothing here yet — make your first board.
-        </p>
-      ) : (
-        <ul className="space-y-3">
-          {boards.map((c) => (
-            <li key={c.id} className="flex items-baseline justify-between gap-4">
-              <Link
-                href={`/board/${c.id}`}
-                className="underline underline-offset-4 hover:no-underline"
-              >
-                {boardLabel(c.title)}
-              </Link>
-              <form action={trashBoardAction}>
-                <input type="hidden" name="id" value={c.id} />
-                <button
-                  className="text-xs text-neutral-400 hover:text-neutral-700"
-                  title="Trash this board (its bits stay in your collection; restorable)"
-                >
-                  trash
-                </button>
-              </form>
-            </li>
-          ))}
-        </ul>
-      )}
+      <Shelf boards={boards} groups={groups} />
 
       {/* Notes — the sibling receptacle (D-113): boards live here, and so do your
           notes. The count is the loose pile (the_inbox view — everything not on
