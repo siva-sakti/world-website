@@ -38,7 +38,7 @@ export function Desk({
     ...notes
       .filter((n) => n.pinned_at)
       .map((n) => ({ kind: "note" as const, id: n.id, name: bitLabel(n.type, n.face) ?? "untitled", when: `edited ${ago(n.updated_at)}` })),
-  ].sort((a, z) => a.when.localeCompare(z.when)); // stable-ish; pin order refined below
+  ];
 
   // Order alive by the pin timestamps (newest star first).
   const pinStamp = new Map<string, string>();

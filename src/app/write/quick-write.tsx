@@ -122,7 +122,7 @@ export function QuickWrite({ boards }: { boards: { id: string; title: string | n
               <>
                 <span>
                   saved —{" "}
-                  <Link href="/bits" className="underline underline-offset-4 hover:no-underline">
+                  <Link href="/notes" className="underline underline-offset-4 hover:no-underline">
                     in your notes →
                   </Link>{" "}
                   ·{" "}

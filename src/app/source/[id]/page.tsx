@@ -31,7 +31,7 @@ export default async function SourcePage({
             boards
           </Link>
           <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            notes
+            bits
           </Link>
           <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             find
