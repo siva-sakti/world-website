@@ -56,7 +56,7 @@ export default async function NotesPage({
       </header>
 
       <p className="mb-4 text-sm text-neutral-500">
-        Your bits — every fragment you've caught. Loose ones wait here; placed ones live on boards.
+        Your bits — every fragment you&rsquo;ve caught. Loose ones wait here; placed ones live on boards.
       </p>
 
       {/* Intake: jot a note with an optional source + tags; each add makes a loose
