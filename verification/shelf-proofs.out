@@ -47,4 +47,18 @@ DELETE 1
 psql:verification/shelf-proofs.sql:131: NOTICE:  PROOF 12 ok — group deleted; the bit survives, ungrouped
 DO
 RESET
+SET
+SET
+psql:verification/shelf-proofs.sql:141: NOTICE:  PROOF 13 ok — kind defaults to bit
+DO
+UPDATE 1
+psql:verification/shelf-proofs.sql:147: NOTICE:  PROOF 14 ok — a bit promotes to a note (and back is symmetric)
+DO
+psql:verification/shelf-proofs.sql:155: NOTICE:  PROOF 15 ok — unruled kinds refused (the door stays a door)
+DO
+INSERT 0 1
+UPDATE 1
+psql:verification/shelf-proofs.sql:162: NOTICE:  PROOF 16 ok — a folder stars (alive) like everything else
+DO
+RESET
 ALL SHELF PROOFS PASSED

@@ -2,7 +2,7 @@
 
 import type { PanelBit } from "@/lib/db/inbox";
 import type { ShelfGroup } from "@/lib/db/shelf";
-import { NoteCard } from "@/app/notes/note-card";
+import { NoteCard } from "@/app/bits/note-card";
 
 // The notes shelved in this group, as the familiar card grid (client because
 // the card's doors — pin, tags, place-on, trash — are interactive).

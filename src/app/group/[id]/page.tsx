@@ -53,7 +53,7 @@ export default async function GroupPage({
       <header className="mb-8 flex items-baseline justify-between text-sm">
         <div className="flex items-baseline gap-5">
           <Link href="/" className="underline underline-offset-4 hover:no-underline">← home</Link>
-          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">notes</Link>
+          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">notes</Link>
         </div>
       </header>
 

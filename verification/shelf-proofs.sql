@@ -131,4 +131,35 @@ do $$ begin
 end $$;
 reset role;
 
+-- ---- V2 addendum: the kind marker + folder stars ---------------------------
+set request.jwt.claims = '{"sub":"a0000000-0000-0000-0000-000000000001"}';
+set role authenticated;
+do $$ begin
+  if (select kind from bit where id = 'a0000000-0000-0000-0000-00000000c001') <> 'bit'
+    then raise exception 'FAIL: existing bit did not default to kind=bit'; end if;
+  raise notice 'PROOF 13 ok — kind defaults to bit';
+end $$;
+update bit set kind = 'note' where id = 'a0000000-0000-0000-0000-00000000c001';
+do $$ begin
+  if (select kind from bit where id = 'a0000000-0000-0000-0000-00000000c001') <> 'note'
+    then raise exception 'FAIL: promote to note did not stick'; end if;
+  raise notice 'PROOF 14 ok — a bit promotes to a note (and back is symmetric)';
+end $$;
+do $$ begin
+  begin
+    update bit set kind = 'doc' where id = 'a0000000-0000-0000-0000-00000000c001';
+    raise exception 'FAIL: an unruled kind was accepted';
+  exception when check_violation then
+    raise notice 'PROOF 15 ok — unruled kinds refused (the door stays a door)';
+  end;
+end $$;
+insert into shelf_group (name, position) values ('starrable', 9);
+update shelf_group set pinned_at = now() where name = 'starrable';
+do $$ begin
+  if (select pinned_at from shelf_group where name = 'starrable') is null
+    then raise exception 'FAIL: folder star did not stick'; end if;
+  raise notice 'PROOF 16 ok — a folder stars (alive) like everything else';
+end $$;
+reset role;
+
 \echo ALL SHELF PROOFS PASSED

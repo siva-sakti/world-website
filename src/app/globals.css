@@ -1546,3 +1546,64 @@ body {
 }
 .shelf-move:disabled { opacity: 0.3; cursor: default; }
 .shelf-move:hover:not(:disabled) { color: #8a6f4d; }
+
+/* ---- the desk & the cabinet (V3, mock B) ---- */
+.home-shell { display: flex; min-height: 100vh; }
+.rail {
+  width: 200px; flex: 0 0 auto;
+  border-right: 1px solid #ece7de;
+  background: #f6f3ec;
+  padding: 22px 18px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.rail-brand { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 18px; color: var(--ink); }
+.rail-link {
+  display: block; width: 100%; text-align: left;
+  padding: 4px 8px; border-radius: 6px;
+  font-size: 13.5px; color: #57503f; text-decoration: none;
+  background: none; border: none; cursor: pointer;
+}
+.rail-link:hover { background: #efeadf; }
+.rail-sec { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #a89f92; margin: 14px 8px 4px; }
+.rail-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid #e6e0d4; }
+.rail-foot .rail-link { font-size: 12px; color: #8a8072; }
+.home-main { flex: 1; padding: 46px 56px; max-width: 900px; }
+.desk-h { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #a89f92; font-weight: 600; margin-bottom: 14px; }
+.desk-tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px; margin-bottom: 44px;
+}
+.desk-tile {
+  background: #fffdfa; border: 1px solid #e7e1d5; border-radius: 10px;
+  padding: 16px 16px 13px; min-height: 104px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 2px 8px rgba(60, 50, 35, 0.05);
+  text-decoration: none; color: var(--ink);
+}
+.desk-tile:hover { box-shadow: 0 4px 14px rgba(60, 50, 35, 0.09); }
+.desk-tile.is-note { background: #f7f3e9; }
+.desk-tile-kind { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #b3a58c; }
+.desk-tile-name { font-size: 15px; font-weight: 550; margin-top: 6px; line-height: 1.3; flex: 1; }
+.desk-tile-meta { font-size: 11px; color: #a89f92; margin-top: 10px; }
+.desk-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.desk-chip {
+  border: 1px solid #e2ddd2; border-radius: 999px;
+  padding: 5px 14px; font-size: 13px; color: #57503f;
+  background: #fffdfa; cursor: pointer;
+}
+.desk-chip:hover { background: #f6f1e6; }
+.desk-chip.is-starred { border-color: #d9c68a; background: #fbf6e8; }
+.desk-chip.is-open { border-color: #b3a58c; }
+.desk-chip-n { color: #b3a58c; font-size: 11.5px; margin-left: 5px; }
+.desk-open h3 { font-size: 13.5px; font-weight: 600; color: #57503f; margin-bottom: 8px; }
+.desk-open ul { list-style: none; margin: 0; padding-left: 14px; border-left: 2px solid #ece5d4; }
+.desk-open li { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; font-size: 14.5px; color: #3a3323; }
+.desk-open-kind { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #b3a58c; width: 40px; flex: 0 0 auto; }
+@media (max-width: 640px) {
+  .home-shell { flex-direction: column; }
+  .rail { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; padding: 14px 16px; border-right: none; border-bottom: 1px solid #ece7de; }
+  .rail-brand { width: 100%; margin-bottom: 6px; }
+  .rail-sec { margin: 0 4px; }
+  .rail-foot { margin-top: 0; padding-top: 0; border-top: none; display: flex; gap: 6px; }
+  .home-main { padding: 24px 18px; }
+}

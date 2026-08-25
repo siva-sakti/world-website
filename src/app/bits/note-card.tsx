@@ -70,7 +70,7 @@ export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean })
     <button
       className="shelf-pin"
       disabled={busy}
-      title={pinned ? "unpin" : "pin to the top"}
+      title={pinned ? "no longer alive" : "mark alive — it greets you on home"}
       onClick={async () => {
         setBusy(true);
         try {

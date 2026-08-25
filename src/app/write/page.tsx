@@ -22,7 +22,7 @@ export default async function WritePage() {
         </Link>
         <span className="text-neutral-400">
           saves to{" "}
-          <Link href="/notes" className="underline underline-offset-4 hover:no-underline">
+          <Link href="/bits" className="underline underline-offset-4 hover:no-underline">
             your notes
           </Link>
         </span>

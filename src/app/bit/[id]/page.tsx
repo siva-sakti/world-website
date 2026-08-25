@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
 import { getBitSource } from "@/lib/db/sources";
 import { listGatheredInto } from "@/lib/db/references";
-import { BitTitle, BitTrash } from "./bit-controls";
+import { BitTitle, BitTrash, KindToggle } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
@@ -66,11 +66,12 @@ export default async function BitPage({
           <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             boards
           </Link>
-          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
+          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
             notes
           </Link>
         </div>
         <div className="flex items-baseline gap-5">
+          {b.type === "text" && <KindToggle bitId={b.id} kind={b.kind} />}
           <BitTrash bitId={b.id} />
           <form action={logout}>
             <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">

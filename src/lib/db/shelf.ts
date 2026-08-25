@@ -4,12 +4,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // Arrangement, not knowledge — a group is a shelf section (one per board),
 // never a rival to tags (meaning) or hub boards (craft). One-door module.
 
-export type ShelfGroup = { id: string; name: string; position: number };
+export type ShelfGroup = { id: string; name: string; position: number; pinned_at: string | null };
 
 export async function listGroups(supabase: SupabaseClient): Promise<ShelfGroup[]> {
   const { data, error } = await supabase
     .from("shelf_group")
-    .select("id, name, position")
+    .select("id, name, position, pinned_at")
     .order("position", { ascending: true });
   if (error) throw error;
   return (data ?? []) as ShelfGroup[];
@@ -24,7 +24,7 @@ export async function createGroup(supabase: SupabaseClient, name: string): Promi
   const { data, error } = await supabase
     .from("shelf_group")
     .insert({ name: clean, position })
-    .select("id, name, position")
+    .select("id, name, position, pinned_at")
     .single();
   if (error) throw error;
   return data as ShelfGroup;
@@ -72,6 +72,15 @@ export async function setBitGroup(
   groupId: string | null,
 ): Promise<void> {
   const { error } = await supabase.from("bit").update({ group_id: groupId }).eq("id", bitId);
+  if (error) throw error;
+}
+
+/** Star / unstar a FOLDER — folders can be alive too (starred bump first). */
+export async function pinGroup(supabase: SupabaseClient, groupId: string, on: boolean): Promise<void> {
+  const { error } = await supabase
+    .from("shelf_group")
+    .update({ pinned_at: on ? new Date().toISOString() : null })
+    .eq("id", groupId);
   if (error) throw error;
 }
 

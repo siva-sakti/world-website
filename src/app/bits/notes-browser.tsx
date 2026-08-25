@@ -35,7 +35,7 @@ export function NotesBrowser({
   function switchView(v: View) {
     setView(v);
     // Keep the URL linkable without a server round-trip.
-    window.history.replaceState(null, "", v === "all" ? "/notes?view=all" : "/notes");
+    window.history.replaceState(null, "", v === "all" ? "/bits?view=all" : "/bits");
   }
 
   const shown = useMemo(() => {

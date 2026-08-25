@@ -99,15 +99,26 @@ export async function createImageBit(
  * board (finally honored). It appears in the inbox until placed (call-in). */
 export async function createLooseTextBit(
   supabase: SupabaseClient,
-  args: { bitId: string; body?: string },
+  args: { bitId: string; body?: string; kind?: "bit" | "note" },
 ): Promise<Bit> {
   const { data, error } = await supabase
     .from("bit")
-    .insert({ id: args.bitId, type: "text", body: args.body ?? "<p></p>" })
+    .insert({ id: args.bitId, type: "text", body: args.body ?? "<p></p>", kind: args.kind ?? "bit" })
     .select("*")
     .single();
   if (error) throw error;
   return data as Bit;
+}
+
+/** Promote a fragment to a written NOTE, or back (V2 — the door defines the kind
+ * at birth; this is the owner's hand changing it later, e.g. pre-marker writings). */
+export async function setBitKind(
+  supabase: SupabaseClient,
+  bitId: string,
+  kind: "bit" | "note",
+): Promise<void> {
+  const { error } = await supabase.from("bit").update({ kind }).eq("id", bitId);
+  if (error) throw error;
 }
 
 /** Call a loose bit onto a board — the app-layer consumer of I-L1. A loose bit has

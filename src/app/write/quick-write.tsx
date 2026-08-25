@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { TextBit } from "@/app/board/[id]/text-bit";
-import { PlaceOnBoard } from "@/app/notes/place-on-board";
+import { PlaceOnBoard } from "@/app/bits/place-on-board";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
 // empty-note litter from opening the page and leaving — guarded by a SYNCHRONOUS
@@ -54,7 +54,7 @@ export function QuickWrite({ boards }: { boards: { id: string; title: string | n
       if (!hasContent) return;
       const id = crypto.randomUUID();
       bitId.current = id;
-      create.current = createLooseTextBit(supabase, { bitId: id, body: html })
+      create.current = createLooseTextBit(supabase, { bitId: id, body: html, kind: "note" })
         .then(() => {
           setSelfId(id);
           flushTitle(); // a title typed before the note was born lands now
@@ -122,7 +122,7 @@ export function QuickWrite({ boards }: { boards: { id: string; title: string | n
               <>
                 <span>
                   saved —{" "}
-                  <Link href="/notes" className="underline underline-offset-4 hover:no-underline">
+                  <Link href="/bits" className="underline underline-offset-4 hover:no-underline">
                     in your notes →
                   </Link>{" "}
                   ·{" "}

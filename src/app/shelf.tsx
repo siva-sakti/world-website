@@ -12,6 +12,7 @@ import {
   setBoardGroup,
   moveGroup,
   pinBoard,
+  pinGroup,
 } from "@/lib/db/shelf";
 import { promptText } from "@/components/confirm";
 import { trashBoardAction } from "./actions";
@@ -81,7 +82,7 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
           <button
             className="shelf-pin"
             disabled={busy}
-            title={b.pinned_at ? "unpin" : "pin to the top"}
+            title={b.pinned_at ? "no longer alive" : "mark alive — it greets you on home"}
             onClick={() => act(() => pinBoard(supabase, b.id, !b.pinned_at))}
           >
             {b.pinned_at ? "★" : "☆"}
@@ -107,7 +108,7 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
     <div className="space-y-8">
       {pinned.length > 0 && (
         <section>
-          <h3 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">★ pinned</h3>
+          <h3 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">★ alive</h3>
           <ul className="space-y-3">{pinned.map(row)}</ul>
         </section>
       )}
@@ -120,6 +121,9 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
                 {g.name}
               </Link>
               <span className="normal-case tracking-normal">
+                <button className="shelf-pin" disabled={busy}
+                  title={g.pinned_at ? "unstar this folder" : "star this folder — it leads the desk"}
+                  onClick={() => act(() => pinGroup(supabase, g.id, !g.pinned_at))}>{g.pinned_at ? "★" : "☆"}</button>
                 <button className="shelf-move" disabled={busy || i === 0} title="move up"
                   onClick={() => act(() => moveGroup(supabase, g.id, "up"))}>↑</button>
                 <button className="shelf-move" disabled={busy || i === groups.length - 1} title="move down"
