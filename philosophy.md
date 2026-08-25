@@ -10,7 +10,9 @@ Not a place to *store* thoughts. A place to *grow* them — where an idea is pla
 
 To do that I need two things I've never had together: the **spatial freedom of paper** (doodle, diagram, lay things out where they belong) and the **memory of digital** (search it, connect it, never lose it). Handwriting and typing on the same page; a wealth of information I can actually find my way back into.
 
-It is a place to think, and to *keep* thinking. It is not a product.
+It is a place to think, and to *keep* thinking. And it is for the **multi-mind** — someone with many interests running at once (the reading, the astrology, the economics, the drawing), who has never had one home that holds all of it: the visual side (boards, images, the hand) and the knowledge side (tags, search, links) and the writing side (real pages), without making me choose which kind of person I am. <!-- placeholder (2026-08-25), spirit only — owner to rewrite in her own voice -->
+
+**On "product":** I originally wrote *"it is not a product."* That has changed, deliberately (2026-08-25): I now want this to become **a product** — because I want to live in something so beautiful I screenshot it, share from it, and have other people want a home like it (the Are.na crowd deserves better). What has NOT changed: each home has **one resident**. A product here means *many single-resident homes* — never collaboration, never an audience machine. <!-- ruling captured by Claude; owner to re-voice -->
 
 ## Why the tools I already have don't do this
 
@@ -40,6 +42,8 @@ Capturing a thought is the easy half. The hard half — the half most tools skip
 
 (Someday, a gentle nudge might help — a random old fragment surfaced, a topic worth another look. Not now, and never as the main event.)
 
+**Alive (added 2026-08-25):** the door I return through is *what's alive for me right now* — the boards, notes, maybe whole topics that are top-of-mind this week. Alive is a status **my hand** places and removes (never an algorithm rearranging my home), and the landing surface shows me my alive things first: I open the app and my current thinking greets me. <!-- placeholder, spirit only — owner to re-voice -->
+
 ## The gradient — from raw to formed, open by default
 
 A thought travels. It starts **raw** — a morning page, a reflection, a line half-thought. From that raw material I pull **fragments**: smaller, a little more formed. Fragments get composed into **pieces**: the most formed, the most shareable. The system holds *every stage of that journey in one place*, so nothing has to leave home to grow up.
@@ -48,6 +52,8 @@ Two axes move roughly together but are not the same thing:
 
 - **Maturity** — seed → seedling → plant → fruit.
 - **Exposure** — *public* by default (the open web), *private* when I choose it (only me), and — someday — *shared* (people I hand a key to).
+
+> **⚠ Under active rethink (2026-08-25):** the paragraph below is the founding dream (public-by-default); the app as built today is all-private with no publish door, and the product ruling makes this tension real. A dedicated session decides: public-by-default, private-by-default, or something smarter. Until then, the built reality (private) stands.
 
 **New things start public unless I say otherwise.** Most of what I make, I'm glad to have in the open — so openness is the default, and marking something private is one deliberate tap, always within reach. What I mark private stays mine alone — the morning pages that want to stay only mine, stay only mine. And nothing is ever actually visible to another person until I share a board on purpose — and at that moment I'm shown exactly what a guest will see, so every act of real publishing is a choice made with my eyes open.
 
@@ -58,14 +64,14 @@ Two axes move roughly together but are not the same thing:
 - **I see my handwriting and my typing on the same page.**
 - **Everything is findable** — searchable, tagged, connected. That includes the pieces, not just the fragments.
 - **I own all of it.** I can export everything, always.
-- **The look is mine.** The visual identity is hand-drawn, added by me later. Until then the build stays plain — unstyled and working beats styled and guessed.
+- **The look is mine — and I am choosing it now, not later.** (Updated 2026-08-25: the original line said the identity would be added later and the build would stay plain. In practice I am designing it deliberately, with Claude as hands: the paper studies, the coming bold direction. The principles: a beautiful, organic, artistic creative space — calm, organic, good — so beautiful I screenshot it.)
 - **It's a home, not a platform.** One resident — me, the only one who writes. A few trusted people can be handed a key to *look*. No collaboration, no audience, no growth mechanics.
 
 ## In and out
 
 **Welcome:** the free-canvas piece; arrows I can draw between cards that follow them; a graph view; pieces that are as findable as fragments.
 
-**Not this:** multiple *writers*, collaboration, AI features, analytics, anything built for an audience. Sharing means handing a trusted person the key to *look* — never opening the doors to the world, never running a product.
+**Not this:** multiple *writers*, collaboration, AI features, analytics, anything built for an audience-machine. Sharing means handing a trusted person the key to *look*. (Product ruling 2026-08-25: "a product" now yes — as many single-resident homes; the *never*-list above is unchanged.)
 
 ## How I reach it
 
