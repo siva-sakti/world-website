@@ -65,6 +65,16 @@ export async function deleteGroup(supabase: SupabaseClient, groupId: string): Pr
   if (error) throw error;
 }
 
+/** Shelve a bit into a section (null = ungrouped) — folders cut across kinds (O1b). */
+export async function setBitGroup(
+  supabase: SupabaseClient,
+  bitId: string,
+  groupId: string | null,
+): Promise<void> {
+  const { error } = await supabase.from("bit").update({ group_id: groupId }).eq("id", bitId);
+  if (error) throw error;
+}
+
 /** Pin / unpin a board (pinned floats to the shelf's top; timestamp orders pins). */
 export async function pinBoard(supabase: SupabaseClient, boardId: string, on: boolean): Promise<void> {
   const { error } = await supabase

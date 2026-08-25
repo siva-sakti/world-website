@@ -22,6 +22,7 @@ CHAIN=(
   supabase/migrations/20260728000002_public_guest_door.sql
 )
 MIG=supabase/migrations/20260822000001_shelf.sql
+MIG2=supabase/migrations/20260825000001_shelf_bits.sql
 
 echo "=== PHASE 1: start the local Postgres server ==="
 brew services start postgresql@17 >/dev/null 2>&1 || true
@@ -45,7 +46,7 @@ grant usage on schema auth to anon, authenticated;" \
   || { echo ">>> runtime stand-in creation failed"; exit 1; }
 
 echo "=== PHASE 4: apply the FULL proven chain, then the shelf migration ==="
-for f in "${CHAIN[@]}" "$MIG"; do
+for f in "${CHAIN[@]}" "$MIG" "$MIG2"; do
   OUT=$(psql -d "$DB" -v ON_ERROR_STOP=1 -f "$f" 2>&1) \
     && echo "applied clean ✓  $f" \
     || { echo ">>> APPLY FAILED: $f"; echo "$OUT"; exit 1; }

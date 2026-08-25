@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
-import { PinToggle } from "./note-card";
+import { PinToggle, GroupPicker } from "./note-card";
+import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The list-view row (O2 extension): one line per bit — denser than the card,
 // same doors. Place-on stays loose-only (A20), trash everywhere.
@@ -12,11 +13,13 @@ export function NoteRow({
   item,
   img,
   boards,
+  groups,
   showBoards,
 }: {
   item: PanelBit;
   img?: string;
   boards: { id: string; title: string | null }[];
+  groups: ShelfGroup[];
   showBoards: boolean;
 }) {
   const title = item.face;
@@ -60,6 +63,7 @@ export function NoteRow({
       )}
       <span className="notes-row-date">{date}</span>
       <span className="notes-row-actions">
+        <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
         <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
         {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
         <form action={trashFromInbox}>

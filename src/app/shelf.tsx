@@ -116,7 +116,9 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
         return (
           <section key={g.id}>
             <h3 className="mb-2 flex items-baseline gap-2 text-xs uppercase tracking-wide text-neutral-400">
-              {g.name}
+              <Link href={`/group/${g.id}`} className="underline underline-offset-4 hover:no-underline" title="open this group — its boards and notes together">
+                {g.name}
+              </Link>
               <span className="normal-case tracking-normal">
                 <button className="shelf-move" disabled={busy || i === 0} title="move up"
                   onClick={() => act(() => moveGroup(supabase, g.id, "up"))}>↑</button>

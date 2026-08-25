@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listAllBits } from "@/lib/db/inbox";
 import { listBoards } from "@/lib/db/boards";
+import { listGroups } from "@/lib/db/shelf";
 import { signedUrl } from "@/lib/storage";
 import { logout } from "@/app/login/actions";
 import { Intake } from "./intake";
@@ -21,6 +22,7 @@ export default async function NotesPage({
   const supabase = await createClient();
   const bits = await listAllBits(supabase);
   const boards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
+  const groups = await listGroups(supabase);
 
   // Resolve display images (thumb preferred). Whole-set signing is fine at
   // one-writer scale; revisit with A22 if the collection outgrows it.
@@ -65,6 +67,7 @@ export default async function NotesPage({
         items={bits}
         imgs={imgs}
         boards={boards}
+        groups={groups}
         initialView={view === "all" ? "all" : "loose"}
       />
     </main>

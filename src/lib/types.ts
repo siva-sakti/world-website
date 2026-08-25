@@ -40,6 +40,7 @@ export type Bit = {
   updated_at: string;
   face: string | null; // computed headline (read-only)
   pinned_at: string | null; // the shelf (O1): pinned floats atop notes; null = unpinned
+  group_id: string | null; // the shelf (O1b): a note can sit in a folder, like a board
 };
 
 export type Board = {

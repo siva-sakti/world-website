@@ -38,4 +38,13 @@ SET
 psql:verification/shelf-proofs.sql:110: NOTICE:  PROOF 10 ok — anon blind to the shelf
 DO
 RESET
+SET
+SET
+UPDATE 1
+psql:verification/shelf-proofs.sql:123: NOTICE:  PROOF 11 ok — a bit sits in a shelf group
+DO
+DELETE 1
+psql:verification/shelf-proofs.sql:131: NOTICE:  PROOF 12 ok — group deleted; the bit survives, ungrouped
+DO
+RESET
 ALL SHELF PROOFS PASSED

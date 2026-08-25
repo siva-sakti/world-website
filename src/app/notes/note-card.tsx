@@ -4,11 +4,62 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { pinBit } from "@/lib/db/shelf";
+import { pinBit, setBitGroup, createGroup, type ShelfGroup } from "@/lib/db/shelf";
+import { promptText } from "@/components/confirm";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { InboxTags } from "./inbox-tags";
 import { PlaceOnBoard } from "./place-on-board";
+
+// The quiet folder picker (O1b) — same gesture as a board's, on a note.
+export function GroupPicker({
+  bitId,
+  groupId,
+  groups,
+}: {
+  bitId: string;
+  groupId: string | null;
+  groups: ShelfGroup[];
+}) {
+  const [supabase] = useState(() => createClient());
+  const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  async function pick(value: string) {
+    setBusy(true);
+    try {
+      if (value === "__new__") {
+        const name = await promptText({ message: "New group", placeholder: "name the section…" });
+        if (name && name.trim()) {
+          const g = await createGroup(supabase, name);
+          await setBitGroup(supabase, bitId, g.id);
+        }
+      } else {
+        await setBitGroup(supabase, bitId, value === "" ? null : value);
+      }
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <select
+      className="shelf-picker"
+      value={groupId ?? ""}
+      disabled={busy}
+      onChange={(e) => pick(e.target.value)}
+      aria-label="group"
+      title="which folder"
+    >
+      <option value="">no group</option>
+      {groups.map((g) => (
+        <option key={g.id} value={g.id}>{g.name}</option>
+      ))}
+      <option value="__new__">+ new group…</option>
+    </select>
+  );
+}
 
 // The ★/☆ pin toggle (O1) — shared by the card and the row.
 export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean }) {
@@ -45,11 +96,13 @@ export function NoteCard({
   item,
   img,
   boards,
+  groups,
   showBoards,
 }: {
   item: PanelBit;
   img?: string;
   boards: { id: string; title: string | null }[];
+  groups: ShelfGroup[];
   showBoards: boolean;
 }) {
   const title = item.face; // first words (text) · label (drawing) · content (image)
@@ -131,6 +184,7 @@ export function NoteCard({
       <div className="inbox-card-foot">
         <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
         <span className="inbox-card-actions">
+          <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
           {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
           <form action={trashFromInbox}>

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { PanelBit } from "@/lib/db/inbox";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
+import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
 // search + type filters + sorts — the board panel's ruled pattern (A22) on its
@@ -16,11 +17,13 @@ export function NotesBrowser({
   items,
   imgs,
   boards,
+  groups,
   initialView,
 }: {
   items: PanelBit[];
   imgs: Record<string, string>;
   boards: { id: string; title: string | null }[];
+  groups: ShelfGroup[];
   initialView: View;
 }) {
   const [view, setView] = useState<View>(initialView);
@@ -158,6 +161,7 @@ export function NotesBrowser({
                   item={b}
                   img={imgs[b.id]}
                   boards={boards}
+                  groups={groups}
                   showBoards={view === "all"}
                 />
               ) : (
@@ -166,6 +170,7 @@ export function NotesBrowser({
                   item={b}
                   img={imgs[b.id]}
                   boards={boards}
+                  groups={groups}
                   showBoards={view === "all"}
                 />
               ),

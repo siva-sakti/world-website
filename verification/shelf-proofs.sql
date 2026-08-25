@@ -110,4 +110,25 @@ do $$ begin
 end $$;
 reset role;
 
+
+-- ---- O1b addendum: bits join groups (same physics as boards) ---------------
+set request.jwt.claims = '{"sub":"a0000000-0000-0000-0000-000000000001"}';
+set role authenticated;
+update bit set group_id = (select id from shelf_group where name = 'life')
+  where id = 'a0000000-0000-0000-0000-00000000c001';
+do $$ begin
+  if (select group_id from bit where id = 'a0000000-0000-0000-0000-00000000c001') is null
+    then raise exception 'FAIL: bit did not join the group'; end if;
+  raise notice 'PROOF 11 ok — a bit sits in a shelf group';
+end $$;
+delete from shelf_group where name = 'life';
+do $$ begin
+  if (select count(*) from bit where id = 'a0000000-0000-0000-0000-00000000c001') <> 1
+    then raise exception 'FAIL: bit vanished with its group'; end if;
+  if (select group_id from bit where id = 'a0000000-0000-0000-0000-00000000c001') is not null
+    then raise exception 'FAIL: bit group_id not cleared on group delete'; end if;
+  raise notice 'PROOF 12 ok — group deleted; the bit survives, ungrouped';
+end $$;
+reset role;
+
 \echo ALL SHELF PROOFS PASSED
