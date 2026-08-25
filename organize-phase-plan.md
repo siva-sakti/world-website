@@ -35,14 +35,13 @@
 - **O4 · Terminology sweep** — every label/confirm/empty-state consistent with §2; per-page navs mirror the home hierarchy.
 - **O5 · Internal-health check** — verify "the mess is only surface-level" (file ceilings, dead code, doc drift) rather than assert it.
 
-## 4 · Phase F — the FEATURE QUEUE (after O; owner may reorder anytime)
-1. **F1 · Collections + board-tagging + hub-board doors** — tags get a folder-face (open #buddhism → its boards + writings together); the UI finally lets a board be tagged (a model promise never surfaced); a "place board on board" door for hubs.
-2. **F2 · Voice memos + PDFs (B7)** — ruled IN by the owner 2026-07-25 and never built (the forgotten one). Media-types round: two new types + faces + search-by-source.
-3. **F3 · Papers into the real app** — washi/linen/vellum + color on real cards (`placement.card_style/card_color/card_frame`, throwaway-proven, owner "go" gate). The designed studies are the spec (`aesthetics-phase.md`).
-4. **F4 · Fonts mechanism** — curated faces, per-note choice, quiet picker (which faces = the design track's call).
-5. **F5+ · The big rooms, owner-ordered when their moment comes:** publishing app-layer (still no way to publish) · phone capture loop (Phase 5) · the feed (Phase 6, deliberately designed) · document mode (design round first) · graph investment (evidence-gated). Small treats anytime: bulk-tag · crop · empty-the-trash · nightly-backup secret (owner's GitHub step).
+## 4 · PHASE V — the VISION BUILD (re-sequenced after D-118; supersedes the old F-queue head)
 
-**The design track runs in parallel** (aesthetics-phase.md): bold ONE-direction identity (owner leans indigo/Gzhel; awaiting her pick + images); chrome design in her design window.
+- **V1 · Home mocks — the desk & the cabinet.** 2 static variants of the D-118 home: the **desk** (what's ALIVE — boards + notes your hand marked — then your folders, starred first) + the **cabinet** (a quiet sidebar/drawer: bits · all boards · all notes · find · graph · tags · sources · trash · export · sign out). Rows quiet (controls on hover/tap). Screenshot → the owner picks. NOTHING builds unmocked.
+- **V2 · The kind marker + terminology.** Migration `bit.kind` ('bit' default · 'note'); ✎ write births notes; a quiet kind-toggle on the thing's page (promote old writings). Renames: the browse surface → **bits** (`/notes`→`/bits`, redirects kept), **notes** becomes the pieces room, UI says **alive** (the owner's word) where it said pinned. Throwaway-proven → owner's go → cloud. Absorbs **O4** (the sweep rides the renames).
+- **V3 · Build the picked home** — desk + cabinet + notes room, per the winning mock, through the loop.
+- **V4 · O5 health check** (unchanged) + docs re-synced.
+- **Then, owner-ordered:** the **privacy/publishing session** (urgent-ish per the product ruling) · the owner's **re-voice pass** on philosophy + the language book · then the surviving F-queue: collections/board-tagging · voice+PDF (B7) · papers · fonts · the big rooms.
 
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
