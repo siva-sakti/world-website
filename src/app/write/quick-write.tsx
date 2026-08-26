@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { TextBit } from "@/app/board/[id]/text-bit";
-import { PlaceOnBoard } from "@/app/bits/place-on-board";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
 // empty-note litter from opening the page and leaving — guarded by a SYNCHRONOUS
@@ -15,12 +14,13 @@ import { PlaceOnBoard } from "@/app/bits/place-on-board";
 // a flush racing the insert would 0-row-update and silently eat the first words
 // (review finding 1 — the same settled-create rule the board's persistence
 // enforces). Save = body + `[[`-chip reconcile, exactly the workspace flush pair.
-export function QuickWrite({ boards }: { boards: { id: string; title: string | null }[] }) {
+// Placing on a board is NOT a writing-moment act (N1): a note is a surface — you
+// place it later, from the note or the board, never mid-write.
+export function QuickWrite() {
   const [supabase] = useState(() => createClient());
   const [err, setErr] = useState<string | null>(null);
-  const [placed, setPlaced] = useState(false); // v1.2 — writing can end with placing
-  // The born note's id as STATE — render reads this (status line, the picker's
-  // self-exclusion); the ref twin below is for synchronous access in flush.
+  // The born note's id as STATE — render reads this (the status line); the ref
+  // twin below is for synchronous access in flush.
   const [selfId, setSelfId] = useState<string | null>(null);
   const bitId = useRef<string | null>(null);
   const create = useRef<Promise<unknown> | null>(null); // set before any await — the sync guard
@@ -107,32 +107,13 @@ export function QuickWrite({ boards }: { boards: { id: string; title: string | n
         {err ? (
           <span className="text-red-700">{err}</span>
         ) : selfId ? (
-          // Born — orientation doors (plan v1.2): where it lives, its own page,
-          // and the finishing act: place it on a board right here.
-          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            {placed ? (
-              // Placed = no longer loose — so no "in your notes" link (it would lie).
-              <span>
-                placed on its board ✓ ·{" "}
-                <Link href={`/bit/${selfId}`} className="underline underline-offset-4 hover:no-underline">
-                  open its page →
-                </Link>
-              </span>
-            ) : (
-              <>
-                <span>
-                  saved —{" "}
-                  <Link href="/notes" className="underline underline-offset-4 hover:no-underline">
-                    in your notes →
-                  </Link>{" "}
-                  ·{" "}
-                  <Link href={`/bit/${selfId}`} className="underline underline-offset-4 hover:no-underline">
-                    open its page →
-                  </Link>
-                </span>
-                <PlaceOnBoard bitId={selfId} boards={boards} onPlaced={() => setPlaced(true)} />
-              </>
-            )}
+          // Born — one quiet door to its surface. Nothing else at the writing
+          // moment (N1): placing, tagging, sourcing all live on the note's page.
+          <span>
+            saved ·{" "}
+            <Link href={`/note/${selfId}`} className="underline underline-offset-4 hover:no-underline">
+              open →
+            </Link>
           </span>
         ) : (
           // The gather hint (O3): the page's superpower shouldn't be a secret.

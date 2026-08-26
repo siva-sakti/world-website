@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Bit } from "@/lib/types";
 import { fmt } from "@/lib/dates";
+import { BitTrash } from "@/app/bit/[id]/bit-controls";
 
 export const dynamic = "force-dynamic";
 
@@ -49,13 +50,10 @@ export default async function NotesRoom() {
       ) : (
         <ul className="space-y-5">
           {notes.map((n) => (
-            <li key={n.id}>
-              <Link href={`/bit/${n.id}`} className="group block">
-                <span className="flex items-baseline justify-between gap-4">
-                  <span className="text-[17px] font-semibold tracking-tight underline-offset-4 group-hover:underline">
-                    {n.content?.trim() || n.face || "untitled"}
-                  </span>
-                  <span className="flex-none text-xs tabular-nums text-neutral-400">{fmt(n.updated_at)}</span>
+            <li key={n.id} className="flex items-baseline justify-between gap-4">
+              <Link href={`/note/${n.id}`} className="group block min-w-0 flex-1">
+                <span className="block text-[17px] font-semibold tracking-tight underline-offset-4 group-hover:underline">
+                  {n.content?.trim() || n.face || "untitled"}
                 </span>
                 {firstLine(n.body, n.face, n.content) && (
                   <span className="mt-0.5 block text-sm text-neutral-500">
@@ -63,6 +61,10 @@ export default async function NotesRoom() {
                   </span>
                 )}
               </Link>
+              <span className="flex flex-none items-baseline gap-4 text-xs">
+                <span className="tabular-nums text-neutral-400">{fmt(n.updated_at)}</span>
+                <BitTrash bitId={n.id} returnTo="/notes" />
+              </span>
             </li>
           ))}
         </ul>

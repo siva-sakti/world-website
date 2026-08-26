@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
 import { listBoards } from "@/lib/db/boards";
@@ -28,6 +28,7 @@ export default async function BitPage({
 
   const b = await getBit(supabase, id);
   if (!b) notFound();
+  if (b.kind === "note") redirect(`/note/${id}`); // a note is a surface — its own page (N1)
 
   const [boards, travel, source, gatheredInto, allBoards] = await Promise.all([
     getBitBoards(supabase, id),

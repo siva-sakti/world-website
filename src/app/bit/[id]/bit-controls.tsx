@@ -89,7 +89,7 @@ export function KindToggle({ bitId, kind }: { bitId: string; kind: "bit" | "note
 // Trash, from the note's own page — the same honest multi-board confirm the board
 // uses (F16), the same one-door act. Afterwards you land in your notes (the inbox):
 // the page you were on no longer shows its note.
-export function BitTrash({ bitId }: { bitId: string }) {
+export function BitTrash({ bitId, returnTo = "/bits" }: { bitId: string; returnTo?: string }) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -109,7 +109,7 @@ export function BitTrash({ bitId }: { bitId: string }) {
     setBusy(true);
     try {
       await trashBit(supabase, bitId);
-      router.push("/bits");
+      router.push(returnTo);
       router.refresh();
     } catch {
       setBusy(false);

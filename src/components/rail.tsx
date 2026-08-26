@@ -11,7 +11,7 @@ import { logout } from "@/app/login/actions";
 // canvases and the writing page can breathe — collapsed by default on those
 // routes, expanded on browse routes; the owner's toggle is remembered.
 
-const TUCKED_ROUTES = ["/board/", "/bit/", "/write"];
+const TUCKED_ROUTES = ["/board/", "/bit/", "/note/", "/write"];
 
 function routeDefault(pathname: string): boolean {
   return TUCKED_ROUTES.some((r) => pathname.startsWith(r));

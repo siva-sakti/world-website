@@ -69,7 +69,7 @@ export function Desk({
           {alive.map((t) => (
             <Link
               key={t.id}
-              href={t.kind === "board" ? `/board/${t.id}` : `/bit/${t.id}`}
+              href={t.kind === "board" ? `/board/${t.id}` : `/note/${t.id}`}
               className={`desk-tile${t.kind === "note" ? " is-note" : ""}`}
             >
               <span className="desk-tile-kind">{t.kind}</span>
@@ -125,7 +125,7 @@ export function Desk({
                   {openC.notes.map((n) => (
                     <li key={n.id}>
                       <span className="desk-open-kind">note</span>
-                      <Link href={`/bit/${n.id}`} className="underline underline-offset-4 hover:no-underline">
+                      <Link href={`/note/${n.id}`} className="underline underline-offset-4 hover:no-underline">
                         {n.content?.trim() || n.face || "untitled"}
                       </Link>
                     </li>
