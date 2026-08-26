@@ -130,7 +130,7 @@ export function GatherPicker({
         <>
           {notesShown.length > 0 && (
             <div className="gather-sect">
-              <div className="gather-sect-head">notes</div>
+              <div className="gather-sect-head">text</div>
               {notesShown.map((h) => (
                 <button
                   key={h.id}
@@ -138,7 +138,7 @@ export function GatherPicker({
                   className="gather-suggest-item"
                   onMouseDown={(e) => e.preventDefault()} // keep the editor's selection
                   onClick={() => onPick(h)}
-                  title="gather this note"
+                  title="gather this bit"
                 >
                   <span className="gather-suggest-face">{h.face}</span>
                 </button>

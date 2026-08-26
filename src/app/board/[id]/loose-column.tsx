@@ -5,14 +5,15 @@ import { createClient } from "@/lib/supabase/client";
 import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
 
-// The board's notes panel — the all-bits browser (loose-notes redesign, D-109).
-// Every live bit, LOOSE FIRST, searchable + filterable, so you can drop ANY note
-// onto this board; a note dropped on a second board now lives on both (multi-board,
-// reference). Filtering is in-memory over the loaded set (snappy at this scale;
+// The board's DRAWER — a browser of all your bits, UNPLACED FIRST, split by kind
+// (bits · notes · all) and filterable by placement/type/tag/source, so you can drop
+// anything onto this board; a bit dropped on a second board lives on both (multi-
+// board). Filtering is in-memory over the loaded set (snappy at this scale;
 // server-side search + paging is the named scale trigger). Reachable from a tab.
 
 type TypeFilter = "all" | "text" | "image" | "drawing";
 type Scope = "loose" | "this" | "other" | "all";
+type Kind = "all" | "bit" | "note"; // the drawer's primary split (owner: bits · notes · all)
 
 function faceOf(it: PanelBit): string {
   if (it.face) return it.face;
@@ -36,6 +37,7 @@ export function LooseColumn({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scope, setScope] = useState<Scope>("loose");
+  const [kind, setKind] = useState<Kind>("all");
   const [query, setQuery] = useState("");
   const [tagId, setTagId] = useState("");
   const [sourceId, setSourceId] = useState("");
@@ -62,7 +64,7 @@ export function LooseColumn({
       if (my !== loadId.current) return;
       setBits(items);
     } catch {
-      if (my === loadId.current) setError("Couldn't load your notes.");
+      if (my === loadId.current) setError("Couldn't load your drawer.");
     } finally {
       if (my === loadId.current) setLoading(false);
     }
@@ -91,6 +93,7 @@ export function LooseColumn({
 
   const q = query.trim().toLowerCase();
   let filtered = (bits ?? []).filter((n) => {
+    if (kind !== "all" && n.kind !== kind) return false;
     if (scope === "loose" && !isLoose(n)) return false;
     if (scope === "this" && !onThis(n)) return false;
     if (scope === "other" && (isLoose(n) || onThis(n))) return false;
@@ -152,36 +155,43 @@ export function LooseColumn({
 
   if (!open) {
     return (
-      <button className="loose-tab" onClick={() => setOpen(true)} title="Your notes">
-        notes
+      <button className="loose-tab" onClick={() => setOpen(true)} title="Your drawer — things to place on this board">
+        drawer
       </button>
     );
   }
 
-  const SCOPES: { key: Scope; label: string }[] = [
-    { key: "loose", label: "loose" },
-    { key: "this", label: "this board" },
-    { key: "other", label: "other" },
+  // Primary split (owner's picture: bits · notes · all).
+  const KINDS: { key: Kind; label: string }[] = [
+    { key: "bit", label: "bits" },
+    { key: "note", label: "notes" },
     { key: "all", label: "all" },
+  ];
+  // "Where" — the placement filter, default unplaced (mostly you see not-yet-placed).
+  const SCOPES: { key: Scope; label: string }[] = [
+    { key: "loose", label: "unplaced" },
+    { key: "this", label: "this board" },
+    { key: "other", label: "other boards" },
+    { key: "all", label: "anywhere" },
   ];
 
   return (
     <aside className="loose-col" ref={colRef}>
       <div className="loose-col-head">
-        <span>notes{bits ? ` (${filtered.length})` : ""}</span>
+        <span>drawer{bits ? ` (${filtered.length})` : ""}</span>
         <button className="loose-col-close" onClick={() => setOpen(false)} title="collapse">
           ×
         </button>
       </div>
 
       <div className="loose-scope">
-        {SCOPES.map((s) => (
+        {KINDS.map((k) => (
           <button
-            key={s.key}
-            className={`loose-scope-tab${scope === s.key ? " is-on" : ""}`}
-            onClick={() => setScope(s.key)}
+            key={k.key}
+            className={`loose-scope-tab${kind === k.key ? " is-on" : ""}`}
+            onClick={() => setKind(k.key)}
           >
-            {s.label}
+            {k.label}
           </button>
         ))}
       </div>
@@ -191,11 +201,16 @@ export function LooseColumn({
           <input
             className="loose-search"
             value={query}
-            placeholder="search all notes…"
-            aria-label="Search notes"
+            placeholder="search…"
+            aria-label="Search the drawer"
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="loose-selects">
+            <select value={scope} onChange={(e) => setScope(e.target.value as Scope)} aria-label="Filter by placement">
+              {SCOPES.map((s) => (
+                <option key={s.key} value={s.key}>{s.label}</option>
+              ))}
+            </select>
             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as TypeFilter)} aria-label="Filter by type">
               <option value="all">all types</option>
               <option value="text">text</option>
@@ -228,7 +243,7 @@ export function LooseColumn({
           {error} <button className="underline" onClick={load}>retry</button>
         </p>
       )}
-      {bits && bits.length === 0 && <p className="loose-col-msg">No notes yet.</p>}
+      {bits && bits.length === 0 && <p className="loose-col-msg">Nothing here yet.</p>}
       {bits && bits.length > 0 && filtered.length === 0 && <p className="loose-col-msg">Nothing matches.</p>}
       {filtered.length > 0 && (
         <ul className="loose-list">
