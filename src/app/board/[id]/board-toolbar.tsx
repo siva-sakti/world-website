@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 
-// The board's top toolbar — create acts (+ note / + image / pen), the select toggle,
+// The board's top toolbar — create acts (+ text / + image / pen), the select toggle,
 // the bulk acts that appear with a multi-selection, fit + zoom %, and the error line.
 // Presentational: every action is a prop, so board-surface keeps all the logic.
 export function BoardToolbar({
@@ -34,7 +34,7 @@ export function BoardToolbar({
 }) {
   return (
     <div className="compose-toolbar">
-      <button className="compose-btn" onClick={onAddNote}>+ note</button>
+      <button className="compose-btn" onClick={onAddNote}>+ text</button>
       <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
       <button className="compose-btn" onClick={onPen}>✎ pen</button>
       <button
@@ -50,7 +50,7 @@ export function BoardToolbar({
           <button className="compose-btn subtle" onClick={onBulkUnplace} title="Remove all selected cards from this board">
             remove from board
           </button>
-          <button className="compose-btn subtle" onClick={onBulkTrash} title="Trash all selected notes">
+          <button className="compose-btn subtle" onClick={onBulkTrash} title="Trash all selected cards">
             trash
           </button>
         </span>

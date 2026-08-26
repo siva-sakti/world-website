@@ -108,8 +108,8 @@ export function BoardSurface({
   }
 
   // Create doors — every way a card is born onto the surface, plus the board-born
-  // note's evaporate-if-empty lifecycle and the editor's markContentIfReal.
-  const { addNote, createNote, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal } =
+  // bit's evaporate-if-empty lifecycle and the editor's markContentIfReal.
+  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal } =
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
@@ -231,7 +231,7 @@ export function BoardSurface({
     const prev = lastTap.current;
     if (prev && now - prev.t < 340 && Math.hypot(w.x - prev.x, w.y - prev.y) < 28 / cam.scale) {
       lastTap.current = null;
-      createNote(w.x, w.y);
+      createTextCard(w.x, w.y);
     } else {
       lastTap.current = { t: now, x: w.x, y: w.y };
     }
@@ -263,21 +263,21 @@ export function BoardSurface({
             <button
               className="compose-btn subtle"
               onClick={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
-              title="Open this note full-page — comfortable writing"
+              title="Open this card full-page — comfortable writing"
             >
               open
             </button>
             <button
               className="compose-btn subtle"
               onClick={() => unplaceSelected(selectedBit.placementId)}
-              title="Take this card off THIS board — the note lives on (on its other boards, and in your notes)"
+              title="Take this card off THIS board — it lives on (its other boards, and loose in your bits)"
             >
               remove from this board
             </button>
             <button
               className="compose-btn subtle"
               onClick={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
-              title="Move this note to the trash — hidden everywhere, restorable"
+              title="Move this card to the trash — hidden everywhere, restorable"
             >
               trash
             </button>
@@ -295,7 +295,7 @@ export function BoardSurface({
         onDrop={onBoardDrop}
       >
         {cards.length === 0 && !converting && (
-          <p className="compose-empty">Tap &ldquo;+ note&rdquo;, or double-tap anywhere, to start.</p>
+          <p className="compose-empty">Tap &ldquo;+ text&rdquo;, or double-tap anywhere, to start.</p>
         )}
         {converting && (
           <div className="compose-converting" role="status">

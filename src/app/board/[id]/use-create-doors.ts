@@ -19,10 +19,10 @@ import type { Camera } from "./use-camera";
 const MAX_DISP = 320; // an image card's initial on-board width
 
 // The board's CREATE doors — every way a card is born onto the surface, plus the
-// board-born note's lifecycle (evaporate-if-empty). Kept together because they all
+// board-born bit's lifecycle (evaporate-if-empty). Kept together because they all
 // share the same optimistic pattern: paint the card locally, then land the row and
 // track its create so later writes wait for it (usePersistence's settled door).
-//  · createNote / addNote — a blank (or pasted) note
+//  · createTextCard / addNote — a blank (or pasted) text bit
 //  · finishDoodle — the pen session → one drawing bit
 //  · importImageFile / onBoardDrop / onPickImage — an image
 //  · bringIn — call a loose bit onto THIS board (insert-or-revive, no dup)
@@ -55,7 +55,7 @@ export function useCreateDoors(deps: {
   } = deps;
 
   const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
-  const freshEmpty = useRef(new Set<string>()); // board-born notes that never held content (evaporate on edit-end)
+  const freshEmpty = useRef(new Set<string>()); // board-born bits that never held content (evaporate on edit-end)
   const prevEditing = useRef<string | null>(null);
 
   // The /write test, board-side: real content = visible text or a gather chip.
@@ -102,7 +102,7 @@ export function useCreateDoors(deps: {
     return { x: start.x + s, y: start.y + s };
   }
 
-  function createNote(x: number, y: number, opts?: { body?: string; edit?: boolean }) {
+  function createTextCard(x: number, y: number, opts?: { body?: string; edit?: boolean }) {
     const body = opts?.body ?? "<p></p>";
     const edit = opts?.edit ?? true;
     const bitId = crypto.randomUUID();
@@ -119,8 +119,8 @@ export function useCreateDoors(deps: {
     trackCreate(placementId, p);
   }
 
-  // Evaporate (plan v1.1-A): a board-born note whose edit ends with still-no-real-
-  // content quietly un-exists — no blank-note litter from a stray double-tap. Once
+  // Evaporate (plan v1.1-A): a board-born bit whose edit ends with still-no-real-
+  // content quietly un-exists — no blank-bit litter from a stray double-tap. Once
   // it has ever held content it stays (matches /write's born-on-first-content).
   // Through the settled door: the create may still be in flight.
   useEffect(() => {
@@ -144,7 +144,7 @@ export function useCreateDoors(deps: {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fires on edit-end only; guarded against re-entry
   }, [editingId, cards]);
 
-  // First real content → the note is truly born; it no longer evaporates. The
+  // First real content → the bit is truly born; it no longer evaporates. The
   // editor's onChange calls this before persisting the patch.
   function markContentIfReal(placementId: string, body: string | undefined) {
     if (body !== undefined && freshEmpty.current.has(placementId) && hasRealContent(body))
@@ -243,8 +243,8 @@ export function useCreateDoors(deps: {
     e.target.value = "";
   }
 
-  // Paste onto the board: an image → an image card; TEXT → a note holding it
-  // (plan v1.1-D — one paste, one note, no cleverness). Never while an editor or
+  // Paste onto the board: an image → an image card; TEXT → a bit holding it
+  // (plan v1.1-D — one paste, one bit, no cleverness). Never while an editor or
   // input has focus: those own their own paste.
   useEffect(() => {
     function onPaste(e: ClipboardEvent) {
@@ -260,7 +260,7 @@ export function useCreateDoors(deps: {
       if (!text.trim()) return;
       const html = text.split(/\r?\n/).map((ln) => `<p>${escapeHtml(ln)}</p>`).join("");
       const p = findClearSpot(400, 160);
-      createNote(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
+      createTextCard(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
     }
     window.addEventListener("paste", onPaste);
     return () => window.removeEventListener("paste", onPaste);
@@ -269,11 +269,11 @@ export function useCreateDoors(deps: {
 
   function addNote() {
     const p = findClearSpot(400, 140);
-    createNote(p.x, p.y);
+    createTextCard(p.x, p.y);
   }
 
-  // Call-in: bring a loose note onto THIS board, where you're looking. Optimistic like
-  // createNote; callInBit inserts-or-revives and returns the TRUE placement, so we
+  // Call-in: bring a loose bit onto THIS board, where you're looking. Optimistic like
+  // createTextCard; callInBit inserts-or-revives and returns the TRUE placement, so we
   // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
@@ -325,11 +325,11 @@ export function useCreateDoors(deps: {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
         setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); return nx; });
         onErr(e);
-        throw e; // let the column restore the note to the pile
+        throw e; // let the column restore the bit to the pile
       });
     trackCreate(placementId, p);
     return p;
   }
 
-  return { addNote, createNote, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal };
+  return { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal };
 }

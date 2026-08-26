@@ -11,7 +11,7 @@ import type { CardVM } from "./card";
 // Every DB write goes through the settled-create door (per placement): firing while
 // a card's create is still in flight would match 0 rows and silently lose the act
 // (review finding #1). The multi-board trash confirm stays honest (F16) — trashing
-// removes the note from EVERY board it's on.
+// removes it from EVERY board it's on.
 export function useBoardActs(deps: {
   supabase: SupabaseClient;
   cards: CardVM[];
@@ -52,8 +52,8 @@ export function useBoardActs(deps: {
     let n = 1;
     try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
     const msg = n > 1
-      ? `This note is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
-      : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
+      ? `This card is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
+      : `Move this card to the trash? Hidden everywhere, restorable from Trash.`;
     if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     clearSelection();
@@ -85,8 +85,8 @@ export function useBoardActs(deps: {
     const n = bitIds.length;
     const msg =
       onOtherBoards > 0
-        ? `Trash ${n} note${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
-        : `Trash ${n} note${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
+        ? `Trash ${n} card${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
+        : `Trash ${n} card${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
     if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
     clearSelection();
