@@ -41,7 +41,13 @@ Build green + a walk: `/write` → saved → its page is a *writing surface*, no
 
 ---
 
-## N1 — DETAILED BUILD PLAN (goal confirmed + owner: actions housed off the writing, 2026-08-26)
+## N1 — DETAILED BUILD PLAN — ✅ BUILT + deployed, owner feel-test passed (2026-08-26)
+
+**Shipped (commit `b9dbec5`):** new `/note/[id]` surface (top action-bar of the non-writing acts · title + `TextWorkspace` full-width · quiet footer for dates/source/tags/gathered-into/boards) · both-way redirects (`/bit`→`/note` for a note, `/note`→`/bit` for a fragment) so every old link lands right · note links repointed at `/note` (notes room · desk alive-tiles + folder lists) · write-end collapsed to a quiet "saved · open →" (the mid-write place-on-board dropdown + `boards` prop dropped — placing is a surface act, done later) · per-note **trash** in the notes room (`returnTo="/notes"`) · rail tucks on `/note`. No schema, no migration; build/type/lint green. **Owed follow-up (owner-flagged):** the `/bit/[id]` header still literally reads "note" for every fragment — a pre-existing label to fix (its type, or drop) when convenient.
+
+---
+
+### (original plan below, kept for the record)
 
 **Design call (owner gave latitude):** a top **action-bar of icons** (not a 2nd sidebar — it'd squeeze the writing), writing full-width below, a quiet footer for read-mostly info. No action ever inside the writing.
 ```
