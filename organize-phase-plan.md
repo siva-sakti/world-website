@@ -66,12 +66,13 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.
-2. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades).
-3. **Plan in detail** — written down (here or the item's own doc).
-4. **Check the plan** — proof it against the current code (read, don't assume).
-5. **Clarify again** — anything the proof surfaced.
-6. **Build per plan** — improvise nothing.
-7. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go."
-8. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
+2. **State the CONCEPTUAL GOAL first, and check it** (owner-added 2026-08-26): before any planning, say plainly *what we're trying to do and why* — the goal and the concept, NOT the implementation — and get the owner's confirmation. Nothing proceeds until the goal is agreed.
+3. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades).
+4. **Plan in detail** — written down (here or the item's own doc).
+5. **Check the plan** — proof it against the current code (read, don't assume).
+6. **Clarify again** — anything the proof surfaced.
+7. **Build per plan** — improvise nothing.
+8. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go."
+9. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
 
 The owner's only standing jobs: answer clarifying questions + "needs owner" calls, feel-test, and dump ideas — filing them is Claude's job.
