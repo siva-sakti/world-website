@@ -38,3 +38,26 @@ The plumbing already matches: a board's members = its `placement` rows; a note's
 
 ## 4 · How to verify
 Build green + a walk: `/write` → saved → its page is a *writing surface*, not a metadata sheet · `/notes` and desk tiles open the surface page · an old `/bit/<noteId>` link redirects · tags/find/trash still work on a note (the free machinery held) · a gather chip to a note opens the note surface.
+
+---
+
+## N1 — DETAILED BUILD PLAN (goal confirmed + owner: actions housed off the writing, 2026-08-26)
+
+**Design call (owner gave latitude):** a top **action-bar of icons** (not a 2nd sidebar — it'd squeeze the writing), writing full-width below, a quiet footer for read-mostly info. No action ever inside the writing.
+```
+[★ alive] [# tags] [⬈ place on a board] [⋯]        ← top action-bar (⋯ = source · make-a-bit · trash)
+─────────────────────────────────────
+Title (large, editable)
+The writing  (editor, full-width, central)          ← the surface — no actions in here
+─────────────────────────────────────
+created · edited   ·   tags   ·   gathered into: …   ·   on boards: … (+ place door)   ← quiet footer
+```
+
+**Steps (no schema; reuse everything):**
+1. **New `/note/[id]/page.tsx`** (server): load the note (if `kind!=='note'` → `redirect('/bit/'+id)`, the inverse guard) + tags/source/gathered-into/boards. Render `<NoteActions>` (top bar) + `BitTitle` + `TextWorkspace` + a quiet footer (`lib/dates`, `TagBar`, gathered-into, boards + `PlaceOnBoard`). Only new component: a thin `note-actions.tsx` arranging ★(`pinBit`) · tags · `PlaceOnBoard` · ⋯(`SourcePicker`·`KindToggle`·`BitTrash`).
+2. **Redirect `/bit/[id]`→`/note/[id]` when `kind==='note'`** — the safety net catching *every* note link (chips, old bookmarks); a note can never render as a bit again.
+3. **Point primary links at `/note`**: the `/notes` room · the desk note-tiles · `/write`'s "open its page" · the group page's notes. (Gather chips rely on the redirect — no change.)
+4. **Clean the write-end**: QuickWrite → quiet **"saved · open →"**; drop the place-on-board dropdown + two-link clutter from the writing moment.
+5. **Trash a note from the room**: a per-note trash control in `/notes/page.tsx` (reuse `trashBit`).
+
+**New files:** `app/note/[id]/page.tsx` · `app/note/[id]/note-actions.tsx`. **Verify:** build green + walk (writing-central · quiet saved · trash from room · `/bit/<note>` redirects · a chip to a note lands on `/note`).
