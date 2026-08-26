@@ -18,7 +18,11 @@ export default async function NotesPage({
 }) {
   const { view } = await searchParams;
   const supabase = await createClient();
-  const bits = await listAllBits(supabase);
+  // Fragments only (D-118 division, owner-ruled 2026-08-26): written NOTES live
+  // in /notes, not here. A bit is a fragment that lives loose or on a board; a
+  // note is a document. (The board side-panel still lists notes so they stay
+  // placeable — that boundary is a separate open ruling.)
+  const bits = (await listAllBits(supabase)).filter((b) => b.kind === "bit");
   const boards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
   const groups = await listGroups(supabase);
 
