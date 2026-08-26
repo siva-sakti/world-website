@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
+import { listBoards } from "@/lib/db/boards";
+import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { getBitSource } from "@/lib/db/sources";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash, KindToggle } from "./bit-controls";
@@ -27,12 +29,19 @@ export default async function BitPage({
   const b = await getBit(supabase, id);
   if (!b) notFound();
 
-  const [boards, travel, source, gatheredInto] = await Promise.all([
+  const [boards, travel, source, gatheredInto, allBoards] = await Promise.all([
     getBitBoards(supabase, id),
     getBitTravel(supabase, id),
     getBitSource(supabase, id),
     listGatheredInto(supabase, id),
+    listBoards(supabase),
   ]);
+  // Boards it's NOT already on — the "place on a board…" door (board-side placement
+  // stays too; both directions, the owner's ruling). callInBit revives a departed
+  // leg rather than duplicating, so this is safe even for a board it once left.
+  const otherBoards = allBoards
+    .filter((bd) => !boards.some((cur) => cur.id === bd.id))
+    .map((bd) => ({ id: bd.id, title: bd.title }));
 
   let imageUrl: string | undefined;
   if (b.type === "image" && b.storage_path) {
@@ -148,6 +157,11 @@ export default async function BitPage({
               </li>
             ))}
           </ul>
+        )}
+        {otherBoards.length > 0 && (
+          <div className="mt-3 text-sm">
+            <PlaceOnBoard bitId={b.id} boards={otherBoards} />
+          </div>
         )}
       </section>
 

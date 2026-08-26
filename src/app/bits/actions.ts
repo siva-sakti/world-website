@@ -76,6 +76,7 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     return { error: "Couldn't add that — try again." };
   }
   revalidatePath("/bits");
+  revalidatePath(`/bit/${bitId}`); // the thing's own page shows its boards + this door
   return {};
 }
 
@@ -101,11 +102,13 @@ export async function placeOnBoard(bitId: string, boardId: string): Promise<{ er
   } catch (e) {
     const msg = e instanceof Error ? e.message : "";
     revalidatePath("/bits"); // a stale pile is often the CAUSE (trashed elsewhere) — refresh it
+    revalidatePath(`/bit/${bitId}`);
     if (msg === "TRASHED_BIT") return { error: "That note is in the trash — restore it first." };
     if (msg === "TRASHED_BOARD") return { error: "That board is in the trash." };
     console.error("placeOnBoard failed:", e);
     return { error: "Couldn't place that on the board." };
   }
   revalidatePath("/bits");
+  revalidatePath(`/bit/${bitId}`); // the thing's own page shows its boards + this door
   return {};
 }
