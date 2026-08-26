@@ -5,13 +5,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { pinBit, setBitGroup, createGroup, type ShelfGroup } from "@/lib/db/shelf";
-import { promptText } from "@/components/confirm";
+import { FolderPicker } from "@/components/folder-picker";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { InboxTags } from "./inbox-tags";
 import { PlaceOnBoard } from "./place-on-board";
 
-// The quiet folder picker (O1b) — same gesture as a board's, on a note.
+// The quiet folder picker (O1b → V4: one shared control) — a note shelves like a board.
 export function GroupPicker({
   bitId,
   groupId,
@@ -24,18 +24,10 @@ export function GroupPicker({
   const [supabase] = useState(() => createClient());
   const [busy, setBusy] = useState(false);
   const router = useRouter();
-  async function pick(value: string) {
+  async function run(fn: () => Promise<unknown>) {
     setBusy(true);
     try {
-      if (value === "__new__") {
-        const name = await promptText({ message: "New group", placeholder: "name the section…" });
-        if (name && name.trim()) {
-          const g = await createGroup(supabase, name);
-          await setBitGroup(supabase, bitId, g.id);
-        }
-      } else {
-        await setBitGroup(supabase, bitId, value === "" ? null : value);
-      }
+      await fn();
       router.refresh();
     } catch (e) {
       console.error(e);
@@ -44,20 +36,19 @@ export function GroupPicker({
     }
   }
   return (
-    <select
-      className="shelf-picker"
-      value={groupId ?? ""}
-      disabled={busy}
-      onChange={(e) => pick(e.target.value)}
-      aria-label="group"
+    <FolderPicker
+      value={groupId}
+      groups={groups}
+      busy={busy}
       title="which folder"
-    >
-      <option value="">no group</option>
-      {groups.map((g) => (
-        <option key={g.id} value={g.id}>{g.name}</option>
-      ))}
-      <option value="__new__">+ new group…</option>
-    </select>
+      onPick={(gid) => run(() => setBitGroup(supabase, bitId, gid))}
+      onNew={(name) =>
+        run(async () => {
+          const g = await createGroup(supabase, name);
+          await setBitGroup(supabase, bitId, g.id);
+        })
+      }
+    />
   );
 }
 

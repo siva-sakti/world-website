@@ -8,22 +8,13 @@ import { BitTitle, BitTrash, KindToggle } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
-import { logout } from "@/app/login/actions";
+import { fmt } from "@/lib/dates";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { TextWorkspace } from "./text-workspace";
 
 export const dynamic = "force-dynamic";
-
-function fmt(iso: string | null): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 export default async function BitPage({
   params,
@@ -59,25 +50,10 @@ export default async function BitPage({
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-8 flex items-baseline justify-between text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/find" className="underline underline-offset-4 hover:no-underline">
-            ← find
-          </Link>
-          <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            boards
-          </Link>
-          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            bits
-          </Link>
-        </div>
+        <span className="font-semibold text-neutral-400">note</span>
         <div className="flex items-baseline gap-5">
           {b.type === "text" && <KindToggle bitId={b.id} kind={b.kind} />}
           <BitTrash bitId={b.id} />
-          <form action={logout}>
-            <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-              sign out
-            </button>
-          </form>
         </div>
       </header>
 

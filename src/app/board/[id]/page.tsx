@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBoard, getBoardCards } from "@/lib/db/boards";
 import { getBitContents } from "@/lib/db/bits";
 import { normalizeDrawing } from "@/lib/stroke";
 import { signedUrl } from "@/lib/storage";
-import { logout } from "@/app/login/actions";
 import { BoardSurface } from "./board-surface";
 import { BoardTitle } from "./board-title";
 import { TagBar } from "./tag-bar";
@@ -72,26 +70,8 @@ export default async function BoardPage({
   return (
     <main className="board-page">
       <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-4">
-        <span className="flex shrink-0 items-baseline gap-4 text-sm">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">
-            ← boards
-          </Link>
-          <Link href="/find" className="underline underline-offset-4 hover:no-underline">
-            find
-          </Link>
-          <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            tags
-          </Link>
-          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            graph
-          </Link>
-        </span>
+        <span className="w-8 shrink-0" aria-hidden="true"></span>
         <BoardTitle boardId={board.id} title={board.title} />
-        <form action={logout} className="shrink-0">
-          <button className="text-sm text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
       </header>
       <div className="shrink-0">
         <TagBar target={{ boardId: board.id }} label="board tags" />

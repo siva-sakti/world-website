@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getWordGraph } from "@/lib/db/graph";
-import { logout } from "@/app/login/actions";
 import { WordGraph } from "./word-graph";
 
 export const dynamic = "force-dynamic";
@@ -13,23 +11,7 @@ export default async function GraphPage() {
   return (
     <main className="graph-page mx-auto max-w-6xl">
       <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-3 text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">
-            ← boards
-          </Link>
-          <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            find
-          </Link>
-          <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            tags
-          </Link>
-          <span className="font-semibold">graph</span>
-        </div>
-        <form action={logout}>
-          <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
+        <span className="font-semibold">graph</span>
       </header>
 
       <p className="shrink-0 text-sm text-neutral-500">

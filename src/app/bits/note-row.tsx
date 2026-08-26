@@ -6,6 +6,7 @@ import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
 import { PinToggle, GroupPicker } from "./note-card";
 import type { ShelfGroup } from "@/lib/db/shelf";
+import { fmt } from "@/lib/dates";
 
 // The list-view row (O2 extension): one line per bit — denser than the card,
 // same doors. Place-on stays loose-only (A20), trash everywhere.
@@ -24,10 +25,7 @@ export function NoteRow({
 }) {
   const title = item.face;
   const isLoose = item.boards.length === 0;
-  const date = new Date(item.created_at).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
+  const date = fmt(item.created_at);
 
   return (
     <li className="notes-row">

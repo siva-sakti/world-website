@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
 import { listAllBits } from "@/lib/db/inbox";
 import { listGroups } from "@/lib/db/shelf";
-import { signedUrl } from "@/lib/storage";
+import { signThumbs } from "@/lib/storage";
 import { boardLabel } from "@/lib/labels";
 import { GroupNotes } from "./group-notes";
 
@@ -34,27 +34,12 @@ export default async function GroupPage({
   const allBoards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
   const groups = await listGroups(supabase);
 
-  const imgs: Record<string, string> = {};
-  await Promise.all(
-    bits.map(async (b) => {
-      if (b.type !== "image") return;
-      const path = b.thumb_path ?? b.storage_path;
-      if (!path) return;
-      try {
-        imgs[b.id] = await signedUrl(supabase, path);
-      } catch {
-        /* skip */
-      }
-    }),
-  );
+  const imgs = await signThumbs(supabase, bits);
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <header className="mb-8 flex items-baseline justify-between text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">← home</Link>
-          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">bits</Link>
-        </div>
+      <header className="mb-6 flex items-baseline justify-between">
+        <span className="text-sm font-semibold">folder</span>
       </header>
 
       <p className="text-xs uppercase tracking-wide text-neutral-400">group</p>

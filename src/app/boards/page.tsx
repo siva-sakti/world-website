@@ -1,9 +1,7 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
 import { listGroups } from "@/lib/db/shelf";
 import { newBoard } from "@/app/actions";
-import { logout } from "@/app/login/actions";
 import { Shelf } from "@/app/shelf";
 
 export const dynamic = "force-dynamic";
@@ -18,21 +16,11 @@ export default async function AllBoardsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
-      <header className="mb-8 flex items-baseline justify-between">
-        <div className="flex items-baseline gap-5 text-sm">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">← home</Link>
-          <span className="font-semibold">all boards</span>
-          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">notes</Link>
-          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">bits</Link>
-        </div>
-        <div className="flex items-baseline gap-5 text-sm">
-          <form action={newBoard}>
-            <button className="underline underline-offset-4 hover:no-underline">+ new board</button>
-          </form>
-          <form action={logout}>
-            <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">sign out</button>
-          </form>
-        </div>
+      <header className="mb-6 flex items-baseline justify-between">
+        <span className="text-sm font-semibold">all boards</span>
+        <form action={newBoard}>
+          <button className="text-sm underline underline-offset-4 hover:no-underline">+ new board</button>
+        </form>
       </header>
       <Shelf boards={boards} groups={groups} />
     </main>

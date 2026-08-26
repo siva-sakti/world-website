@@ -14,7 +14,7 @@ import {
   pinBoard,
   pinGroup,
 } from "@/lib/db/shelf";
-import { promptText } from "@/components/confirm";
+import { FolderPicker } from "@/components/folder-picker";
 import { trashBoardAction } from "./actions";
 
 // The shelf (O1): pinned boards float in a ★ section; groups in the owner's own
@@ -38,17 +38,14 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
     }
   }
 
-  async function reshelve(boardId: string, value: string) {
-    if (value === "__new__") {
-      const name = await promptText({ message: "New group", placeholder: "name the section…" });
-      if (!name || !name.trim()) return;
-      await act(async () => {
-        const g = await createGroup(supabase, name);
-        await setBoardGroup(supabase, boardId, g.id);
-      });
-      return;
-    }
-    await act(() => setBoardGroup(supabase, boardId, value === "" ? null : value));
+  function reshelve(boardId: string, groupId: string | null) {
+    void act(() => setBoardGroup(supabase, boardId, groupId));
+  }
+  function reshelveNew(boardId: string, name: string) {
+    void act(async () => {
+      const g = await createGroup(supabase, name);
+      await setBoardGroup(supabase, boardId, g.id);
+    });
   }
 
   const pinned = boards
@@ -65,20 +62,14 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
           {boardLabel(b.title)}
         </Link>
         <span className="flex items-baseline gap-3">
-          <select
-            className="shelf-picker"
-            value={b.group_id ?? ""}
-            disabled={busy}
-            onChange={(e) => reshelve(b.id, e.target.value)}
-            aria-label="group"
+          <FolderPicker
+            value={b.group_id}
+            groups={groups}
+            busy={busy}
             title="which shelf section"
-          >
-            <option value="">no group</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-            <option value="__new__">+ new group…</option>
-          </select>
+            onPick={(gid) => reshelve(b.id, gid)}
+            onNew={(name) => reshelveNew(b.id, name)}
+          />
           <button
             className="shelf-pin"
             disabled={busy}

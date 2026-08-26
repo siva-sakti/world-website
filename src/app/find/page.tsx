@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { findBits, type FindResult } from "@/lib/db/find";
 import { listTags } from "@/lib/db/tags";
 import { bitLabel } from "@/lib/labels";
-import { logout } from "@/app/login/actions";
 import { SearchBox } from "./search-box";
 
 export const dynamic = "force-dynamic";
@@ -28,29 +27,7 @@ export default async function FindPage({
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between">
-        <div className="flex items-baseline gap-5 text-sm">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">
-            ← boards
-          </Link>
-          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            bits
-          </Link>
-          <span className="font-semibold">find</span>
-          <Link href="/tags" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            tags
-          </Link>
-          <Link href="/sources" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sources
-          </Link>
-          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            graph
-          </Link>
-        </div>
-        <form action={logout}>
-          <button className="text-sm text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
+        <span className="text-sm font-semibold">find</span>
       </header>
 
       <SearchBox initial={q} />

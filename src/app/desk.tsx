@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { HomeBoard, Bit } from "@/lib/types";
 import type { ShelfGroup } from "@/lib/db/shelf";
 import { boardLabel, bitLabel } from "@/lib/labels";
+import { ago } from "@/lib/dates";
 
 // THE DESK (V3, mock B — owner's pick): what's ALIVE as tiles, then folders as
 // chips (starred first) with the tapped one open beneath. Curated by the owner's
@@ -13,14 +14,6 @@ import { boardLabel, bitLabel } from "@/lib/labels";
 type AliveThing =
   | { kind: "board"; id: string; name: string; when: string }
   | { kind: "note"; id: string; name: string; when: string };
-
-function ago(iso: string): string {
-  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (d <= 0) return "today";
-  if (d === 1) return "yesterday";
-  if (d < 30) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
 
 export function Desk({
   boards,

@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { logout } from "@/app/login/actions";
 import type { Bit } from "@/lib/types";
+import { fmt } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
-
-function fmt(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
 
 function firstLine(body: string | null, face: string | null, content: string | null): string {
   // The whisper under the title: the piece's opening words (minus the title itself).
@@ -34,17 +30,8 @@ export default async function NotesRoom() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between">
-        <div className="flex items-baseline gap-5 text-sm">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">← home</Link>
-          <span className="font-semibold">notes</span>
-          <Link href="/bits" className="text-neutral-500 underline underline-offset-4 hover:no-underline">bits</Link>
-        </div>
-        <div className="flex items-baseline gap-5 text-sm">
-          <Link href="/write" className="underline underline-offset-4 hover:no-underline">✎ write</Link>
-          <form action={logout}>
-            <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">sign out</button>
-          </form>
-        </div>
+        <span className="text-sm font-semibold">notes</span>
+        <Link href="/write" className="text-sm underline underline-offset-4 hover:no-underline">✎ write</Link>
       </header>
 
       <p className="mb-8 text-sm text-neutral-500">

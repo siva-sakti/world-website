@@ -1607,3 +1607,22 @@ body {
   .rail-foot { margin-top: 0; padding-top: 0; border-top: none; display: flex; gap: 6px; }
   .home-main { padding: 24px 18px; }
 }
+
+/* the everywhere-rail (V4) */
+.shell-main { flex: 1; min-width: 0; }
+.shell-collapsed { position: relative; }
+.rail-peek {
+  position: fixed; top: 10px; left: 10px; z-index: 60;
+  width: 26px; height: 26px; border-radius: 8px;
+  border: 1px solid #e2ddd2; background: #fffdfacc; color: #8a8072;
+  cursor: pointer; font-size: 13px; line-height: 1;
+  backdrop-filter: blur(3px);
+}
+.rail-peek:hover { color: #57503f; background: #fffdfa; }
+.rail-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+.rail-top .rail-brand { margin-bottom: 0; text-decoration: none; }
+.rail-tuck {
+  border: none; background: none; cursor: pointer;
+  color: #b3a58c; font-size: 13px; padding: 2px 6px;
+}
+.rail-tuck:hover { color: #57503f; }

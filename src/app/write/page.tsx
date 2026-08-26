@@ -17,9 +17,7 @@ export default async function WritePage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between text-sm">
-        <Link href="/" className="underline underline-offset-4 hover:no-underline">
-          ← boards
-        </Link>
+        <span className="font-semibold">✎ write</span>
         <span className="text-neutral-400">
           saves to{" "}
           <Link href="/notes" className="underline underline-offset-4 hover:no-underline">

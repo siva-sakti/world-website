@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ConfirmHost } from "@/components/confirm";
+import { AppShell } from "@/components/rail";
 
 // One typeface, set once (see Design stance). Geist is a neutral default; the
 // visual identity arrives later as the owner's own hand-drawn work.
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} h-full`}>
       <body className="min-h-full">
-        {children}
+        <AppShell>{children}</AppShell>
         <ConfirmHost />
       </body>
     </html>
