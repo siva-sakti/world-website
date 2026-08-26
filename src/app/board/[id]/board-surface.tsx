@@ -3,22 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import {
-  createTextBit,
-  createDrawingBit,
-  createImageBit,
-  updateBitContent,
-  unplaceBit,
-  trashBit,
-  callInBit,
-  getBitBoards,
-  abortBitCreate,
-} from "@/lib/db/bits";
-import { uploadObject, signedUrl } from "@/lib/storage";
-import { importImage, isHeic, MediaError } from "@/lib/media";
-import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
-import type { Drawing } from "@/lib/types";
-import type { PanelBit } from "@/lib/db/inbox";
+import { updateBitContent } from "@/lib/db/bits";
+import { MediaError } from "@/lib/media";
 import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
@@ -28,9 +14,8 @@ import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
-import { confirm } from "@/components/confirm";
-
-const MAX_DISP = 320; // an image card's initial on-board width
+import { useBoardActs } from "./use-board-acts";
+import { useCreateDoors } from "./use-create-doors";
 
 // The board's compose surface, on real data, on an infinite canvas. Local state
 // drives the canvas for a snappy feel; every change mirrors to the database
@@ -61,9 +46,6 @@ export function BoardSurface({
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
-  const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
-  const freshEmpty = useRef(new Set<string>()); // board-born notes that never held content (evaporate on edit-end)
-  const prevEditing = useRef<string | null>(null);
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
   const router = useRouter();
@@ -86,6 +68,12 @@ export function BoardSurface({
   // waits for its card's create to land before writing).
   const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow } =
     usePersistence(supabase, setCards, onErr);
+
+  // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
+  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
+    supabase, cards, selectedIds, setCards, clearSelection,
+    setEditingId, settled, setLooseRefresh, onErr,
+  });
 
   // "open" — the focused writing view (writing-experience-plan v1): the bit's own
   // page. Gated: the row must exist (a fresh card's insert may be in flight → the
@@ -118,6 +106,15 @@ export function BoardSurface({
   function nextZ() {
     return cards.reduce((m, c) => Math.max(m, c.z), 0) + 1;
   }
+
+  // Create doors — every way a card is born onto the surface, plus the board-born
+  // note's evaporate-if-empty lifecycle and the editor's markContentIfReal.
+  const { addNote, createNote, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal } =
+    useCreateDoors({
+      supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
+      setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
+      trackCreate, settled, reconcileId, setConverting, setWordsFor, onErr,
+    });
 
   function select(placementId: string, bitId: string, additive: boolean) {
     patchCard(placementId, bitId, { z: nextZ() }); // the clicked card comes to front
@@ -171,210 +168,6 @@ export function BoardSurface({
       patchCard(c.placementId, c.bitId, { x: p0.x + dx, y: p0.y + dy }); // per-card independent save
     }
   }
-
-  // ---- create ----
-
-  // The /write test, board-side: real content = visible text or a gather chip.
-  function hasRealContent(html: string): boolean {
-    return html.replace(/<[^>]+>/g, "").trim() !== "" || html.includes("data-ref");
-  }
-  function escapeHtml(s: string): string {
-    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  }
-
-  // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate
-  // against every card on the board, step down-right until clear — preferring a
-  // spot fully IN VIEW (a new thing must never seem to not-appear). Text heights
-  // in state are stale by design (height:auto), so measure the rendered card via
-  // data-pid and fall back to state. Deterministic; last resort = plain cascade.
-  function findClearSpot(w0: number, h0: number): { x: number; y: number } {
-    const r = boardRef.current?.getBoundingClientRect();
-    if (!r) {
-      const s = (spawnStep.current++ % 8) * 28;
-      return { x: 40 + s, y: 84 + s };
-    }
-    const anchor = screenToWorld(r.left + r.width / 2, r.top + Math.min(200, r.height / 2));
-    const tl = screenToWorld(r.left, r.top);
-    const br = screenToWorld(r.left + r.width, r.top + r.height);
-    const rects = cards.map((c) => {
-      const el = c.type === "text" ? document.querySelector(`[data-pid="${c.placementId}"]`) : null;
-      return { x: c.x, y: c.y, w: c.w, h: el instanceof HTMLElement ? el.offsetHeight : c.h };
-    });
-    const MARGIN = 12;
-    const start = { x: anchor.x - w0 / 2, y: anchor.y };
-    let firstClear: { x: number; y: number } | null = null;
-    for (let i = 0; i < 24; i++) {
-      const x = start.x + i * 36;
-      const y = start.y + i * 36;
-      const taken = rects.some(
-        (q) => x < q.x + q.w + MARGIN && x + w0 + MARGIN > q.x && y < q.y + q.h + MARGIN && y + h0 + MARGIN > q.y,
-      );
-      if (taken) continue;
-      if (x >= tl.x && y >= tl.y && x + w0 <= br.x && y + h0 <= br.y) return { x, y }; // clear AND visible
-      if (!firstClear) firstClear = { x, y };
-    }
-    if (firstClear) return firstClear;
-    const s = (spawnStep.current++ % 8) * 28;
-    return { x: start.x + s, y: start.y + s };
-  }
-
-  function createNote(x: number, y: number, opts?: { body?: string; edit?: boolean }) {
-    const body = opts?.body ?? "<p></p>";
-    const edit = opts?.edit ?? true;
-    const bitId = crypto.randomUUID();
-    const placementId = crypto.randomUUID();
-    const z = nextZ();
-    setCards((cs) => [
-      ...cs,
-      { placementId, bitId, type: "text", x, y, w: 400, h: 60, z, body },
-    ]);
-    selectOne(placementId);
-    if (edit) setEditingId(placementId);
-    if (!hasRealContent(body)) freshEmpty.current.add(placementId); // evaporates if it stays empty
-    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch(onErr);
-    trackCreate(placementId, p);
-  }
-
-  // Evaporate (plan v1.1-A): a board-born note whose edit ends with still-no-real-
-  // content quietly un-exists — no blank-note litter from a stray double-tap. Once
-  // it has ever held content it stays (matches /write's born-on-first-content).
-  // Through the settled door: the create may still be in flight.
-  useEffect(() => {
-    const prev = prevEditing.current;
-    if (prev === editingId) return;
-    prevEditing.current = editingId;
-    if (!prev || !freshEmpty.current.has(prev)) return;
-    freshEmpty.current.delete(prev);
-    const c = cards.find((x) => x.placementId === prev);
-    if (!c || hasRealContent(c.body ?? "")) return;
-    setCards((cs) => cs.filter((x) => x.placementId !== prev));
-    setSelectedIds((s) => {
-      if (!s.has(prev)) return s;
-      const nx = new Set(s);
-      nx.delete(prev);
-      return nx;
-    });
-    settled(prev)
-      .then(() => abortBitCreate(supabase, c.bitId))
-      .catch(onErr);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fires on edit-end only; guarded against re-entry
-  }, [editingId, cards]);
-
-  // Pen "Done": convert the session's strokes (screen space) into world space,
-  // bundle into ONE drawing bit at their bounding box (widths kept). Empty → nothing.
-  function finishDoodle(drawing: Drawing) {
-    setDrawMode(false);
-    if (!drawing.strokes.length) return;
-    const c = camRef.current;
-    const world = drawing.strokes.map((s) =>
-      s.map(([px, py, pr]) => [(px - c.x) / c.scale, (py - c.y) / c.scale, pr]),
-    );
-    const b = strokesBounds(world);
-    const w = Math.max(1, b.w);
-    const h = Math.max(1, b.h);
-    const rel = world.map((s) => s.map(([px, py, pr]) => [px - b.minX, py - b.minY, pr]));
-    const relDrawing: Drawing = { strokes: rel, sizes: drawing.sizes, colors: drawing.colors };
-    const bitId = crypto.randomUUID();
-    const placementId = crypto.randomUUID();
-    const z = nextZ();
-    setCards((cs) => [
-      ...cs,
-      { placementId, bitId, type: "drawing", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
-    ]);
-    selectOne(placementId);
-    const p = createDrawingBit(supabase, {
-      bitId, placementId, boardId, drawing: relDrawing,
-      x: b.minX, y: b.minY, width: w, height: h, z,
-    })
-      .then(() => setWordsFor({ bitId, kind: "drawing" }))
-      .catch(onErr);
-    trackCreate(placementId, p);
-  }
-
-  function importImageFile(file: File, wx: number, wy: number) {
-    const bitId = crypto.randomUUID();
-    const placementId = crypto.randomUUID();
-    // HEIC decoding takes a few seconds; only then does it show a notice.
-    const heic = isHeic(file);
-    if (heic) setConverting(true);
-    const chain = importImage(file)
-      .then(async (img) => {
-        const dispScale = Math.min(1, MAX_DISP / img.width);
-        const w = Math.max(1, Math.round(img.width * dispScale));
-        const h = Math.max(1, Math.round(img.height * dispScale));
-        const z = nextZ();
-        const localUrl = URL.createObjectURL(img.blob);
-        setCards((cs) => [
-          ...cs,
-          { placementId, bitId, type: "image", x: wx, y: wy, w, h, z, imageUrl: localUrl },
-        ]);
-        selectOne(placementId);
-        const storagePath = `images/${bitId}.jpg`;
-        const thumbPath = `thumbs/${bitId}.jpg`;
-        // The two uploads are independent — send them together, not one-then-two.
-        await Promise.all([
-          uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" }),
-          uploadObject(supabase, { path: thumbPath, body: img.thumb, contentType: "image/jpeg" }),
-        ]);
-        await createImageBit(supabase, {
-          bitId, placementId, boardId, storagePath, thumbPath,
-          mediaWidth: img.width, mediaHeight: img.height,
-          mime: "image/jpeg", byteSize: img.blob.size, fileName: file.name,
-          x: wx, y: wy, width: w, height: h, z,
-        });
-        setWordsFor({ bitId, kind: "image" });
-      })
-      .catch((e) => {
-        setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        onErr(e);
-      })
-      .finally(() => {
-        if (heic) setConverting(false);
-      });
-    trackCreate(placementId, chain);
-  }
-
-  function onBoardDrop(e: React.DragEvent) {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      const w = screenToWorld(e.clientX, e.clientY);
-      importImageFile(file, w.x, w.y);
-    }
-  }
-
-  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      const p = findClearSpot(320, 260); // dims unknown until decode — a sensible estimate
-      importImageFile(file, p.x, p.y);
-    }
-    e.target.value = "";
-  }
-
-  // Paste onto the board: an image → an image card; TEXT → a note holding it
-  // (plan v1.1-D — one paste, one note, no cleverness). Never while an editor or
-  // input has focus: those own their own paste.
-  useEffect(() => {
-    function onPaste(e: ClipboardEvent) {
-      const t = e.target as HTMLElement | null;
-      if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
-      const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith("image/"));
-      if (file) {
-        const p = findClearSpot(320, 260);
-        importImageFile(file, p.x, p.y);
-        return;
-      }
-      const text = e.clipboardData?.getData("text/plain") ?? "";
-      if (!text.trim()) return;
-      const html = text.split(/\r?\n/).map((ln) => `<p>${escapeHtml(ln)}</p>`).join("");
-      const p = findClearSpot(400, 160);
-      createNote(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
-    }
-    window.addEventListener("paste", onPaste);
-    return () => window.removeEventListener("paste", onPaste);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-bind on cards so findClearSpot sees live positions
-  }, [cards]);
 
   // Escape clears the selection (and exits edit).
   useEffect(() => {
@@ -442,134 +235,6 @@ export function BoardSurface({
     } else {
       lastTap.current = { t: now, x: w.x, y: w.y };
     }
-  }
-
-  // ---- remove (I-W1: two distinct, labeled acts) ----
-  function clearCard(placementId: string) {
-    setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-    clearSelection();
-    setEditingId(null);
-  }
-  // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
-  // Through the settled-create door: firing while the card's create is still in
-  // flight would match 0 rows and silently lose the removal (review finding #1).
-  function unplaceSelected(placementId: string) {
-    clearCard(placementId);
-    settled(placementId)
-      .then((id) => unplaceBit(supabase, id))
-      .catch(onErr);
-    setLooseRefresh((n) => n + 1); // it's loose again — let the column show it
-  }
-  // Trash the whole bit — hidden everywhere, restorable from /trash. With multi-board,
-  // trash is the heavy act (off EVERY board), so the confirm is honest about it (F16).
-  // Same door: the bit row must exist before the freeze can land.
-  async function trashSelected(placementId: string, bitId: string) {
-    let n = 1;
-    try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
-    const msg = n > 1
-      ? `This note is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
-      : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
-    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
-    setCards((cs) => cs.filter((c) => c.bitId !== bitId));
-    clearSelection();
-    setEditingId(null);
-    settled(placementId)
-      .then(() => trashBit(supabase, bitId))
-      .catch(onErr);
-  }
-
-  // ---- bulk acts (multi-select, ②c) — the same I-W1 acts, looped, each through the
-  // settled door (per placement); the trash confirm keeps ①'s multi-board honesty.
-  function bulkUnplace() {
-    const ids = [...selectedIds];
-    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
-    clearSelection();
-    setEditingId(null);
-    for (const pid of ids) settled(pid).then((id) => unplaceBit(supabase, id)).catch(onErr);
-    setLooseRefresh((n) => n + 1);
-  }
-  async function bulkTrash() {
-    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
-    const bitIds = [...new Set(chosen.map((c) => c.bitId))];
-    let onOtherBoards = 0;
-    try {
-      const counts = await Promise.all(bitIds.map((bid) => getBitBoards(supabase, bid)));
-      onOtherBoards = counts.filter((boards) => boards.length > 1).length;
-    } catch { /* fall back to the plain confirm */ }
-    const n = bitIds.length;
-    const msg =
-      onOtherBoards > 0
-        ? `Trash ${n} note${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
-        : `Trash ${n} note${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
-    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
-    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
-    clearSelection();
-    setEditingId(null);
-    for (const c of chosen) settled(c.placementId).then(() => trashBit(supabase, c.bitId)).catch(onErr);
-  }
-
-  function addNote() {
-    const p = findClearSpot(400, 140);
-    createNote(p.x, p.y);
-  }
-
-  // Call-in: bring a loose note onto THIS board, where you're looking. Optimistic like
-  // createNote; callInBit inserts-or-revives and returns the TRUE placement, so we
-  // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
-  async function bringIn(bit: PanelBit) {
-    const type = bit.type;
-    if (type !== "text" && type !== "drawing" && type !== "image") return;
-    const width = type === "text" ? 400 : 220;
-    const height = type === "text" ? 60 : 220;
-    // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
-    // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate.
-    const w = findClearSpot(width, type === "text" ? 120 : height);
-    const placementId = crypto.randomUUID();
-    const z = nextZ();
-    let imageUrl: string | undefined;
-    if (type === "image") {
-      const path = bit.thumb_path ?? bit.storage_path;
-      if (path) {
-        try { imageUrl = await signedUrl(supabase, path); } catch {}
-      }
-    }
-    setCards((cs) => [
-      ...cs,
-      {
-        placementId, bitId: bit.id, type,
-        x: w.x, y: w.y, w: width, h: height, z,
-        body: bit.body ?? undefined,
-        drawing: type === "drawing" ? normalizeDrawing(bit.strokes) : undefined,
-        imageUrl,
-        content: bit.content ?? undefined,
-        sourceName: bit.source?.name ?? undefined,
-        sourceUrl: bit.source?.url ?? undefined,
-      },
-    ]);
-    selectOne(placementId);
-    const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: w.x, y: w.y, width, height, z })
-      .then((placement) => {
-        if (placement.id !== placementId) {
-          reconcileId(placementId, placement.id);
-          // If a card already renders under the real id (the bit was ALREADY live
-          // here — a stale column), drop the optimistic twin instead of renaming:
-          // two cards must never share a placement id.
-          setCards((cs) =>
-            cs.some((c) => c.placementId === placement.id)
-              ? cs.filter((c) => c.placementId !== placementId)
-              : cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
-          );
-          setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); nx.add(placement.id); return nx; });
-        }
-      })
-      .catch((e) => {
-        setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); return nx; });
-        onErr(e);
-        throw e; // let the column restore the note to the pile
-      });
-    trackCreate(placementId, p);
-    return p;
   }
 
   const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
@@ -660,9 +325,7 @@ export function BoardSurface({
                 setEditingId(c.placementId);
               }}
               onChange={(patch) => {
-                // First real content → the note is truly born; it no longer evaporates.
-                if (patch.body !== undefined && freshEmpty.current.has(c.placementId) && hasRealContent(patch.body))
-                  freshEmpty.current.delete(c.placementId);
+                markContentIfReal(c.placementId, patch.body); // first real content → no longer evaporates
                 patchCard(c.placementId, c.bitId, patch);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
