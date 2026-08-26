@@ -50,6 +50,19 @@
   Then **O5 signs off** + docs re-synced, closing the phase.
 - **Then, owner-ordered:** the **privacy/publishing session** (urgent-ish per the product ruling) · the owner's **re-voice pass** on philosophy + the language book · then the surviving F-queue: collections/board-tagging · voice+PDF (B7) · papers · fonts · the big rooms.
 
+## 4b · PHASE N — the note as a surface + the flows' gaps (sequenced 2026-08-26)
+
+Ordered so each item lands on ground the previous one cleared. Each gets its own **detailed plan → owner nod → build** (the loop) when reached; the notes below are *just enough to justify the sequence*. Full flows + technical background: `user-flows.md`; the whole model: `model.md`.
+
+- **N1 · Note re-surfacing (FIRST — the headline correctness fix).** New `/note/[id]` writing-surface page (reuse `TextWorkspace`/`TagBar`/`SourcePicker`/`listGatheredInto`, re-arranged writing-first) · point all note links at it · redirect `/bit/[id]`→`/note` for `kind='note'` · clean the write-end · **trash a note from the notes room**. **No schema.** Kills "a note feels like a bit" + the delete gap in one pass. Plan: `note-as-surface-plan.md` (steps 1–4, 6, 8).
+- **N2 · `board-surface.tsx` breakdown (the deferred hygiene item — sequenced HERE).** 699→~350: extract `use-create-doors` + `use-bulk-acts`. Pure refactor, plan-first, full flow-trace. Done *before* N3 so the note-on-board render lands in clean board code. *(Was task #8.)*
+- **N3 · Note-on-board = a document doorway card.** A `kind==='note'` branch in `card.tsx`: an 8.5×11 paper-shaped doorway (default, resizable) → opens `/note`. **No schema** (uses `placement`). Builds on N2.
+- **N4 · Find: kind filters + labels.** `/find` gains notes·bits·boards filters + a per-result label. **No schema.** Small, independent, high-value.
+- **N5 · Notes: archive decision + build.** ⚑ Decide *archive = a distinct resting state vs. just trash*; if distinct, a small schema add (`archived_at`) + a room control. Owner rules the concept first.
+- **N6 · Gather a board / a source inline.** Extend `reference` to point at a board (`to_board_id` + CHECK — the A15 shape) and/or a source; the `[[` picker + chip render the new targets. **Schema add**, throwaway-proven, owner-gated.
+- **N7 · Onboarding (design-heavy, own round).** First-run: detect empty owner → a seeded starter board or a guided intro; `onboarded` flag. Uses `user-flows.md` Arc 0 as the curriculum. After the surfaces are correct.
+- **Parked, each its own phase:** phone capture (5) · the reference-threaded graph (evidence-gated) · document-mode (design round) · publishing/guest layer. **Design track runs in parallel** (`aesthetics-phase.md`: the bold indigo/Gzhel identity + papers into the app).
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.

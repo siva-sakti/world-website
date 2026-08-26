@@ -1,67 +1,57 @@
-# User flows — the whole journey, end to end
+# User flows — the whole journey, end to end (+ technical background)
 
-**What this is:** every path a user can take through the app, arc by arc, so we can *see* we've thought about all of it. Complements `model.md` (the static shape) with the moving journeys. ✅ = built · 🔲 = not built yet · ⚑ = decision/design open. Written 2026-08-26.
+**What this is:** every path a user takes, arc by arc, **each grounded in its technical mechanism** so UX and engineering are thought about together. Complements `model.md` (static shape). ✅ built · 🔲 not yet · ⚑ decision open · ⚙ = the technical mechanism. Written 2026-08-26.
 
-**The person:** a multi-mind — many interests at once (astrology · economics · buddhism · design). The whole arc: **catch → arrange & write → connect → return → develop into pieces**, without anything getting lost.
+**The person:** a multi-mind — many interests at once. The whole arc: **catch → arrange & write → connect → return → develop into pieces**, nothing lost.
 
 ---
+
+## Arc 0 · ONBOARDING (first run — how a new mind learns the app) 🔲 NOT BUILT
+Teach the model *by doing*, not a slideshow. A new user arrives empty.
+- **Welcome:** one warm line of *what this is* (from `vision-and-language.md`) + **one** first action — "catch your first thing" (jot/paste/image) **or** a pre-seeded example board to poke at.
+- **Progressive reveal, one move at a time:** catch a **bit** → put it on a **board** → **write** a note → mark something **alive** so the desk greets you. Each step introduced only when it's the natural next thing.
+- ⚙ **technically:** detect first-run = *this owner has 0 boards and 0 bits*; either a scripted **starter board** seeded on first login, or a light guided-overlay; persist an `onboarded` flag (an owner setting row, or `localStorage` v1). Design-heavy → its **own round**, but the *curriculum is this doc* (the arcs, in order). Ties to the eventual **product** goal (others get onboarded too).
 
 ## Arc 1 · CATCH (something enters your world)
-- ✅ Jot a line (the quick box) → a loose **bit**
-- ✅ Paste a link or quote (a **source** attaches) → a loose bit
-- ✅ Drop / paste an image → a loose bit
-- ✅ Draw with the pen on a board → a doodle bit, on that board
-- ✅ Write a piece (`✎ write`) → a **note**
-- 🔲 Capture from the phone (instant, offline) → a loose bit *(Phase 5)*
+- ✅ Jot a line (quick box) → loose **bit** · ✅ paste link/quote (source attaches) · ✅ drop/paste image · ✅ pen on a board → doodle · ✅ write a piece (`✎ write`) → **note**
+- 🔲 Phone capture (instant, offline)
+- ⚙ **technically:** `createLooseTextBit(kind='bit')` · image → `lib/media` (decode→downscale→thumb) → `createImageBit` · source auto-title via `fetchPageMeta` · pen → `createDrawingBit`. Note-write → `createLooseTextBit(kind='note')`. Phone = a **PWA + offline outbox + iOS Shortcut** (Phase 5) — real infra, not built.
 
 ## Arc 2 · ARRANGE (compose in space — a board)
-- ✅ Make a board
-- ✅ Bring loose bits onto it (the side-panel / call-in) · drag · resize · stack · multi-select & move together
-- ✅ Draw arrows between cards (connectors)
-- 🔲 Place a **board** on a board — a doorway/hub *(schema ready, no UI)*
-- 🔲⚑ Place a **note** on a board — a **document-shaped doorway card** (8.5×11 default, resizable), opens the note *(ruled; not built)*
+- ✅ make a board · bring loose bits in (side-panel/call-in) · drag·resize·stack · multi-select move-together · arrows (connectors)
+- 🔲 board-on-board doorway · 🔲⚑ **note-on-board = a document-shaped doorway** (8.5×11 default)
+- ⚙ **technically:** `board` + `placement` (x·y·w·h·z, per-board); `callInBit` (insert-or-revive a departed leg, no dup); `board-surface.tsx` (the 699-line canvas — **due for its breakdown before more lands here**); `connector` rows. Note-doorway = a `kind==='note'` branch in `card.tsx` rendering a paper-shaped doorway → `/note/[id]`.
 
 ## Arc 3 · WRITE & GATHER (compose in words — a note)
-- ✅ Write a note (`✎ write`, or the note's own page)
-- ✅ Gather bits into the writing (`[[` → a chip; tap = peek)
-- ✅ See **"gathered into"** on a bit/note — who reached for it
-- 🔲 Gather a **board** into a note · **link a source inline** *(each a small addition — a reference that points at a board / a source)*
+- ✅ write (`✎ write` / the note's page) · gather bits (`[[` → chip, tap=peek) · see **"gathered into"**
+- 🔲 gather a **board** / **link a source** inline
+- ⚙ **technically:** the note = a `bit(kind='note')` with `body`; gather = `reference` rows (`from_bit→to_bit`), reconciled on save from the `[[` chips in the HTML; `listGatheredInto` reads them backward. Gather-a-board = extend `reference` with `to_board_id` + a CHECK (the parked A15 shape) + the picker/chip; gather-a-source = a reference that points at a `source`.
 
 ## Arc 4 · CONNECT (relate across everything — the web)
-- ✅ Tag a bit, a board, a note (shared words)
-- ✅ Pull a tag → everything about a topic (`the_pull`)
-- ✅ Wander the graph — *but* it predates gather (tags/boards only); the reference-threaded graph is 🔲 parked, evidence-gated
+- ✅ tag a bit/board/note · pull a tag (`the_pull`) · wander the graph
+- 🔲 the **reference-threaded** graph (today's is tags/boards only)
+- ⚙ **technically:** `tag` + `tag_application` (polymorphic: bit **or** board); the pull = filter the ledger by tag; graph = `react-force-graph` over co-occurrence — the reference-layer is parked, evidence-gated.
 
 ## Arc 5 · ORGANIZE (the shelf)
-- ✅ Put boards & notes into **folders** (cut across both)
-- ✅ Mark boards / notes / folders **alive** (★) → the **desk** greets you with them
+- ✅ folder boards & notes · mark boards/notes/folders **alive** (★) → the **desk**
+- ⚙ **technically:** `shelf_group` (owner-ordered) + `group_id` on board/bit (set-null on delete); `pinned_at` on board/bit/shelf_group; home reads `home` view + a notes query, splits alive/foldered/rest client-side.
 
 ## Arc 6 · RETURN (come back — the point)
-- ✅ Open the app → the **desk** (alive things + folders)
-- ✅ Open a folder → its boards + notes together
-- ✅ Browse the **cabinet** (all boards · all notes · bits) via the rail
-- ✅ **Find** (search everything) — 🔲 add **kind filters + labels** (notes · bits · boards)
-- ✅ Open a **bit's** page (source · tags · boards · travel)
-- 🔲 Open a **note's** page as a **writing surface** *(the re-surfacing; today it wears the bit page)*
+- ✅ desk (alive + folders) · open a folder · browse the cabinet (all boards·notes·bits) via the rail · **find** (search all)
+- 🔲 find **kind filters + labels** · 🔲 a note's **writing-surface page** (today it wears the bit page)
+- ⚙ **technically:** `home`/`the_inbox`/`the_ledger` views; `/find` = `lib/db/find.ts` (empty=ledger, +full-text over the face, +tag filter). Note page = new `/note/[id]` reusing `TextWorkspace`/`TagBar`/etc., writing-first; redirect `/bit/[id]`→`/note` for `kind='note'`. Find-filter = a `kind`/`type` branch in the find query + labels.
 
-## Arc 7 · DEVELOP (raw → fragment → piece — the whole reason)
-- ✅ The gradient by hand: jot → tag → arrange on a board → **synthesize into a note** by gathering its bits → a finished piece
-- ✅ **Promote** a fragment into a note (it grew up) / demote back
-- ✅ A board **feeds** a note (open `✎ write`, `[[` in its bits) — the "synthesize a board into a Substack piece" flow, live today
-- 🔲 Document-mode (a whole board read/edited as flowing text) — parked, its own design round
+## Arc 7 · DEVELOP (raw → fragment → piece — the reason)
+- ✅ jot → tag → arrange on a board → **synthesize into a note** (gather its bits) → a finished piece · ✅ promote/demote a fragment ↔ note · ✅ a board **feeds** a note (the Substack flow)
+- 🔲 document-mode (a whole board as flowing text) — parked, own design round
+- ⚙ **technically:** the whole gradient is already the existing machinery (bits · placements · `kind` · references) — no new storage; document-mode is the one genuine addition (bit-boundaries in a flowing editor).
 
 ## Arc 8 · MANAGE (housekeeping)
-- ✅ Trash / restore a **bit**, a **board**
-- 🔲 Trash a **note** from the notes room · ⚑ decide **archive** (a distinct resting state?) vs. trash
-- ✅ Rename a board/note · change a source · **export everything**
-- 🔲 Publish / share a board — the whole guest layer *(DB door open, no publish act built; all private)*
+- ✅ trash/restore a bit·board · rename · change source · **export all**
+- 🔲 trash a **note from the room** · ⚑ **archive** as a distinct state? · 🔲 publish/share
+- ⚙ **technically:** `deleted_at` freeze + `trash_listing` + `restoreBit/Board`; export = `/api/export` (all tables). Note-trash from the room = reuse `trashBit` + a per-row control. Archive = a new state (`archived_at`?) — decide first. Publish = the whole guest layer (DB door open, no act built).
 
 ---
 
-## The gaps this surfaces (the honest to-do, in one place)
-1. **A note's own writing-surface page** (re-surfacing) — the active plan.
-2. **Note-on-board = a document-shaped doorway card.**
-3. **Trash + maybe archive for notes**, in the notes room.
-4. **Find: kind filters + labels.**
-5. **Gather a board / a source inline** (small extensions).
-6. Later/parked: phone capture · the reference-graph · document-mode · publishing.
+## The gaps, in one place (the to-do the flows expose)
+See `organize-phase-plan.md` §Phase N for the *sequenced* version. Summary: note writing-page · note-on-board doorway · notes trash/archive · find filters · gather board/source · onboarding · (parked) phone capture · reference-graph · document-mode · publishing. Plus the standing code item: `board-surface.tsx` breakdown.
