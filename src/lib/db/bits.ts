@@ -308,15 +308,20 @@ export async function getBitTravel(
   return (data ?? []) as BitTravelLeg[];
 }
 
-/** Raw owner content for a set of bits — the board_cards view exposes only the
- * computed face, but the title editor needs the raw column. */
-export async function getBitContents(
+/** Raw per-bit fields the board_cards view doesn't expose: `content` (the title
+ * editor needs the raw column, not the computed face) and `kind` (so a placed NOTE
+ * renders as a doorway, not editable text — N3). One indexed query for the board. */
+export async function getBitMeta(
   supabase: SupabaseClient,
   ids: string[],
-): Promise<Map<string, string | null>> {
-  const out = new Map<string, string | null>();
+): Promise<Map<string, { content: string | null; kind: "bit" | "note" }>> {
+  const out = new Map<string, { content: string | null; kind: "bit" | "note" }>();
   if (!ids.length) return out;
-  const { data } = await supabase.from("bit").select("id, content").in("id", ids);
-  for (const b of data ?? []) out.set(b.id as string, (b.content as string | null) ?? null);
+  const { data } = await supabase.from("bit").select("id, content, kind").in("id", ids);
+  for (const b of data ?? [])
+    out.set(b.id as string, {
+      content: (b.content as string | null) ?? null,
+      kind: (b.kind as "bit" | "note") ?? "bit",
+    });
   return out;
 }

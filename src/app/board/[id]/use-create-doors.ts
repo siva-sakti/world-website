@@ -110,7 +110,7 @@ export function useCreateDoors(deps: {
     const z = nextZ();
     setCards((cs) => [
       ...cs,
-      { placementId, bitId, type: "text", x, y, w: 400, h: 60, z, body },
+      { placementId, bitId, type: "text", kind: "bit", x, y, w: 400, h: 60, z, body },
     ]);
     selectOne(placementId);
     if (edit) setEditingId(placementId);
@@ -170,7 +170,7 @@ export function useCreateDoors(deps: {
     const z = nextZ();
     setCards((cs) => [
       ...cs,
-      { placementId, bitId, type: "drawing", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
+      { placementId, bitId, type: "drawing", kind: "bit", x: b.minX, y: b.minY, w, h, z, drawing: relDrawing },
     ]);
     selectOne(placementId);
     const p = createDrawingBit(supabase, {
@@ -197,7 +197,7 @@ export function useCreateDoors(deps: {
         const localUrl = URL.createObjectURL(img.blob);
         setCards((cs) => [
           ...cs,
-          { placementId, bitId, type: "image", x: wx, y: wy, w, h, z, imageUrl: localUrl },
+          { placementId, bitId, type: "image", kind: "bit", x: wx, y: wy, w, h, z, imageUrl: localUrl },
         ]);
         selectOne(placementId);
         const storagePath = `images/${bitId}.jpg`;
@@ -278,11 +278,13 @@ export function useCreateDoors(deps: {
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
     if (type !== "text" && type !== "drawing" && type !== "image") return;
-    const width = type === "text" ? 400 : 220;
-    const height = type === "text" ? 60 : 220;
+    const isNote = bit.kind === "note"; // a note lands page-shaped (a doorway), not receipt-shaped
+    const width = isNote ? 200 : type === "text" ? 400 : 220;
+    const height = isNote ? 260 : type === "text" ? 60 : 220;
     // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
-    // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate.
-    const w = findClearSpot(width, type === "text" ? 120 : height);
+    // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate;
+    // a note has a real fixed height, so use it directly.
+    const w = findClearSpot(width, isNote ? height : type === "text" ? 120 : height);
     const placementId = crypto.randomUUID();
     const z = nextZ();
     let imageUrl: string | undefined;
@@ -295,7 +297,7 @@ export function useCreateDoors(deps: {
     setCards((cs) => [
       ...cs,
       {
-        placementId, bitId: bit.id, type,
+        placementId, bitId: bit.id, type, kind: bit.kind,
         x: w.x, y: w.y, w: width, h: height, z,
         body: bit.body ?? undefined,
         drawing: type === "drawing" ? normalizeDrawing(bit.strokes) : undefined,

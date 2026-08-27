@@ -324,6 +324,7 @@ export function BoardSurface({
                 selectOne(c.placementId);
                 setEditingId(c.placementId);
               }}
+              onOpen={() => openSelected(c.placementId, c.bitId)}
               onChange={(patch) => {
                 markContentIfReal(c.placementId, patch.body); // first real content → no longer evaporates
                 patchCard(c.placementId, c.bitId, patch);

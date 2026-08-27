@@ -14,6 +14,7 @@ export type CardVM = {
   placementId: string;
   bitId: string;
   type: "text" | "drawing" | "image";
+  kind: "bit" | "note"; // a note (a written PIECE) renders as a page-shaped DOORWAY, not editable text (N3)
   x: number;
   y: number;
   w: number;
@@ -50,6 +51,11 @@ function handleStyles(size: number) {
     right: { ...dot, right: off, top: "50%", marginTop: mid },
   };
 }
+// A note doorway shows plain text drawn from its rich-text body (tags stripped).
+function plainText(html: string | undefined): string {
+  return (html ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 const HANDLE_STYLES = handleStyles(11);
 const HANDLE_STYLES_COARSE = handleStyles(22);
 // text → LEFT/RIGHT handles reflow (width); height follows the text.
@@ -72,6 +78,7 @@ export function Card({
   offeringWords,
   onSelect,
   onEdit,
+  onOpen,
   onChange,
   onContentSave,
   onDragStart,
@@ -86,6 +93,7 @@ export function Card({
   offeringWords?: boolean; // the "add a few words?" prompt owns the caption right now
   onSelect: (additive: boolean) => void;
   onEdit: () => void;
+  onOpen?: () => void; // a note doorway → open the note's page (N3)
   onChange: (patch: Partial<CardVM>) => void;
   onContentSave: (value: string) => void;
   // Drag reporting for move-together: the board moves the OTHER selected cards; this
@@ -104,7 +112,13 @@ export function Card({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time device capability read
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
   }, []);
-  const isText = card.type === "text";
+  const isNote = card.kind === "note";
+  const isText = card.type === "text" && !isNote; // a note renders as a doorway, not editable text
+  // The doorway's face: the note's title (its `content`, else its first words) + a
+  // faint preview of the body — read-only; clicking opens the note's page.
+  const noteBody = isNote ? plainText(card.body) : "";
+  const noteTitle = isNote ? (card.content?.trim() || noteBody.slice(0, 48) || "untitled") : "";
+  const notePreview = isNote ? (card.content?.trim() ? noteBody : noteBody.slice(48)) : "";
   // Auto-widen while typing (writing-experience plan v1.1): a receipt-shaped note
   // grows WIDER first — stepwise, up to a comfortable measure — then taller as
   // today. The owner's own resize always wins (userSized, set on resize-stop).
@@ -159,11 +173,13 @@ export function Card({
         ref={innerRef}
         data-pid={card.placementId}
         className={`compose-card-inner${
-          card.type === "image"
-            ? " is-image"
-            : card.type === "drawing"
-              ? " is-doodle"
-              : ""
+          isNote
+            ? " is-note"
+            : card.type === "image"
+              ? " is-image"
+              : card.type === "drawing"
+                ? " is-doodle"
+                : ""
         }`}
         onPointerDown={(e) => {
           wasSelected.current = selected;
@@ -179,6 +195,7 @@ export function Card({
             return;
           }
           if (isText && !editing && wasSelected.current) onEdit();
+          if (isNote && wasSelected.current) onOpen?.(); // a doorway opens the note's page
         }}
       >
         {/* Owner words (§2b): a text bit's optional TITLE above its body (D-087);
@@ -231,7 +248,15 @@ export function Card({
         {card.type === "drawing" && card.drawing && (
           <DoodleBit drawing={card.drawing} />
         )}
-        {!isText && selected && !offeringWords && (
+        {/* A NOTE on a board = a page-shaped DOORWAY (N3): its title + a faint preview
+            of its words, read-only. A click (once selected) opens the note's own page. */}
+        {isNote && (
+          <div className="compose-note-doorway">
+            <div className="compose-note-title">{noteTitle}</div>
+            {notePreview && <p className="compose-note-preview">{notePreview}</p>}
+          </div>
+        )}
+        {!isText && !isNote && selected && !offeringWords && (
           <ContentLine
             value={card.content ?? ""}
             placeholder="add a few words — optional"
@@ -239,7 +264,7 @@ export function Card({
             onSave={onContentSave}
           />
         )}
-        {!isText && !selected && card.content && (
+        {!isText && !isNote && !selected && card.content && (
           <div className="compose-caption-line">{card.content}</div>
         )}
       </div>
