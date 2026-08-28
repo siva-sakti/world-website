@@ -6,7 +6,7 @@ import { listBoards } from "@/lib/db/boards";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { getBitSource } from "@/lib/db/sources";
 import { listGatheredInto } from "@/lib/db/references";
-import { BitTitle, BitTrash, KindToggle } from "./bit-controls";
+import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
@@ -62,7 +62,6 @@ export default async function BitPage({
       <header className="mb-8 flex items-baseline justify-between text-sm">
         <span className="font-semibold text-neutral-400">note</span>
         <div className="flex items-baseline gap-5">
-          {b.type === "text" && <KindToggle bitId={b.id} kind={b.kind} />}
           <BitTrash bitId={b.id} />
         </div>
       </header>

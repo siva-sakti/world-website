@@ -110,16 +110,8 @@ export async function createLooseTextBit(
   return data as Bit;
 }
 
-/** Promote a fragment to a written NOTE, or back (V2 — the door defines the kind
- * at birth; this is the owner's hand changing it later, e.g. pre-marker writings). */
-export async function setBitKind(
-  supabase: SupabaseClient,
-  bitId: string,
-  kind: "bit" | "note",
-): Promise<void> {
-  const { error } = await supabase.from("bit").update({ kind }).eq("id", bitId);
-  if (error) throw error;
-}
+// (No setBitKind: a thing never changes type — kind is fixed at birth, catch → 'bit'
+// / ✎ write → 'note' (ruled 2026-08-27). The only kind-writes are the create paths.)
 
 /** Call a loose bit onto a board — the app-layer consumer of I-L1. A loose bit has
  * no LIVE placement, but it may carry a DEPARTED one on this board (it lived here and

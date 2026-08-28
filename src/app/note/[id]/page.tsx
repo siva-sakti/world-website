@@ -10,7 +10,7 @@ import { bitLabel, boardLabel } from "@/lib/labels";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { TextWorkspace } from "@/app/bit/[id]/text-workspace";
-import { BitTitle, BitTrash, KindToggle } from "@/app/bit/[id]/bit-controls";
+import { BitTitle, BitTrash } from "@/app/bit/[id]/bit-controls";
 import { PinToggle } from "@/app/bits/note-card";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 
@@ -50,7 +50,6 @@ export default async function NotePage({
         <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} />
         <PlaceOnBoard bitId={b.id} boards={otherBoards} />
         <span className="note-actions-spacer" />
-        <KindToggle bitId={b.id} kind={b.kind} />
         <BitTrash bitId={b.id} returnTo="/notes" />
       </div>
 

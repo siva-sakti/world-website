@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateBitContent, trashBit, getBitBoards, setBitKind } from "@/lib/db/bits";
+import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
 import { confirm } from "@/components/confirm";
 
 // The note's own words above its body (plan v1.2): the same `content` field the
@@ -56,35 +56,9 @@ export function BitTitle({
   );
 }
 
-// The kind toggle (V2): a fragment can grow up into a NOTE (a written piece,
-// first-class beside boards) — and back. The door set it at birth; this is the
-// owner's hand. Quiet, reversible, one tap.
-export function KindToggle({ bitId, kind }: { bitId: string; kind: "bit" | "note" }) {
-  const [supabase] = useState(() => createClient());
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const other = kind === "note" ? "bit" : "note";
-  return (
-    <button
-      className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      disabled={busy}
-      title={kind === "note" ? "make this a plain bit again" : "make this a note — a written piece, listed beside your boards"}
-      onClick={async () => {
-        setBusy(true);
-        try {
-          await setBitKind(supabase, bitId, other);
-          router.refresh();
-        } catch (e) {
-          console.error(e);
-        } finally {
-          setBusy(false);
-        }
-      }}
-    >
-      {kind === "note" ? "note ✓" : "make a note"}
-    </button>
-  );
-}
+// (No kind toggle: a thing never changes type. A bit is always a bit, a note always
+// a note — decided at birth (catch → bit · ✎ write → note). To write a piece from
+// bits you saved, start a note and pull them in with `[[`. Ruled 2026-08-27.)
 
 // Trash, from the note's own page — the same honest multi-board confirm the board
 // uses (F16), the same one-door act. Afterwards you land in your notes (the inbox):
