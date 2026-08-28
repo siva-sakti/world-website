@@ -5,13 +5,13 @@
 ## When you start a session — do this, in order
 
 1. **Read this file.**
-2. **Read `ROADMAP.md`** — the canonical phase sequence + steps: **this is what to build next, in what order.** Then **`PROGRESS.md`** — the Status block (where we are *right now*), the decisions log (D-xxx), and **"Needs owner"** for anything blocked on the human.
-3. **Read `agreements.md`** — **the ruled model, the seed of truth.** It outranks every other doc where they conflict; nothing predating it is followed without checking it against the agreements first.
+2. **Read `organize-phase-plan.md`** — **THE live plan + feature queue: what to build next, in what order.** Then **`PROGRESS.md`** — the decisions log (D-xxx), where we are now, and **"Needs owner."** (`ROADMAP.md` is the older product-phase sketch — background, superseded as the live sequence.)
+3. **Read `model.md`** — **⭐ THE current conceptual model, the authority for what's true now** (the three kinds bit·note·board · the hard lines · how they join · what's built). Check every decision against it. Its words are governed by **`lexicon.md`**; its rulings are receipted in **`PROGRESS.md`** (D-xxx). **`agreements.md` is the *historical* D-019→D-102 record — it predates the notes era and does NOT describe the current model; do not build from it.**
 4. **Scope the next step** — `SPEC.md` (the **rebuilt** technical manual — the schema, RLS, media, ops, capture, the invariant→enforcement map; D-085) for the technical *what*; `philosophy.md` for the why. The proven schema is `supabase/migrations/20260721000001_init.sql`; its proofs are `verification/`.
 5. **Write a specific plan for the step into `PROGRESS.md`.** If it's 3+ steps or touches any open question, **pause and confirm the plan with the owner before building.**
 6. **Build** in small pieces.
 7. **Verify** each piece — `pnpm build` + typecheck + run what you can. The owner tests what only their devices can (phone / offline / Shortcut / Daylight).
-8. **Record** — each in its ONE place, all **in the same session**: the ruling into `agreements.md` · the full reasoning (options, rejections, catches, lessons) into `deliberations.md` · new always-true rules into `invariants.md` · deferrals into `parked.md` · and a **short** D-log entry (the ruling + supersessions + pointers — a receipt, not an essay; the substance lives in deliberations, never duplicated into the log). "Needs owner" updated.
+8. **Record** — each in its ONE place, all **in the same session**: the ruling folded into `model.md` (the current model) · the full reasoning (options, rejections, catches, lessons) into `deliberations.md` · new always-true rules into `invariants.md` · deferrals into `parked.md` · and a **short** D-log entry (the ruling + supersessions + pointers — a receipt, not an essay; the substance lives in deliberations, never duplicated into the log). "Needs owner" updated.
 9. **Sync** — **docs must never drift.** Anything superseded goes to `old/` (never edited again); an external review once caught us drifting, and it doesn't happen twice.
 
 ## Where to find what
@@ -20,7 +20,9 @@
 |---|---|
 | **`CLAUDE.md`** (this) | Operating manual + hub; the routine above |
 | **`philosophy.md`** | The *why* / the goal — check decisions serve it. In the owner's voice; rewritten to the live model (D-069; publish-preview line + "link" verbs swept, D-077) |
-| **`agreements.md`** | ⭐ **THE ruled model — the seed of truth.** Everything settled in the owner–Claude working sessions (principles · the bit · tags · the pull · boards · connectors · deferred document mode), latest ruling wins; **outranks every other doc until they're rebuilt from it**. Conceptual model CLOSED (D-070) **+ audit-merged 14/14 (D-072–D-076)** |
+| **`model.md`** | ⭐ **THE current conceptual model — the authority for what's true now.** The whole shape in one read: the three kinds (**bit · note · board**), the hard lines (a thing never changes type — D-121), how they join, what's built. Fact-checked against the schema. **Build from this** (words → `lexicon.md`; rulings → `PROGRESS.md` D-log). |
+| **`user-flows.md`** | Every user path arc-by-arc (catch → arrange & write → connect → return → develop), each grounded in its technical mechanism + built/not-built status. The current flows. |
+| **`agreements.md`** | 📜 **HISTORICAL — the D-019→D-102 era rulings** (principles · the bit · tags · the pull · boards · connectors · deferred document mode). Conceptual model CLOSED D-070. **Predates the notes era (D-118–D-121); it does NOT describe the current model — do not build from it.** The current model is **`model.md`**. Kept as the record of how the early model was reasoned. |
 | **`lexicon.md`** | **The precise words** — the nine stored things (things · acts · vocabulary) vs the computed surfaces, parts of a bit, the acts, and RETIRED words that cause drift. Check terminology here before using a term two ways |
 | **`invariants.md`** | **The always-true rules** — the model's invariants, grown as each cluster of the audit-merge closes; at translation they become the DB constraints + SPEC §2.1. The checklist every data-touching feature is run against |
 | **`parked.md`** | **The parked ledger** — every deferral and open item in one place, each with its named re-entry + source. An *index, never a source*: rulings live at the cited sections. Update in the same pass as any new deferral or re-entry |
@@ -38,7 +40,7 @@
 | **`connections-review-and-resumption-notes.md`** | ⏸ **The complete review + resumption package for the parked connections feature** (D-098): vision, findings, the five revision asks, open questions, owner rulings (graph = read-only), and the locked resumption procedure. The pick-up point |
 | **`verification/`** | **The proof record + regression suite (D-085):** the migration's attack suite, the FOR SHARE race probe, the seven-scene replay, the old-schema diff. Re-run after any schema change — the model's regression test from now on |
 | **`PROGRESS.md`** | Decisions log (D-xxx) · needs-owner · work done |
-| **`ROADMAP.md`** | **The product phase sequence — REBUILT in the ruled language (D-085):** port → knowledge layer → graph → richer boards → capture → feed → sharing; parked items reconciled to phases |
+| **`ROADMAP.md`** | 📜 **Older product-phase sketch (D-085), frozen pre-notes:** port → knowledge layer → graph → richer boards → capture → feed → sharing. **Superseded as the live plan by `organize-phase-plan.md` (Phases O/V/N)** — background, not the build queue. |
 | **`research-knowledge-layer.md`** · **`research-canvas.md`** | Cited research — findings don't expire with plans (the connector's binding model came from here); reference at build time |
 | **`old/`** | Everything superseded — kept as history, never edited, never followed. **Includes the completed audit docs** (`audit-agreements.md` · `agreements-review-brief.md` — the cold audit + merge ledger, job done) |
 
@@ -46,7 +48,7 @@
 
 ## What this is (one line)
 
-A spatial notebook for one writer: catch what you consume and think as **bits**, return to them, and grow them by arranging them on **boards**. Built **canvas-first** (D-067). The *bit* is the atom (it needs no board, no title, no tag). Full why → `philosophy.md`; the ruled model → `agreements.md`.
+A spatial notebook for one writer: catch what you consume and think as **bits**, return to them, and grow them by arranging them on **boards**. Built **canvas-first** (D-067). The *bit* is the atom (it needs no board, no title, no tag). Full why → `philosophy.md`; the current model → `model.md`.
 
 ## Stack
 

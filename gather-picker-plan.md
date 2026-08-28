@@ -1,6 +1,6 @@
 # Gather picker — the smart organized dropdown (build plan)
 
-**Status: ✅ BUILT + DEPLOYED — all three stages + the chip peek + screen-edge-aware popups (D-110, 2026-08-01); owner feel-tested "really good".**
+**Status: 📜 ✅ BUILT + DEPLOYED — all three stages + the chip peek + screen-edge-aware popups (D-110, 2026-08-01); owner feel-tested "really good". HISTORICAL — do not build from; the current model is `model.md`.**
 
 **What this is:** the plan for the `[[` gather picker, redesigned as a **smart, organized dropdown**. Refines the flat text-only picker shipped in gather **G2** (live on production now) and pulls the *visual chip* forward from G3, because they're one experience. Owner design session + cold review + choices locked, 2026-08-01. **No schema change** (it only reads a few more columns already on `bit`).
 

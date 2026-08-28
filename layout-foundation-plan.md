@@ -1,6 +1,6 @@
 # Layout foundation — fit to any screen (plan)
 
-**What this is:** the plan to fix the *base layout logic* so the app is dynamic to any screen size, resize, and zoom — desktop, the Daylight tablet, and phone. It fixes **structure, not style**: the owner is redesigning the look of the elements, so this lays a solid foundation to restyle on top of, and deliberately leaves visual design alone. Owner + Claude, 2026-08-03.
+**What this is:** the plan to fix the *base layout logic* so the app is dynamic to any screen size, resize, and zoom — desktop, the Daylight tablet, and phone. It fixes **structure, not style**: the owner is redesigning the look of the elements, so this lays a solid foundation to restyle on top of, and deliberately leaves visual design alone. Owner + Claude, 2026-08-03. **📜 HISTORICAL — the responsive-foundation work here shipped; do not build from this; the current model is `model.md`.**
 
 **Why now:** a full diagnosis found the app has **no responsive layer at all** (zero `@media` queries, zero breakpoints) and two canvas surfaces sized by a hardcoded magic number — which is why the board's bottom "remove/trash/tag" bar gets cut off. Better base logic is worth setting now, while the visual redesign is still being ideated.
 

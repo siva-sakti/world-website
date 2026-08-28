@@ -1,6 +1,6 @@
 # The model — the whole picture, top to bottom
 
-**What this is:** the current, complete conceptual model — atoms, surfaces, how they join, everything cross-cutting. Written 2026-08-26, **fact-checked against the real schema** (the tables named below exist). Complements the others: `philosophy.md` = *why*, `agreements.md` = *historical rulings*, `lexicon.md` = *exact words*, `invariants.md` = *always-true rules*. This is the *whole current shape* in one read. Where the note-as-surface change isn't built yet, it's marked **[ideal / not yet]**.
+**What this is:** ⭐ **THE current conceptual model — the authority for what's true now** (CLAUDE.md hub; supersedes `agreements.md`, which is the *historical* pre-notes record). The whole shape in one read — atoms, surfaces, how they join, everything cross-cutting. Written 2026-08-26, kept current through D-121, **fact-checked against the real schema**. Complements: `philosophy.md` = *why* · `lexicon.md` = *exact words* (naming authority) · `invariants.md` = *always-true rules* · `PROGRESS.md` D-log = *the rulings* (D-118–D-121) · `agreements.md` = *historical D-019→D-102 record, do not build from*.
 
 ---
 

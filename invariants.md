@@ -1,6 +1,6 @@
 # Invariants — the always-true rules
 
-**What this is:** the model's **invariants** — rules that must hold *no matter what the owner does*. "Smooth cascading" = every operation preserves every invariant. This doc **grows as each cluster of the model closes**; at the **translation step** each rule becomes a real safeguard — a database constraint (`UNIQUE`/foreign key/`CHECK`), a computed read rule, or a single db-module function. It is the checklist every feature is run against. Companion to `agreements.md` (the ruled model) and `lexicon.md` (the words). Written 2026-07-20.
+**What this is:** the model's **invariants** — rules that must hold *no matter what the owner does*. "Smooth cascading" = every operation preserves every invariant. This doc **grows as each cluster of the model closes**; at the **translation step** each rule becomes a real safeguard — a database constraint (`UNIQUE`/foreign key/`CHECK`), a computed read rule, or a single db-module function. It is the checklist every feature is run against. Companion to `model.md` (the current model) and `lexicon.md` (the words). Written 2026-07-20; grown through D-121.
 
 **How to read the "kept by" tag:** `constraint` = the database refuses to write an illegal row · `computed` = derived at read, so it can't drift · `app` = enforced in one db-module function (the single chokepoint). Prefer pushing a rule as far *left* as it will go (constraint > computed > app).
 
@@ -12,6 +12,7 @@
 
 - **I-G1 — Export completeness.** Every one of the stored record kinds appears in the storage map *and* in the export. *(This is the invariant that would have caught the missing `category` — finding #4.)* The sweep surface includes **§7's payoff ledger** — twice a ledger row went stale silently (D-074, D-076). → `app` + a test.
 - **I-G2 — One fact, one record.** Every fact is stored exactly once; computed surfaces (the pull, find, a bit's page, the graph, the publish preview) are never stored. → design + `computed`.
+- **I-K1 — A thing never changes type (D-121).** `bit.kind` ('bit'|'note') is set **at birth** (catch/jot → 'bit' · ✎ write → 'note') and is **never updated** — there is no bit↔note conversion. The only writes to `kind` are the create-path inserts; no `setBitKind`/update-kind path exists. → `app` (single chokepoint: kind is insert-only) — could harden to a `CHECK`/trigger later. `LOCKED`.
 - **I-G3 — One clock.** Every ordering anywhere derives from birth/last-touch stamps; no second clocks. → `computed`.
 - **I-G4 — Only acts apply meaning.** The system may *propose* (mechanical sources only — §3d); only an owner act ever writes a tag application or a subtype. No auto-applied meaning, ever (principle 1). → `app` + review.
 

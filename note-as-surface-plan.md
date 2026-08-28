@@ -1,6 +1,6 @@
 # A note is a surface, not a bit — the re-surfacing plan
 
-**What this is:** the plan to fix the model error the owner caught (2026-08-26): a **note** is a *surface* (a peer of a board), not a *bit* (an atom). Today it's surfaced as a bit. This is a **re-surfacing, not a re-architecture** — the data already supports it. Written to the owner's ask for "current state / ideal state / how you get there." Not built — for review.
+**What this is:** the plan to fix the model error the owner caught (2026-08-26): a **note** is a *surface* (a peer of a board), not a *bit* (an atom). Today it's surfaced as a bit. This is a **re-surfacing, not a re-architecture** — the data already supports it. Written to the owner's ask for "current state / ideal state / how you get there." **📜 ✅ BUILT as N1 (and N3 for note-on-board); the framing "a note is a surface" was later sharpened by D-121 (three kinds, hard lines). HISTORICAL — the current model is `model.md`.**
 
 ---
 
