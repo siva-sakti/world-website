@@ -165,3 +165,187 @@ Under the face, the quiet meta line: **`from 〈source〉`** · **`on N boards`*
 7. Boards **don't** appear in the note page's drawer (that's N6) — but they still do in **find**.
 8. Open a board → the drawer works **exactly as before**: place a bit, the where-dropdown, the tabs, thumbnails.
 9. On the phone: the drawer **overlays** the writing rather than squeezing it.
+
+---
+
+# Part II · The engineering plan — exact files, exact signatures
+
+Written against the code as it is. Every signature below is checked against the shapes it has to accept (`PanelBit` = `Bit & {source, tags, boards}`; `FindItem` = `{kind,id,label,mediaType?,tags,created_at,searchText}`; `BitHit` = `{id,face,type,thumbPath,storagePath,strokes}`).
+
+## 11 · The file list
+
+**New (4):**
+
+| file | what it is |
+|---|---|
+| `src/lib/search.ts` | the one matcher + the one haystack builder |
+| `src/components/thing-row.tsx` | the one label ladder + the row's shared inner markup |
+| `src/components/drawer.tsx` | the drawer shell — board and note page both mount it |
+| `src/app/note/[id]/note-workspace.tsx` | the note page's client wrapper: editor handle + drawer |
+
+**Changed (7):**
+
+| file | change |
+|---|---|
+| `src/app/board/[id]/loose-column.tsx` | becomes a thin board call-site of `<Drawer>` |
+| `src/app/find/find-live.tsx` | uses `matches()` + the shared row body |
+| `src/app/board/[id]/gather-picker.tsx` | uses `matches()` (today: `face` substring only) |
+| `src/app/board/[id]/text-bit.tsx` | **additive** optional `onReady` handing up `gather()` |
+| `src/app/bit/[id]/text-workspace.tsx` | **additive** optional `onReady` + `onSaved` pass-through |
+| `src/app/note/[id]/page.tsx` | renders `<NoteWorkspace>` instead of `<TextWorkspace>` directly |
+| `src/app/globals.css` | the `is-fixed` drawer variant |
+
+**No schema. No new dependency.**
+
+## 12 · `src/lib/search.ts` — the one matcher
+
+```ts
+/** THE definition of a search match, everywhere in the app: case-insensitive
+ *  SUBSTRING — `budd` finds "buddhism" (the owner's ruling, 2026-08-28). Not
+ *  word-stem: partial typing is how you search your own notes. An empty query
+ *  matches everything (the ledger). */
+export function matches(text: string, query: string): boolean;
+
+/** Strip tags from rich-text HTML so a body is searchable as words. */
+export function stripHtml(html: string | null | undefined): string;
+
+/** What a thing offers up to be searched. Every surface builds one of these —
+ *  the shapes differ (PanelBit · FindItem · BitHit), the fields don't. */
+export type Searchable = {
+  face?: string | null;
+  content?: string | null;   // a text bit's title
+  body?: string | null;      // rich-text HTML; stripped here
+  fileName?: string | null;
+  sourceName?: string | null;
+  tagWords?: string[];
+};
+
+/** The two tiers, as ONE function with a dial (§7 "the knob"):
+ *  "near" = face + content + fileName + source + tags — the drawer's quick narrowing
+ *  "deep" = all of that + the stripped body — find's full-text reach */
+export function haystack(s: Searchable, reach: "near" | "deep"): string;
+```
+
+Changing a tier later is now **one argument**, not four hand-written filters.
+
+## 13 · `src/components/thing-row.tsx` — the label ladder + the row body
+
+```ts
+/** THE fallback ladder for a thing with no words — replaces the two that
+ *  currently disagree (`faceOf` in the drawer, `bitLabel` in find). */
+export function thingLabel(t: {
+  kind?: "bit" | "note";
+  type?: BitType;
+  face?: string | null;
+  content?: string | null;
+  file_name?: string | null;
+}): string;
+
+/** What a row shows. Every field optional past the label — the row renders what
+ *  it is given, so find can keep NOT fetching sources/boards/thumbs (it holds up
+ *  to 2000 items; fattening it to match the drawer would cost real time). */
+export type RowThing = {
+  id: string;
+  label: string;
+  thumbUrl?: string;
+  sourceName?: string;
+  boardCount?: number;
+  hereLabel?: string;   // "on this board" / "on this + 2 more"
+  badge?: string;       // "note" · "board" · "doodle" — find shows it, the drawer doesn't
+  tags?: { id: string; word: string }[];
+};
+
+/** The row's INNER markup only — face-or-thumbnail, "from 〈source〉", "on N
+ *  boards", the badge. NOT the wrapper: the drawer wraps it in a <button> (it
+ *  acts), find wraps it in a <Link> (it navigates). Forcing one wrapper would
+ *  contort one of them; the inner shape is what actually repeats. */
+export function ThingRowBody({ thing }: { thing: RowThing }): JSX.Element;
+```
+
+**Why the body and not the whole row:** the drawer's row is a `<button>` that *does* something; find's is a `<Link>` that *goes* somewhere. That difference is real, not incidental. Sharing the inside gives one look; sharing the outside would fight both.
+
+## 14 · `src/components/drawer.tsx` — the shell
+
+```ts
+export function Drawer({
+  variant,   // "board" | "note" — the two homes; see below
+  exclude,   // (b: PanelBit) => boolean — the note page excludes ITSELF (§6.1)
+  mark,      // (b: PanelBit) => string | null — the row's status word:
+             //   board → "on this board"; note → "gathered"; null → none
+  onPick,    // (b: PanelBit) => void | Promise<void> — place · gather
+  refreshSignal?: number, // board only: the canvas says the set changed
+}): JSX.Element;
+```
+
+**Four props, and `variant` rather than five booleans.** There are exactly *two* homes for this shell, and the differences between them are correlated, not independent:
+
+| | board | note |
+|---|---|---|
+| position | `absolute` (a positioned canvas ancestor) | **`fixed`** (the note page's `<main>` isn't positioned — §6.10) |
+| wheel events | stopped (or the canvas zooms under you) | not stopped |
+| the "where" dropdown | shown (unplaced · this board · other · anywhere) | hidden — you're not placing |
+| kind tabs · search · type/tag/source · thumbnails · loading · error · empty · no-match | identical | identical |
+
+Inventing independent props for correlated facts would be the abstraction arriving before its second real case. Two homes, one `variant`.
+
+**Everything else moves in unchanged** from `loose-column.tsx`: `listAllBits` load-on-first-open, `loadId` race guard, lazy thumbnail signing for shown rows only, the tag/source option lists derived from the loaded set, all four message states, the `loose-tab` pill.
+
+## 15 · The gather handle — `text-bit.tsx`, additive
+
+```ts
+// TextBit gains ONE optional prop. Board cards pass nothing → untouched.
+onReady?: (api: { gather: (hit: BitHit) => void }) => void;
+```
+
+`gather` is a **second insert path**, deliberately not `insertRef` (§6.7 — that one replaces the typed `[[query` range and needs an open picker):
+
+```ts
+// Insert at the CURRENT selection, replacing nothing.
+editor.chain().focus()
+  .insertContent({ type: "bitRef", attrs: { refId: hit.id, label } })
+  .insertContent(" ")   // land the cursor after the chip, same as `[[`
+  .run();
+```
+
+`label` uses the **same** cache rule as `insertRef` (`hit.face || "drawing" | "image" | "untitled"`) — extract that one-liner so the two callers can't drift.
+
+## 16 · `note-workspace.tsx` — the note page's client wrapper
+
+```
+NoteWorkspace (client, new)
+├── holds  gatherRef: (hit) => void          ← from TextWorkspace's onReady
+├── holds  gatheredIds: Set<string>          ← extractRefIds(body), the existing helper
+├── <TextWorkspace onReady onSaved />        ← two additive optional props
+└── <Drawer variant="note"
+           exclude={b => b.id === noteId}
+           mark={b => gatheredIds.has(b.id) ? "gathered" : null}
+           onPick={b => { gatherRef.current?.(b); setGathered(add b.id) }} />
+```
+
+**How "gathered" stays true without costing a keystroke:** `gatheredIds` refreshes on the body's **save** (the existing 350ms debounced `flush`, via a new optional `onSaved`) — not on every keypress — plus an optimistic add the instant you click a row. So the mark is right immediately and stays right, and the drawer doesn't re-filter while you type.
+
+**The caret** (§6.6): the drawer's row does `onMouseDown={e => e.preventDefault()}` — the exact trick the rich-text `Toolbar` already uses — so the editor never blurs and keeps its selection. `TextBit` focuses `"end"` on mount, so a caret always exists.
+
+## 17 · CSS — the one new rule
+
+```css
+.loose-col.is-fixed,  .loose-tab.is-fixed { position: fixed; }
+.loose-col.is-fixed { top: 0; right: 0; height: 100dvh;
+                      padding-bottom: env(safe-area-inset-bottom); }
+```
+On a phone the drawer must **overlay** the writing, not squeeze it (`max-width: 70%` already leans that way — confirm at build).
+
+## 18 · The step-by-step, each verified before the next
+
+| # | do | verify |
+|---|---|---|
+| 1 | `lib/search.ts`; point the drawer, find, **and the `[[` picker** at it | build green; the picker now matches past the first line — nothing else looks different |
+| 2 | `thing-row.tsx`; drawer + find render `ThingRowBody`; delete `faceOf`/reconcile `bitLabel` | board rows and find rows **pixel-unchanged** |
+| 3 | `components/drawer.tsx`; `loose-column.tsx` becomes the board call-site | **the board trace:** open · close · bits/notes/all · where-dropdown · type/tag/source · search · place a bit · `is-here` · thumbnails · `refreshSignal` · wheel doesn't zoom |
+| 4 | `onReady`/`gather` on `TextBit`; `onReady`/`onSaved` on `TextWorkspace` | board cards + `[[` unchanged; typecheck green |
+| 5 | `note-workspace.tsx` + the note page renders it + the `is-fixed` CSS | the §10 feel-test list |
+| 6 | `pnpm typecheck` · `pnpm lint` · `pnpm build` | all green, then deploy for the owner's feel-test |
+
+**Rollback shape:** steps 1–2 are pure extractions (no behavior); step 3 is the only one that touches working board code, and it is a straight move of `loose-column.tsx`'s body — if the board trace fails, revert that one commit and the note page still has nothing to lose.
+
+**The file ceiling (~150):** `loose-column.tsx` is ~300 today. After the split: `drawer.tsx` carries the shell (the bulk), `thing-row.tsx` the row, `search.ts` the matching, and `loose-column.tsx` shrinks to a small board-specific call-site. Any remaining overage gets named honestly, not hidden.
