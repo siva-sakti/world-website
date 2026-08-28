@@ -84,7 +84,7 @@ Closed by the `×` in `loose-col-head`, both homes. State is per-mount (not reme
 
 Under the face, the quiet meta line: **`from 〈source〉`** · **`on N boards`**. Tags as chips.
 
-**A real drift to fix while here:** the drawer's `faceOf()` and find's `bitLabel()` are two different fallback ladders for the same job. They must become **one**.
+**A claim this plan made and the code refuted (checked 2026-08-28):** "`faceOf` and `bitLabel` are two ladders for one job, unify them." **False — do not do it.** `lib/labels.ts` already IS the shared home for prose fallbacks, and `bitLabel` has **7 call sites** (desk · note page · bit page · source page · graph · find · labels). It returns grammatical prose — "a note", "an image" — for a heading or a link. The drawer's `faceOf` returns a *compact* face where an image shows its `file_name` and a faceless note shows "…". **Two different jobs that merely look alike**, and `faceOf` is used exactly once. Unifying them would silently change the desk and the graph. So: `ThingRowBody` takes a **computed `label: string`** — the drawer passes `faceOf(it)`, find passes its already-`bitLabel`'d `item.label`. Nothing merges, blast radius zero.
 
 ## 5 · The states
 
@@ -114,7 +114,7 @@ Under the face, the quiet meta line: **`from 〈source〉`** · **`on N boards`*
 7. **A second insert path, not a reuse of the first.** `insertRef` replaces the typed `[[query` range (`{from: picker.from, to}`) and **requires an open picker**. Drawer-gather has no picker and replaces nothing — it inserts at the current selection. So: same `bitRef` node, same label-cache rule, **two callers**. Do not try to force one function.
 8. **Reconcile timing.** Chip lands → `onChange` → 350ms debounce → `updateBitBody` then `reconcileReferences`. Leaving the page flushes on unmount (`TextWorkspace`). Covered.
 9. **The board's wheel-stop is board-only.** The drawer stops `wheel` so the canvas doesn't zoom under it. Harmless but meaningless on the note page — keep it at the board call site, out of the shared shell.
-10. **⚠ Layout — the one real unknown.** `.loose-col` and `.loose-tab` are `position: absolute`. On the board they resolve against the positioned viewport. The note page's `<main class="mx-auto max-w-2xl">` is **not positioned**, so absolute would resolve against the initial containing block and **scroll away with the writing**. The note page needs a **fixed** variant: right edge, full height (`100dvh`), safe-area aware (the app sets `viewport-fit=cover`).
+10. **Layout — checked 2026-08-28, the failure is real; the mechanism I first named was wrong.** `.loose-col`/`.loose-tab` are `position: absolute`. On the board they resolve against `.compose-stage { position: relative; overflow: hidden }` — correct, which is why the drawer works today. On `/note` the rail is tucked, so `AppShell` renders `.shell-collapsed { position: relative }` — **that** catches the absolute, not the initial containing block as first written. It has no fixed height, so `top:0; height:100%` would pin the drawer to the top of the whole document at the height of the entire writing: it **scrolls away as you write down the page**. Same failure, precise cause. The **fixed** variant is the fix, and it is **verified safe**: a `transform`/`filter`/`will-change` ancestor would trap `position: fixed`, and a sweep of the `/note` path found **none**.
 11. **Mobile.** `.loose-col` is `260px / max-width 70%`. On a phone it must **overlay** the writing, not squeeze it. Check at build.
 12. **The rail.** Left, tucked on `/note/`. The drawer is right. No collision.
 
@@ -125,7 +125,7 @@ Under the face, the quiet meta line: **`from 〈source〉`** · **`on N boards`*
 **Extract:**
 
 1. **`lib/search.ts`** — one `matches(text, q)`: lowercase, trim, substring. **The single definition of partial-word matching.** Called by the drawer, by find, and by the **`[[` picker** — which today matches `face` **only**, so it gets a free upgrade.
-2. **One label/fallback function** — `faceOf` and `bitLabel` reconciled into one ladder (§4).
+2. ~~One label/fallback function~~ — **struck after checking (§4).** `lib/labels.ts` already holds the shared prose ladder; `faceOf` is a different job used once. The row takes a computed `label` string instead.
 3. **One row view-model** both sides map into:
    `{ id, kind, label, mediaType?, thumbUrl?, strokes?, source?, boards?, tags }`
    The row **renders what's present**. This matters: find holds up to 2000 items and deliberately does *not* fetch sources, boards, or thumbnails. Passing fewer fields keeps find cheap — the row degrades gracefully instead of forcing find to fatten.
@@ -179,7 +179,7 @@ Written against the code as it is. Every signature below is checked against the 
 | file | what it is |
 |---|---|
 | `src/lib/search.ts` | the one matcher + the one haystack builder |
-| `src/components/thing-row.tsx` | the one label ladder + the row's shared inner markup |
+| `src/components/thing-row.tsx` | the row's shared inner markup (label passed in, not computed — §4) |
 | `src/components/drawer.tsx` | the drawer shell — board and note page both mount it |
 | `src/app/note/[id]/note-workspace.tsx` | the note page's client wrapper: editor handle + drawer |
 
@@ -230,17 +230,9 @@ Changing a tier later is now **one argument**, not four hand-written filters.
 
 ## 13 · `src/components/thing-row.tsx` — the label ladder + the row body
 
-```ts
-/** THE fallback ladder for a thing with no words — replaces the two that
- *  currently disagree (`faceOf` in the drawer, `bitLabel` in find). */
-export function thingLabel(t: {
-  kind?: "bit" | "note";
-  type?: BitType;
-  face?: string | null;
-  content?: string | null;
-  file_name?: string | null;
-}): string;
+*(`thingLabel` was in the first draft of this file and is **struck** — see §4: `lib/labels.ts` already owns the shared prose ladder and the drawer's `faceOf` is a different job with one call site. The row receives a label, it doesn't compute one.)*
 
+```ts
 /** What a row shows. Every field optional past the label — the row renders what
  *  it is given, so find can keep NOT fetching sources/boards/thumbs (it holds up
  *  to 2000 items; fattening it to match the drawer would cost real time). */
@@ -340,7 +332,7 @@ On a phone the drawer must **overlay** the writing, not squeeze it (`max-width: 
 | # | do | verify |
 |---|---|---|
 | 1 | `lib/search.ts`; point the drawer, find, **and the `[[` picker** at it | build green; the picker now matches past the first line — nothing else looks different |
-| 2 | `thing-row.tsx`; drawer + find render `ThingRowBody`; delete `faceOf`/reconcile `bitLabel` | board rows and find rows **pixel-unchanged** |
+| 2 | `thing-row.tsx`; drawer + find render `ThingRowBody`, each passing its own computed `label` (§4 — no ladder merge) | board rows and find rows **pixel-unchanged** |
 | 3 | `components/drawer.tsx`; `loose-column.tsx` becomes the board call-site | **the board trace:** open · close · bits/notes/all · where-dropdown · type/tag/source · search · place a bit · `is-here` · thumbnails · `refreshSignal` · wheel doesn't zoom |
 | 4 | `onReady`/`gather` on `TextBit`; `onReady`/`onSaved` on `TextWorkspace` | board cards + `[[` unchanged; typecheck green |
 | 5 | `note-workspace.tsx` + the note page renders it + the `is-fixed` CSS | the §10 feel-test list |
@@ -349,3 +341,21 @@ On a phone the drawer must **overlay** the writing, not squeeze it (`max-width: 
 **Rollback shape:** steps 1–2 are pure extractions (no behavior); step 3 is the only one that touches working board code, and it is a straight move of `loose-column.tsx`'s body — if the board trace fails, revert that one commit and the note page still has nothing to lose.
 
 **The file ceiling (~150):** `loose-column.tsx` is ~300 today. After the split: `drawer.tsx` carries the shell (the bulk), `thing-row.tsx` the row, `search.ts` the matching, and `loose-column.tsx` shrinks to a small board-specific call-site. Any remaining overage gets named honestly, not hidden.
+
+---
+
+## 19 · The plan checked against the code (2026-08-28)
+
+Every load-bearing claim run down before building. Three changed the plan.
+
+| # | claim | verdict |
+|---|---|---|
+| 1 | Inserting the chip without an open picker works | ✅ **holds.** `BitRef` is an inline atom with `refId`+`label` attrs, and `insertRef` already inserts exactly `{type:"bitRef", attrs:{refId,label}}` via `insertContentAt`. The picker-free call is the same payload minus the range. |
+| 2 | The drawer breaks on the note page | ✅ **real — cause corrected.** Board: resolves against `.compose-stage{position:relative}` (why it works today). Note: `.shell-collapsed{position:relative}` catches it — not the initial containing block as first written. Unbounded height ⇒ the drawer scrolls away as the writing grows. |
+| 3 | `position: fixed` is a safe fix | ✅ **verified.** A `transform`/`filter`/`will-change` ancestor would trap a fixed element; a sweep of the `/note` path found none. |
+| 4 | "`faceOf` and `bitLabel` are one job, unify them" | ❌ **WRONG — struck.** `lib/labels.ts` already owns the shared prose ladder (7 call sites incl. desk + graph); `faceOf` is a compact drawer face with one call site. Merging would silently change unrelated pages. The row takes a label instead. |
+| 5 | A note can gather (`type='text'`) | ✅ born via `createLooseTextBit(…, kind:'note')`. |
+| 6 | Find can render the shared row body without new queries | ✅ every field past `label` is optional; find keeps not fetching sources/boards/thumbs. |
+| 7 | `TextBit`'s new prop is additive | ✅ optional; board cards pass nothing. |
+
+**Net:** one piece of the plan deleted, one cause corrected, the rest stands. No step's shape changed.
