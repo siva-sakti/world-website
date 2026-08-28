@@ -33,7 +33,7 @@ export async function findBits(
     .select("*")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(1000); // load-most: find filters client-side (instant); ~1000+ = server-search trigger
   if (args.type) query = query.eq("type", args.type);
   if (args.kind) query = query.eq("kind", args.kind); // bit vs note (N4)
   if (args.q && args.q.trim())
@@ -112,7 +112,7 @@ export async function findBoards(
     .select("id, title, created_at")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(1000);
   if (args.q && args.q.trim())
     query = query.textSearch("search_tsv", args.q.trim(), { type: "websearch" });
   if (onlyIds) query = query.in("id", onlyIds);
@@ -147,6 +147,7 @@ export type FindItem = {
   mediaType?: BitType; // bits only — text/drawing/image
   tags: { id: string; word: string }[];
   created_at: string;
+  searchText: string; // lowercased words to match on client-side (bit: content+body+face · board: title)
 };
 
 /** Find across all three kinds (N4). Bits (fragments and notes, by their words),
@@ -171,6 +172,7 @@ export async function findItems(
         mediaType: b.type,
         tags: b.tags,
         created_at: b.created_at,
+        searchText: `${b.content ?? ""} ${(b.body ?? "").replace(/<[^>]+>/g, " ")} ${b.face ?? ""}`.toLowerCase(),
       });
     }
   }
@@ -184,10 +186,11 @@ export async function findItems(
         label: boardLabel(bd.title),
         tags: bd.tags,
         created_at: bd.created_at,
+        searchText: (bd.title ?? "").toLowerCase(),
       });
     }
   }
 
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));
-  return items.slice(0, 200);
+  return items.slice(0, 2000);
 }
