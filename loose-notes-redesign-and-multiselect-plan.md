@@ -78,7 +78,7 @@ The on-board side panel becomes a **searchable browser of every note**, loose-fi
 
 ### Code structure & files
 - **New:** a shared `lib/db` bits-list module (`listAllBits` + filter helpers) that both the panel and `/inbox` call (F19).
-- **Grown:** `board/[id]/loose-column.tsx` → the all-bits panel (filter row, search, "on N boards", lazy thumbs).
+- **Grown:** `board/[id]/loose-column.tsx` → the all-bits panel (filter row, search, "on N boards", lazy thumbs). *(That file is now `src/components/drawer.tsx` — moved at N4b, when the note page gained the same drawer.)*
 - **Touched lightly:** `board-surface.tsx` (bring-in exists; the trash-confirm line), `inbox/page.tsx` (point at the shared module), `globals.css`.
 - **Unchanged:** `callInBit`, `unplaceBit`, the schema.
 

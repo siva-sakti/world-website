@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 // THE SAVE GUARD — one place that makes sure a debounced write isn't lost to a
 // timer you never saw.
 //
@@ -50,11 +48,4 @@ export function registerSave(flush: () => void): () => void {
   listen();
   pending.add(flush);
   return () => pending.delete(flush);
-}
-
-/** Hook form: keeps `flush` registered for as long as the component lives.
- *  Pass a ref-backed / stable function, or accept that re-registering per render
- *  is cheap (it is — a Set add + delete). */
-export function useSaveGuard(flush: () => void): void {
-  useEffect(() => registerSave(flush), [flush]);
 }
