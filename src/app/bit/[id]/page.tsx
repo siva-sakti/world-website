@@ -165,13 +165,18 @@ export default async function BitPage({
         )}
       </section>
 
-      {/* Travel */}
+      {/* Where it's been — the bit's board history (arrived/left), boards clickable. */}
       <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">travel</h2>
+        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">where it&rsquo;s been</h2>
         <ul className="space-y-1 text-sm text-neutral-600">
           {travel.map((t, i) => (
             <li key={i}>
-              <span className="text-neutral-800">{boardLabel(t.board_title)}</span>
+              <Link
+                href={`/board/${t.board_id}`}
+                className="text-neutral-800 underline underline-offset-4 hover:no-underline"
+              >
+                {boardLabel(t.board_title)}
+              </Link>
               {" · arrived "}
               {fmt(t.arrived_at)}
               {t.left_at ? ` · left ${fmt(t.left_at)}` : " · here now"}
