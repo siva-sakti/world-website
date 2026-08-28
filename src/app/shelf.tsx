@@ -13,14 +13,24 @@ import {
   moveGroup,
   pinBoard,
   pinGroup,
+  deleteGroup,
 } from "@/lib/db/shelf";
 import { FolderPicker } from "@/components/folder-picker";
 import { trashBoardAction } from "./actions";
+import { confirm } from "@/components/confirm";
 
 // The shelf (O1): pinned boards float in a ★ section; groups in the owner's own
 // order (↑/↓); ungrouped below. Grouping is a quiet per-row picker — groups
 // exist because boards name them (the owner's ruling; no manage screen).
-export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGroup[] }) {
+export function Shelf({
+  boards,
+  groups,
+  bitCounts = {},
+}: {
+  boards: HomeBoard[];
+  groups: ShelfGroup[];
+  bitCounts?: Record<string, number>; // notes per folder — folders cut across kinds
+}) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -36,6 +46,23 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Remove a folder. Its contents are NOT trashed — boards and notes simply come
+   *  out of it (set-null physics). The confirm says so, and counts both kinds:
+   *  a count of boards alone would understate what you're about to touch. */
+  async function removeGroup(g: ShelfGroup) {
+    const nb = byGroup(g.id).length;
+    const nn = bitCounts[g.id] ?? 0;
+    const inside = [
+      nb ? `${nb} board${nb === 1 ? "" : "s"}` : "",
+      nn ? `${nn} note${nn === 1 ? "" : "s"}` : "",
+    ].filter(Boolean).join(" and ");
+    const msg = inside
+      ? `Delete the folder “${g.name}”? Its ${inside} come out of the folder — nothing is trashed.`
+      : `Delete the empty folder “${g.name}”?`;
+    if (!(await confirm({ message: msg, confirmLabel: "Delete folder", danger: true }))) return;
+    void act(() => deleteGroup(supabase, g.id));
   }
 
   function reshelve(boardId: string, groupId: string | null) {
@@ -119,6 +146,8 @@ export function Shelf({ boards, groups }: { boards: HomeBoard[]; groups: ShelfGr
                   onClick={() => act(() => moveGroup(supabase, g.id, "up"))}>↑</button>
                 <button className="shelf-move" disabled={busy || i === groups.length - 1} title="move down"
                   onClick={() => act(() => moveGroup(supabase, g.id, "down"))}>↓</button>
+                <button className="shelf-move" disabled={busy} title="delete this folder — what's inside comes out, nothing is trashed"
+                  onClick={() => void removeGroup(g)}>×</button>
               </span>
             </h3>
             {members.length === 0 ? (

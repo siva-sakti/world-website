@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
-import { listGroups } from "@/lib/db/shelf";
+import { listGroups, countBitsPerGroup } from "@/lib/db/shelf";
 import { newBoard } from "@/app/actions";
 import { Shelf } from "@/app/shelf";
 
@@ -13,6 +13,7 @@ export default async function AllBoardsPage() {
   const supabase = await createClient();
   const boards = await listBoards(supabase);
   const groups = await listGroups(supabase);
+  const bitCounts = await countBitsPerGroup(supabase);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
@@ -22,7 +23,7 @@ export default async function AllBoardsPage() {
           <button className="text-sm underline underline-offset-4 hover:no-underline">+ new board</button>
         </form>
       </header>
-      <Shelf boards={boards} groups={groups} />
+      <Shelf boards={boards} groups={groups} bitCounts={bitCounts} />
     </main>
   );
 }
