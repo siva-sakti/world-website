@@ -9,7 +9,7 @@ import { fmt } from "@/lib/dates";
 import { bitLabel, boardLabel } from "@/lib/labels";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
-import { TextWorkspace } from "@/app/bit/[id]/text-workspace";
+import { NoteWorkspace } from "./note-workspace";
 import { BitTitle, BitTrash } from "@/app/bit/[id]/bit-controls";
 import { PinToggle } from "@/app/bits/note-card";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
@@ -55,9 +55,7 @@ export default async function NotePage({
 
       {/* The surface — title + the writing, central, full-width. */}
       <BitTitle bitId={b.id} initial={b.content ?? ""} placeholder="title — optional" />
-      <div className="page-editor mt-3">
-        <TextWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
-      </div>
+      <NoteWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
 
       {/* Quiet footer — the read-mostly facts + connections. */}
       <footer className="note-footer">
