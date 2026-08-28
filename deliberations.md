@@ -263,3 +263,22 @@ All vocabulary physics verified line-by-line (renames-by-id · wrong-references-
 **The A14 re-home.** A14 (video as a stored type) previously read "video = a *reference* (bookmark to Drive/YouTube)." With the bookmark object gone, that mechanism is gone — so a video is now a **source on a note**, or a **rich-text link inside** a note, not a saved object. The re-entry condition is unchanged: the day a video wants to be a placeable/taggable *bit* (or a linked video dies and it hurts), a `video` type is additive with the same two-halves storage as images.
 
 **Standing.** Proven on a throwaway copy of the real database (the full proven chain applied in filename order, then the exact data this change must convert seeded, then the migration applied and a suite run green), then applied to cloud with the owner's conscious sign-off. This reverses parts of D-100 (its two `source_*` columns) and supersedes `capture-build-plan.md` (→ `old/`). A want-driven pivot the owner ruled in knowingly, in the same family as D-087/D-101 (owner authority, recorded as such).
+
+---
+
+## Notes as synthesis surfaces + the hard line (D-118 → D-121, 2026-08-25 → 08-28)
+
+**The rulings:** notes are first-class written pieces (D-118/D-119) · the bit/note division + two-way placement (D-120) · the **hard line — a thing never changes type** (D-121). Built: N1 (a note's own writing page, `/note/[id]`), N2 (the `board-surface.tsx` breakdown that cleared the way), N3 (a note on a board = a page-shaped doorway).
+
+**The core insight — the synthesis framing.** The model resolves to one move: *take scattered material and bring it together into something you can take forward.* Everything is either **material** (bits) or a **surface where you synthesize** (notes, boards). A note and a board are the *same kind of thing* — a place you bring material together — differing only in **how**: a note stitches it *in words* (verbal), a board *in space* (spatial). This is the owner's framing, held consistently since the N1 correction; the doc work was catching up to it.
+
+**What a bit is — role, not size.** A bit is *material*: raw input you bring into a synthesis, **any size**. The owner's own catch: "a PDF is finished, but it's still a bit." So a bit is defined by its role (input), **not** by being small — someone else's whole finished PDF is *your* material. → "bits are small things" was retired for **"bits are the material."**
+
+**The hard line (D-121) + what was rejected.**
+- **Rejected: the fluid promote/demote toggle** (D-118/D-119 shipped a "make a note" / "note ✓" button that flipped a saved thing's `kind`). Owner: if a thing freely converts between bit and note, the two names stop meaning anything. Ruled out — `kind` is fixed at birth; the toggle + `setBitKind` were removed (I-K1).
+- **Rejected: a "start a note from this bit" button** (Claude proposed it as a bridge). It is *not* the flip — it makes a *new* note and leaves the bit, so it doesn't break the rule — but it was declined for now: to write a piece from bits you **write a note and gather them in** (`[[`), which already exists. No new machinery.
+- **The "note is like a PDF" catch.** The owner said this to convey the *finished feeling* on a board, not a taxonomy. Claude over-read it into a "document family" (note + PDF as a class distinct from bits) — **rejected**: PDF and voice memos are **bits**. A note is a **surface** (peer of a board), full stop.
+
+**Storage stays shared (deliberate).** A note is a `bit` row with `kind='note'` — invisible plumbing, so notes inherit tags/find/trash/gather/export. The hard line lives at the *concept/UI* level, not storage. (Three layers allowed to differ: model = surface · storage = a bit row · presentation = a surface.)
+
+**Meta-note — Claude's failure mode, named by the owner ("it feels like I keep losing you").** The owner's core was *stable and clear the whole time*; the breakdowns were Claude's, in a specific pattern: **over-formalizing a simple idea** (inventing the document family, the escape-hatch button) and **over-rotating on the owner's most-recent analogy** instead of holding the through-line. Same elegant-unification bias flagged in Cluster 3's meta-map — *watch for added hidden machinery.* Fix: hold the stable core; treat the owner's analogies as *feeling*, not taxonomy; ask "structure or feeling?" before building on one. (Memory saved.)

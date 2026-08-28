@@ -27,6 +27,17 @@ The authority is the migration; this is the map. **Nine record kinds in three fa
 
 **Build note (the frozen `select *` — DONE, closed by D-102):** a view defined `select *` freezes its column list the day it is created — so when D-102 dropped the D-100 `source_*` columns (now the `source` table), it had to rebuild `the_inbox` / `the_ledger` / `board_cards`; the latter two now **join `source`** and expose `source_name`/`source_url` (a note's *"from …"* on boards and lists). Keep the caveat in mind for any future `select *` view.
 
+### 2.1 Since the base schema — the notes / synthesis layer (D-118 → D-121)
+
+Added **additively** to the proven base (migrations `…_shelf.sql`, `…_shelf_bits.sql`, `…_kind_and_folder_stars.sql`); no record kind was added — these are columns + one small table:
+
+- **`bit.kind`** (`text`, `CHECK in ('bit','note')`, default `'bit'`) — the field that splits a bit's **role**: **`'bit'` = material** (a fragment you caught/made); **`'note'` = a written piece** — a *verbal-synthesis surface* (model.md §premise). **A note is stored as a `bit` row** with `kind='note'`: its writing is `body`, its gathered bits are `reference` rows. That shared storage is deliberate and invisible — it inherits all bit-machinery (tags · find · trash · gather · export) for free (*three layers allowed to differ*: model = surface, storage = a bit row, presentation = a surface). **`reference`** is the note's membership record — *placement is to a board what a reference is to a note.*
+- **`bit.group_id` / `board.group_id`** (FK → **`shelf_group`**, `ON DELETE SET NULL`) + **`pinned_at`** on `bit` / `board` / `shelf_group` — folders (the "shelf") and **alive** (the owner's ★), both cutting across boards and notes.
+
+**HARD LINE — I-K1 / D-121: `kind` is set at birth and never updated** (catch/jot → `'bit'` · ✎ write → `'note'`). There is no conversion; the only writes to `kind` are the create-path inserts (no `setBitKind`). Enforced at the app chokepoint (kind is insert-only); could harden to a trigger/`CHECK` later.
+
+**Serving (presentation ≠ storage).** A note is served as a **surface** at `/note/[id]` — its own writing page, listed beside boards, never the `/bit` page (N1). On a board it renders as a page-shaped **doorway card** that opens the note (N3); the `board_cards` view doesn't expose `kind`, so the board page reads it in one indexed query (`getBitMeta`), same pattern as raw `content`.
+
 ## 3. Security — RLS, the ruled composition (replaces the old §3, which leaked)
 
 The browser holds the anon key; query filtering is not security. **RLS on every table.**

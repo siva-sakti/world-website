@@ -4,20 +4,24 @@
 
 ---
 
-## The one premise: two levels
+## The one premise: material, and the surfaces you bring it together on
+
+The whole app is one move: **take scattered material and bring it together into something you can take forward.** Everything is one of two things:
 ```
-ATOMS      →  bits            the fragments — the smallest unit of thought/consumption
-SURFACES   →  boards · notes  where you compose bits into something
+MATERIAL   →  bits             what you catch or make — the stuff you work with
+SURFACES   →  notes · boards   where you bring material together (synthesize)
 ```
-A **bit** is only ever an atom. A **board** and a **note** are *peers* — both surfaces — and a surface can *also* be a unit (a doorway) on another surface. A bit can never be a surface; a surface is never an atom. **A thing never changes type** — `kind` is set at birth (catch/jot → bit · ✎ write → note) and is never flipped (D-121; no bit↔note toggle).
+- A **bit** is **material** — one thing you caught or made. *Any size:* a jotted line, an image, a doodle, later a PDF or a voice memo. What makes it a bit is its **role** — raw input you bring in — **not** that it's small. Someone else's finished PDF is still *your* material.
+- A **note** and a **board** are the two **surfaces where you synthesize** — the *same kind of thing* (a place you bring material together), differing only in **how**: a **note** stitches material **in words** (verbal); a **board** stitches it **in space** (spatial). They're peers; a surface can also sit on another surface as a doorway.
+- **A thing never changes type** — `kind` is set at birth (catch/jot → bit · ✎ write → note) and is never flipped (D-121; no bit↔note toggle). To make a piece from bits, you **write a note and gather them in** — you don't convert a bit.
 
 ## The three things
 
-**bit** (table: `bit`) — the atom. One unit: text, drawing, image (audio·pdf later). Needs nothing to exist — no title, board, or tag. Carries: its content (`body`), the owner's optional words (`content` = a title/caption), a `source` (where it came from), a `kind` ('bit' | 'note'), tags, a folder, alive-status, dates, visibility. Its computed headline is its **face**.
+**bit** (table: `bit`) — the **material**. One thing you caught or made: text, drawing, image (audio·pdf later). **Any size** — a jotted line or a whole PDF; what makes it a bit is its *role* (raw input you bring in), not being small. Needs nothing to exist — no title, board, or tag. Carries: its content (`body`), the owner's optional words (`content` = a title/caption), a `source` (where it came from), a `kind` ('bit' | 'note'), tags, a folder, alive-status, dates, visibility. Its computed headline is its **face**.
 
-**board** (table: `board`) — a **spatial** surface. Bits join it by **placement** (a position). A board has no body of its own — its composition *is* the arrangement. Carries: title, folder, alive, visibility, dates.
+**board** (table: `board`) — a **spatial** surface: you bring material together **in space**. Bits join it by **placement** (a position). A board has no body of its own — its composition *is* the arrangement. Carries: title, folder, alive, visibility, dates.
 
-**note** — a **textual** surface (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/find/trash/gather/export). **Built (N1):** presented as a surface — its own writing page (`/note/[id]`), listed beside boards, never as a fragment.
+**note** — a **verbal** surface: you bring material together **in words** (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/find/trash/gather/export). **Built (N1):** presented as a surface — its own writing page (`/note/[id]`), listed beside boards, never as a fragment.
 
 ## How a bit joins a surface (the same act, two mediums)
 - **placement** (table: `placement`) — a bit **on a board**, in *space* (x·y·w·h·z, per-board). Un-placing stamps `left_at` (its travel history is kept, never deleted). *This is a board's membership record.*
