@@ -14,9 +14,9 @@ function firstLine(body: string | null, face: string | null, content: string | n
   return rest.slice(0, 140);
 }
 
-// THE NOTES ROOM (V2, D-118): your written PIECES — first-class, beside boards.
-// A notebook index: title · opening words · date. Born in ✎ write; a bit can be
-// promoted from its page ("make a note").
+// THE NOTES ROOM (D-118): your written PIECES — first-class, beside boards.
+// A notebook index: title · opening words · date. Born a note in ✎ write; a note is
+// never converted from a bit (a thing never changes type — D-121).
 export default async function NotesRoom() {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -45,7 +45,7 @@ export default async function NotesRoom() {
           <Link href="/write" className="underline underline-offset-4 hover:no-underline">
             ✎ write your first
           </Link>
-          . (An existing bit can also grow up: open it and tap &ldquo;make a note.&rdquo;)
+          .
         </p>
       ) : (
         <ul className="space-y-5">

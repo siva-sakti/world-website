@@ -42,7 +42,7 @@ Teach the model *by doing*, not a slideshow. A new user arrives empty.
 - ⚙ **technically:** `home`/`the_inbox`/`the_ledger` views; `/find` = `lib/db/find.ts` (empty=ledger, +full-text over the face, +tag filter). Note page = new `/note/[id]` reusing `TextWorkspace`/`TagBar`/etc., writing-first; redirect `/bit/[id]`→`/note` for `kind='note'`. Find-filter = a `kind`/`type` branch in the find query + labels.
 
 ## Arc 7 · DEVELOP (raw → fragment → piece — the reason)
-- ✅ jot → tag → arrange on a board → **synthesize into a note** (gather its bits) → a finished piece · ✅ promote/demote a fragment ↔ note · ✅ a board **feeds** a note (the Substack flow)
+- ✅ jot → tag → arrange on a board → **synthesize into a note** (gather its bits) → a finished piece · ✅ a board **feeds** a note (the Substack flow). **A thing never changes type (D-121):** you don't promote a fragment into a note — you *write* a note and gather fragments in.
 - 🔲 document-mode (a whole board as flowing text) — parked, own design round
 - ⚙ **technically:** the whole gradient is already the existing machinery (bits · placements · `kind` · references) — no new storage; document-mode is the one genuine addition (bit-boundaries in a flowing editor).
 

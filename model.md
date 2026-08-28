@@ -9,7 +9,7 @@
 ATOMS      →  bits            the fragments — the smallest unit of thought/consumption
 SURFACES   →  boards · notes  where you compose bits into something
 ```
-A **bit** is only ever an atom. A **board** and a **note** are *peers* — both surfaces — and a surface can *also* be a unit (a doorway) on another surface. A bit can never be a surface; a surface is never an atom.
+A **bit** is only ever an atom. A **board** and a **note** are *peers* — both surfaces — and a surface can *also* be a unit (a doorway) on another surface. A bit can never be a surface; a surface is never an atom. **A thing never changes type** — `kind` is set at birth (catch/jot → bit · ✎ write → note) and is never flipped (D-121; no bit↔note toggle).
 
 ## The three things
 
@@ -17,7 +17,7 @@ A **bit** is only ever an atom. A **board** and a **note** are *peers* — both 
 
 **board** (table: `board`) — a **spatial** surface. Bits join it by **placement** (a position). A board has no body of its own — its composition *is* the arrangement. Carries: title, folder, alive, visibility, dates.
 
-**note** — a **textual** surface (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/find/trash/gather/export). **[ideal / not yet]:** presented as a surface (its own writing page, listed beside boards), never as a fragment.
+**note** — a **textual** surface (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/find/trash/gather/export). **Built (N1):** presented as a surface — its own writing page (`/note/[id]`), listed beside boards, never as a fragment.
 
 ## How a bit joins a surface (the same act, two mediums)
 - **placement** (table: `placement`) — a bit **on a board**, in *space* (x·y·w·h·z, per-board). Un-placing stamps `left_at` (its travel history is kept, never deleted). *This is a board's membership record.*
@@ -27,7 +27,7 @@ A **bit** is only ever an atom. A **board** and a **note** are *peers* — both 
 ## Surfaces as units (doorways)
 A surface can also be *one unit* placed on another surface — a **doorway** (a titled card → click to open it), not its contents exploded.
 - A **board on a board** = a board-card (a hub/doorway). *(schema supports it: a placement can target a board.)*
-- A **note on a board** = a note-card (a doorway → the note's surface). **[ideal / not yet]** — today a placed note renders as a raw text card; owner ruled it should become a doorway (option b).
+- A **note on a board** = a page-shaped **doorway card** → opens the note's surface (**built, N3**; option b — a note is placed on a board like a PDF will be).
 
 ## The cross-cutting dimensions (apply to bits and/or surfaces)
 - **tags** (`tag`, `tag_application`) — shared *words*; "what it's about." On **bits and boards** (polymorphic). Pull a word → everything that ever carried it (`the_pull`). Words referenced by id, so renames are free (Principle 9).
@@ -48,10 +48,10 @@ Three ways, all computed from the above: **shared words** (tags) · **shared spa
 ## Three layers that are ALLOWED to differ (the note lesson)
 - **Model** — what a thing *is* (a note is a surface). ← the truth.
 - **Storage** — how it's *filed* (a note is a `bit` row, `kind='note'`) — reuse, to inherit the machinery; fine to differ from the model.
-- **Presentation** — what the user *sees* (must match the **model**: a note looks like a surface). ← the current bug.
+- **Presentation** — what the user *sees* (must match the **model**: a note looks like a surface). ✓ fixed — N1 (note page) + N3 (note-on-board doorway).
 
 ## Open threads the full picture surfaces (beyond the note re-surfacing)
-1. **Note-on-board = doorway** (ruled b) — a board must render a note-placement as a titled doorway card. *(bigger piece of the re-surfacing.)*
+1. ~~**Note-on-board = doorway** (ruled b)~~ **✓ BUILT (N3)** — a placed note renders as a page-shaped doorway card that opens its surface.
 2. **Gather beyond bits** — today `[[` gathers only bits. Owner asked about **gathering a board into a note**, and **linking sources inline**. Both are small additions (a reference that can point at a board / a source), not built.
 3. **Notes management** — trash + (maybe) a distinct **archive** state, surfaced in the notes room. Missing.
 4. **Find shows notes as text bits** — should the notes room / find distinguish notes as surfaces? Minor, worth a pass.
