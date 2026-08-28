@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { FindItem, FindKind } from "@/lib/db/find";
 import type { TagChoice } from "@/lib/db/tags";
+import { matches } from "@/lib/search";
 
 // Find, filtered IN THE BROWSER (N4 refinement): the server loads everything once,
 // this filters it live — instant, no per-search round-trip (same trick as the board
@@ -44,7 +45,7 @@ export function FindLive({
   const results = items.filter((item) => {
     if (kind !== "all" && item.kind !== kind) return false;
     if (tagId && !item.tags.some((t) => t.id === tagId)) return false;
-    if (needle && !item.searchText.includes(needle)) return false;
+    if (!matches(item.searchText, q)) return false; // the one rule (lib/search)
     return true;
   });
 

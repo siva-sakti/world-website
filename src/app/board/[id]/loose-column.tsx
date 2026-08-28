@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
+import { haystack, matches } from "@/lib/search";
 
 // The board's DRAWER — a browser of all your bits, UNPLACED FIRST, split by kind
 // (bits · notes · all) and filterable by placement/type/tag/source, so you can drop
@@ -91,7 +92,27 @@ export function LooseColumn({
     return [...m].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [bits]);
 
-  const q = query.trim().toLowerCase();
+  // Each bit's searchable words, built ONCE per load through the one builder
+  // (lib/search) — not per keystroke. `faceOf` is fed in so today's reach is
+  // preserved exactly (a faceless doodle still answers to "drawing"); `body` is
+  // the addition — the owner's full-text ruling, 2026-08-28.
+  const hays = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const n of bits ?? []) {
+      m.set(
+        n.id,
+        haystack({
+          face: faceOf(n),
+          content: n.content,
+          body: n.body,
+          sourceName: n.source?.name,
+          tagWords: n.tags.map((t) => t.word),
+        }),
+      );
+    }
+    return m;
+  }, [bits]);
+
   let filtered = (bits ?? []).filter((n) => {
     if (kind !== "all" && n.kind !== kind) return false;
     if (scope === "loose" && !isLoose(n)) return false;
@@ -100,10 +121,7 @@ export function LooseColumn({
     if (typeFilter !== "all" && n.type !== typeFilter) return false;
     if (sourceId && n.source?.id !== sourceId) return false;
     if (tagId && !n.tags.some((t) => t.id === tagId)) return false;
-    if (q) {
-      const hay = `${faceOf(n)} ${n.source?.name ?? ""} ${n.tags.map((t) => t.word).join(" ")}`.toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
+    if (!matches(hays.get(n.id) ?? "", query)) return false; // the one rule
     return true;
   });
   // "all" shows loose first; JS sort is stable, so newest-first holds within groups.

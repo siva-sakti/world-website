@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, BitType } from "@/lib/types";
 import { bitLabel, boardLabel } from "@/lib/labels";
+import { haystack } from "@/lib/search";
 
 // Find (§7) — all computed, stored nowhere. The empty query is THE LEDGER: every
 // live bit, newest first, the reachability floor (I-T1). Add a text query, a tag,
@@ -147,7 +148,7 @@ export type FindItem = {
   mediaType?: BitType; // bits only — text/drawing/image
   tags: { id: string; word: string }[];
   created_at: string;
-  searchText: string; // lowercased words to match on client-side (bit: content+body+face · board: title)
+  searchText: string; // from haystack() in lib/search — the ONE match rule (bit: content+body+face · board: title)
 };
 
 /** Find across all three kinds (N4). Bits (fragments and notes, by their words),
@@ -172,7 +173,7 @@ export async function findItems(
         mediaType: b.type,
         tags: b.tags,
         created_at: b.created_at,
-        searchText: `${b.content ?? ""} ${(b.body ?? "").replace(/<[^>]+>/g, " ")} ${b.face ?? ""}`.toLowerCase(),
+        searchText: haystack({ face: b.face, content: b.content, body: b.body }),
       });
     }
   }
@@ -186,7 +187,7 @@ export async function findItems(
         label: boardLabel(bd.title),
         tags: bd.tags,
         created_at: bd.created_at,
-        searchText: (bd.title ?? "").toLowerCase(),
+        searchText: haystack({ content: bd.title }),
       });
     }
   }
