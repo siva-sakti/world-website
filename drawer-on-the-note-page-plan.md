@@ -359,3 +359,30 @@ Every load-bearing claim run down before building. Three changed the plan.
 | 7 | `TextBit`'s new prop is additive | ✅ optional; board cards pass nothing. |
 
 **Net:** one piece of the plan deleted, one cause corrected, the rest stands. No step's shape changed.
+
+---
+
+## 20 · What got built (2026-08-28) — the record
+
+Branch `worktree-find-and-search-plan`. **Built and green; NOT yet owner-tested or deployed.**
+
+| step | commit | what |
+|---|---|---|
+| 1 | `618aa85` | `lib/search.ts` — one `matches()`+`haystack()`; find, the drawer, and the `[[` picker all point at it |
+| ~~2~~ | — | **dropped** (see below) |
+| 3 | `9e86e54` | `loose-column.tsx` **moved** to `components/drawer.tsx` + a `variant`; board repointed; the `is-fixed` CSS |
+| 4–5 | `c45b28c` | `TextBit.onReady`/`gather`, `TextWorkspace.onSaved`, `note-workspace.tsx`, the drawer mounted on `/note/[id]` |
+
+**Two owner rulings arrived mid-build and simplified the plan:**
+
+1. **Full text everywhere** (not the two tiers). That **deleted the reach dial** — with nothing shallow left, a `reach` parameter would have been speculative code. `haystack()` takes no mode.
+2. **Shared matcher first** — so every box agreed before anything new was added.
+
+**Step 2 (a shared `thing-row`) was dropped after looking at the actual markup.** The drawer's row is a `<button className="loose-card">` holding a thumbnail-or-face and a meta line; find's is an `<li>` holding a `<Link>`, tag chips, and a badge. **They share zero markup** — different elements, classes, structure, children. A "shared" row there would have been abstraction with no second copy to remove. The row the two *drawer* homes share already lives inside `drawer.tsx`. Net: one fewer file than planned.
+
+**Net file count:** +2 (`lib/search.ts`, `note-workspace.tsx`), −0 (the drawer *moved*, it wasn't duplicated). `loose-column.tsx` no longer exists.
+
+**Left open — one owner call:** clicking a row already marked "gathered" currently gathers it **again** (a second chip), matching `[[`, which doesn't stop you either. The owner's answer came back as "Other" with no text. This is a documented default, not a ruling — it's a one-line change in `pick()`.
+
+**Verified:** `pnpm typecheck` clean · `pnpm lint` 0 errors (39 warnings, all pre-existing: vendor, scripts, `<img>`) · `pnpm build` green, all 18 routes.
+**Not verified:** how the caret feels, whether the fixed drawer sits right on desktop and phone, and that the board is unchanged in the hand. All behind the login — the §10 feel-test list is the proof.
