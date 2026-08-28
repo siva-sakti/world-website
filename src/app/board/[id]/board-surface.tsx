@@ -9,7 +9,7 @@ import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
-import { LooseColumn } from "./loose-column";
+import { Drawer } from "@/components/drawer";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useMarqueeSelect } from "./use-marquee-select";
@@ -342,7 +342,7 @@ export function BoardSurface({
             style={{ left: marquee.marqueeBox.left, top: marquee.marqueeBox.top, width: marquee.marqueeBox.w, height: marquee.marqueeBox.h }}
           />
         )}
-        <LooseColumn boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />
+        <Drawer variant="board" boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
         {wordsFor && (
           <WordsOffer

@@ -6,11 +6,20 @@ import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
 import { haystack, matches } from "@/lib/search";
 
-// The board's DRAWER — a browser of all your bits, UNPLACED FIRST, split by kind
-// (bits · notes · all) and filterable by placement/type/tag/source, so you can drop
-// anything onto this board; a bit dropped on a second board lives on both (multi-
-// board). Filtering is in-memory over the loaded set (snappy at this scale;
-// server-side search + paging is the named scale trigger). Reachable from a tab.
+// THE DRAWER — a browser of all your bits, split by kind (bits · notes · all) and
+// filterable by type/tag/source, reachable from a tab. It has TWO HOMES and the
+// same clothes in both; only the act at the end differs (N4b):
+//
+//   board — "where" scope (unplaced first), click PLACES the bit on this board;
+//           a bit placed on a second board lives on both (multi-board).
+//   note  — click GATHERS the bit into the writing at your caret; the note itself
+//           is excluded, and rows already gathered say so.
+//
+// The two modes are a discriminated union, so each declares exactly what it needs
+// and TypeScript refuses the wrong combination. Position/wheel/scope differ between
+// them but are CORRELATED facts about two homes, not independent knobs — hence one
+// `variant`, not four booleans. Filtering is in-memory over the loaded set (snappy
+// at this scale; server-side search + paging is the named scale trigger).
 
 type TypeFilter = "all" | "text" | "image" | "drawing";
 type Scope = "loose" | "this" | "other" | "all";
@@ -22,15 +31,25 @@ function faceOf(it: PanelBit): string {
   return it.type === "drawing" ? "drawing" : "";
 }
 
-export function LooseColumn({
-  boardId,
-  onBringIn,
-  refreshSignal,
-}: {
+/** On a board: place what you pick onto this board. */
+type BoardMode = {
+  variant: "board";
   boardId: string;
   onBringIn: (bit: PanelBit) => Promise<void>;
   refreshSignal: number;
-}) {
+};
+/** On a note: gather what you pick into the writing. */
+type NoteMode = {
+  variant: "note";
+  excludeId: string; // the note being written — never offer it to itself
+  gatheredIds: Set<string>; // already in the writing → the row says "gathered"
+  onGather: (bit: PanelBit) => void;
+};
+
+export function Drawer(props: BoardMode | NoteMode) {
+  const onBoard = props.variant === "board";
+  const boardId = onBoard ? props.boardId : null;
+  const refreshSignal = onBoard ? props.refreshSignal : 0;
   const [supabase] = useState(() => createClient());
   const [open, setOpen] = useState(false);
   const [bits, setBits] = useState<PanelBit[] | null>(null);
@@ -46,15 +65,16 @@ export function LooseColumn({
   const loadId = useRef(0);
   const colRef = useRef<HTMLElement>(null);
 
-  // Keep wheel events inside the column — the board's native wheel listener (an
-  // ancestor) would otherwise zoom the canvas while you scroll.
+  // Keep wheel events inside the column — the BOARD's native wheel listener (an
+  // ancestor) would otherwise zoom the canvas while you scroll. Meaningless on a
+  // note page, so it doesn't run there.
   useEffect(() => {
     const el = colRef.current;
-    if (!el) return;
+    if (!el || !onBoard) return;
     const stop = (e: WheelEvent) => e.stopPropagation();
     el.addEventListener("wheel", stop);
     return () => el.removeEventListener("wheel", stop);
-  }, [open]);
+  }, [open, onBoard]);
 
   async function load() {
     const my = ++loadId.current;
@@ -79,7 +99,15 @@ export function LooseColumn({
   }, [open, refreshSignal]);
 
   const isLoose = (n: PanelBit) => n.boards.length === 0;
-  const onThis = (n: PanelBit) => n.boards.some((b) => b.id === boardId);
+  const onThis = (n: PanelBit) => Boolean(boardId) && n.boards.some((b) => b.id === boardId);
+  // The row's status word — "on this board" on a board, "gathered" on a note.
+  const marked = (n: PanelBit) =>
+    onBoard ? onThis(n) : props.gatheredIds.has(n.id);
+
+  // On a note page the editor must NOT blur when you tap a row, or the chip loses
+  // the caret it should land at (N4b §6.6 — the same trick the rich-text toolbar
+  // uses). Unused on a board.
+  const keepCaret = (e: React.MouseEvent) => e.preventDefault();
 
   const allTags = useMemo(() => {
     const m = new Map<string, string>();
@@ -114,10 +142,13 @@ export function LooseColumn({
   }, [bits]);
 
   let filtered = (bits ?? []).filter((n) => {
+    // A note never offers itself for gathering (the db refuses it too — this
+    // keeps it off the screen). N4b §6.1.
+    if (!onBoard && n.id === props.excludeId) return false;
     if (kind !== "all" && n.kind !== kind) return false;
-    if (scope === "loose" && !isLoose(n)) return false;
-    if (scope === "this" && !onThis(n)) return false;
-    if (scope === "other" && (isLoose(n) || onThis(n))) return false;
+    if (onBoard && scope === "loose" && !isLoose(n)) return false;
+    if (onBoard && scope === "this" && !onThis(n)) return false;
+    if (onBoard && scope === "other" && (isLoose(n) || onThis(n))) return false;
     if (typeFilter !== "all" && n.type !== typeFilter) return false;
     if (sourceId && n.source?.id !== sourceId) return false;
     if (tagId && !n.tags.some((t) => t.id === tagId)) return false;
@@ -125,7 +156,7 @@ export function LooseColumn({
     return true;
   });
   // "all" shows loose first; JS sort is stable, so newest-first holds within groups.
-  if (scope === "all") {
+  if (onBoard && scope === "all") {
     filtered = [...filtered].sort((a, b) => (isLoose(b) ? 1 : 0) - (isLoose(a) ? 1 : 0));
   }
 
@@ -155,25 +186,32 @@ export function LooseColumn({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [needKey]);
 
-  async function bring(bit: PanelBit) {
+  /** What a row click does — the one difference between the two homes. */
+  async function pick(bit: PanelBit) {
+    if (props.variant === "note") return props.onGather(bit);
+    const { boardId: bid, onBringIn } = props;
     if (onThis(bit)) return; // F13: already on this board → no-op (client-side)
     loadId.current++; // invalidate any in-flight load
     // Optimistic: this board joins the bit's memberships (it re-groups + "on N" bumps).
     setBits((ns) =>
-      ns ? ns.map((n) => (n.id === bit.id ? { ...n, boards: [...n.boards, { id: boardId, title: null }] } : n)) : ns,
+      ns ? ns.map((n) => (n.id === bit.id ? { ...n, boards: [...n.boards, { id: bid, title: null }] } : n)) : ns,
     );
     try {
       await onBringIn(bit);
     } catch {
       setBits((ns) =>
-        ns ? ns.map((n) => (n.id === bit.id ? { ...n, boards: n.boards.filter((b) => b.id !== boardId) } : n)) : ns,
+        ns ? ns.map((n) => (n.id === bit.id ? { ...n, boards: n.boards.filter((b) => b.id !== bid) } : n)) : ns,
       );
     }
   }
 
   if (!open) {
     return (
-      <button className="loose-tab" onClick={() => setOpen(true)} title="Your drawer — things to place on this board">
+      <button
+        className={`loose-tab${onBoard ? "" : " is-fixed"}`}
+        onClick={() => setOpen(true)}
+        title={onBoard ? "Your drawer — things to place on this board" : "Your drawer — things to gather into your writing"}
+      >
         drawer
       </button>
     );
@@ -194,7 +232,7 @@ export function LooseColumn({
   ];
 
   return (
-    <aside className="loose-col" ref={colRef}>
+    <aside className={`loose-col${onBoard ? "" : " is-fixed"}`} ref={colRef}>
       <div className="loose-col-head">
         <span>drawer{bits ? ` (${filtered.length})` : ""}</span>
         <button className="loose-col-close" onClick={() => setOpen(false)} title="collapse">
@@ -224,11 +262,13 @@ export function LooseColumn({
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="loose-selects">
-            <select value={scope} onChange={(e) => setScope(e.target.value as Scope)} aria-label="Filter by placement">
-              {SCOPES.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
-              ))}
-            </select>
+            {onBoard && (
+              <select value={scope} onChange={(e) => setScope(e.target.value as Scope)} aria-label="Filter by placement">
+                {SCOPES.map((s) => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+            )}
             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as TypeFilter)} aria-label="Filter by type">
               <option value="all">all types</option>
               <option value="text">text</option>
@@ -266,14 +306,23 @@ export function LooseColumn({
       {filtered.length > 0 && (
         <ul className="loose-list">
           {filtered.map((it) => {
-            const here = onThis(it);
+            const isMarked = marked(it);
             const n = it.boards.length;
             return (
               <li key={it.id}>
                 <button
-                  className={`loose-card${here ? " is-here" : ""}`}
-                  onClick={() => bring(it)}
-                  title={here ? "already on this board" : "place on this board"}
+                  className={`loose-card${isMarked ? " is-here" : ""}`}
+                  onClick={() => pick(it)}
+                  onMouseDown={onBoard ? undefined : keepCaret}
+                  title={
+                    onBoard
+                      ? isMarked
+                        ? "already on this board"
+                        : "place on this board"
+                      : isMarked
+                        ? "already gathered into this writing"
+                        : "gather into your writing"
+                  }
                 >
                   {it.type === "image" && thumbs.get(it.id) ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -283,9 +332,14 @@ export function LooseColumn({
                   )}
                   <span className="loose-meta">
                     {it.source && <span className="loose-from">from {it.source.name}</span>}
+                    {!onBoard && isMarked && <span className="loose-boards">gathered</span>}
                     {n > 0 && (
                       <span className="loose-boards">
-                        {here ? (n === 1 ? "on this board" : `on this + ${n - 1} more`) : `on ${n} board${n === 1 ? "" : "s"}`}
+                        {onBoard && isMarked
+                          ? n === 1
+                            ? "on this board"
+                            : `on this + ${n - 1} more`
+                          : `on ${n} board${n === 1 ? "" : "s"}`}
                       </span>
                     )}
                   </span>

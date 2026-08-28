@@ -136,6 +136,21 @@ body {
   border-left: 1px solid #e6e0d6;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
 }
+
+/* THE DRAWER ON A NOTE PAGE (N4b). The writing scrolls; the drawer must not.
+   An `absolute` drawer resolves against `.shell-collapsed` (the tucked-rail
+   wrapper — it is position:relative and unbounded in height), so it would sit at
+   the top of the whole document and scroll away as you write down the page.
+   `fixed` pins it to the viewport instead; verified safe — a transform/filter/
+   will-change ancestor would trap a fixed element, and the /note path has none. */
+.loose-tab.is-fixed { position: fixed; }
+.loose-col.is-fixed {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
 .loose-col-head {
   display: flex;
   align-items: center;
