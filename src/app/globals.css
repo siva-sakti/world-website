@@ -1454,6 +1454,17 @@ body {
   color: #c4bcae;
   font-weight: 400;
 }
+/* The save line under a note's writing. Quiet by design — you should be able to
+   ignore it and still trust it — but a silent save is indistinguishable from a
+   broken one, so it says "saving…" then "saved". */
+.save-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #a89f92;
+}
+.save-note.is-err {
+  color: #a13b2f;
+}
 .page-editor .tiptap,
 .page-editor .tiptap .ProseMirror {
   font-size: 17px;

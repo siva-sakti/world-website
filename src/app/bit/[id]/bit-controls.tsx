@@ -1,14 +1,21 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
 import { confirm } from "@/components/confirm";
+import { registerSave } from "@/lib/save-guard";
 
 // The note's own words above its body (plan v1.2): the same `content` field the
 // board card edits (D-087) — a text bit's optional TITLE / a media bit's caption.
-// Saves on Enter/blur; Esc reverts; empty saves as "no words" (P5).
+// Esc reverts; empty saves as "no words" (P5).
+//
+// It used to save ONLY on Enter/blur, and that lost titles: hit back (or close the
+// tab) while still in the field and React tears the input down without ever firing
+// blur, so the title was never written. Now it also debounces like the body, and
+// registers with the save guard — so leaving, hiding, or closing the page writes
+// what you typed.
 export function BitTitle({
   bitId,
   initial,
@@ -20,12 +27,15 @@ export function BitTitle({
 }) {
   const [supabase] = useState(() => createClient());
   const [draft, setDraft] = useState(initial);
-  const saved = useRef(initial);
+  const saved = useRef(initial); // what the db has
+  const latest = useRef(initial); // what you've typed (a timer's closure can't see state)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [err, setErr] = useState(false);
 
   function save() {
-    if (draft.trim() === saved.current.trim()) return;
-    const next = draft;
+    timer.current = null;
+    const next = latest.current;
+    if (next.trim() === saved.current.trim()) return; // nothing changed
     updateBitContent(supabase, bitId, next)
       .then(() => {
         saved.current = next;
@@ -34,17 +44,44 @@ export function BitTitle({
       .catch(() => setErr(true));
   }
 
+  /** Write now if anything is waiting. Safe to call twice. */
+  function savePending() {
+    if (timer.current) clearTimeout(timer.current);
+    save();
+  }
+
+  function type(v: string) {
+    setDraft(v);
+    latest.current = v;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(save, 600);
+  }
+
+  // One stable door to the latest savePending, for the escape hatches below.
+  const leave = useRef(savePending);
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: registered once
+  leave.current = savePending;
+  // The tab hidden · the app switched · the page closed.
+  useEffect(() => registerSave(() => leave.current()), []);
+  // Leaving this page — the case that used to lose titles.
+  useEffect(() => () => leave.current(), []);
+
   return (
     <div>
       <input
         value={draft}
         placeholder={placeholder}
         className="page-title-input"
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={save}
+        onChange={(e) => type(e.target.value)}
+        onBlur={savePending}
         onKeyDown={(e) => {
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-          if (e.key === "Escape") setDraft(saved.current);
+          if (e.key === "Escape") {
+            if (timer.current) clearTimeout(timer.current);
+            timer.current = null;
+            latest.current = saved.current;
+            setDraft(saved.current);
+          }
         }}
       />
       {err && (

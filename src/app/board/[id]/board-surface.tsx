@@ -10,6 +10,7 @@ import { DrawOverlay } from "./draw-overlay";
 import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
 import { Drawer } from "@/components/drawer";
+import { registerSave } from "@/lib/save-guard";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useMarqueeSelect } from "./use-marquee-select";
@@ -66,8 +67,17 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow } =
+  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow, flushAll } =
     usePersistence(supabase, setCards, onErr);
+
+  // Don't lose a move or a keystroke to the 350ms debounce. One stable door to
+  // flushAll, fired when you leave the board and when the page goes away (a hidden
+  // tab, a switched app, a closed window — lib/save-guard).
+  const leaveBoard = useRef(flushAll);
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: registered once
+  leaveBoard.current = flushAll;
+  useEffect(() => registerSave(() => leaveBoard.current()), []);
+  useEffect(() => () => leaveBoard.current(), []);
 
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({

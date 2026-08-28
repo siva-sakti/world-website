@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
+import { registerSave } from "@/lib/save-guard";
 import { TextBit } from "@/app/board/[id]/text-bit";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
@@ -84,6 +85,20 @@ export function QuickWrite() {
       setErr("Couldn't save — check your connection. Your words are still here.");
     }
   }
+
+  /** Write everything waiting — leaving /write, or the page going away. Without
+   *  this, words typed less than 600ms before navigating away died with the timer,
+   *  and a title never blurred was never written at all. */
+  function leaveNow() {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    flushTitle(); // guarded internally (no id / unchanged → no-op)
+    void flush();
+  }
+  const leave = useRef(leaveNow);
+  leave.current = leaveNow;
+  useEffect(() => registerSave(() => leave.current()), []);
+  useEffect(() => () => leave.current(), []);
 
   return (
     <div>
