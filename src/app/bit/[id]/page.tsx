@@ -60,7 +60,7 @@ export default async function BitPage({
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-8 flex items-baseline justify-between text-sm">
-        <span className="font-semibold text-neutral-400">note</span>
+        <span className="font-semibold text-neutral-400">bit</span>
         <div className="flex items-baseline gap-5">
           <BitTrash bitId={b.id} />
         </div>
