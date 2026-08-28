@@ -30,18 +30,24 @@ export function TextWorkspace({
   function flush() {
     timer.current = null;
     const body = latest.current;
-    // Tell the parent what the writing now says — the note page reads its `[[`
-    // chips from this to mark drawer rows "gathered", at save cadence rather than
-    // once per keystroke.
-    onSaved?.(body);
     // Save the body, then reconcile its `[[` chips into `reference` rows (the two-
     // write step; a failed reconcile self-heals on next save/read — plan risk 1).
+    // NOTHING runs before this write: a listener that threw would silently skip
+    // the save, and this function also runs from the unmount cleanup.
     updateBitBody(supabase, bitId, body)
       .then(() => reconcileReferences(supabase, bitId, extractRefIds(body)))
       .catch((e) => {
         console.error("save body failed:", e);
         setErr("Couldn't save — keep typing, we'll retry.");
       });
+    // Then tell the parent what the writing says — the note page reads its `[[`
+    // chips from this to mark drawer rows "gathered", at save cadence rather than
+    // per keystroke. Guarded: a listener must never be able to break saving.
+    try {
+      onSaved?.(body);
+    } catch {
+      /* a mark that didn't update is not worth losing writing over */
+    }
   }
 
   function onChange(html: string) {
