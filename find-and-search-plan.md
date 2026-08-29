@@ -38,6 +38,25 @@
 ## 5 · Proof
 The Part-A plan was verified against the codebase (read-only agent, 2026-08-29): boards-in-Find is isolated (only `findItems → findBoards`), no `/find?kind=board` links exist, and export/graph/tests don't depend on it. Corrections it surfaced are folded into §4. Re-verify at build with typecheck + `pnpm build` + the named flow-traces.
 
+## 6b · Follow-up — the search language + a clearer filter (owner feel-test, 2026-08-29)
+First feel-test of Search surfaced two asks; both are **client-side only** (no schema, no server — the items are already loaded), so Search stays instant + exact.
+
+**The search language (in the box) — a small operator set, matched in the browser:**
+- **whole word by default** — "lit" finds the word *lit*, not "literature"/"split". (As you type, a word matches once complete.)
+- **`word*`** — starts-with (the opt-in to broaden; prefix only, never mid/ends).
+- **`"exact phrase"`** — words contiguous, in order (the universal convention).
+- **`-word`** — exclude.
+- **two words = both must appear** (AND).
+- **a quiet `?` tips button** by the box → a non-intrusive popover listing the above with examples.
+- *Why client-side, not Postgres FTS: the DB stems ("run"="running") — the opposite of the exact matching the owner wants.*
+
+**The ⌗ filter panel (collapsible) — categories, out of the way:**
+- Move **kind** (bits/notes) + **tags** off the front and into a panel behind a **⌗ filter** button (a dot on it when a filter is on); collapsed by default so the box is primary.
+- Add a **date range** (from/to) — acts on **created** (when made); friendlier than typed date syntax.
+
+**Defaults ruled (owner-informed):** date = created · `*` = prefix-only · the language is Search-only (Jump-to stays a plain title match).
+**Files:** `lib/search-query.ts` (parse + compile matcher, pure) · `app/search/search-tips.tsx` · `app/search/search-filters.tsx` · `app/search/search-live.tsx` (orchestration).
+
 ## 6 · Open
 - **Umbrella noun for board+note** — needed only for the *home* list's Jump-to placeholder ("Jump to a ___…"). Model word = **surface** (feels abstract for a user label); options: adopt "surface" · a warmer word · or spell out "board or note". **Not needed for this feature** (separate board/note pages). Settle with the home feature.
 - On build: the word "search"/"jump to" is ruled into `lexicon.md` (authority done; sweep code + `SPEC.md` then), build per §4, record the receipt in `PROGRESS.md` (same session).
