@@ -27,6 +27,7 @@ ok(`signed in as ${auth.user.email}`);
 const boardId = crypto.randomUUID();
 const bitId = crypto.randomUUID();
 const placementId = crypto.randomUUID();
+const cleanupIds = []; // extra bits made mid-run, removed in finally whatever happens
 
 try {
   // create a board
@@ -207,8 +208,93 @@ try {
     if (e.error) { exportOk = false; fail(`export read ${t}: ${e.error.message}`); }
   }
   if (exportOk) ok("export can read all 9 record kinds as the owner (I-G1)");
+
+  // --- increment 7: THIS SESSION — the gather door, the picker's words, archive ---
+  // (N4b + N5. Each assertion is about the DATA PATH, not the UI: the client-side
+  // match rule is unit-obvious, but whether the rows carry what it needs is not.)
+
+  const needle = "portneedle" + Math.random().toString(36).slice(2, 7);
+  const bit2Id = crypto.randomUUID();
+  cleanupIds.push(bit2Id);
+  r = await sb.from("bit").insert({
+    id: bit2Id, type: "text", kind: "note",
+    content: "A Titled Piece",
+    body: `<p>the word ${needle} sits in the body, not the title</p>`,
+  }).select("id").single();
+  if (r.error) throw r.error;
+
+  // The `[[` picker matched the FACE ONLY before N4b, so a word inside a note's
+  // body was unreachable from the picker. Its candidate query must now carry the
+  // words the shared matcher (lib/search) needs.
+  r = await sb.from("bit")
+    .select("id, face, type, content, body, thumb_path, storage_path, strokes")
+    .eq("id", bit2Id).single();
+  if (r.error) throw r.error;
+  `${r.data.content ?? ""} ${r.data.body ?? ""}`.includes(needle)
+    ? ok("the `[[` picker's candidates carry BODY words (it saw only the face before N4b)")
+    : fail("picker candidates missing body text — `[[` can only match titles again");
+
+  // The face is still the title (D-087) — so a candidate carrying body words has
+  // NOT quietly changed what a note is labelled by.
+  r.data.face === "A Titled Piece"
+    ? ok("carrying body words did not disturb the face (still the title)")
+    : fail("face changed: " + r.data.face);
+
+  // Gathering — from `[[` or from the drawer — is ONE act underneath: a chip in
+  // the body plus a reconciled `reference` row.
+  await sb.from("bit").update({
+    body: `<p>see <span data-ref="${bit2Id}">A Titled Piece</span> here</p>`,
+  }).eq("id", bitId);
+  r = await sb.from("reference").insert({ from_bit_id: bitId, to_bit_id: bit2Id }).select("id");
+  if (r.error) throw r.error;
+  ok("gathering writes a reference row (the drawer's door and `[[` share it)");
+
+  // The backward read — what the note's "gathered into" section shows.
+  r = await sb.from("reference")
+    .select("created_at, gatherer:from_bit_id(id, deleted_at)")
+    .eq("to_bit_id", bit2Id);
+  (r.data ?? []).some((x) => x.gatherer?.id === bitId && x.gatherer?.deleted_at === null)
+    ? ok('"gathered into" reads the tie backwards, live gatherers only')
+    : fail("backward gather read missing the tie");
+
+  // Gathering the same thing twice is ONE tie — the body may name it twice, the
+  // index must not double (extractRefIds dedupes; the row is unique on from+to).
+  r = await sb.from("reference").insert({ from_bit_id: bitId, to_bit_id: bit2Id });
+  r.error
+    ? ok("a duplicate tie is refused — cite it twice, it is still one reference")
+    : fail("duplicate reference row was accepted");
+
+  // --- archive (N5) — skipped cleanly until the migration is on this cloud ---
+  const probe = await sb.from("bit").select("archived_at").eq("id", bit2Id).limit(1);
+  if (probe.error) {
+    console.log("  – SKIP archive: migration 20260828000001_archive.sql is not on this cloud yet");
+  } else {
+    await sb.from("bit").update({ archived_at: new Date().toISOString(), pinned_at: null }).eq("id", bit2Id);
+    r = await sb.from("bit").select("archived_at,deleted_at").eq("id", bit2Id).single();
+    (r.data.archived_at && !r.data.deleted_at)
+      ? ok("archiving puts it away WITHOUT trashing it")
+      : fail("archive/trash confused");
+
+    // The whole point: put away is still findable. An archived row is a LIVE row.
+    r = await sb.from("the_ledger").select("id").eq("id", bit2Id);
+    (r.data?.length === 1)
+      ? ok("an archived note is STILL in the ledger — find reaches it (I-T1 floor holds)")
+      : fail("archiving removed it from the ledger — that is trash, not archive");
+
+    // The invariant, at the DB and not merely in the app.
+    const bad = await sb.from("bit").update({ pinned_at: new Date().toISOString() }).eq("id", bit2Id);
+    bad.error
+      ? ok("the DB REFUSES starred AND archived (bit_archived_not_alive)")
+      : fail("a note was allowed to be both alive and put away");
+
+    await sb.from("bit").update({ archived_at: null }).eq("id", bit2Id);
+    r = await sb.from("bit").select("archived_at").eq("id", bit2Id).single();
+    (r.data.archived_at === null) ? ok("taking it back out clears the archive") : fail("un-archive failed");
+  }
+
 } finally {
-  // cleanup — hard-delete the test board + bit (cascades placements)
+  // cleanup — hard-delete the test board + bits (cascades placements + references)
+  for (const id of cleanupIds) await sb.from("bit").delete().eq("id", id);
   await sb.from("bit").delete().eq("id", bitId);
   await sb.from("board").delete().eq("id", boardId);
   ok("cleaned up the test rows");
