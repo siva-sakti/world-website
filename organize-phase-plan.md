@@ -69,12 +69,17 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.
 2. **State the CONCEPTUAL GOAL first, and check it** (owner-added 2026-08-26): before any planning, say plainly *what we're trying to do and why* — the goal and the concept, NOT the implementation — and get the owner's confirmation. Nothing proceeds until the goal is agreed.
-3. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades).
+2b. **NAME IT, before any planning** (owner-ruled 2026-08-28, after archive was built unnamed): the concept gets **clear language first**, and that language then carries — *concept → the word → the docs → what is actually built* — one chain, the same words at every link.
+   - The word goes into **`lexicon.md`**, the ruling into **`agreements.md`**, the always-true rules into **`invariants.md`**, the reasoning into **`deliberations.md`**. Not afterwards; *before* the code.
+   - **No word gets invented in a button label.** ("put away" was — it reached a UI, a migration comment and two plan docs without ever being ruled, and the feature was unclear precisely because nobody had decided it.)
+   - The test that this step actually happened: **grep the lexicon for the concept.** `gather` scores 9; `archive` and `drawer` scored 0 while both were already built and deployed-adjacent.
+   - The build then uses those words verbatim — in the UI, the db functions, the comments. Step 8 checks it.
+3. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades). A question about implementation is not a question about the concept; don't let one wear the other's costume.
 4. **Plan in detail** — written down (here or the item's own doc).
 5. **Check the plan** — proof it against the current code (read, don't assume).
 6. **Clarify again** — anything the proof surfaced.
 7. **Build per plan** — improvise nothing.
-8. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go."
+8. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go." **Plus the language check: do the UI, the db functions and the comments use the ruled word from 2b, or did a synonym creep in?**
 9. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
 
 The owner's only standing jobs: answer clarifying questions + "needs owner" calls, feel-test, and dump ideas — filing them is Claude's job.
