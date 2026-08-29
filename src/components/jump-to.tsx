@@ -28,8 +28,18 @@ export function JumpTo({
   // Nothing to jump to → no box at all, just the normal (empty) view.
   if (items.length === 0) return <>{children}</>;
 
-  const needle = q.trim().toLowerCase();
-  const matches = needle ? items.filter((it) => it.title.toLowerCase().includes(needle)) : [];
+  // Word-start per word: each typed word must begin some word in a title (\b = word
+  // boundary) — "clim" finds "Climate", never mid-word ("victim"); "clim pol" needs
+  // both. Simpler than Search's language (no operators) — you're jumping to one name.
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const matches = words.length
+    ? items.filter((it) => {
+        const title = it.title.toLowerCase();
+        return words.every((w) =>
+          new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`).test(title),
+        );
+      })
+    : [];
 
   return (
     <>
@@ -40,7 +50,7 @@ export function JumpTo({
         aria-label={placeholder}
         className="mb-6 w-full border-b border-neutral-300 bg-transparent py-2 text-base outline-none focus:border-neutral-900"
       />
-      {needle ? (
+      {words.length ? (
         matches.length === 0 ? (
           <p className="text-neutral-500">{emptyMatch}</p>
         ) : (
