@@ -3,6 +3,8 @@ import { listBoards } from "@/lib/db/boards";
 import { listGroups } from "@/lib/db/shelf";
 import { newBoard } from "@/app/actions";
 import { Shelf } from "@/app/shelf";
+import { JumpTo, type JumpItem } from "@/components/jump-to";
+import { boardLabel } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,13 @@ export default async function AllBoardsPage() {
   const boards = await listBoards(supabase);
   const groups = await listGroups(supabase);
 
+  const jumpItems: JumpItem[] = boards.map((b) => ({
+    id: b.id,
+    title: boardLabel(b.title),
+    href: `/board/${b.id}`,
+    folder: groups.find((g) => g.id === b.group_id)?.name ?? null,
+  }));
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between">
@@ -22,7 +31,9 @@ export default async function AllBoardsPage() {
           <button className="text-sm underline underline-offset-4 hover:no-underline">+ new board</button>
         </form>
       </header>
-      <Shelf boards={boards} groups={groups} />
+      <JumpTo items={jumpItems} placeholder="Jump to a board…" emptyMatch="No boards match">
+        <Shelf boards={boards} groups={groups} />
+      </JumpTo>
     </main>
   );
 }

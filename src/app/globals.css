@@ -863,7 +863,7 @@ body {
   border-color: #b7aea0;
 }
 
-/* Tags: the editor bar for the selected note, and chips used here + on /find. */
+/* Tags: the editor bar for the selected note, and chips used here + on /search. */
 .tag-bar {
   display: flex;
   flex-wrap: wrap;

@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/notes" className="rail-link">all notes</Link>
         <Link href="/bits" className="rail-link">bits</Link>
         <div className="rail-sec">lenses</div>
-        <Link href="/find" className="rail-link">find</Link>
+        <Link href="/search" className="rail-link">search</Link>
         <Link href="/graph" className="rail-link">graph</Link>
         <Link href="/tags" className="rail-link">tags</Link>
         <div className="rail-foot">

@@ -63,6 +63,36 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
 - **N7 · Onboarding (design-heavy, own round).** First-run: detect empty owner → a seeded starter board or a guided intro; `onboarded` flag. Uses `user-flows.md` Arc 0 as the curriculum. After the surfaces are correct.
 - **Parked, each its own phase:** phone capture (5) · the reference-threaded graph (evidence-gated) · document-mode (design round) · publishing/guest layer. **Design track runs in parallel** (`aesthetics-phase.md`: the bold indigo/Gzhel identity + papers into the app).
 
+## 4c · PHASE S — HOME = YOUR SURFACES (the landing redesign; settled 2026-08-29)
+
+**The idea, plainly:** when you land, you're in your studio — you see the surfaces you compose on (your **boards** and **notes**) together, with what you're actively working on floated to the top. No more split between a curated "desk" and separate "all boards" / "all notes" rooms — they merge into one home. **Bits** (your material) stay their own room; **find** stays the content search.
+
+**Why this revises the V-phase:** V1–V3 made home the *desk* (only what's alive), with completeness pushed to the cabinet's two separate lists. The owner's call: home should show *everything*, with curation as the **ordering** (alive first) — not a separate screen. So home now carries the full list too. The cabinet rail stays; it just stops holding "all boards" / "all notes" as separate rooms.
+
+**Two kinds of looking, kept distinct** (names RULED 2026-08-29; full plan: `find-and-search-plan.md`):
+- **Search** (renamed from "Find") — the *broad* look: content-level, global ("which thing *has* X in it") — over bits + notes' full text. **Not** board titles, **not** a board's contained bits.
+- **Jump to** — the *targeted* look: title-level, on a list ("take me to the board named X"). Instant, titles only, box reads "Jump to a board…". *Not "filter" (= category-narrowing by tag/kind), not "sort" (= ordering).*
+- **Filtering** (tags · notes/boards) is a *refinement*, not a third look — already exists, unchanged.
+
+**Two organizing axes, kept distinct (don't blur them):**
+- **Alive** (★) — top-of-mind; you mark it, it floats to the top (later: onto the home canvas).
+- **Folders** — how things are filed; the categorical grouping in the list.
+
+### S1 · Search & Jump-to (FIRST — done + bowed before home) — plan: `find-and-search-plan.md`
+The owner's priority: finish *both kinds of looking* cleanly before touching home. Two parts:
+- **Search = content only** — boards drop out (tabs → **all · bits · notes**); plus the **find→search rename** (route + nav label, redirect kept). `lib/db/find.ts` + `find/page.tsx` + `find-live.tsx`. Trim proofed clean against the code.
+- **Jump to** — one *shared* title-matcher mounted on today's boards list (`shelf.tsx`) and notes list (new `notes-list.tsx`); the home surfaces list inherits the same piece in S2 (no new code then). Reuse arch: Search = one home (`lib/db/find.ts`); Jump-to = one shared piece across all lists (owner deferred to Claude).
+Full technical steps, proof, and the naming ruling live in `find-and-search-plan.md`.
+
+### S2 · The surfaces list = home (the structural core)
+Home (`/`) becomes ONE list of boards + notes together: **alive first**, then the rest, with a **filter (all · boards · notes)** and a **title search**. Folders group the list. `/boards` and `/notes` redirect into it. The rail's "all boards" + "all notes" collapse to home-is-surfaces (+ keep **bits**). Bits stay their own room (material, not a surface). Each row carries its kind's own controls (board: folder-picker · ★ · trash; note: ★ · trash) — both action sets already exist.
+- **Open forks for the owner (settle before building S2):** (a) folders shown as **sections** (Shelf-style) or **chips you open** (Desk-style)? · (b) keep a direct "just boards" / "just notes" via `/?view=…` so old links land pre-filtered?
+
+### S3 · The alive canvas on top (LATER — its own build)
+A spatial top strip: star a surface → it lands on the home board → drag to arrange. Needs three named pieces first: **board-as-a-card doorways** (activates the dormant hub-board UI — §1) · the **BoardThumbnail** (v1 = titled card, no visual; live re-render later — never stored screenshots) · the **"alive = placed on the home board"** model decision. Designed now so there are no surprises; built after S1–S2. Both boards and notes are draggable cards up there (owner's pick).
+
+**Empty home = the first impression.** A brand-new user has no surfaces, so home is empty on first run — that's onboarding's job (**N7**), and this arc feeds it: home's empty state should invite the first board / first note.
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.

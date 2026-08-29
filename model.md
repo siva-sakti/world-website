@@ -21,7 +21,7 @@ SURFACES   →  notes · boards   where you bring material together (synthesize)
 
 **board** (table: `board`) — a **spatial** surface: you bring material together **in space**. Bits join it by **placement** (a position). A board has no body of its own — its composition *is* the arrangement. Carries: title, folder, alive, visibility, dates.
 
-**note** — a **verbal** surface: you bring material together **in words** (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/find/trash/gather/export). **Built (N1):** presented as a surface — its own writing page (`/note/[id]`), listed beside boards, never as a fragment.
+**note** — a **verbal** surface: you bring material together **in words** (a written *piece*). Bits join it by **gather**. Its composition *is* the writing. **Storage reality:** today a note is a `bit` row with `kind='note'` (its writing = `bit.body`, its gathered bits = `reference` rows) — filed as an atom, which is why it keeps all bit-machinery for free (tags/search/trash/gather/export). **Built (N1):** presented as a surface — its own writing page (`/note/[id]`), listed beside boards, never as a fragment.
 
 ## How a bit joins a surface (the same act, two mediums)
 - **placement** (table: `placement`) — a bit **on a board**, in *space* (x·y·w·h·z, per-board). Un-placing stamps `left_at` (its travel history is kept, never deleted). *This is a board's membership record.*
@@ -47,7 +47,7 @@ A surface can also be *one unit* placed on another surface — a **doorway** (a 
 Three ways, all computed from the above: **shared words** (tags) · **shared space** (boards/placements) · **deliberate threads** (gather/references). The **graph** draws these; today's `/graph` predates gather (tag/board only) — the reference-threaded graph is parked, evidence-gated.
 
 ## Stored vs computed (never confuse them)
-**Stored** (the truth): the tables above. **Computed on the fly** (views/pages): `home`, the **desk**, `the_inbox`(loose bits→`/bits`), the notes room(`/notes`), `the_ledger`(`/find`), `the_pull`, `trash_listing`, `board_cards`, `bit_travel`, `tag_counts`, the graph, a bit's **face**. A surface you see is a *view* of stored things, not a second copy.
+**Stored** (the truth): the tables above. **Computed on the fly** (views/pages): `home`, the **desk**, `the_inbox`(loose bits→`/bits`), the notes room(`/notes`), `the_ledger`(**search**, `/search` — renamed from `/find`), `the_pull`, `trash_listing`, `board_cards`, `bit_travel`, `tag_counts`, the graph, a bit's **face**. A surface you see is a *view* of stored things, not a second copy.
 
 ## Three layers that are ALLOWED to differ (the note lesson)
 - **Model** — what a thing *is* (a note is a surface). ← the truth.
@@ -58,6 +58,6 @@ Three ways, all computed from the above: **shared words** (tags) · **shared spa
 1. ~~**Note-on-board = doorway** (ruled b)~~ **✓ BUILT (N3)** — a placed note renders as a page-shaped doorway card that opens its surface.
 2. **Gather beyond bits** — today `[[` gathers only bits. Owner asked about **gathering a board into a note**, and **linking sources inline**. Both are small additions (a reference that can point at a board / a source), not built.
 3. **Notes management** — trash + (maybe) a distinct **archive** state, surfaced in the notes room. Missing.
-4. **Find shows notes as text bits** — should the notes room / find distinguish notes as surfaces? Minor, worth a pass.
+4. **Search shows notes as text bits** — should the notes room / search distinguish notes as surfaces? Minor, worth a pass.
 5. **A note has a body; a board doesn't** — the one real asymmetry between the two surfaces (a note carries authored prose; a board is pure arrangement). Not a problem — just true.
 6. **Discipline cost of note-as-bit** — because notes live in the `bit` table, every bit-oriented surface must consciously choose "bits, notes, or both" (we filter by `kind`). A standing tax, acceptable, worth remembering.

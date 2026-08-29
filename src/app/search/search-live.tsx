@@ -2,42 +2,41 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { FindItem, FindKind } from "@/lib/db/find";
+import type { SearchItem, SearchKind } from "@/lib/db/search";
 import type { TagChoice } from "@/lib/db/tags";
 
-// Find, filtered IN THE BROWSER (N4 refinement): the server loads everything once,
-// this filters it live — instant, no per-search round-trip (same trick as the board
-// drawer; server search is the ~1000-item scale trigger). Kind tabs + tag chips are
-// client state; a click on the active tag clears it (toggle).
+// Search, filtered IN THE BROWSER: the server loads everything once, this filters it
+// live — instant, no per-search round-trip (same trick as the board drawer; server
+// search is the ~1000-item scale trigger). Kind tabs + tag chips are client state; a
+// click on the active tag clears it (toggle). A board never appears here (no content
+// of its own — reach a board by title via jump-to on its list).
 
-const KINDS: { key: FindKind; label: string }[] = [
+const KINDS: { key: SearchKind; label: string }[] = [
   { key: "all", label: "all" },
   { key: "bit", label: "bits" },
   { key: "note", label: "notes" },
-  { key: "board", label: "boards" },
 ];
 
-function badge(item: FindItem): string {
-  if (item.kind === "board") return "board";
+function badge(item: SearchItem): string {
   if (item.kind === "note") return "note";
   return item.mediaType === "drawing" ? "doodle" : item.mediaType ?? "bit";
 }
 
-export function FindLive({
+export function SearchLive({
   items,
   tags,
   initialQ,
   initialTag,
   initialKind,
 }: {
-  items: FindItem[];
+  items: SearchItem[];
   tags: TagChoice[];
   initialQ: string;
   initialTag: string | null;
-  initialKind: FindKind;
+  initialKind: SearchKind;
 }) {
   const [q, setQ] = useState(initialQ);
-  const [kind, setKind] = useState<FindKind>(initialKind);
+  const [kind, setKind] = useState<SearchKind>(initialKind);
   const [tagId, setTagId] = useState<string | null>(initialTag);
 
   const needle = q.trim().toLowerCase();
@@ -56,12 +55,12 @@ export function FindLive({
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="search…"
+        placeholder="search your words…"
         className="w-full border-b border-neutral-300 bg-transparent py-2 text-base outline-none focus:border-neutral-900"
         autoFocus={!initialQ}
       />
 
-      {/* Kind tabs — all · bits · notes · boards (instant). */}
+      {/* Kind tabs — all · bits · notes (instant). */}
       <div className="loose-scope mt-4">
         {KINDS.map((k) => (
           <button
@@ -110,7 +109,7 @@ export function FindLive({
               className="flex items-baseline justify-between gap-4 py-3"
             >
               <Link
-                href={item.kind === "board" ? `/board/${item.id}` : `/bit/${item.id}`}
+                href={`/bit/${item.id}`}
                 className={`hover:underline underline-offset-4 ${item.label ? "" : "italic text-neutral-500"}`}
               >
                 {item.label || "untitled"}

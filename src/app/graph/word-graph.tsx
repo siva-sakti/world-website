@@ -96,7 +96,7 @@ export function WordGraph({ nodes, links }: { nodes: GraphNode[]; links: GraphLi
           }
           onNodeHover={(n: FGNode | null) => setHovered(n ? n.id : null)}
           onNodeClick={(n: FGNode) =>
-            router.push(n.kind === "tag" ? `/find?tag=${n.refId}` : `/bit/${n.refId}`)
+            router.push(n.kind === "tag" ? `/search?tag=${n.refId}` : `/bit/${n.refId}`)
           }
           nodeCanvasObject={(node: FGNode, ctx: CanvasRenderingContext2D, scale: number) => {
             if (node.x == null || node.y == null) return;

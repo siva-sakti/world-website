@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { Bit } from "@/lib/types";
 import { fmt } from "@/lib/dates";
 import { BitTrash } from "@/app/bit/[id]/bit-controls";
+import { listGroups } from "@/lib/db/shelf";
+import { JumpTo, type JumpItem } from "@/components/jump-to";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,13 @@ export default async function NotesRoom() {
     .order("updated_at", { ascending: false });
   if (error) throw error;
   const notes = (data ?? []) as Bit[];
+  const groups = await listGroups(supabase);
+  const jumpItems: JumpItem[] = notes.map((n) => ({
+    id: n.id,
+    title: n.content?.trim() || n.face || "untitled",
+    href: `/note/${n.id}`,
+    folder: groups.find((g) => g.id === n.group_id)?.name ?? null,
+  }));
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
@@ -39,6 +48,7 @@ export default async function NotesRoom() {
         Your written pieces — the things you&rsquo;re making, beside your boards.
       </p>
 
+      <JumpTo items={jumpItems} placeholder="Jump to a note…" emptyMatch="No notes match">
       {notes.length === 0 ? (
         <p className="text-neutral-500">
           Nothing written yet —{" "}
@@ -69,6 +79,7 @@ export default async function NotesRoom() {
           ))}
         </ul>
       )}
+      </JumpTo>
     </main>
   );
 }
