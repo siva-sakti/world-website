@@ -10,7 +10,9 @@ Written 2026-08-28 by walking each surface in the code. Re-walk it after any pha
 
 ## How to read the findings
 
-Findings are numbered **F1…** and collected at the bottom with severity. Two of them are **classes**, not instances — the same mistake in several places. Those matter most: fixing one instance and calling it done is how they survive.
+Findings are numbered **F1…** and collected at the bottom with severity. Two of them (**F1**, **F3**) are **classes**, not instances — the same mistake in several places. Those matter most: fixing one instance and calling it done is how they survive.
+
+**F7–F12 came from two adversarial audits** run against the code on 2026-08-28 (one technical, one logical — reasoning in `deliberations.md`). They found things a walkthrough by the author did not, including a claim in *this document* that was simply false (F7). Re-run that kind of audit rather than trusting a self-review.
 
 ---
 
@@ -20,9 +22,11 @@ Findings are numbered **F1…** and collected at the bottom with severity. Two o
 Home. What's **alive right now** (starred boards + notes) followed by your folders. Rail on the left for everything else.
 - ⚠️ **F1** — archived notes still appear inside folders here. The desk queries `kind='note'`, `deleted_at null` and nothing else.
 
-### A board (`/board/[id]`) ✅
-The infinite canvas: pan/zoom, cards (text · image · doodle · note-doorway), pen, multi-select, marquee, move-together, paste-to-create, image drop. The most developed surface in the app.
+### A board (`/board/[id]`) ✅⚠️
+The infinite canvas: pan/zoom, cards (text · image · doodle · note-doorway), pen, multi-select, marquee, move-together, paste-to-create, image drop. **Six create doors**, not one (+ text · double-tap empty canvas · paste text · paste image · + image · drag-drop file · pen Done). The most developed surface in the app.
 - Save on leaving is now covered (F6 fixed this session).
+- ⚠️ **F8 — reading writes.** Selecting a card to look at it calls `patchCard` with a new z (`board-surface.tsx:130`) — it writes `placement.z` and re-stacks your board. Clicking to read changes your data.
+- ⚠️ **F9 — typing resizes, permanently.** When rendered text gets tall enough the card auto-widens 80px and persists `placement.width` (`card.tsx:129-136`), with no gesture the owner would recognise as a resize.
 
 ### The drawer (on a board, and now on a note) ✅
 One component, two homes. Tabs bits · notes · all; a "where" scope on boards; search; type/tag/source filters; lazy thumbnails. Click **places** (board) or **gathers** (note).
@@ -72,8 +76,9 @@ Read-only reference graph. **Not walked this session** — I have not verified i
 ### Gather (`[[` and the drawer) ✅
 A chip in the body is the truth; `reference` rows are a derived index reconciled on save. Two doors, one act. Duplicate ties refused at the DB. Backward "gathered into" reads live gatherers only.
 
-### Capture / jot ✅ · Tag ✅ · Source ✅
+### Capture / jot ✅ · Tag ⚠️ · Source ⚠️
 Jot box (notes + bits rooms), intake with source + tags. Tag bar on bits and boards; tag manager with rename/merge/delete. Source manager with rename/edit-URL/delete/merge. All show their errors.
+- ⚠️ **F10 — bulk mutation of your bits, hidden behind vocabulary management.** Merging two sources rewrites `bit.source_id` across an unbounded set of bits (`sources.ts:206`); deleting or merging a tag cascades `tag_application` rows off every carrier **including trashed bits**. None of this is visible from any bit's own page, and the scale isn't stated at the moment of the act.
 
 ### Place / call-in ✅
 Loose notes onto a board, via the drawer or the inbox door. Insert-or-revive; travel survives a return.
@@ -81,6 +86,7 @@ Loose notes onto a board, via the drawer or the inbox door. Insert-or-revive; tr
 ### Star ("alive") ⚠️
 Boards, notes, and folders can be starred to the desk.
 - ⚠️ **F3** — fails silently (see below).
+- ⚠️ **F11 — starring a put-away note is impossible and says nothing.** `pinBit` (`shelf.ts:117`) sets `pinned_at` without clearing `archived_at`, which the DB check refuses; the error is swallowed (`note-card.tsx:70`). The star simply never fills, forever. Both audits named this the sharpest live defect. *(Moot while archive is reverted — returns the moment archive does, so the fix belongs in archive's own loop: starring should mean "I'm working on this," and un-archive.)*
 
 ### Put away / archive 🚧 **NEW, and the least finished thing here**
 Three states at the DB (live · archived · trashed), proven 8/8 on a throwaway.
@@ -89,8 +95,9 @@ Three states at the DB (live · archived · trashed), proven 8/8 on a throwaway.
 - ❌ Not applied to the cloud; not testable until you apply the migration.
 - ❌ Only notes. Bits, images, doodles and boards cannot be put away.
 
-### Trash / restore ✅
-Un-place and trash are distinct, labelled acts. `/trash` lists both kinds with restore. Nothing is ever destroyed.
+### Trash / restore ✅⚠️
+Un-place and trash are distinct, labelled acts. `/trash` lists both kinds with restore.
+- ⚠️ **F7 — "nothing is ever destroyed" is FALSE.** I wrote that here on 2026-08-28 and an audit disproved it the same day. `destroyBit` (`lib/db/bits.ts:274`) is a real hard `DELETE`, with two callers — and one of them, the **empty-note evaporate** (`use-create-doors.ts:142`), runs with **no confirmation at all**. The trash page also tells the owner nothing is destroyed. Either the copy is wrong or the evaporate is; that's a ruling, not a patch.
 - ❌ **Empty-the-trash does not exist** — long-standing, deliberate.
 
 ### Export ✅
@@ -106,6 +113,9 @@ Create, rename by naming, reorder ↑↓, star, and now **delete** — with an h
 Debounced writes everywhere, now flushed on unmount, on tab-hide, on app-switch and on close, via one `lib/save-guard.ts`. The note's writing says "saving… / saved".
 - ⚠️ **F5** — a hard tab-close can still drop the last request (filed as N4c, with a recommendation not to fix yet).
 
+### Dead columns ⚠️
+**F12** — five columns are carried in the schema and in `/api/export` with **zero write paths anywhere in the UI**: `bit.visibility`, `bit.subtype_word_id`, `bit.url`, `bit.captured_title`, `placement.display_size`. Nothing sets them. Some are known (`captured_title` is documented as dead-but-present since D-102); the rest are not. Worth a deliberate keep-or-drop rather than drift.
+
 ### Auth ✅
 Login wall, RLS at the boundary. A logged-out client sees zero rows — asserted every harness run.
 
@@ -120,6 +130,12 @@ Login wall, RLS at the boundary. A logged-out client sees zero rows — asserted
 | **F4** | low | The folder-delete confirm counts archived notes among what "comes out of the folder". Falls out of F1. |
 | **F2** | — | `/bits` shows written notes as well as bits. **Awaiting your ruling**, already recorded in the plan. Not a bug. |
 | **F5** | low | A hard tab-close can drop the final in-flight save. Filed as N4c with a reasoned recommendation not to fix yet. |
+| **F7** | **high** | **"Nothing is ever destroyed" is false** — a hard `DELETE` exists, and the empty-note evaporate calls it with **no confirmation**. The trash page tells the owner otherwise. A ruling: is the copy wrong, or the evaporate? |
+| **F8** | medium | **Reading writes.** Selecting a card to look at it re-stacks the board and writes `placement.z`. |
+| **F9** | medium | **Typing resizes.** Text growing past a threshold permanently widens the card, with no resize gesture. |
+| **F10** | medium | **Bulk mutation hidden behind vocabulary management** — one dropdown pick rewrites `source_id` across unbounded bits, or cascades tag rows off every carrier including trashed ones. Invisible from any bit's page; the scale is never stated. |
+| **F11** | — | Starring a put-away note is impossible and silent. **Moot while archive is reverted**; returns with it, so it belongs in archive's loop. |
+| **F12** | low | **Five dead columns** carried in schema and export with zero write paths. Deliberate keep-or-drop rather than drift. |
 | **F6** | — | *(Fixed this session — the three save holes.)* |
 | **?** | unknown | The **graph** was not walked. Unverified against the current schema. |
 
