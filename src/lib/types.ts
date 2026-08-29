@@ -42,6 +42,7 @@ export type Bit = {
   pinned_at: string | null; // the shelf (O1): pinned floats atop notes; null = unpinned
   group_id: string | null; // the shelf (O1b): a note can sit in a folder, like a board
   kind: "bit" | "note"; // V2 (D-118): a fragment, or a written PIECE (first-class beside boards)
+  archived_at: string | null; // N5: put away — out of your rooms, still findable; null = not archived
 };
 
 export type Board = {

@@ -226,6 +226,32 @@ export async function unplaceBit(
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
+/** Put a note away, or take it back out (N5). Archive is a RESTING state, not
+ *  trash-lite: the row stays live, so find still reaches it — it just leaves the
+ *  rooms you work in.
+ *
+ *  Archiving clears the star in the SAME statement. Nothing is both "alive right
+ *  now" and put away — they're opposite claims about one thing — and the DB check
+ *  `bit_archived_not_alive` refuses any other combination, so this is the only
+ *  shape that can succeed. That's deliberate: the invariant lives in the schema,
+ *  and this is the one door that satisfies it. */
+export async function archiveBit(
+  supabase: SupabaseClient,
+  bitId: string,
+  on: boolean,
+): Promise<void> {
+  const patch = on
+    ? { archived_at: new Date().toISOString(), pinned_at: null }
+    : { archived_at: null };
+  const { data, error } = await supabase
+    .from("bit")
+    .update(patch)
+    .eq("id", bitId)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("that note no longer exists — reload");
+}
+
 /** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
  * row was touched (0 rows = the act missed — surface it). */
 export async function trashBit(

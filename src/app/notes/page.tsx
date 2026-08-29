@@ -17,35 +17,60 @@ function firstLine(body: string | null, face: string | null, content: string | n
 // THE NOTES ROOM (D-118): your written PIECES — first-class, beside boards.
 // A notebook index: title · opening words · date. Born a note in ✎ write; a note is
 // never converted from a bit (a thing never changes type — D-121).
-export default async function NotesRoom() {
+export default async function NotesRoom({
+  searchParams,
+}: {
+  searchParams: Promise<{ archived?: string }>;
+}) {
+  const { archived } = await searchParams;
+  const showArchived = archived === "1";
   const supabase = await createClient();
-  const { data, error } = await supabase
+  // Archived pieces leave this room but stay LIVE rows — find still reaches them
+  // (N5). This is the whole difference between putting away and trashing.
+  let q = supabase
     .from("bit")
     .select("*")
     .eq("kind", "note")
-    .is("deleted_at", null)
-    .order("updated_at", { ascending: false });
+    .is("deleted_at", null);
+  q = showArchived ? q.not("archived_at", "is", null) : q.is("archived_at", null);
+  const { data, error } = await q.order("updated_at", { ascending: false });
   if (error) throw error;
   const notes = (data ?? []) as Bit[];
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between">
-        <span className="text-sm font-semibold">notes</span>
-        <Link href="/write" className="text-sm underline underline-offset-4 hover:no-underline">✎ write</Link>
+        <span className="text-sm font-semibold">{showArchived ? "put away" : "notes"}</span>
+        <span className="flex items-baseline gap-5 text-sm">
+          <Link
+            href={showArchived ? "/notes" : "/notes?archived=1"}
+            className="text-neutral-500 underline underline-offset-4 hover:no-underline"
+          >
+            {showArchived ? "← your notes" : "put away"}
+          </Link>
+          <Link href="/write" className="underline underline-offset-4 hover:no-underline">✎ write</Link>
+        </span>
       </header>
 
       <p className="mb-8 text-sm text-neutral-500">
-        Your written pieces — the things you&rsquo;re making, beside your boards.
+        {showArchived
+          ? "Pieces you've put away. Still yours, still findable in find — just not in the way."
+          : "Your written pieces — the things you\u2019re making, beside your boards."}
       </p>
 
       {notes.length === 0 ? (
         <p className="text-neutral-500">
-          Nothing written yet —{" "}
-          <Link href="/write" className="underline underline-offset-4 hover:no-underline">
-            ✎ write your first
-          </Link>
-          .
+          {showArchived ? (
+            "Nothing put away yet."
+          ) : (
+            <>
+              Nothing written yet —{" "}
+              <Link href="/write" className="underline underline-offset-4 hover:no-underline">
+                ✎ write your first
+              </Link>
+              .
+            </>
+          )}
         </p>
       ) : (
         <ul className="space-y-5">

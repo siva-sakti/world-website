@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
+import { updateBitContent, trashBit, getBitBoards, archiveBit } from "@/lib/db/bits";
 import { confirm } from "@/components/confirm";
 import { registerSave } from "@/lib/save-guard";
 
@@ -135,6 +135,54 @@ export function BitTrash({ bitId, returnTo = "/bits" }: { bitId: string; returnT
       title="Move this note to the trash — hidden everywhere, restorable"
     >
       {busy ? "trashing…" : "trash"}
+    </button>
+  );
+}
+
+// PUT AWAY (N5) — the thin slice. Archive is a resting state, not trash: the note
+// leaves the rooms you work in and stays findable in find. Starring and archiving
+// are opposite claims about a thing, so putting away also un-stars it (the db
+// refuses any other combination) — the label says so rather than surprising you.
+export function BitArchive({
+  bitId,
+  archived,
+  starred,
+}: {
+  bitId: string;
+  archived: boolean;
+  starred: boolean;
+}) {
+  const [supabase] = useState(() => createClient());
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  async function go() {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await archiveBit(supabase, bitId, !archived);
+      router.refresh();
+    } catch (e) {
+      console.error("archive failed:", e);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <button
+      className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+      disabled={busy}
+      onClick={() => void go()}
+      title={
+        archived
+          ? "take this back out — it returns to your notes"
+          : starred
+            ? "put this away — it leaves your notes (and loses its star), stays findable in find"
+            : "put this away — it leaves your notes but stays findable in find"
+      }
+    >
+      {archived ? "take back out" : "put away"}
     </button>
   );
 }
