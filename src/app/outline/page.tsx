@@ -14,8 +14,12 @@ export const dynamic = "force-dynamic";
 // NOT kind-filtered here, so notes appear alongside bits.
 export default async function OutlinePage() {
   const supabase = await createClient();
-  const boards = await listBoards(supabase);
-  const items = await listAllBits(supabase);
+  // The two reads are independent — run them together so the round-trips
+  // overlap instead of stacking (shape unchanged; toOutline joins them below).
+  const [boards, items] = await Promise.all([
+    listBoards(supabase),
+    listAllBits(supabase),
+  ]);
   const outline = toOutline(boards, items);
 
   return (
