@@ -123,6 +123,31 @@ export function QuickWrite() {
 
   return (
     <div>
+      {/* A stable action toolbar — always here, never popping in as you type. Trash is
+          always available; open lights up once the note exists. */}
+      <div className="mb-4 flex items-center justify-end gap-2 text-sm">
+        <span className="mr-1 text-xs text-neutral-400">
+          {selfId ? "saved" : "saves as you write"}
+        </span>
+        <Link
+          href={selfId ? `/note/${selfId}` : "#"}
+          aria-disabled={!selfId}
+          tabIndex={selfId ? 0 : -1}
+          className={`rounded-md border border-neutral-200 px-2 py-1 hover:bg-neutral-50 ${
+            selfId ? "" : "pointer-events-none opacity-40"
+          }`}
+        >
+          open →
+        </Link>
+        <button
+          type="button"
+          onClick={trashNote}
+          className="rounded-md border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
+          title="Trash this note (restorable)"
+        >
+          🗑 trash
+        </button>
+      </div>
       <input
         value={title}
         placeholder="title — optional"
@@ -142,28 +167,10 @@ export function QuickWrite() {
       <p className="mt-4 text-xs text-neutral-400" role="status">
         {err ? (
           <span className="text-red-700">{err}</span>
-        ) : selfId ? (
-          // Born — one quiet door to its surface. Nothing else at the writing
-          // moment (N1): placing, tagging, sourcing all live on the note's page.
-          <span>
-            saved ·{" "}
-            <Link href={`/note/${selfId}`} className="underline underline-offset-4 hover:no-underline">
-              open →
-            </Link>
-            {" · "}
-            <button
-              type="button"
-              onClick={trashNote}
-              className="underline underline-offset-4 hover:no-underline"
-            >
-              trash
-            </button>
-          </span>
         ) : (
           // The gather hint (O3): the page's superpower shouldn't be a secret.
           <span>
-            start writing — it saves itself · type <code className="rounded bg-neutral-100 px-1">[[</code> to
-            gather a note into your writing
+            type <code className="rounded bg-neutral-100 px-1">[[</code> to gather a note into your writing
           </span>
         )}
       </p>
