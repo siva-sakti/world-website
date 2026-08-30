@@ -199,7 +199,7 @@ async function toggleLink(editor: TiptapEditor) {
     editor.chain().focus().unsetLink().run();
     return;
   }
-  const prev = (editor.getAttributes("link").href as string | undefined) ?? "https://";
+  const prev = (editor.getAttributes("link").href as string | undefined) ?? "";
   const url = await promptText({ message: "Link URL", initial: prev, placeholder: "https://…" });
   if (url === null) return; // cancelled
   if (url.trim() === "") {
