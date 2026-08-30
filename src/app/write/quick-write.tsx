@@ -3,9 +3,10 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
+import { createLooseTextBit, updateBitBody, updateBitContent, trashBit } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { TextBit } from "@/app/board/[id]/text-bit";
+import { confirm } from "@/components/confirm";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
 // empty-note litter from opening the page and leaving — guarded by a SYNCHRONOUS
@@ -32,6 +33,8 @@ export function QuickWrite() {
   const [title, setTitle] = useState("");
   const titleRef = useRef("");
   const titleSaved = useRef("");
+  // Bumped on discard to remount the editor blank for a fresh start.
+  const [resetKey, setResetKey] = useState(0);
 
   function flushTitle() {
     const id = bitId.current;
@@ -85,6 +88,39 @@ export function QuickWrite() {
     }
   }
 
+  // Discard the just-written note in place — it goes to the trash (restorable), and
+  // the page resets to a fresh blank writer. Only offered once the note is born.
+  async function discard() {
+    const id = bitId.current;
+    if (!id) return;
+    if (
+      !(await confirm({
+        message: "Discard this note? It goes to your trash — restorable there.",
+        confirmLabel: "Discard",
+        danger: true,
+      }))
+    )
+      return;
+    try {
+      await create.current; // never trash before the row exists (the settled gate)
+      await trashBit(supabase, id);
+    } catch (e) {
+      console.error("discard failed:", e);
+      setErr("Couldn't discard — check your connection.");
+      return;
+    }
+    if (timer.current) clearTimeout(timer.current);
+    bitId.current = null;
+    create.current = null; // any in-flight flush now reads a null id and aborts
+    latest.current = "";
+    titleRef.current = "";
+    titleSaved.current = "";
+    setTitle("");
+    setSelfId(null);
+    setErr(null);
+    setResetKey((k) => k + 1);
+  }
+
   return (
     <div>
       <input
@@ -101,7 +137,7 @@ export function QuickWrite() {
         }}
       />
       <div className="page-editor">
-        <TextBit html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
+        <TextBit key={resetKey} html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
       </div>
       <p className="mt-4 text-xs text-neutral-400" role="status">
         {err ? (
@@ -114,6 +150,14 @@ export function QuickWrite() {
             <Link href={`/note/${selfId}`} className="underline underline-offset-4 hover:no-underline">
               open →
             </Link>
+            {" · "}
+            <button
+              type="button"
+              onClick={discard}
+              className="underline underline-offset-4 hover:no-underline"
+            >
+              discard
+            </button>
           </span>
         ) : (
           // The gather hint (O3): the page's superpower shouldn't be a secret.
