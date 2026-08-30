@@ -5,6 +5,7 @@ import type { Surface } from "@/lib/surfaces";
 import type { ShelfGroup } from "@/lib/db/shelf";
 import { FolderPicker } from "@/components/folder-picker";
 import { BitTrash } from "@/app/bit/[id]/bit-controls";
+import { ArchiveButton } from "@/app/archive/archive-controls";
 import { trashBoardAction } from "@/app/actions";
 
 // One row in the home surfaces list — a board or a note, with its own controls.
@@ -52,6 +53,7 @@ export function SurfaceRow({
         >
           {s.pinned_at ? "★" : "☆"}
         </button>
+        <ArchiveButton thing={s.kind === "board" ? "board" : "bit"} id={s.id} compact />
         {s.kind === "board" ? (
           <form action={trashBoardAction}>
             <input type="hidden" name="id" value={s.id} />

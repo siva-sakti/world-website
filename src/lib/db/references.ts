@@ -107,7 +107,7 @@ export async function listGatherCandidates(
   let query = supabase
     .from("bit")
     .select("id, face, type, thumb_path, storage_path, strokes")
-    .is("deleted_at", null)
+    .eq("state", "live")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (excludeId) query = query.neq("id", excludeId);
@@ -140,16 +140,16 @@ export async function listGatheredInto(
 ): Promise<GatheredIntoRow[]> {
   const { data, error } = await supabase
     .from("reference")
-    .select("created_at, gatherer:from_bit_id(id, face, type, deleted_at)")
+    .select("created_at, gatherer:from_bit_id(id, face, type, state)")
     .eq("to_bit_id", bitId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   type Row = {
     created_at: string;
-    gatherer: { id: string; face: string | null; type: string; deleted_at: string | null } | null;
+    gatherer: { id: string; face: string | null; type: string; state: string } | null;
   };
   return ((data ?? []) as unknown as Row[])
-    .filter((r) => r.gatherer && r.gatherer.deleted_at === null)
+    .filter((r) => r.gatherer && r.gatherer.state === "live")
     .map((r) => ({
       bitId: r.gatherer!.id,
       face: r.gatherer!.face,
@@ -166,7 +166,7 @@ export type RefTargetRow = {
   storage_path: string | null;
   strokes: Stroke[] | null;
   face: string | null;
-  deleted_at: string | null;
+  state: string;
 };
 
 /** The target bit behind a gather chip — read once by the chip's inline thumbnail +
@@ -179,7 +179,7 @@ export async function getRefTarget(
 ): Promise<RefTargetRow | null> {
   const { data, error } = await supabase
     .from("bit")
-    .select("type, content, body, thumb_path, storage_path, strokes, face, deleted_at")
+    .select("type, content, body, thumb_path, storage_path, strokes, face, state")
     .eq("id", bitId)
     .maybeSingle();
   if (error) throw error;

@@ -36,6 +36,8 @@ export type Bit = {
   byte_size: number | null;
   visibility: Visibility;
   deleted_at: string | null; // trash = a freeze (§2g)
+  archived_at: string | null; // archive = hide-but-keep, its own resting state
+  state: "live" | "archived" | "trashed"; // generated: the single source of truth for "in the world"
   created_at: string;
   updated_at: string;
   face: string | null; // computed headline (read-only)
@@ -51,6 +53,8 @@ export type Board = {
   group_id: string | null; // the shelf (O1): which home section this board sits in
   pinned_at: string | null; // pinned floats to the top of the shelf; null = unpinned
   deleted_at: string | null;
+  archived_at: string | null; // archive = hide-but-keep, its own resting state
+  state: "live" | "archived" | "trashed"; // generated: the single source of truth
   created_at: string;
   updated_at: string;
 };

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, Placement, Drawing } from "@/lib/types";
 import { removeObjects } from "@/lib/storage";
+import { setResting } from "./resting";
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
 // is the act of putting it on a board. Ids are client-supplied (crypto.randomUUID)
@@ -135,8 +136,8 @@ export async function callInBit(
   // mechanism, §2h FOR SHARE + keep-by-default, is the owed follow-up; this narrow
   // guard covers the call-in door.)
   const [bitLive, boardLive] = await Promise.all([
-    supabase.from("bit").select("id").eq("id", args.bitId).is("deleted_at", null).maybeSingle(),
-    supabase.from("board").select("id").eq("id", args.boardId).is("deleted_at", null).maybeSingle(),
+    supabase.from("bit").select("id").eq("id", args.bitId).eq("state", "live").maybeSingle(),
+    supabase.from("board").select("id").eq("id", args.boardId).eq("state", "live").maybeSingle(),
   ]);
   if (bitLive.error) throw bitLive.error;
   if (boardLive.error) throw boardLive.error;
@@ -233,13 +234,8 @@ export async function trashBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const { data, error } = await supabase
-    .from("bit")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", bitId)
-    .select("id");
-  if (error) throw error;
-  if (!data?.length) throw new Error("that note no longer exists — reload");
+  const n = await setResting(supabase, "bit", bitId, "deleted_at", true);
+  if (!n) throw new Error("that note no longer exists — reload");
 }
 
 /** Compensating erase of a bit created MOMENTS ago by a multi-step intake whose
@@ -254,11 +250,7 @@ export async function restoreBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const { error } = await supabase
-    .from("bit")
-    .update({ deleted_at: null })
-    .eq("id", bitId);
-  if (error) throw error;
+  await setResting(supabase, "bit", bitId, "deleted_at", false);
 }
 
 /** DESTROY a bit permanently (I-L10) — only if trashed. Removes its media files,
@@ -286,7 +278,7 @@ export async function destroyBit(supabase: SupabaseClient, bitId: string): Promi
 /** One bit for its page — null if missing or trashed. */
 export async function getBit(supabase: SupabaseClient, id: string): Promise<Bit | null> {
   const { data } = await supabase
-    .from("bit").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
+    .from("bit").select("*").eq("id", id).eq("state", "live").maybeSingle();
   return (data as Bit) ?? null;
 }
 

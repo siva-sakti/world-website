@@ -19,7 +19,7 @@ export default async function Home() {
     .from("bit")
     .select("*")
     .eq("kind", "note")
-    .is("deleted_at", null)
+    .eq("state", "live")
     .order("updated_at", { ascending: false });
   if (error) throw error;
   const notes = (noteRows ?? []) as Bit[];

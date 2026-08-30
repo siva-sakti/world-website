@@ -68,17 +68,26 @@ state =  'trashed'   when deleted_at  is not null     -- trash wins
 4. **Drop + recreate each world view**, changing ONLY the resting filter `X.deleted_at is null` → `X.state = 'live'` (nothing else), from the LATEST def: `the_ledger`, `the_pull` (both arms), `home`, `the_inbox` (top-level **and** the `not exists` `bo` test → `bo.state='live'`), `board_cards` (**both** the `b` target and `tb` target tests), `board_connectors` (**all four** endpoint-target tests). **`bit_travel` untouched.** `tag_counts`/`subtype_word_counts`: **leave unchanged** (world/trash split stays; archived rows simply fall out of `world_count` and are not counted as trash — acceptable for Stage 1, revisit Stage 2).
 5. **Recreate the guest door** (5 spots in `20260728000002…`): `… deleted_at is null` → `… state = 'live'`. Ordering: the columns (steps 1–2) must exist before these SECURITY DEFINER recreations.
 
-### The app edits (exact, ~11 — `.is("deleted_at", null)` → `.eq("state","live")`)
-`page.tsx:22` · `search.ts:35` · `search.ts:60` · `boards.ts:26 getBoard` · `inbox.ts:25 listAllBits` · the membership test `inbox.ts:43` (`bd.deleted_at` → `bd.state !== 'live'`) · `references.ts:110` · `references.ts:152` (`gatherer.deleted_at` → `gatherer.state !== 'live'`) · `getRefTarget` + `bit-ref-view.tsx:60` (`target.deleted_at` → `target.state`) · `graph.ts:36` (`bit.deleted_at` → `bit.state`) · `bits.ts:289 getBit`. Keep `callInBit` (`bits.ts:138`) as a liveness gate (`state='live'`). **Do NOT touch the destroy guards** (`deleted_at is not null` in destroyBit/Board/emptyTrash/listTrash — trash-area ops; Stage 1 leaves the trash area exactly as is).
+### The app edits — CORRECTED after the adversarial check (2 classes + 2 missed sites)
+**(a) Server-side query filters** — a plain `.is("deleted_at", null)` on a query → `.eq("state","live")` (one line each): `page.tsx:22` · `search.ts:35` · `search.ts:60` · `boards.ts:26 getBoard` · `inbox.ts:25 listAllBits` · `references.ts:110 listGatherCandidates` · `bits.ts:289 getBit` · `bits.ts:138 callInBit` (bit guard) · **`bits.ts:139 callInBit` (the BOARD guard — was MISSED)**.
+**(b) Client-side reads off an already-fetched row — each a 3-PART edit** (add `state` to the `.select(...)`, add `state` to the TS row type, then change the read — filtering on `state` *without* selecting it = `undefined` = a silent live-behavior bug):
+- `inbox.ts` membership: select `:36`, type `:42`, filter `:43` `if (!bd || bd.deleted_at)` → `if (!bd || bd.state !== 'live')` *(skip-trashed polarity)*.
+- `references.ts` gatherer: select `:143`, type `:149`, filter `:152` `.filter(r => r.gatherer && r.gatherer.deleted_at === null)` → `r.gatherer.state === 'live'` **← KEEP-LIVE; must be `=== 'live'`, NOT `!== 'live'` (that would invert "gathered into")**.
+- `getRefTarget` + chip: select `references.ts:182`, type `:169`, read `bit-ref-view.tsx:60` (`target.deleted_at` → `target.state`; keep the gone/set-aside branch).
+- `graph.ts`: select `:25`, type `:34`, filter `:36` `bit.deleted_at` → `bit.state !== 'live'`.
+- **+ `src/lib/types.ts:38/:53`** — add `state` to the Bit/Board types so the selects type-check.
+**(c) Left as-is in Stage 1, added to the Stage-2 list:** `sources.ts:149/:158 listManagedSources` (live/frozen source-count split — a `tag_counts`-class thing). **Destroy guards untouched** (`deleted_at is not null`).
 
-### The proof — byte-identical, ACTUALLY RUN (not claimed)
-On a **throwaway Postgres** (the `verification/` harness — the same native-PG path used for the schema proofs):
-1. Apply the CURRENT schema (all migrations) → seed the standard fixture (the seven-scene dataset + a few trashed rows) → **snapshot every surface's rows** (`home`, `the_ledger`, `the_inbox`, `the_pull`, `board_cards`, `board_connectors`, `trash_listing`, `tag_counts`).
-2. Apply CURRENT **+ the new resting-state migration** → same fixture → snapshot the same surfaces.
-3. **DIFF the two snapshots → must be EMPTY (identical).** Rationale: with `archived_at` all-null, `state='live'` ≡ `deleted_at is null` and `state='trashed'` ≡ `deleted_at is not null`; the diff *proves* every surface is unchanged rather than assuming it.
-4. Re-run the existing `verification/` **attack suite + seven-scene replay** on the new schema → all green (constraints · RLS wall · FOR-SHARE race probe).
-5. Forward check: set `archived_at` on one fixture bit → it leaves `home`/`the_ledger`/`board_cards`, appears in no world surface, and its **placement row still exists** (Stage-2 readiness).
-Cloud apply is proposed only when 3 **and** 4 are green — backup → atomic → verify, on the owner's explicit go.
+### The proof — CORRECTED (the DB diff proves the VIEWS; app + guest need their own legs)
+On a **throwaway Postgres 17** (confirmed: local `psql` 17.10, harness `verification/run-1c-native.sh`):
+1. **Author** a snapshot/diff harness (none pre-exists). Apply CURRENT schema → seed the seven-scene fixture (+ a few trashed rows) → snapshot each world surface (`home`, `the_ledger`, `the_inbox`, `the_pull`, `board_cards`, `board_connectors`, `trash_listing`) using an **EXPLICIT shared column list** (or row-id) — **NOT `select *`** (the `b.*` views `the_ledger`/`the_inbox`/`home` legitimately GAIN `state`+`archived_at`; a `*` diff would falsely fail).
+2. Apply CURRENT **+ the migration** → same fixture → snapshot the same, same column lists.
+3. **DIFF → must be EMPTY.** Proves the view transforms are behavior-identical (archived_at all-null ⇒ `state='live'` ≡ `deleted_at is null` exactly).
+4. **App layer (the diff does NOT cover it — the app bypasses the views):** `pnpm build` (typecheck catches the missing-`state`-in-select bugs) **+ a behavioral check** of the 4 client-side filters and the `references.ts:152` polarity site.
+5. **Guest door:** re-run **`verification/run-public-door-native.sh`** (fixtures P3/E already exercise the trashed→`state` path) — the only proof that validates the 5 guest-door edits.
+6. Re-run the existing **attacks + seven-scene scenarios** on the new schema → green.
+7. Forward check: set one `archived_at` → leaves every world surface, its **placement row still exists**.
+**Build note:** views are **drop+recreate** (never `create or replace` — it fails on a mid-list column change, proven) and each keeps `with (security_invoker = true)`. Cloud apply proposed only when 3–6 are all green — backup → atomic → verify, owner-gated.
 
 ## Decisions to settle (before Stage 2)
 1. **Archiving a *placed* thing — RESOLVED (owner, 2026-08-29): it VANISHES from the board** (mirror trash). The **placement row is kept**, so un-archive restores its exact spot — the hole is temporary and chosen, not a broken board. **Refinement:** an *informing confirm* when it's on boards ("on N boards — archiving hides it from them until you un-archive"), mirroring trash's multi-board confirm, so the hole is never a surprise.

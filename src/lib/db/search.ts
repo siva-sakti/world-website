@@ -32,7 +32,7 @@ export async function searchBits(
   let query = supabase
     .from("bit")
     .select("*")
-    .is("deleted_at", null)
+    .eq("state", "live")
     .order("created_at", { ascending: false })
     .limit(1000); // load-most: search filters client-side (instant); ~1000+ = server-search trigger
   if (args.type) query = query.eq("type", args.type);
@@ -57,7 +57,7 @@ export async function bitsFromSource(
     .from("bit")
     .select("*")
     .eq("source_id", sourceId)
-    .is("deleted_at", null)
+    .eq("state", "live")
     .order("created_at", { ascending: false })
     .limit(200);
   if (error) throw error;

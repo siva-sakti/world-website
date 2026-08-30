@@ -81,6 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/tags" className="rail-link">tags</Link>
         <div className="rail-foot">
           <Link href="/sources" className="rail-link">sources</Link>
+          <Link href="/archive" className="rail-link">archive</Link>
           <Link href="/trash" className="rail-link">trash</Link>
           <a href="/api/export" className="rail-link" title="Download all your data">export</a>
           <form action={logout}>
