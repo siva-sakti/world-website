@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, Placement, Drawing } from "@/lib/types";
+import { removeObjects } from "@/lib/storage";
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
 // is the act of putting it on a board. Ids are client-supplied (crypto.randomUUID)
@@ -257,6 +258,26 @@ export async function restoreBit(
     .from("bit")
     .update({ deleted_at: null })
     .eq("id", bitId);
+  if (error) throw error;
+}
+
+/** DESTROY a bit permanently (I-L10) — only if trashed. Removes its media files,
+ *  then deletes the row; the schema cascades its placements (+ their connectors),
+ *  tag applications, gather ties both ways, and travel. Guarded to `deleted_at IS
+ *  NOT NULL`: a live bit can never be destroyed, even if this is mis-called. */
+export async function destroyBit(supabase: SupabaseClient, bitId: string): Promise<void> {
+  const { data } = await supabase
+    .from("bit")
+    .select("storage_path, thumb_path")
+    .eq("id", bitId)
+    .not("deleted_at", "is", null)
+    .maybeSingle();
+  if (data) await removeObjects(supabase, [data.storage_path, data.thumb_path]);
+  const { error } = await supabase
+    .from("bit")
+    .delete()
+    .eq("id", bitId)
+    .not("deleted_at", "is", null);
   if (error) throw error;
 }
 

@@ -59,3 +59,17 @@ export async function signThumbs(
   );
   return out;
 }
+
+/** PERMANENTLY remove objects from the private bucket — the destroy path (I-L10:
+ *  "its media — file bytes and derived artifacts"). Nulls filtered; storage errors
+ *  are logged, never thrown — a failed/missing file must not block the row delete
+ *  (the row is the source of truth; a stray file is minor and cleanable). */
+export async function removeObjects(
+  supabase: SupabaseClient,
+  paths: (string | null | undefined)[],
+): Promise<void> {
+  const real = paths.filter((p): p is string => !!p);
+  if (real.length === 0) return;
+  const { error } = await supabase.storage.from(PRIVATE_BUCKET).remove(real);
+  if (error) console.error("storage remove failed (continuing):", error);
+}
