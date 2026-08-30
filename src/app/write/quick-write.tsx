@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { createLooseTextBit, updateBitBody, updateBitContent, trashBit } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
@@ -126,16 +125,6 @@ export function QuickWrite() {
       {/* A stable action toolbar — always here, never popping in as you type. Trash is
           always available; open lights up once the note exists. */}
       <div className="mb-4 flex items-center justify-end gap-2 text-sm">
-        <Link
-          href={selfId ? `/note/${selfId}` : "#"}
-          aria-disabled={!selfId}
-          tabIndex={selfId ? 0 : -1}
-          className={`rounded-md border border-neutral-200 px-2 py-1 hover:bg-neutral-50 ${
-            selfId ? "" : "pointer-events-none opacity-40"
-          }`}
-        >
-          open →
-        </Link>
         <button
           type="button"
           onClick={trashNote}
