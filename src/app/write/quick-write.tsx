@@ -126,9 +126,6 @@ export function QuickWrite() {
       {/* A stable action toolbar — always here, never popping in as you type. Trash is
           always available; open lights up once the note exists. */}
       <div className="mb-4 flex items-center justify-end gap-2 text-sm">
-        <span className="mr-1 text-xs text-neutral-400">
-          {selfId ? "saved" : "saves as you write"}
-        </span>
         <Link
           href={selfId ? `/note/${selfId}` : "#"}
           aria-disabled={!selfId}
