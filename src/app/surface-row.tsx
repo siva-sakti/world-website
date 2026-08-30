@@ -63,7 +63,7 @@ export function SurfaceRow({
             </button>
           </form>
         ) : (
-          <BitTrash bitId={s.id} returnTo="/" />
+          <BitTrash bitId={s.id} returnTo="/" compact />
         )}
       </span>
     </li>
