@@ -33,7 +33,7 @@ export function QuickWrite() {
   const [title, setTitle] = useState("");
   const titleRef = useRef("");
   const titleSaved = useRef("");
-  // Bumped on discard to remount the editor blank for a fresh start.
+  // Bumped on trash to remount the editor blank for a fresh start.
   const [resetKey, setResetKey] = useState(0);
 
   function flushTitle() {
@@ -88,15 +88,15 @@ export function QuickWrite() {
     }
   }
 
-  // Discard the just-written note in place — it goes to the trash (restorable), and
-  // the page resets to a fresh blank writer. Only offered once the note is born.
-  async function discard() {
+  // Trash the just-written note in place — the same "trash" as everywhere else
+  // (restorable), then reset to a fresh blank writer. Only offered once it's born.
+  async function trashNote() {
     const id = bitId.current;
     if (!id) return;
     if (
       !(await confirm({
-        message: "Discard this note? It goes to your trash — restorable there.",
-        confirmLabel: "Discard",
+        message: "Trash this note?",
+        confirmLabel: "Trash",
         danger: true,
       }))
     )
@@ -105,8 +105,8 @@ export function QuickWrite() {
       await create.current; // never trash before the row exists (the settled gate)
       await trashBit(supabase, id);
     } catch (e) {
-      console.error("discard failed:", e);
-      setErr("Couldn't discard — check your connection.");
+      console.error("trash failed:", e);
+      setErr("Couldn't trash — check your connection.");
       return;
     }
     if (timer.current) clearTimeout(timer.current);
@@ -153,10 +153,10 @@ export function QuickWrite() {
             {" · "}
             <button
               type="button"
-              onClick={discard}
+              onClick={trashNote}
               className="underline underline-offset-4 hover:no-underline"
             >
-              discard
+              trash
             </button>
           </span>
         ) : (
