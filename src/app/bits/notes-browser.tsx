@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { PanelBit } from "@/lib/db/inbox";
+import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
 import type { ShelfGroup } from "@/lib/db/shelf";
@@ -41,8 +42,11 @@ export function NotesBrowser({
   const shown = useMemo(() => {
     let xs = view === "loose" ? items.filter((b) => b.boards.length === 0) : items;
     if (kind) xs = xs.filter((b) => b.type === kind);
-    const needle = q.trim().toLowerCase();
-    if (needle) {
+    // Same search language as the global search (search-query.ts): whole word by
+    // default · word* starts-with · "phrase" · -exclude — never a partial word.
+    const parsed = parseQuery(q);
+    if (!isEmptyQuery(parsed)) {
+      const matcher = compileMatcher(parsed);
       xs = xs.filter((b) => {
         const hay = [
           b.face ?? "",
@@ -53,7 +57,7 @@ export function NotesBrowser({
         ]
           .join(" ")
           .toLowerCase();
-        return hay.includes(needle);
+        return matcher(hay);
       });
     }
     const by = {

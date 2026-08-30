@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { jumpWords, titleMatches } from "@/lib/jump-match";
 import {
   listSources,
   getBitSource,
@@ -91,9 +92,11 @@ export function SourcePicker({
     }
   }
 
-  const q = draft.trim().toLowerCase();
+  // Word-START matching (jump-match.ts): each typed word must begin a word in the
+  // source name — "art" → "Artforum", never "cartography" — still completing as you type.
+  const words = jumpWords(draft);
   const suggestions = all
-    .filter((s) => s.id !== current?.id && (!q || s.name.toLowerCase().includes(q)))
+    .filter((s) => s.id !== current?.id && titleMatches(s.name, words))
     .slice(0, 10);
 
   return (

@@ -7,6 +7,7 @@ import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { DoodleBit } from "./doodle-bit";
 import { computePlacement, type Placement } from "@/lib/floating";
+import { jumpWords, titleMatches } from "@/lib/jump-match";
 import type { BitHit } from "@/lib/db/references";
 
 // The `[[` gather picker — a SMART ORGANIZED dropdown (gather-picker-plan.md).
@@ -51,7 +52,10 @@ export function GatherPicker({
     [candidates],
   );
 
-  const match = (c: BitHit) => c.face.toLowerCase().includes(q);
+  // Word-START matching (jump-match.ts): "art" surfaces "artist"/"article", never
+  // "cartography" — while still completing as you type.
+  const words = jumpWords(query);
+  const match = (c: BitHit) => titleMatches(c.face, words);
   const notesShown = (q ? notes.filter(match) : notes).slice(0, NOTES_CAP);
   const visualMatches = q ? visual.filter(match) : visual;
 

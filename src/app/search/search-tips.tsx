@@ -5,10 +5,10 @@ import { useState } from "react";
 // A quiet ? by the search box → a non-intrusive cheatsheet for the search language.
 // Toggle open/closed; nothing is blocked while it's up.
 const TIPS: { syntax: string; means: string }[] = [
-  { syntax: "climate", means: "the whole word “climate” (matches once you finish typing it)" },
-  { syntax: "clim*", means: "words starting with “clim” — matches live as you type" },
+  { syntax: "climate", means: "words starting with “climate” — matches as you type" },
+  { syntax: "*ai", means: "“ai” anywhere in a word — even buried inside a link" },
   { syntax: "“climate policy”", means: "those words together, in order (use straight quotes)" },
-  { syntax: "climate -draft", means: "has “climate”, but not “draft”" },
+  { syntax: "climate -draft", means: "starts with “climate”, but not “draft”" },
   { syntax: "climate policy", means: "both words appear, in any order" },
 ];
 

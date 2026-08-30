@@ -1,11 +1,12 @@
-// The search language (client-side, instant, EXACT — no DB stemming, which would
-// treat "run" = "running", the opposite of what the owner wants). Parse a raw query
-// into terms / phrases / exclusions, compile it once into a matcher, run it over each
-// bit or note's words. Grammar: whole word by default · word* = starts-with ·
-// "exact phrase" = words contiguous · -word = exclude · two words = both must appear.
+// The search language (client-side, instant — no DB stemming, which would treat
+// "run" = "running"). Parse a raw query into terms / phrases / exclusions, compile it
+// once into a matcher, run it over each bit or note's words. Grammar: STARTS-WITH by
+// default (matches word beginnings, so it grows as you type — "ai" → "aim", never
+// "again") · *word = contains (anywhere, for text buried in a URL) · "exact phrase" =
+// words contiguous · -word = exclude · two words = both must appear.
 
 export type ParsedQuery = {
-  terms: { text: string; prefix: boolean }[]; // all must appear
+  terms: { text: string; contains: boolean }[]; // all must appear (contains = anywhere; else starts-with)
   phrases: string[]; // all must appear, words contiguous
   excludes: string[]; // none may appear
 };
@@ -23,18 +24,22 @@ export function parseQuery(raw: string): ParsedQuery {
     return " ";
   });
 
-  const terms: { text: string; prefix: boolean }[] = [];
+  const terms: { text: string; contains: boolean }[] = [];
   const excludes: string[] = [];
   for (const tok of rest.split(/\s+/)) {
     if (!tok) continue;
     if (tok.startsWith("-") && tok.length > 1) {
-      const x = tok.slice(1).replace(/\*+$/, "");
+      const x = tok.slice(1).replace(/^\*+|\*+$/g, "");
       if (x) excludes.push(x);
       continue;
     }
-    const prefix = tok.endsWith("*");
-    const text = prefix ? tok.replace(/\*+$/, "") : tok;
-    if (text) terms.push({ text, prefix });
+    // A leading * (e.g. *ai, *ai*) = CONTAINS — match anywhere in a word, for a
+    // handle buried in a URL. Otherwise the term is STARTS-WITH (the default): it
+    // matches words BEGINNING with it, so it grows as you type and never fires on a
+    // mid-word ("ai" → "aim"/"AI", never "again"). A trailing * is just the default.
+    const contains = tok.startsWith("*");
+    const text = tok.replace(/^\*+|\*+$/g, "");
+    if (text) terms.push({ text, contains });
   }
   return { terms, phrases, excludes };
 }
@@ -45,14 +50,16 @@ export function isEmptyQuery(pq: ParsedQuery): boolean {
 
 /** Compile a parsed query once into a fast matcher over a thing's lowercased words. */
 export function compileMatcher(pq: ParsedQuery): (text: string) => boolean {
-  // \b is a word boundary: `\blit\b` matches the word "lit" but not "literature"
-  // or "split"; a prefix drops the trailing \b so `\blit` matches words *starting*
-  // with "lit" (never mid-word — "split" has no boundary before "lit").
+  // \b is a word boundary. Default term = STARTS-WITH (`\bword`): matches words
+  // beginning with the term ("ai" → "aim"/"AI", never "again"/"email" mid-word) — so
+  // it grows as you type. `contains` drops the leading \b too (`word`) to match
+  // anywhere. A "phrase" is exact contiguous words (`\bword\b`); -word excludes a
+  // word-start.
   const phraseRes = pq.phrases.map((p) => new RegExp(`\\b${esc(p)}\\b`));
   const termRes = pq.terms.map((t) =>
-    t.prefix ? new RegExp(`\\b${esc(t.text)}`) : new RegExp(`\\b${esc(t.text)}\\b`),
+    t.contains ? new RegExp(esc(t.text)) : new RegExp(`\\b${esc(t.text)}`),
   );
-  const excludeRes = pq.excludes.map((x) => new RegExp(`\\b${esc(x)}\\b`));
+  const excludeRes = pq.excludes.map((x) => new RegExp(`\\b${esc(x)}`));
 
   return (text: string) => {
     for (const re of phraseRes) if (!re.test(text)) return false;

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Outline } from "@/lib/outline";
 import type { PanelBit } from "@/lib/db/inbox";
+import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { boardLabel } from "@/lib/labels";
 import { OutlineRow } from "./outline-row";
 
@@ -61,17 +62,21 @@ export function OutlineView({ outline }: { outline: Outline }) {
     return { cats: CAT_ORDER.filter((c) => cs.has(c)), tags: [...ts].sort() };
   }, [outline]);
 
-  const needle = q.trim().toLowerCase();
-  const filterActive = needle !== "" || cat !== null || tag !== "";
+  // Same search language as the global + drawer search (search-query.ts): whole word
+  // by default · word* starts-with · "phrase" · -exclude — never a partial word.
+  const parsed = useMemo(() => parseQuery(q), [q]);
+  const matcher = useMemo(() => compileMatcher(parsed), [parsed]);
+  const hasWords = !isEmptyQuery(parsed);
+  const filterActive = hasWords || cat !== null || tag !== "";
 
   function matches(b: PanelBit): boolean {
     if (cat && itemCat(b) !== cat) return false;
     if (tag && !b.tags.some((t) => t.word === tag)) return false;
-    if (needle) {
+    if (hasWords) {
       const hay = [b.face ?? "", b.content ?? "", (b.body ?? "").replace(/<[^>]+>/g, " "), b.source?.name ?? "", ...b.tags.map((t) => t.word)]
         .join(" ")
         .toLowerCase();
-      if (!hay.includes(needle)) return false;
+      if (!matcher(hay)) return false;
     }
     return true;
   }
@@ -108,7 +113,7 @@ export function OutlineView({ outline }: { outline: Outline }) {
             <option value="">all tags</option>
             {tags.map((t) => (
               <option key={t} value={t}>
-                #{t}
+                {t}
               </option>
             ))}
           </select>

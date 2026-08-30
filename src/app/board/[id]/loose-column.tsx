@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
+import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 
 // The board's DRAWER — a browser of all your bits, UNPLACED FIRST, split by kind
 // (bits · notes · all) and filterable by placement/type/tag/source, so you can drop
@@ -91,7 +92,11 @@ export function LooseColumn({
     return [...m].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [bits]);
 
-  const q = query.trim().toLowerCase();
+  // Same search language as the global search (search-query.ts): whole word by
+  // default · word* starts-with · "phrase" · -exclude — never a partial word.
+  const parsed = useMemo(() => parseQuery(query), [query]);
+  const matcher = useMemo(() => compileMatcher(parsed), [parsed]);
+  const hasWords = !isEmptyQuery(parsed);
   let filtered = (bits ?? []).filter((n) => {
     if (kind !== "all" && n.kind !== kind) return false;
     if (scope === "loose" && !isLoose(n)) return false;
@@ -100,9 +105,9 @@ export function LooseColumn({
     if (typeFilter !== "all" && n.type !== typeFilter) return false;
     if (sourceId && n.source?.id !== sourceId) return false;
     if (tagId && !n.tags.some((t) => t.id === tagId)) return false;
-    if (q) {
+    if (hasWords) {
       const hay = `${faceOf(n)} ${n.source?.name ?? ""} ${n.tags.map((t) => t.word).join(" ")}`.toLowerCase();
-      if (!hay.includes(q)) return false;
+      if (!matcher(hay)) return false;
     }
     return true;
   });
@@ -221,7 +226,7 @@ export function LooseColumn({
               <select value={tagId} onChange={(e) => setTagId(e.target.value)} aria-label="Filter by tag">
                 <option value="">any tag</option>
                 {allTags.map((t) => (
-                  <option key={t.id} value={t.id}>#{t.word}</option>
+                  <option key={t.id} value={t.id}>{t.word}</option>
                 ))}
               </select>
             )}

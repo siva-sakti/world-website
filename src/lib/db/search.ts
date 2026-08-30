@@ -107,15 +107,23 @@ export async function searchItems(
 ): Promise<SearchItem[]> {
   const bitKind = args.kind === "bit" || args.kind === "note" ? args.kind : undefined;
   const bits = await searchBits(supabase, { q: args.q, tagId: args.tagId, kind: bitKind });
-  const items: SearchItem[] = bits.map((b) => ({
-    kind: b.kind,
-    id: b.id,
-    label: bitLabel(b.type, b.face),
-    mediaType: b.type,
-    tags: b.tags,
-    created_at: b.created_at,
-    searchText: `${b.content ?? ""} ${(b.body ?? "").replace(/<[^>]+>/g, " ")} ${b.face ?? ""}`.toLowerCase(),
-  }));
+  const items: SearchItem[] = bits.map((b) => {
+    // `face` isn't a column on the base `bit` table (it's computed in the views), so
+    // b.face is undefined here — derive it the way bit_face does (owner's content,
+    // else the body's first words) so a result shows its ACTUAL text, not the generic
+    // "a note" fallback. Media with no caption still falls back per-type in bitLabel.
+    const bodyText = (b.body ?? "").replace(/<[^>]+>/g, " ").trim();
+    const face = b.content?.trim() || (bodyText ? bodyText.slice(0, 80) : null);
+    return {
+      kind: b.kind,
+      id: b.id,
+      label: bitLabel(b.type, face),
+      mediaType: b.type,
+      tags: b.tags,
+      created_at: b.created_at,
+      searchText: `${b.content ?? ""} ${bodyText}`.toLowerCase(),
+    };
+  });
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));
   return items.slice(0, 2000);
 }
