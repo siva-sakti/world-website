@@ -50,7 +50,7 @@ export default async function NotePage({
         <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} />
         <PlaceOnBoard bitId={b.id} boards={otherBoards} />
         <span className="note-actions-spacer" />
-        <BitTrash bitId={b.id} returnTo="/notes" />
+        <BitTrash bitId={b.id} returnTo="/" />
       </div>
 
       {/* The surface — title + the writing, central, full-width. */}

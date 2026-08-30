@@ -16,7 +16,7 @@ export default async function WritePage() {
         <span className="font-semibold">✎ write</span>
         <span className="text-neutral-400">
           saves to{" "}
-          <Link href="/notes" className="underline underline-offset-4 hover:no-underline">
+          <Link href="/" className="underline underline-offset-4 hover:no-underline">
             your notes
           </Link>
         </span>

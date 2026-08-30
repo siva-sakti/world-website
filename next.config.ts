@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     return [
       { source: "/inbox", destination: "/bits", permanent: true },
       { source: "/find", destination: "/search", permanent: true },
+      // Boards & notes merged into home (S2) — one surfaces list. Non-permanent
+      // (307) so the merge stays reversible; old links land on home.
+      { source: "/boards", destination: "/", permanent: false },
+      { source: "/notes", destination: "/", permanent: false },
     ];
   },
 };

@@ -73,8 +73,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button className="rail-link rail-btn">+ new board</button>
         </form>
         <div className="rail-sec">everything</div>
-        <Link href="/boards" className="rail-link">all boards</Link>
-        <Link href="/notes" className="rail-link">all notes</Link>
+        <Link href="/" className="rail-link">home</Link>
         <Link href="/bits" className="rail-link">bits</Link>
         <div className="rail-sec">lenses</div>
         <Link href="/search" className="rail-link">search</Link>
