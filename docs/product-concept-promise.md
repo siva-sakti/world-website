@@ -218,6 +218,39 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 **The third is the one consistent with "one primitive, everywhere"** and the only one that connects to the spatial half. ⚪ **Not decided — the owner has not chosen between them, and may mean the first while asking for the second.**
 
+## 2c-bis · ⭐⭐⭐ THE HEADLINE FINDING — we built the DIVERGENT half and not the CONVERGENT half (the owner, 2026-08-31)
+
+**The owner's framing, and it reorganises everything below it:**
+
+> *"The board is like a composing surface — it's for ideation. It might be all you need to go and jump into the world and do stuff. But if you want another surface to really DRAFT things… whatever we're calling the segmentation for people being more divergent and then being more convergent — **what do you need to converge more?** To me you basically need a Google Sheets, you need Google Docs, that functionality — or Notion could be the same thing — and you also need something like a Canva, or basically what PowerPoint or Google Slides would be **if it wasn't ancient news**."*
+
+| | the surface | state today |
+|---|---|---|
+| **DIVERGE** | **the board** — ideation, spread out, arrange, draw | ✅ **genuinely built.** Pan · zoom · drag · resize · pen · place anything anywhere |
+| **CONVERGE** | **a document** | ⚠️ **a text box** with a title and `[[` chips. The owner: *"it's not like a full Google Docs that I'm kind of wanting it to be"* |
+| **CONVERGE** | **a sheet** | ❌ nothing |
+| **CONVERGE** | **a deck** | ❌ nothing |
+
+### Why this outranks every individual feature gap
+
+**The product's own headline claim is half-built.** The owner's positioning line is *"we accommodate the process of getting from divergent to convergent — and usually all these interfaces are very notes-faced."* Today **we are the inverse of notes-faced, and that is the problem**: divergence is beautifully served and convergence lands in a text field. The claim rests on the half we haven't built.
+
+**It also re-frames the five-types reduction (§The sort).** The three "missing generic types" — a table with fields · an ordered sequence · a file you hand someone — **are not three unrelated gaps. They are doc · sheet · deck**: the convergent toolkit, found artifact-first and therefore mis-organised. The owner's cut is one idea where Claude had three.
+
+| what Claude called it | what it actually is |
+|---|---|
+| a table with fields | **a sheet** |
+| an ordered sequence | **a deck** |
+| a file you hand someone | how a doc/sheet/deck **leaves** — print/export |
+
+### The discipline (the owner's own rule, §6, applied hard)
+
+**We do not beat Google Docs, Excel, or Canva.** *Good enough that you never have to leave.* The entire justification for building any of this here is the seam: **a deck in Canva cannot reach your board; a deck here can.** If a convergent surface isn't connected to your material, it has no reason to exist in this app — go use the real one.
+
+⚑ **Scope warning, stated honestly:** doc + sheet + deck is the largest scope expansion this project has ever considered, and "good enough" is doing enormous load-bearing work in that sentence. Nothing here is ruled. But the *diagnosis* — that the convergent half is missing and the positioning depends on it — is the owner's, and it stands regardless of what gets built.
+
+⚑ **Naming (step 2b):** "document" · "sheet" · "deck" are Google's words, not ours. Unruled.
+
 ## 2d · ⭐ THE MISSING DIMENSION: SEQUENCE (surfaced 2026-08-31)
 
 **⚠ EVIDENCE CORRECTED (2026-08-31).** Claude first wrote *"four requests, one gap — the owner has described this absence four times."* **That was inflated: one ask is the owner's, three were Claude's own scenario drafts.** Counting my own generated scenarios as independent evidence is the same failure the owner corrected in the writer pass (*"critical mass"*) — I generated three plausible situations, noticed they shared an element, then cited the shared element as convergence. It is consistency with myself, not evidence.
