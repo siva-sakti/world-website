@@ -14,8 +14,10 @@ import {
   pinBit,
   pinGroup,
   moveGroup,
+  deleteGroup,
 } from "@/lib/db/shelf";
 import { SurfaceRow } from "./surface-row";
+import { confirm } from "@/components/confirm";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
 
 // YOUR SURFACES — the one list of boards + notes (S2). Kind tabs · folders ⇄ flat ·
@@ -103,6 +105,28 @@ export function HomeSurfaces({
     if (Boolean(a.pinned_at) !== Boolean(z.pinned_at)) return a.pinned_at ? -1 : 1;
     if (a.pinned_at && z.pinned_at) return z.pinned_at.localeCompare(a.pinned_at);
     return z.modified_at.localeCompare(a.modified_at);
+  }
+
+  /** Remove a folder. Its contents are NOT trashed — the boards and notes inside
+   *  simply come out of it (ON DELETE SET NULL physics). The confirm says so, and
+   *  counts BOTH kinds from the unfiltered list, so the number is honest even when
+   *  a kind tab is narrowing the view. (Re-wired at the origin/main merge: the db
+   *  door exported deleteGroup but nothing called it — the half-built door again.) */
+  async function removeGroup(g: { id: string; name: string }) {
+    const inGroup = surfaces.filter((s) => s.group_id === g.id);
+    const nb = inGroup.filter((s) => s.kind === "board").length;
+    const nn = inGroup.filter((s) => s.kind === "note").length;
+    const inside = [
+      nb ? `${nb} board${nb === 1 ? "" : "s"}` : "",
+      nn ? `${nn} note${nn === 1 ? "" : "s"}` : "",
+    ]
+      .filter(Boolean)
+      .join(" and ");
+    const message = inside
+      ? `Delete the folder \u201c${g.name}\u201d? Its ${inside} come out of the folder \u2014 nothing is trashed.`
+      : `Delete the empty folder \u201c${g.name}\u201d?`;
+    if (!(await confirm({ message, confirmLabel: "Delete folder", danger: true }))) return;
+    await act(() => deleteGroup(supabase, g.id));
   }
 
   const kinded = surfaces.filter((s) => kind === "all" || s.kind === kind);
@@ -253,6 +277,14 @@ export function HomeSurfaces({
                     onClick={() => act(() => moveGroup(supabase, g.id, "down"))}
                   >
                     ↓
+                  </button>
+                  <button
+                    className="shelf-move"
+                    disabled={busy}
+                    title="delete this folder — what's inside comes out, nothing is trashed"
+                    onClick={() => void removeGroup(g)}
+                  >
+                    ×
                   </button>
                 </span>
               </h3>
