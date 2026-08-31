@@ -180,7 +180,7 @@ INDEX.md ................ this file — where everything is
 ## 5 · THE RECORD — what happened
 
 ### `PROGRESS.md` — the decisions log
-**Contains:** the status block (where we are now) · **the D-log, D-001→D-122** (each a short receipt: the ruling + supersessions + pointers) · "needs owner" · work done.
+**Contains:** the status block (where we are now) · **the D-log, D-001→D-128** (each a short receipt: the ruling + supersessions + pointers) · "needs owner" · work done.
 **Does NOT cover:** the reasoning (→ `deliberations.md`, deliberately — the log is a receipt, not an essay).
 **Links:** `deliberations.md` · `model.md` · `parked.md`.
 

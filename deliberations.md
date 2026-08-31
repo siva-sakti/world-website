@@ -283,7 +283,7 @@ All vocabulary physics verified line-by-line (renames-by-id · wrong-references-
 
 **Meta-note — Claude's failure mode, named by the owner ("it feels like I keep losing you").** The owner's core was *stable and clear the whole time*; the breakdowns were Claude's, in a specific pattern: **over-formalizing a simple idea** (inventing the document family, the escape-hatch button) and **over-rotating on the owner's most-recent analogy** instead of holding the through-line. Same elegant-unification bias flagged in Cluster 3's meta-map — *watch for added hidden machinery.* Fix: hold the stable core; treat the owner's analogies as *feeling*, not taxonomy; ask "structure or feeling?" before building on one. (Memory saved.)
 
-## Archive — proposed, audited, and sent back (2026-08-28 → D-122)
+## Archive — proposed, audited, and sent back (2026-08-28 → D-128, renumbered from D-122; the question it raised was answered by D-127)
 
 **What was wanted (owner, in their words):** *"the possibility for archiving and deletion for anything that is a unit in our app whether that's a bit or board or a note."* Something you're done with should stop being in the way without being thrown away.
 

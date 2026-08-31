@@ -97,7 +97,7 @@ The owner asked directly. Nothing here is padded; each item is real work.
 18. **Trash / restore** semantics — what does trashing a row mean? a table?
 19. **Find integration** — does table content appear in `/find`? (It does free under Option A.)
 20. **The `[[` picker** — do rows show up as gatherable? (Free under A; a build under B.)
-21. **Naming** — ⚑ **step 2b: none of this has a ruled word yet.** "table," "list," "database," "grid" are all unruled. `lexicon.md` has nothing. **Name it before building it** — this is exactly the rule that archive broke (D-122).
+21. **Naming** — ⚑ **step 2b: none of this has a ruled word yet.** "table," "list," "database," "grid" are all unruled. `lexicon.md` has nothing. **Name it before building it** — this is exactly the rule that archive broke (D-128).
 
 ---
 

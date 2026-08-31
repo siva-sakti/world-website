@@ -74,7 +74,7 @@ The owner asked for the cut to be checked before journeys got built on it. Check
 - **"Pieces" is the computed room** gathering everything finished — as the desk gathers the alive. The one room that should be **presentation-forward**: image-rich, proud, screenshot-worthy. The design stance already demands the return surface be deliberately designed; this is its truest case — your work, displayed to *you* first.
 - **The feeling distinction that keeps it honest:** archive (parked A24) *hides* — "out of my way." Pieces *displays* — "done and proud." **Opposite gestures; never merge them.**
 - **The zero-build test available TODAY:** a `finished` tag — its pull is already a proto-pieces-room. Live with it two weeks; find out whether finished-ness earns first-class status. Evidence before schema.
-- ⚑ When it builds: **step 2b, name it first** — "pieces" vs "portfolio" vs "finished"; the archive lesson (D-122) was exactly this.
+- ⚑ When it builds: **step 2b, name it first** — "pieces" vs "portfolio" vs "finished"; the archive lesson (D-128) was exactly this.
 
 **FINDING 3 (original) — the ARCHIVE is missing or deliberately excluded; choose.** Where finished work lives: the painter's photographed pieces, the writer's published clips — today a Google Drive folder. Adjacent to presentation, not the same. Claude leans *include* (it's list-and-image-shaped, exactly our material); a scope call, ⚑ the owner's.
 
