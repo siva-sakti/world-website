@@ -89,19 +89,42 @@ export function NoteCard({
   boards,
   groups,
   showBoards,
+  onPlaced,
+  selectMode,
+  selected,
+  onToggle,
 }: {
   item: PanelBit;
   img?: string;
   boards: { id: string; title: string | null }[];
   groups: ShelfGroup[];
   showBoards: boolean;
+  onPlaced?: (boardId: string, boardTitle: string | null) => void;
+  selectMode?: boolean; // loose-page multi-select: the whole card becomes a selection toggle
+  selected?: boolean;
+  onToggle?: () => void;
 }) {
   const title = item.face; // first words (text) · label (drawing) · content (image)
   const source = item.source;
   const isLoose = item.boards.length === 0;
 
   return (
-    <li className={`inbox-card inbox-card--${item.type}`}>
+    <li
+      className={`inbox-card inbox-card--${item.type}${selectMode ? " inbox-card--selecting" : ""}${selected ? " inbox-card--selected" : ""}`}
+      // Capture the click at the card BEFORE it can reach the inner open-link, and toggle instead —
+      // reliable regardless of CSS (pointer-events alone let the link's navigation slip through).
+      onClickCapture={
+        selectMode
+          ? (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle?.();
+            }
+          : undefined
+      }
+    >
+      {/* In select mode the whole card toggles selection; a CSS rule makes inner links/controls
+          click-through (.inbox-card--selecting *), so a click anywhere selects instead of opening. */}
       {/* Open → the workspace, where full editing / tagging / source live. */}
       <Link href={`/bit/${item.id}`} className="inbox-card-body" title="open">
         {item.type === "image" || item.type === "pdf" ? (
@@ -184,7 +207,7 @@ export function NoteCard({
         <span className="inbox-card-actions">
           <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
-          {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
+          {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} onPlaced={onPlaced} />}
           <form action={trashFromInbox}>
             <input type="hidden" name="id" value={item.id} />
             <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>

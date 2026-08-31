@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createLooseTextBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
+import { getBoardCards } from "@/lib/db/boards";
+import { anchorNearContent, pointForIndex } from "./placement-anchor";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
@@ -88,27 +90,43 @@ export async function trashFromInbox(formData: FormData) {
   revalidatePath("/bits");
 }
 
-/** Door B (call-in from the inbox): place a loose note onto a board. It lands at a
- * default spot (you're not on the board — its "fit" frames it), spread a little by
- * the bit's own id so several sends don't stack at one exact point; callInBit
- * revives the row if the note lived there before, never a duplicate (I-L1). */
-export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
+/** Door B (call-in from the inbox): send one or more loose bits to a board (Batch 2 —
+ * send-to-board-plan.md). You're NOT on the board, so each arrival lands just to the RIGHT of the
+ * board's existing cluster (anchorNearContent — never on top of it), cascading down-right so a batch
+ * doesn't pile. Best-effort: a trashed bit/board is reported, the rest still land. callInBit revives
+ * a row the bit lived on before, never a duplicate (I-L1) — and each bit needs a FRESH placement id
+ * (a reused one collides on the PK and would throw for every bit after the first). */
+export async function placeBitsOnBoard(bitIds: string[], boardId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
-  const seed = Array.from(bitId).reduce((a, c) => a + c.charCodeAt(0), 0);
-  const x = 40 + (seed % 5) * 36;
-  const y = 40 + (seed % 7) * 28;
-  try {
-    await callInBit(supabase, { bitId, boardId, placementId: randomUUID(), x, y });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "";
-    revalidatePath("/bits"); // a stale pile is often the CAUSE (trashed elsewhere) — refresh it
-    revalidatePath(`/bit/${bitId}`);
-    if (msg === "TRASHED_BIT") return { error: "That note is in the trash — restore it first." };
-    if (msg === "TRASHED_BOARD") return { error: "That board is in the trash." };
-    console.error("placeOnBoard failed:", e);
-    return { error: "Couldn't place that on the board." };
+  const anchor = anchorNearContent(await getBoardCards(supabase, boardId));
+  let failed = 0;
+  let firstMsg = "";
+  for (let i = 0; i < bitIds.length; i++) {
+    const { x, y } = pointForIndex(anchor, i);
+    try {
+      await callInBit(supabase, { bitId: bitIds[i], boardId, placementId: randomUUID(), x, y });
+    } catch (e) {
+      failed++;
+      if (!firstMsg) firstMsg = e instanceof Error ? e.message : "";
+      console.error("placeBitsOnBoard: a bit failed:", e);
+    }
   }
+  // Revalidate on success AND on error — a stale pile (trashed elsewhere) is often the cause. Pre-warm
+  // the board so it shows the arrivals when the "open it" link is followed.
   revalidatePath("/bits");
-  revalidatePath(`/bit/${bitId}`); // the thing's own page shows its boards + this door
+  revalidatePath(`/board/${boardId}`);
+  for (const id of bitIds) revalidatePath(`/bit/${id}`);
+  if (failed) {
+    const many = bitIds.length > 1;
+    if (firstMsg === "TRASHED_BIT")
+      return { error: many ? "Some of those notes are in the trash — restore them first." : "That note is in the trash — restore it first." };
+    if (firstMsg === "TRASHED_BOARD") return { error: "That board is in the trash." };
+    return { error: many ? "Couldn't send some of those to the board." : "Couldn't place that on the board." };
+  }
   return {};
+}
+
+/** Single-bit send — a thin wrapper so the existing per-card door keeps its signature. */
+export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
+  return placeBitsOnBoard([bitId], boardId);
 }

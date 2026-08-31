@@ -16,19 +16,40 @@ export function NoteRow({
   boards,
   groups,
   showBoards,
+  onPlaced,
+  selectMode,
+  selected,
+  onToggle,
 }: {
   item: PanelBit;
   img?: string;
   boards: { id: string; title: string | null }[];
   groups: ShelfGroup[];
   showBoards: boolean;
+  onPlaced?: (boardId: string, boardTitle: string | null) => void;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggle?: () => void;
 }) {
   const title = item.face;
   const isLoose = item.boards.length === 0;
   const date = fmt(item.created_at);
 
   return (
-    <li className="notes-row">
+    <li
+      className={`notes-row${selectMode ? " notes-row--selecting" : ""}${selected ? " notes-row--selected" : ""}`}
+      // Capture the click before it reaches the inner open-link, and toggle instead (reliable
+      // regardless of CSS — pointer-events alone let the link's navigation slip through).
+      onClickCapture={
+        selectMode
+          ? (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle?.();
+            }
+          : undefined
+      }
+    >
       <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
       <Link href={`/bit/${item.id}`} className="notes-row-title" title="open">
         {(item.type === "image" || item.type === "pdf") && img && (
@@ -63,7 +84,7 @@ export function NoteRow({
       <span className="notes-row-actions">
         <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
         <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
-        {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
+        {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} onPlaced={onPlaced} />}
         <form action={trashFromInbox}>
           <input type="hidden" name="id" value={item.id} />
           <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>

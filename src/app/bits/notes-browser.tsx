@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
+import { placeBitsOnBoard } from "./actions";
 import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
@@ -32,9 +34,71 @@ export function NotesBrowser({
   const [kind, setKind] = useState<Kind | null>(null);
   const [sort, setSort] = useState<Sort>("new");
   const [layout, setLayout] = useState<"cards" | "list">("cards");
+  // The "sent to … ✓ · open it" banner lives HERE, not in the card: sending revalidates /bits, which
+  // drops the placed bit and unmounts its card — this browser stays mounted, so the banner survives.
+  const [sent, setSent] = useState<{ boardId: string; title: string | null } | null>(null);
+  useEffect(() => {
+    if (!sent) return;
+    const t = setTimeout(() => setSent(null), 6000);
+    return () => clearTimeout(t);
+  }, [sent]);
+
+  // Loose-page multi-select → send several bits to a board at once. Loose-ONLY: the "all" tab holds
+  // placed bits, and selecting one there to send elsewhere is the parked A20 multi-board door — so the
+  // select toggle shows only in the loose view, and switching to "all" exits select mode.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [bulkPending, setBulkPending] = useState(false);
+  const [bulkErr, setBulkErr] = useState<string | null>(null);
+
+  function exitSelect() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    setBulkErr(null);
+  }
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  async function bulkSend(boardId: string) {
+    if (!boardId || bulkPending || selectedIds.size === 0) return;
+    setBulkPending(true);
+    setBulkErr(null);
+    try {
+      const res = await placeBitsOnBoard([...selectedIds], boardId);
+      if (res.error) {
+        setBulkErr(res.error);
+        return;
+      }
+      setSent({ boardId, title: boards.find((b) => b.id === boardId)?.title ?? null });
+      exitSelect(); // the sent bits drop from the loose list; the banner above confirms + links
+    } catch {
+      setBulkErr("Couldn't send those — try again.");
+    } finally {
+      setBulkPending(false);
+    }
+  }
+  // Escape leaves select mode.
+  useEffect(() => {
+    if (!selectMode) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setSelectMode(false);
+        setSelectedIds(new Set());
+        setBulkErr(null);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectMode]);
 
   function switchView(v: View) {
     setView(v);
+    if (v === "all") exitSelect(); // multi-select is loose-only (parked A20 guard)
     // Keep the URL linkable without a server round-trip.
     window.history.replaceState(null, "", v === "all" ? "/bits?view=all" : "/bits");
   }
@@ -141,7 +205,61 @@ export function NotesBrowser({
             ☰
           </button>
         </div>
+        {view === "loose" && (
+          <button
+            className={`loose-scope-tab${selectMode ? " is-on" : ""}`}
+            onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
+            title="Select several bits to send to a board together"
+          >
+            ⛶ select
+          </button>
+        )}
       </div>
+
+      {sent && (
+        <div
+          className="mt-4 flex items-center gap-3 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm"
+          role="status"
+        >
+          <span>
+            sent to <strong>{sent.title || "untitled board"}</strong> ✓
+          </span>
+          <Link href={`/board/${sent.boardId}`} className="underline underline-offset-2">
+            open it →
+          </Link>
+          <button
+            onClick={() => setSent(null)}
+            className="ml-auto text-neutral-400 hover:text-neutral-600"
+            aria-label="dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {selectMode && (
+        <div className="mt-4 flex items-center gap-3 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm">
+          <span>{selectedIds.size} selected</span>
+          <select
+            value=""
+            disabled={bulkPending || selectedIds.size === 0}
+            onChange={(e) => bulkSend(e.target.value)}
+            className="inbox-card-place"
+            aria-label="send selected bits to a board"
+          >
+            <option value="">{bulkPending ? "sending…" : "send to…"}</option>
+            {boards.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.title || "untitled board"}
+              </option>
+            ))}
+          </select>
+          {bulkErr && <span className="text-red-700">{bulkErr}</span>}
+          <button onClick={exitSelect} className="ml-auto text-neutral-500 underline underline-offset-2">
+            clear
+          </button>
+        </div>
+      )}
 
       {shown.length === 0 ? (
         <p className="mt-8 text-neutral-500">
@@ -167,6 +285,10 @@ export function NotesBrowser({
                   boards={boards}
                   groups={groups}
                   showBoards={view === "all"}
+                  onPlaced={(boardId, title) => setSent({ boardId, title })}
+                  selectMode={selectMode}
+                  selected={selectedIds.has(b.id)}
+                  onToggle={() => toggleSelect(b.id)}
                 />
               ) : (
                 <NoteRow
@@ -176,6 +298,10 @@ export function NotesBrowser({
                   boards={boards}
                   groups={groups}
                   showBoards={view === "all"}
+                  onPlaced={(boardId, title) => setSent({ boardId, title })}
+                  selectMode={selectMode}
+                  selected={selectedIds.has(b.id)}
+                  onToggle={() => toggleSelect(b.id)}
                 />
               ),
             )}

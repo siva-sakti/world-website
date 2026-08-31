@@ -1267,6 +1267,23 @@ body {
   box-shadow: 0 4px 14px rgba(60, 50, 35, 0.08);
   transform: translateY(-1px);
 }
+/* Loose-page multi-select (send several bits to a board). The click-to-select is handled in JS
+   (onClickCapture on the card intercepts the click before it reaches the inner open-link); these rules
+   are cosmetic — quiet the inner links' hover/cursor so the card reads as ONE toggle, and give a
+   selected card the app's selection outline (#365a8c). */
+.inbox-card--selecting,
+.notes-row--selecting {
+  cursor: pointer;
+}
+.inbox-card--selecting *,
+.notes-row--selecting * {
+  pointer-events: none;
+}
+.inbox-card--selected,
+.notes-row--selected {
+  outline: 2px solid #365a8c;
+  outline-offset: 2px;
+}
 .inbox-card-body {
   display: flex;
   flex: 1;

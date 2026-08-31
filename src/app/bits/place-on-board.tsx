@@ -13,7 +13,8 @@ export function PlaceOnBoard({
 }: {
   bitId: string;
   boards: { id: string; title: string | null }[];
-  onPlaced?: () => void; // /write uses this for its "placed ✓" line; the notes page relies on revalidate
+  onPlaced?: (boardId: string, boardTitle: string | null) => void; // the LIST hosts the "sent ✓ · open it"
+  // banner — this card unmounts on the revalidate that drops the now-placed bit, so it can't host it itself.
 }) {
   const [pending, setPending] = useState(false);
   const [err, setErr] = useState(false);
@@ -27,7 +28,7 @@ export function PlaceOnBoard({
     try {
       const res = await placeOnBoard(bitId, boardId);
       if (res.error) setErr(true);
-      else onPlaced?.();
+      else onPlaced?.(boardId, boards.find((b) => b.id === boardId)?.title ?? null);
       // On success, revalidatePath re-renders the notes page without this note.
     } catch {
       setErr(true); // network rejection — without this, `pending` sticks forever
