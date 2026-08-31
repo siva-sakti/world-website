@@ -99,16 +99,19 @@ export async function createImageBit(
  * board (finally honored). It appears in the inbox until placed (call-in). */
 export async function createLooseTextBit(
   supabase: SupabaseClient,
-  args: { bitId: string; body?: string },
+  args: { bitId: string; body?: string; kind?: "bit" | "note" },
 ): Promise<Bit> {
   const { data, error } = await supabase
     .from("bit")
-    .insert({ id: args.bitId, type: "text", body: args.body ?? "<p></p>" })
+    .insert({ id: args.bitId, type: "text", body: args.body ?? "<p></p>", kind: args.kind ?? "bit" })
     .select("*")
     .single();
   if (error) throw error;
   return data as Bit;
 }
+
+// (No setBitKind: a thing never changes type — kind is fixed at birth, catch → 'bit'
+// / ✎ write → 'note' (ruled 2026-08-27). The only kind-writes are the create paths.)
 
 /** Call a loose bit onto a board — the app-layer consumer of I-L1. A loose bit has
  * no LIVE placement, but it may carry a DEPARTED one on this board (it lived here and
@@ -223,6 +226,32 @@ export async function unplaceBit(
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
+/** Put a note away, or take it back out (N5). Archive is a RESTING state, not
+ *  trash-lite: the row stays live, so find still reaches it — it just leaves the
+ *  rooms you work in.
+ *
+ *  Archiving clears the star in the SAME statement. Nothing is both "alive right
+ *  now" and put away — they're opposite claims about one thing — and the DB check
+ *  `bit_archived_not_alive` refuses any other combination, so this is the only
+ *  shape that can succeed. That's deliberate: the invariant lives in the schema,
+ *  and this is the one door that satisfies it. */
+export async function archiveBit(
+  supabase: SupabaseClient,
+  bitId: string,
+  on: boolean,
+): Promise<void> {
+  const patch = on
+    ? { archived_at: new Date().toISOString(), pinned_at: null }
+    : { archived_at: null };
+  const { data, error } = await supabase
+    .from("bit")
+    .update(patch)
+    .eq("id", bitId)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("that note no longer exists — reload");
+}
+
 /** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
  * row was touched (0 rows = the act missed — surface it). */
 export async function trashBit(
@@ -297,15 +326,20 @@ export async function getBitTravel(
   return (data ?? []) as BitTravelLeg[];
 }
 
-/** Raw owner content for a set of bits — the board_cards view exposes only the
- * computed face, but the title editor needs the raw column. */
-export async function getBitContents(
+/** Raw per-bit fields the board_cards view doesn't expose: `content` (the title
+ * editor needs the raw column, not the computed face) and `kind` (so a placed NOTE
+ * renders as a doorway, not editable text — N3). One indexed query for the board. */
+export async function getBitMeta(
   supabase: SupabaseClient,
   ids: string[],
-): Promise<Map<string, string | null>> {
-  const out = new Map<string, string | null>();
+): Promise<Map<string, { content: string | null; kind: "bit" | "note" }>> {
+  const out = new Map<string, { content: string | null; kind: "bit" | "note" }>();
   if (!ids.length) return out;
-  const { data } = await supabase.from("bit").select("id, content").in("id", ids);
-  for (const b of data ?? []) out.set(b.id as string, (b.content as string | null) ?? null);
+  const { data } = await supabase.from("bit").select("id, content, kind").in("id", ids);
+  for (const b of data ?? [])
+    out.set(b.id as string, {
+      content: (b.content as string | null) ?? null,
+      kind: (b.kind as "bit" | "note") ?? "bit",
+    });
   return out;
 }

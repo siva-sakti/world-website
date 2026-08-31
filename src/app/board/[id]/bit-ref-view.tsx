@@ -198,7 +198,7 @@ function Peek({
         ) : (
           <>
             {target.type === "text" ? (
-              <p className="gather-peek-text">{target.snippet || name || "empty note"}</p>
+              <p className="gather-peek-text">{target.snippet || name || "empty bit"}</p>
             ) : (
               <>
                 <div className="gather-peek-glimpse">

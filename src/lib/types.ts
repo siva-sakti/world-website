@@ -39,12 +39,18 @@ export type Bit = {
   created_at: string;
   updated_at: string;
   face: string | null; // computed headline (read-only)
+  pinned_at: string | null; // the shelf (O1): pinned floats atop notes; null = unpinned
+  group_id: string | null; // the shelf (O1b): a note can sit in a folder, like a board
+  kind: "bit" | "note"; // V2 (D-118): a fragment, or a written PIECE (first-class beside boards)
+  archived_at: string | null; // N5: put away — out of your rooms, still findable; null = not archived
 };
 
 export type Board = {
   id: string;
   title: string | null;
   visibility: Visibility;
+  group_id: string | null; // the shelf (O1): which home section this board sits in
+  pinned_at: string | null; // pinned floats to the top of the shelf; null = unpinned
   deleted_at: string | null;
   created_at: string;
   updated_at: string;

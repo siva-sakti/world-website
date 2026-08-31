@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, BitType } from "@/lib/types";
+import { bitLabel, boardLabel } from "@/lib/labels";
+import { haystack } from "@/lib/search";
 
 // Find (§7) — all computed, stored nowhere. The empty query is THE LEDGER: every
 // live bit, newest first, the reachability floor (I-T1). Add a text query, a tag,
@@ -8,7 +10,7 @@ import type { Bit, BitType } from "@/lib/types";
 
 export type FindResult = Bit & { tags: { id: string; word: string }[] };
 
-export type FindArgs = { q?: string; tagId?: string; type?: BitType };
+export type FindArgs = { q?: string; tagId?: string; type?: BitType; kind?: "bit" | "note" };
 
 export async function findBits(
   supabase: SupabaseClient,
@@ -32,8 +34,9 @@ export async function findBits(
     .select("*")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(1000); // load-most: find filters client-side (instant); ~1000+ = server-search trigger
   if (args.type) query = query.eq("type", args.type);
+  if (args.kind) query = query.eq("kind", args.kind); // bit vs note (N4)
   if (args.q && args.q.trim())
     query = query.textSearch("search_tsv", args.q.trim(), { type: "websearch" });
   if (onlyIds) query = query.in("id", onlyIds);
@@ -80,4 +83,115 @@ async function attachTags(
     byBit.set(a.target_bit_id as string, arr);
   }
   return rows.map((b) => ({ ...b, tags: byBit.get(b.id) ?? [] }));
+}
+
+// ---- boards + the unified find (N4) ----
+
+type BoardFindRow = { id: string; title: string | null; created_at: string; tags: { id: string; word: string }[] };
+
+/** Boards matching a text query (over the board's `search_tsv` — its title) and/or a
+ *  tag (a tag on a board — the polymorphic `target_board_id` side). Title-deep only:
+ *  we do NOT dive into the bits placed on a board (those turn up as bits themselves). */
+export async function findBoards(
+  supabase: SupabaseClient,
+  args: { q?: string; tagId?: string },
+): Promise<BoardFindRow[]> {
+  let onlyIds: string[] | null = null;
+  if (args.tagId) {
+    const { data, error } = await supabase
+      .from("tag_application")
+      .select("target_board_id")
+      .eq("tag_id", args.tagId)
+      .not("target_board_id", "is", null);
+    if (error) throw error;
+    onlyIds = (data ?? []).map((r) => r.target_board_id as string);
+    if (onlyIds.length === 0) return [];
+  }
+
+  let query = supabase
+    .from("board")
+    .select("id, title, created_at")
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (args.q && args.q.trim())
+    query = query.textSearch("search_tsv", args.q.trim(), { type: "websearch" });
+  if (onlyIds) query = query.in("id", onlyIds);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  const rows = (data ?? []) as { id: string; title: string | null; created_at: string }[];
+  if (rows.length === 0) return [];
+
+  const { data: apps, error: tErr } = await supabase
+    .from("tag_application")
+    .select("target_board_id, tag:tag(id, word)")
+    .in("target_board_id", rows.map((b) => b.id));
+  if (tErr) throw tErr;
+  const byBoard = new Map<string, { id: string; word: string }[]>();
+  for (const a of apps ?? []) {
+    const t = a.tag as unknown as { id: string; word: string };
+    const arr = byBoard.get(a.target_board_id as string) ?? [];
+    if (t) arr.push(t);
+    byBoard.set(a.target_board_id as string, arr);
+  }
+  return rows.map((b) => ({ ...b, tags: byBoard.get(b.id) ?? [] }));
+}
+
+export type FindKind = "all" | "bit" | "note" | "board";
+
+/** One result in the mixed find list, tagged with what it is. */
+export type FindItem = {
+  kind: "bit" | "note" | "board";
+  id: string;
+  label: string;
+  mediaType?: BitType; // bits only — text/drawing/image
+  tags: { id: string; word: string }[];
+  created_at: string;
+  searchText: string; // from haystack() in lib/search — the ONE match rule (bit: content+body+face · board: title)
+};
+
+/** Find across all three kinds (N4). Bits (fragments and notes, by their words),
+ *  boards (by their title), each labeled; narrowed by `kind`; newest first. Empty
+ *  query = everything (the ledger, now including boards). */
+export async function findItems(
+  supabase: SupabaseClient,
+  args: { q?: string; tagId?: string; kind: FindKind },
+): Promise<FindItem[]> {
+  const wantBits = args.kind === "all" || args.kind === "bit" || args.kind === "note";
+  const wantBoards = args.kind === "all" || args.kind === "board";
+  const items: FindItem[] = [];
+
+  if (wantBits) {
+    const bitKind = args.kind === "bit" || args.kind === "note" ? args.kind : undefined;
+    const bits = await findBits(supabase, { q: args.q, tagId: args.tagId, kind: bitKind });
+    for (const b of bits) {
+      items.push({
+        kind: b.kind,
+        id: b.id,
+        label: bitLabel(b.type, b.face),
+        mediaType: b.type,
+        tags: b.tags,
+        created_at: b.created_at,
+        searchText: haystack({ face: b.face, content: b.content, body: b.body }),
+      });
+    }
+  }
+
+  if (wantBoards) {
+    const boards = await findBoards(supabase, { q: args.q, tagId: args.tagId });
+    for (const bd of boards) {
+      items.push({
+        kind: "board",
+        id: bd.id,
+        label: boardLabel(bd.title),
+        tags: bd.tags,
+        created_at: bd.created_at,
+        searchText: haystack({ content: bd.title }),
+      });
+    }
+  }
+
+  items.sort((a, z) => z.created_at.localeCompare(a.created_at));
+  return items.slice(0, 2000);
 }

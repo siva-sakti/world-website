@@ -1,6 +1,8 @@
-# ROADMAP — the spatial notebook
+# ROADMAP — the spatial notebook  📜 SUPERSEDED as the live plan
 
-**What this is:** the single, canonical **product sequence** — what to build next, in what order, and how we'll know it worked. **Rebuilt from the closed model at the translation step (Stage 1f, D-085)** in the ruled language: no bit-to-bit *links*, no `kind`, no `stage` in v1 — relatedness is a **shared tag** or a **shared board**, and the canvas arrow is the **connector**. Reads *downstream* of `agreements.md` (the ruled model) and `SPEC.md` (the technical manual); it never re-derives them. The **work campaign** for the current stretch (translation → port → knowledge layer → return test, with the owner's checkpoints) is `technical-build-plan-stages-and-checkpoints.md`. Decisions + status live in `PROGRESS.md`; every deferral lives in `parked.md`.
+> **📜 Older product-phase sketch (D-085), frozen pre-notes.** The **live plan / build queue is now `organize-phase-plan.md`** (Phases O/V/N). Two claims below are stale: "**no `kind`**" is false — `bit.kind` ('bit'|'note') is the load-bearing field of the whole bit/note distinction (D-119/D-121); and `agreements.md` "the ruled model" is historical now — the current model is **`model.md`**. Kept for the phase-shape background.
+
+**What this was:** the single, canonical **product sequence** — what to build next, in what order, and how we'll know it worked. **Rebuilt from the then-closed model at the translation step (Stage 1f, D-085)** — relatedness is a **shared tag** or a **shared board**, and the canvas arrow is the **connector**. Read *downstream* of the model and `SPEC.md` (the technical manual); it never re-derived them. The **work campaign** for the current stretch (translation → port → knowledge layer → return test, with the owner's checkpoints) is `technical-build-plan-stages-and-checkpoints.md`. Decisions + status live in `PROGRESS.md`; every deferral lives in `parked.md`.
 
 _Rebuilt: 2026-07-21._
 

@@ -1,29 +1,22 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
+import { listBoards } from "@/lib/db/boards";
+import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { getBitSource } from "@/lib/db/sources";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
-import { logout } from "@/app/login/actions";
+import { fmt } from "@/lib/dates";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { TextWorkspace } from "./text-workspace";
 
 export const dynamic = "force-dynamic";
-
-function fmt(iso: string | null): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 export default async function BitPage({
   params,
@@ -35,13 +28,21 @@ export default async function BitPage({
 
   const b = await getBit(supabase, id);
   if (!b) notFound();
+  if (b.kind === "note") redirect(`/note/${id}`); // a note is a surface — its own page (N1)
 
-  const [boards, travel, source, gatheredInto] = await Promise.all([
+  const [boards, travel, source, gatheredInto, allBoards] = await Promise.all([
     getBitBoards(supabase, id),
     getBitTravel(supabase, id),
     getBitSource(supabase, id),
     listGatheredInto(supabase, id),
+    listBoards(supabase),
   ]);
+  // Boards it's NOT already on — the "place on a board…" door (board-side placement
+  // stays too; both directions, the owner's ruling). callInBit revives a departed
+  // leg rather than duplicating, so this is safe even for a board it once left.
+  const otherBoards = allBoards
+    .filter((bd) => !boards.some((cur) => cur.id === bd.id))
+    .map((bd) => ({ id: bd.id, title: bd.title }));
 
   let imageUrl: string | undefined;
   if (b.type === "image" && b.storage_path) {
@@ -59,24 +60,9 @@ export default async function BitPage({
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-8 flex items-baseline justify-between text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/find" className="underline underline-offset-4 hover:no-underline">
-            ← find
-          </Link>
-          <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            boards
-          </Link>
-          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            notes
-          </Link>
-        </div>
+        <span className="font-semibold text-neutral-400">bit</span>
         <div className="flex items-baseline gap-5">
           <BitTrash bitId={b.id} />
-          <form action={logout}>
-            <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-              sign out
-            </button>
-          </form>
         </div>
       </header>
 
@@ -172,15 +158,25 @@ export default async function BitPage({
             ))}
           </ul>
         )}
+        {otherBoards.length > 0 && (
+          <div className="mt-3 text-sm">
+            <PlaceOnBoard bitId={b.id} boards={otherBoards} />
+          </div>
+        )}
       </section>
 
-      {/* Travel */}
+      {/* Where it's been — the bit's board history (arrived/left), boards clickable. */}
       <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">travel</h2>
+        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">where it&rsquo;s been</h2>
         <ul className="space-y-1 text-sm text-neutral-600">
           {travel.map((t, i) => (
             <li key={i}>
-              <span className="text-neutral-800">{boardLabel(t.board_title)}</span>
+              <Link
+                href={`/board/${t.board_id}`}
+                className="text-neutral-800 underline underline-offset-4 hover:no-underline"
+              >
+                {boardLabel(t.board_title)}
+              </Link>
               {" · arrived "}
               {fmt(t.arrived_at)}
               {t.left_at ? ` · left ${fmt(t.left_at)}` : " · here now"}

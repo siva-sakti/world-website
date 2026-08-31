@@ -114,5 +114,17 @@ export function usePersistence(
       .catch(onErr);
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush };
+  /** Write EVERY waiting change now — leaving the board, or the page going away.
+   *  Without this, a card you moved or typed in less than 350ms before navigating
+   *  away lost its write with the timer. Safe to call twice: each flush writes the
+   *  current value and clears its own pending entry. */
+  function flushAll() {
+    for (const id of [...timers.current.keys()]) {
+      const t = timers.current.get(id);
+      if (t) clearTimeout(t);
+      void flush(id);
+    }
+  }
+
+  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush, flushAll };
 }

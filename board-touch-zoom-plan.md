@@ -1,6 +1,6 @@
 # Board touch zoom — pinch + a readable mobile open (plan)
 
-**What this is:** the plan to make the board zoomable on touch (it currently is NOT — owner hit this live on their phone) and to open the board readable on a small screen instead of fit-all-tiny. Planned against the current code, 2026-08-03. **Not yet built — for review.**
+**What this is:** the plan to make the board zoomable on touch (it currently is NOT — owner hit this live on their phone) and to open the board readable on a small screen instead of fit-all-tiny. Planned against the current code, 2026-08-03. **📜 ✅ BUILT (pinch-zoom + readable mobile open) — HISTORICAL plan, do not build from; the current model is `model.md`.**
 
 ## The diagnosis (verified in code)
 - **Zoom exists only on the mouse wheel.** `use-camera.ts` attaches one native `wheel` listener (non-passive, zoom-toward-cursor). There is **no touch path at all**.

@@ -1,6 +1,6 @@
 # The writing experience — notes that feel like notes (plan)
 
-**What this is:** planning a real note-**writing** experience. On the phone the owner found the text box too small and too canvas-y for actually writing a note, wants to resize it in a touch-friendly way, and — bigger — sometimes just wants to *write* (type a note out), not place a spatial card. This plans the **structure/UX**; the visual restyle stays the owner's. Owner + Claude, 2026-08-03. **Not yet built — plan for review.**
+**What this is:** planning a real note-**writing** experience. On the phone the owner found the text box too small and too canvas-y for actually writing a note, wants to resize it in a touch-friendly way, and — bigger — sometimes just wants to *write* (type a note out), not place a spatial card. This plans the **structure/UX**; the visual restyle stays the owner's. Owner + Claude, 2026-08-03. **📜 ✅ BUILT (D-111/D-112) — HISTORICAL plan, do not build from; the current model is `model.md`.**
 
 ## What the owner said (on the phone)
 - The text card **opens small** and feels cramped for writing a real note.

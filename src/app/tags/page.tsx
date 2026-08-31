@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listManagedTags } from "@/lib/db/tags";
-import { logout } from "@/app/login/actions";
 import { TagManager } from "./tag-manager";
 
 export const dynamic = "force-dynamic";
@@ -12,24 +10,8 @@ export default async function TagsPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
-      <header className="mb-6 flex items-baseline justify-between text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/" className="underline underline-offset-4 hover:no-underline">
-            ← boards
-          </Link>
-          <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            find
-          </Link>
-          <span className="font-semibold">tags</span>
-          <Link href="/graph" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            graph
-          </Link>
-        </div>
-        <form action={logout}>
-          <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
+      <header className="mb-6 flex items-baseline justify-between">
+        <span className="text-sm font-semibold">tags</span>
       </header>
 
       <p className="mb-6 text-sm text-neutral-500">

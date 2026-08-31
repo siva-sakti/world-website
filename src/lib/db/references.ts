@@ -83,6 +83,10 @@ export type BitHit = {
   id: string;
   face: string;
   type: string;
+  // The bit's own words, so the picker searches full text like every other box
+  // (the owner's ruling, 2026-08-28) instead of only the face.
+  content: string | null;
+  body: string | null;
   // Enough to draw a thumbnail in the organized picker (and the media chip): an
   // image's object path (sign at read time) or a drawing's vectors. Null on a text
   // bit — it shows by its words, not a picture.
@@ -94,9 +98,10 @@ export type BitHit = {
 /** The `[[` picker's candidates — recent LIVE bits (newest first), each with its
  *  face for the label + type for the section, plus a thumb path / strokes so a
  *  picture identifies a doodle or screenshot by sight (the organized picker). The
- *  picker filters this list client-side by substring as you type (the house pattern
- *  — source-picker/tag-bar — best as-you-type feel at one writer's scale; server-
- *  side body search is a later add when the pile grows past this cap). Excludes
+ *  picker filters this list client-side through lib/search — the one match rule
+ *  (full text, partial words), the house pattern (source-picker/tag-bar) and the
+ *  best as-you-type feel at one writer's scale; a server-side search is the later
+ *  add when the pile grows past this cap. Excludes
  *  `excludeId` (you can't gather the note you're writing) and trashed bits. Existing
  *  bits only — v1 doesn't create from `[[`. */
 export async function listGatherCandidates(
@@ -106,7 +111,7 @@ export async function listGatherCandidates(
 ): Promise<BitHit[]> {
   let query = supabase
     .from("bit")
-    .select("id, face, type, thumb_path, storage_path, strokes")
+    .select("id, face, type, content, body, thumb_path, storage_path, strokes")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -117,6 +122,8 @@ export async function listGatherCandidates(
     id: b.id as string,
     face: (b.face as string | null) ?? "",
     type: b.type as string,
+    content: (b.content as string | null) ?? null,
+    body: (b.body as string | null) ?? null,
     thumbPath: (b.thumb_path as string | null) ?? null,
     storagePath: (b.storage_path as string | null) ?? null,
     strokes: (b.strokes as Stroke[] | null) ?? null,

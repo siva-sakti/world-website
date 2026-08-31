@@ -75,7 +75,8 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     if (created) await abortBitCreate(supabase, bitId);
     return { error: "Couldn't add that — try again." };
   }
-  revalidatePath("/notes");
+  revalidatePath("/bits");
+  revalidatePath(`/bit/${bitId}`); // the thing's own page shows its boards + this door
   return {};
 }
 
@@ -84,7 +85,7 @@ export async function trashFromInbox(formData: FormData) {
   const id = String(formData.get("id"));
   const supabase = await createClient();
   await trashBit(supabase, id);
-  revalidatePath("/notes");
+  revalidatePath("/bits");
 }
 
 /** Door B (call-in from the inbox): place a loose note onto a board. It lands at a
@@ -100,12 +101,14 @@ export async function placeOnBoard(bitId: string, boardId: string): Promise<{ er
     await callInBit(supabase, { bitId, boardId, placementId: randomUUID(), x, y });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "";
-    revalidatePath("/notes"); // a stale pile is often the CAUSE (trashed elsewhere) — refresh it
+    revalidatePath("/bits"); // a stale pile is often the CAUSE (trashed elsewhere) — refresh it
+    revalidatePath(`/bit/${bitId}`);
     if (msg === "TRASHED_BIT") return { error: "That note is in the trash — restore it first." };
     if (msg === "TRASHED_BOARD") return { error: "That board is in the trash." };
     console.error("placeOnBoard failed:", e);
     return { error: "Couldn't place that on the board." };
   }
-  revalidatePath("/notes");
+  revalidatePath("/bits");
+  revalidatePath(`/bit/${bitId}`); // the thing's own page shows its boards + this door
   return {};
 }

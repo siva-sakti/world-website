@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSource } from "@/lib/db/sources";
 import { bitsFromSource } from "@/lib/db/find";
 import { bitLabel } from "@/lib/labels";
-import { logout } from "@/app/login/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -23,25 +22,7 @@ export default async function SourcePage({
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <header className="mb-6 flex items-baseline justify-between text-sm">
-        <div className="flex items-baseline gap-5">
-          <Link href="/sources" className="underline underline-offset-4 hover:no-underline">
-            ← sources
-          </Link>
-          <Link href="/" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            boards
-          </Link>
-          <Link href="/notes" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            notes
-          </Link>
-          <Link href="/find" className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            find
-          </Link>
-        </div>
-        <form action={logout}>
-          <button className="text-neutral-500 underline underline-offset-4 hover:no-underline">
-            sign out
-          </button>
-        </form>
+        <span className="font-semibold text-neutral-400">source</span>
       </header>
 
       <p className="text-xs uppercase tracking-wide text-neutral-400">source</p>

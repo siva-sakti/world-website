@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { PanelBit } from "@/lib/db/inbox";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
+import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
 // search + type filters + sorts — the board panel's ruled pattern (A22) on its
@@ -16,11 +17,13 @@ export function NotesBrowser({
   items,
   imgs,
   boards,
+  groups,
   initialView,
 }: {
   items: PanelBit[];
   imgs: Record<string, string>;
   boards: { id: string; title: string | null }[];
+  groups: ShelfGroup[];
   initialView: View;
 }) {
   const [view, setView] = useState<View>(initialView);
@@ -32,7 +35,7 @@ export function NotesBrowser({
   function switchView(v: View) {
     setView(v);
     // Keep the URL linkable without a server round-trip.
-    window.history.replaceState(null, "", v === "all" ? "/notes?view=all" : "/notes");
+    window.history.replaceState(null, "", v === "all" ? "/bits?view=all" : "/bits");
   }
 
   const shown = useMemo(() => {
@@ -58,7 +61,12 @@ export function NotesBrowser({
       old: (a: PanelBit, z: PanelBit) => a.created_at.localeCompare(z.created_at),
       edited: (a: PanelBit, z: PanelBit) => z.updated_at.localeCompare(a.updated_at),
     }[sort];
-    return [...xs].sort(by);
+    const sorted = [...xs].sort(by);
+    // Pinned floats to the top (O1), keeping the chosen sort within each half.
+    return [
+      ...sorted.filter((b) => b.pinned_at),
+      ...sorted.filter((b) => !b.pinned_at),
+    ];
   }, [items, view, kind, q, sort]);
 
   const looseCount = items.filter((b) => b.boards.length === 0).length;
@@ -153,6 +161,7 @@ export function NotesBrowser({
                   item={b}
                   img={imgs[b.id]}
                   boards={boards}
+                  groups={groups}
                   showBoards={view === "all"}
                 />
               ) : (
@@ -161,6 +170,7 @@ export function NotesBrowser({
                   item={b}
                   img={imgs[b.id]}
                   boards={boards}
+                  groups={groups}
                   showBoards={view === "all"}
                 />
               ),

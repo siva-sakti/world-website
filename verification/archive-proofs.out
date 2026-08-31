@@ -1,0 +1,19 @@
+BEGIN
+CREATE TABLE
+psql:verification/archive-proofs.sql:29: NOTICE:  PASS 1 — a bit is born NOT archived (archived_at defaults null)
+DO
+psql:verification/archive-proofs.sql:43: NOTICE:  PASS 2 — archiving sets archived_at and does NOT trash the row
+DO
+psql:verification/archive-proofs.sql:58: NOTICE:  PASS 3 — starring an archived bit is REFUSED (bit_archived_not_alive)
+DO
+psql:verification/archive-proofs.sql:73: NOTICE:  PASS 4 — archiving a starred bit is REFUSED (the app must clear the star)
+DO
+psql:verification/archive-proofs.sql:85: NOTICE:  PASS 5 — clearing the star AND archiving in ONE statement is allowed
+DO
+psql:verification/archive-proofs.sql:102: NOTICE:  PASS 6 — archived survives a trash/restore round-trip unchanged
+DO
+psql:verification/archive-proofs.sql:113: NOTICE:  PASS 7 — an archived bit stays LIVE, so find still reaches it
+DO
+psql:verification/archive-proofs.sql:125: NOTICE:  PASS 8 — the partial index bit_archived exists
+DO
+ROLLBACK

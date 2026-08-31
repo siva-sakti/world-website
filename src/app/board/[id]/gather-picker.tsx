@@ -8,6 +8,7 @@ import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { DoodleBit } from "./doodle-bit";
 import { computePlacement, type Placement } from "@/lib/floating";
 import type { BitHit } from "@/lib/db/references";
+import { haystack, matches } from "@/lib/search";
 
 // The `[[` gather picker — a SMART ORGANIZED dropdown (gather-picker-plan.md).
 // Two sections split by TYPE: `notes` (text, found by their words) on top, and
@@ -51,7 +52,10 @@ export function GatherPicker({
     [candidates],
   );
 
-  const match = (c: BitHit) => c.face.toLowerCase().includes(q);
+  // The one match rule (lib/search): full text, partial words — so `[[` finds a
+  // note by a phrase inside it, not just by its first line.
+  const match = (c: BitHit) =>
+    matches(haystack({ face: c.face, content: c.content, body: c.body }), q);
   const notesShown = (q ? notes.filter(match) : notes).slice(0, NOTES_CAP);
   const visualMatches = q ? visual.filter(match) : visual;
 
@@ -130,7 +134,7 @@ export function GatherPicker({
         <>
           {notesShown.length > 0 && (
             <div className="gather-sect">
-              <div className="gather-sect-head">notes</div>
+              <div className="gather-sect-head">text</div>
               {notesShown.map((h) => (
                 <button
                   key={h.id}
@@ -138,7 +142,7 @@ export function GatherPicker({
                   className="gather-suggest-item"
                   onMouseDown={(e) => e.preventDefault()} // keep the editor's selection
                   onClick={() => onPick(h)}
-                  title="gather this note"
+                  title="gather this bit"
                 >
                   <span className="gather-suggest-face">{h.face}</span>
                 </button>

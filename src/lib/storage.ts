@@ -37,3 +37,25 @@ export async function signedUrl(
   if (error) throw error;
   return data.signedUrl;
 }
+
+/** Sign display thumbnails for a set of bits (thumb preferred, full fallback) —
+ * the V4 broom for the copy-pasted per-page loops. Failures skip quietly. */
+export async function signThumbs(
+  supabase: Parameters<typeof signedUrl>[0],
+  bits: { id: string; type: string; thumb_path: string | null; storage_path: string | null }[],
+): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  await Promise.all(
+    bits.map(async (b) => {
+      if (b.type !== "image") return;
+      const path = b.thumb_path ?? b.storage_path;
+      if (!path) return;
+      try {
+        out[b.id] = await signedUrl(supabase, path);
+      } catch {
+        /* skip */
+      }
+    }),
+  );
+  return out;
+}

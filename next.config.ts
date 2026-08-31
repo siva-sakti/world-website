@@ -2,9 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async redirects() {
-    // The loose-notes surface was renamed inbox → notes (D-113, owner ruling);
-    // old bookmarks/history keep working.
-    return [{ source: "/inbox", destination: "/notes", permanent: true }];
+    // The geography moved twice (D-113, then D-118's re-ruling): the browse
+    // surface is now /bits; /notes is the notes ROOM (written pieces). Old
+    // bookmarks keep landing somewhere sensible.
+    return [{ source: "/inbox", destination: "/bits", permanent: true }];
   },
 };
 

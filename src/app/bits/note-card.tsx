@@ -1,10 +1,83 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { pinBit, setBitGroup, createGroup, type ShelfGroup } from "@/lib/db/shelf";
+import { FolderPicker } from "@/components/folder-picker";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { InboxTags } from "./inbox-tags";
 import { PlaceOnBoard } from "./place-on-board";
+
+// The quiet folder picker (O1b → V4: one shared control) — a note shelves like a board.
+export function GroupPicker({
+  bitId,
+  groupId,
+  groups,
+}: {
+  bitId: string;
+  groupId: string | null;
+  groups: ShelfGroup[];
+}) {
+  const [supabase] = useState(() => createClient());
+  const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  async function run(fn: () => Promise<unknown>) {
+    setBusy(true);
+    try {
+      await fn();
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <FolderPicker
+      value={groupId}
+      groups={groups}
+      busy={busy}
+      title="which folder"
+      onPick={(gid) => run(() => setBitGroup(supabase, bitId, gid))}
+      onNew={(name) =>
+        run(async () => {
+          const g = await createGroup(supabase, name);
+          await setBitGroup(supabase, bitId, g.id);
+        })
+      }
+    />
+  );
+}
+
+// The ★/☆ pin toggle (O1) — shared by the card and the row.
+export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean }) {
+  const [supabase] = useState(() => createClient());
+  const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  return (
+    <button
+      className="shelf-pin"
+      disabled={busy}
+      title={pinned ? "no longer alive" : "mark alive — it greets you on home"}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await pinBit(supabase, bitId, !pinned);
+          router.refresh();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      {pinned ? "★" : "☆"}
+    </button>
+  );
+}
 
 // One bit in the notes grid (client — the browser filters/sorts around it).
 // On the "all" tab (showBoards) a placed bit shows its board links; place-on
@@ -14,11 +87,13 @@ export function NoteCard({
   item,
   img,
   boards,
+  groups,
   showBoards,
 }: {
   item: PanelBit;
   img?: string;
   boards: { id: string; title: string | null }[];
+  groups: ShelfGroup[];
   showBoards: boolean;
 }) {
   const title = item.face; // first words (text) · label (drawing) · content (image)
@@ -100,6 +175,8 @@ export function NoteCard({
       <div className="inbox-card-foot">
         <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
         <span className="inbox-card-actions">
+          <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
+          <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
           {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} />}
           <form action={trashFromInbox}>
             <input type="hidden" name="id" value={item.id} />

@@ -1,6 +1,6 @@
 # Multi-select — build plan (Part ②)
 
-**Status:** PLANNING (owner: "move onto multiselect"). Not built. Follows ① (all-bits panel + multi-board, D-109, shipped).
+**Status:** 📜 **✅ BUILT (multi-select ②a–c). HISTORICAL plan — do not build from; the current model is `model.md`.** Follows ① (all-bits panel + multi-board, D-109, shipped).
 **No schema change** — multi-select is board-canvas interaction: card positions + the existing remove/trash acts, looped. Owner session 2026-07-28.
 
 ---

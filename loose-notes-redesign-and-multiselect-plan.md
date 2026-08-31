@@ -1,6 +1,6 @@
 # The all-bits panel + multi-board (Part ①) — build plan · FINAL
 
-**Status:** ✅ **BUILT + deployed (D-109, 2026-07-28)** — all F1–F20 landed; review folded; `pnpm build` green; owner feel-test owed. Part ② (multi-select) held below.
+**Status:** 📜 **✅ BUILT + deployed (D-109, 2026-07-28)** — all F1–F20 landed. **HISTORICAL — do not build from; the current model is `model.md`.** ⚠ **Terminology trap:** this doc predates D-121 and uses **"note" to mean *any loose bit*** (a fragment) — e.g. "drop any note onto the board," "one note, many boards." Today "note" is reserved for a *written piece*; read every "note" in this doc as **"bit."** Part ② (multi-select) held below.
 _(Original planning status: decisions locked at the owner design session, 2026-07-28.)_
 **No schema change** — a `placement` is per (board, bit), so a bit on many boards is already legal; this exposes it. Board-history is already stored (verified: un-place keeps the row, stamped `left_at`; `bit_travel` surfaces it).
 **Part ② (multi-select) is HELD** — its own plan, built after ① (short note at the end).
@@ -78,7 +78,7 @@ The on-board side panel becomes a **searchable browser of every note**, loose-fi
 
 ### Code structure & files
 - **New:** a shared `lib/db` bits-list module (`listAllBits` + filter helpers) that both the panel and `/inbox` call (F19).
-- **Grown:** `board/[id]/loose-column.tsx` → the all-bits panel (filter row, search, "on N boards", lazy thumbs).
+- **Grown:** `board/[id]/loose-column.tsx` → the all-bits panel (filter row, search, "on N boards", lazy thumbs). *(That file is now `src/components/drawer.tsx` — moved at N4b, when the note page gained the same drawer.)*
 - **Touched lightly:** `board-surface.tsx` (bring-in exists; the trash-confirm line), `inbox/page.tsx` (point at the shared module), `globals.css`.
 - **Unchanged:** `callInBit`, `unplaceBit`, the schema.
 

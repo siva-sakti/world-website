@@ -156,7 +156,7 @@ Each stage: `pnpm build` green → deploy → owner feel-test before the next. S
 - `src/lib/db/bits.ts` — add **`callInBit`** (find-or-insert; `23505`→revive; returns the placement).
 - `src/lib/db/inbox.ts` (or a sibling `loose-notes` module) — the **shared loose-notes query + filter logic** (§7).
 - `src/app/board/[id]/board-surface.tsx` — mount the column; the bring-in handler (optimistic `CardVM` + `callInBit` + `trackCreate` + **id reconcile** + rollback); `screenToWorld` view-center + cascade.
-- `src/app/board/[id]/loose-column.tsx` *(new)* — the collapsible column UI (list · search · tag/source/type filters · empty states).
+- `src/app/board/[id]/loose-column.tsx` *(new; **now `src/components/drawer.tsx`** — moved at N4b, when the note page gained the same drawer)* — the collapsible column UI (list · search · tag/source/type filters · empty states).
 - `src/app/inbox/*` — door B: a "place on a board…" control + its server action (Stage ⑤).
 - `src/app/globals.css` — column + control styles (quiet, matches existing).
 

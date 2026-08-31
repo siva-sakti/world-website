@@ -1,6 +1,6 @@
 # Gather picker — the smart organized dropdown (build plan)
 
-**Status: ✅ BUILT + DEPLOYED — all three stages + the chip peek + screen-edge-aware popups (D-110, 2026-08-01); owner feel-tested "really good".**
+**Status: 📜 ✅ BUILT + DEPLOYED — all three stages + the chip peek + screen-edge-aware popups (D-110, 2026-08-01); owner feel-tested "really good". HISTORICAL — do not build from; the current model is `model.md`.**
 
 **What this is:** the plan for the `[[` gather picker, redesigned as a **smart, organized dropdown**. Refines the flat text-only picker shipped in gather **G2** (live on production now) and pulls the *visual chip* forward from G3, because they're one experience. Owner design session + cold review + choices locked, 2026-08-01. **No schema change** (it only reads a few more columns already on `bit`).
 
@@ -63,7 +63,7 @@ Baked-in details: **compact + internal scroll** (never takes over the screen) ·
 - **Every bit fits one of the two sections.** A bit is `text`, `image`, or `drawing` (a saved *link* is a text bit — "bookmark" was retired, D-102 — so there's no fourth kind and no missing section). Sort **by type first**: `image`/`drawing` → *images & drawings* (always shown in browse); `text` → *notes*, and **only there** drop a bit whose `face` is empty (a truly blank note). This one rule is unambiguous — a *captioned* screenshot is still type `image`, so it stays with the pictures (where you'd look for it), never mis-sorted into notes.
 - **Extend the candidate query** to also select `thumb_path`, `storage_path` (image) and `strokes` (drawing) — everything a thumbnail needs. All already columns on `bit`; no schema change. (`strokes` rides along with the row — eager, not lazy — which is fine at one writer's scale.)
 - **Thumbnails — reuse proven patterns, honestly:**
-  - **Images** → a **lazily-signed URL**, signed only for the rows **actually rendered** (not the whole filtered list) — the `signedUrl(supabase, thumb_path ?? storage_path)` pattern from `loose-column.tsx`.
+  - **Images** → a **lazily-signed URL**, signed only for the rows **actually rendered** (not the whole filtered list) — the `signedUrl(supabase, thumb_path ?? storage_path)` pattern from `loose-column.tsx` *(that file is now `src/components/drawer.tsx` — moved at N4b)*.
   - **Drawings** → a **mini render of `strokes`** via `DoodleBit` (the same component the bit page uses), drawn in a **fixed-ratio box** so a thumbnail doesn't distort (it renders full-bleed by default). *Note:* the loose-notes *panel* does **not** mini-render drawings — it shows them as the word "drawing" — so this is real new rendering, not a copy-paste.
 - **Browse = the 200 newest.** `listGatherCandidates` caps at 200 (newest-first). Honest framing: browse shows *everything you'd reach for*, which at this scale is the recent pile; a real search comes when the pile outgrows 200.
 - **Sections + smart collapse:** split candidates by type as above; filter each by the typed query (`face` substring); render a section only if it has matches — except the images row, which collapses to the slim "N images — browse" affordance rather than disappearing.
@@ -86,7 +86,7 @@ Baked-in details: **compact + internal scroll** (never takes over the screen) ·
 
 ## Model-safety gates
 1. **No schema change** — reads more existing columns; writes nothing new.
-2. **Thumbnails lazy-signed** — only the rows actually rendered (the `loose-column` rule), never the whole filtered list.
+2. **Thumbnails lazy-signed** — only the rows actually rendered (the `loose-column` rule — that file is now `src/components/drawer.tsx`, N4b), never the whole filtered list.
 3. **Faceless-media stays reachable; empty-notes excluded** — a conscious *display* rule (type-first, then drop an empty-`face` text bit), not an eligibility one (reconcile already refuses self / a non-text source).
 4. **One source of truth unchanged** — the media chip's NodeView changes only the *rendered look*; its serialized `<span data-ref>label</span>` is exactly what G2 saves, so `extractRefIds` / reconcile / `search_tsv` / export are untouched.
 5. **Prove the flow** — typecheck + build green; owner feel-tests: thumbnails render, sections narrow on filter, the images row collapses to the browse line (not vanish), a gathered doodle shows as a picture and peeks larger, and search still finds a note by a gathered chip's words.

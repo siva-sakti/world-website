@@ -24,6 +24,18 @@ import { promptText } from "@/components/confirm";
 
 type TiptapEditor = NonNullable<ReturnType<typeof useEditor>>;
 
+/** The minimum a thing must offer to be gathered — satisfied by both the `[[`
+ *  picker's BitHit and the drawer's PanelBit. */
+export type GatherTarget = { id: string; face: string | null; type: string };
+
+/** The chip's cache/fallback label (the visible thumbnail comes from the NodeView).
+ *  A faceless doodle/screenshot caches its KIND, not "untitled" — cleaner search
+ *  text and a better fallback if the thumbnail can't load. ONE rule, both callers
+ *  (`[[` and the drawer) — they cannot drift. */
+function chipLabel(t: GatherTarget): string {
+  return t.face || (t.type === "drawing" ? "drawing" : t.type === "image" ? "image" : "untitled");
+}
+
 // The open `[[` picker: what was typed, the doc range to replace, and the caret's
 // screen box (top+bottom so the dropdown can float below — or flip above when low).
 type Picker = { query: string; from: number; to: number; left: number; caretTop: number; caretBottom: number };
@@ -33,11 +45,15 @@ export function TextBit({
   editing,
   onChange,
   selfBitId,
+  onReady,
 }: {
   html: string;
   editing: boolean;
   onChange: (html: string) => void;
   selfBitId?: string; // excluded from the picker — you can't gather the note you're writing
+  // Hands the parent a way to gather from OUTSIDE the editor (N4b — the note
+  // page's drawer). Optional and additive: board cards pass nothing.
+  onReady?: (api: { gather: (t: GatherTarget) => void }) => void;
 }) {
   const [supabase] = useState(() => createClient());
   const [picker, setPicker] = useState<Picker | null>(null);
@@ -104,11 +120,7 @@ export function TextBit({
       const end = editor.state.doc.content.size;
       const after = editor.state.doc.textBetween(to, Math.min(to + 2, end), "\n", "\0");
       if (after === "]]") to += 2;
-      // The chip's cache/fallback label (the visible thumbnail comes from the
-      // NodeView). A faceless doodle/screenshot caches its kind, not "untitled" —
-      // cleaner search text and a better fallback if the thumbnail can't load.
-      const label =
-        hit.face || (hit.type === "drawing" ? "drawing" : hit.type === "image" ? "image" : "untitled");
+      const label = chipLabel(hit); // the one rule, shared with drawer-gather
       editor
         .chain()
         .focus()
@@ -124,6 +136,37 @@ export function TextBit({
       setPicker(null);
     }
   };
+
+  // GATHER FROM OUTSIDE (N4b). Deliberately NOT insertRef: that one replaces the
+  // typed `[[query` range and needs an open picker. This one replaces nothing and
+  // lands at the CURRENT selection — the drawer's row keeps the caret alive by
+  // preventing mousedown's blur, and TextBit focuses "end" on mount, so a caret
+  // always exists (worst case the chip lands at the end, never nowhere).
+  const gatherRef = useRef<(t: GatherTarget) => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref (see detectRef above)
+  gatherRef.current = (t) => {
+    try {
+      if (!editor) return;
+      editor
+        .chain()
+        .focus()
+        .insertContent({ type: "bitRef", attrs: { refId: t.id, label: chipLabel(t) } })
+        .insertContent(" ") // land the cursor after the chip so you keep writing
+        .run();
+    } catch {
+      /* an insertion hiccup leaves your text untouched */
+    }
+  };
+
+  // Hand the gather door up once the editor exists (through a ref, so an inline
+  // parent callback can't re-fire it).
+  const onReadyRef = useRef(onReady);
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref (see detectRef above)
+  onReadyRef.current = onReady;
+  useEffect(() => {
+    if (!editor) return;
+    onReadyRef.current?.({ gather: (t) => gatherRef.current(t) });
+  }, [editor]);
 
   // Load the candidate list once, the first time a picker opens.
   useEffect(() => {
@@ -189,7 +232,7 @@ function Toolbar({ editor }: { editor: TiptapEditor }) {
       {/* Gather by button (O3): inserts the `[[` trigger at the caret — the same
           watcher that handles typed `[[` opens the picker, so touch/stylus (the
           Daylight) reaches gather without a keyboard mode-switch. One code path. */}
-      {btn(false, "[[", () => editor.chain().focus().insertContent("[[").run(), "gather a note into your writing")}
+      {btn(false, "[[", () => editor.chain().focus().insertContent("[[").run(), "gather a bit into your writing")}
     </div>
   );
 }

@@ -136,6 +136,21 @@ body {
   border-left: 1px solid #e6e0d6;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
 }
+
+/* THE DRAWER ON A NOTE PAGE (N4b). The writing scrolls; the drawer must not.
+   An `absolute` drawer resolves against `.shell-collapsed` (the tucked-rail
+   wrapper — it is position:relative and unbounded in height), so it would sit at
+   the top of the whole document and scroll away as you write down the page.
+   `fixed` pins it to the viewport instead; verified safe — a transform/filter/
+   will-change ancestor would trap a fixed element, and the /note path has none. */
+.loose-tab.is-fixed { position: fixed; }
+.loose-col.is-fixed {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
 .loose-col-head {
   display: flex;
   align-items: center;
@@ -377,6 +392,44 @@ body {
   padding: 0;
   background: transparent;
   border-color: transparent;
+}
+/* A NOTE placed on a board = a page-shaped DOORWAY (N3): a quiet sheet showing the
+   note's title + a faint preview; clicking (once selected) opens the note's page.
+   Deliberately plain — the paper treatment is thematic, saved for later. */
+.compose-card-inner.is-note {
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(60, 50, 35, 0.08);
+}
+.compose-note-doorway {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 0.7em 0.75em;
+  overflow: hidden;
+}
+.compose-note-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.compose-note-preview {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #9a9184;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .compose-doodle-svg {
   display: block;
@@ -1401,6 +1454,17 @@ body {
   color: #c4bcae;
   font-weight: 400;
 }
+/* The save line under a note's writing. Quiet by design — you should be able to
+   ignore it and still trust it — but a silent save is indistinguishable from a
+   broken one, so it says "saving…" then "saved". */
+.save-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #a89f92;
+}
+.save-note.is-err {
+  color: #a13b2f;
+}
 .page-editor .tiptap,
 .page-editor .tiptap .ProseMirror {
   font-size: 17px;
@@ -1408,6 +1472,40 @@ body {
 }
 .page-editor .tiptap p + p {
   margin-top: 0.6em;
+}
+
+/* ---- the note SURFACE page (N1): a note is a writing surface, a peer of a board.
+   The action bar holds everything that ISN'T writing (never in the writing); the
+   footer holds the quiet, read-mostly facts + connections. ---- */
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 12px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #ece7dc;
+  font-size: 13px;
+}
+.note-actions-spacer {
+  flex: 1;
+}
+.note-footer {
+  margin-top: 44px;
+  padding-top: 22px;
+  border-top: 1px solid #ece7dc;
+  color: #8a8072;
+}
+.note-footer-dates {
+  font-size: 12px;
+  color: #a89f92;
+}
+.note-footer-h {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a89f92;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 /* ---- notes: the bit-first view (organize plan O2) ---- */
@@ -1515,3 +1613,114 @@ body {
   align-items: center;
   gap: 8px;
 }
+
+
+/* the shelf (O1) */
+.shelf-picker {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid #e2ddd2;
+  border-radius: 6px;
+  background: #fffdfa;
+  color: #6b6257;
+  max-width: 130px;
+}
+.shelf-pin {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #b3a58c;
+  padding: 0 2px;
+}
+.shelf-pin:hover { color: #8a6f4d; }
+.shelf-move {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: #b3a58c;
+  padding: 0 3px;
+}
+.shelf-move:disabled { opacity: 0.3; cursor: default; }
+.shelf-move:hover:not(:disabled) { color: #8a6f4d; }
+
+/* ---- the desk & the cabinet (V3, mock B) ---- */
+.home-shell { display: flex; min-height: 100vh; }
+.rail {
+  width: 200px; flex: 0 0 auto;
+  border-right: 1px solid #ece7de;
+  background: #f6f3ec;
+  padding: 22px 18px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.rail-brand { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 18px; color: var(--ink); }
+.rail-link {
+  display: block; width: 100%; text-align: left;
+  padding: 4px 8px; border-radius: 6px;
+  font-size: 13.5px; color: #57503f; text-decoration: none;
+  background: none; border: none; cursor: pointer;
+}
+.rail-link:hover { background: #efeadf; }
+.rail-sec { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #a89f92; margin: 14px 8px 4px; }
+.rail-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid #e6e0d4; }
+.rail-foot .rail-link { font-size: 12px; color: #8a8072; }
+.home-main { flex: 1; padding: 46px 56px; max-width: 900px; }
+.desk-h { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #a89f92; font-weight: 600; margin-bottom: 14px; }
+.desk-tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px; margin-bottom: 44px;
+}
+.desk-tile {
+  background: #fffdfa; border: 1px solid #e7e1d5; border-radius: 10px;
+  padding: 16px 16px 13px; min-height: 104px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 2px 8px rgba(60, 50, 35, 0.05);
+  text-decoration: none; color: var(--ink);
+}
+.desk-tile:hover { box-shadow: 0 4px 14px rgba(60, 50, 35, 0.09); }
+.desk-tile.is-note { background: #f7f3e9; }
+.desk-tile-kind { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #b3a58c; }
+.desk-tile-name { font-size: 15px; font-weight: 550; margin-top: 6px; line-height: 1.3; flex: 1; }
+.desk-tile-meta { font-size: 11px; color: #a89f92; margin-top: 10px; }
+.desk-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.desk-chip {
+  border: 1px solid #e2ddd2; border-radius: 999px;
+  padding: 5px 14px; font-size: 13px; color: #57503f;
+  background: #fffdfa; cursor: pointer;
+}
+.desk-chip:hover { background: #f6f1e6; }
+.desk-chip.is-starred { border-color: #d9c68a; background: #fbf6e8; }
+.desk-chip.is-open { border-color: #b3a58c; }
+.desk-chip-n { color: #b3a58c; font-size: 11.5px; margin-left: 5px; }
+.desk-open h3 { font-size: 13.5px; font-weight: 600; color: #57503f; margin-bottom: 8px; }
+.desk-open ul { list-style: none; margin: 0; padding-left: 14px; border-left: 2px solid #ece5d4; }
+.desk-open li { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; font-size: 14.5px; color: #3a3323; }
+.desk-open-kind { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #b3a58c; width: 40px; flex: 0 0 auto; }
+@media (max-width: 640px) {
+  .home-shell { flex-direction: column; }
+  .rail { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; padding: 14px 16px; border-right: none; border-bottom: 1px solid #ece7de; }
+  .rail-brand { width: 100%; margin-bottom: 6px; }
+  .rail-sec { margin: 0 4px; }
+  .rail-foot { margin-top: 0; padding-top: 0; border-top: none; display: flex; gap: 6px; }
+  .home-main { padding: 24px 18px; }
+}
+
+/* the everywhere-rail (V4) */
+.shell-main { flex: 1; min-width: 0; }
+.shell-collapsed { position: relative; }
+.rail-peek {
+  position: fixed; top: 10px; left: 10px; z-index: 60;
+  width: 26px; height: 26px; border-radius: 8px;
+  border: 1px solid #e2ddd2; background: #fffdfacc; color: #8a8072;
+  cursor: pointer; font-size: 13px; line-height: 1;
+  backdrop-filter: blur(3px);
+}
+.rail-peek:hover { color: #57503f; background: #fffdfa; }
+.rail-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+.rail-top .rail-brand { margin-bottom: 0; text-decoration: none; }
+.rail-tuck {
+  border: none; background: none; cursor: pointer;
+  color: #b3a58c; font-size: 13px; padding: 2px 6px;
+}
+.rail-tuck:hover { color: #57503f; }
