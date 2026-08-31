@@ -80,6 +80,28 @@ The owner asked for the cut to be checked before journeys got built on it. Check
 
 **Standing caveat (the owner's own earlier correction):** the areas are **examples we check ourselves against, never a taxonomy the product enforces.** No "areas" in the UI, ever.
 
+### ⭐⭐ THE BETTER CUT — REQUIRED ARTIFACTS, not abstract areas (2026-08-31)
+
+**Where it came from.** The owner, watching a video: *"if you're new to making art and a gallerist asks you for a list of work — how do you make that PDF? There's a lot of stuff like this."* Plus the honest limit: *"I don't know about nuances in the creative world. I can get the things and patterns."*
+
+**The reframe:** every discipline requires **documents you must produce that are not your art.** Concrete, checkable, and instantly recognisable to the person who has to make one.
+
+| discipline | required artifacts |
+|---|---|
+| **artist** | list of work · artist statement · CV · exhibition proposal |
+| **writer** | pitch · query letter · bio · synopsis |
+| **musician** | one-sheet · EPK · bio · setlist · liner notes |
+| **designer** | portfolio · case study · deck |
+| **filmmaker** | treatment · shot list · pitch deck |
+
+**Why this beats the six areas below.** The six are abstract categories Claude invented — "meaning," "outreach," "presentation." You cannot check them and you cannot show them to a person. **An artist reading "list of work" feels seen instantly; nobody feels seen by "presentation."** Keep the six as an internal sanity-check; **lead with artifacts everywhere a person is involved.**
+
+**It hands us the onboarding line, per discipline** (the owner's own phrasing): ***"You're an artist. You have to make a list of work. Here's how this app does that."*** — the switching pitch (§Are.na), made concrete one discipline at a time.
+
+**And it produces features directly rather than by inference.** A list of work = rows with fields (title · year · medium · dimensions) → **structured data** (`tables-and-structured-data.md`) · assembled from finished work → **pieces** (§Finding 3) · handed to someone → **an output artifact / export**. Three open threads converging on one buildable, demoable thing.
+
+⚠ **THE METHOD WARNING, and it is not optional.** The owner is the oracle for **one** discipline. For every other one, Claude will generate *plausible* workflows that no practitioner would recognise — convincing fiction we would then build features on. **Two honest sources only: real accounts (research, practitioner writing, video) and real people who can be asked.** Never invention. → this changes the research round, see `product-concept-frameworks.md` §5.
+
 ### Each area, at length — because the table flattens what's actually going on
 
 **Material.** The one area that *is* well served — and even here it's fragmented across four tools that don't talk to each other. The screenshots are in the camera roll. The saved images are in Are.na. The quotes are in the notes app. The melodies are in voice memos. A person doesn't experience this as "I have good tools for material"; they experience it as *"I know I saved that somewhere."* So even the served area has an unserved version of the problem: **not capture, but reunion.**

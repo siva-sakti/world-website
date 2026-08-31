@@ -87,6 +87,16 @@ Offered earlier in the session, on the owner's *"is there ground to stand on her
 | 5 | **Where does the arc actually break in practice** — what do practitioner accounts say about where the gather→make handoff fails, and what do people currently do instead? | Tests **the seams claim** empirically instead of asserting it. |
 | 6 | **What is the serious critique of diverge/converge and the Double Diamond?** | The owner asked for honest, not hype. If the pitch rests on this frame we should know where it's weak **before** a smart user does. |
 
+### ⭐ ADDED 2026-08-31 — the research round is now TWO questions wide
+
+The owner's gallerist example (`product-concept-promise.md` §Required artifacts) changed the brief. It isn't only about creative *frameworks* any more. **Question 7 may matter more than 1–6:**
+
+| # | question | why |
+|---|---|---|
+| **7** | **Per discipline — what documents is a practitioner actually REQUIRED to produce that are not their art, and how do they make them today?** (artist: list of work · statement · CV. writer: pitch · query · bio. musician: one-sheet · EPK. designer: portfolio · case study. filmmaker: treatment · shot list.) | **Directly buildable.** Names real artifacts, real formats, and the real tool being suffered today — which is the switching pitch, per discipline. And it is the one thing Claude **must not invent**: the owner is the oracle for one discipline only; every other workflow Claude writes unaided is plausible fiction. |
+
+**Sources that count for Q7:** practitioner writing · how-to videos and guides for that discipline · gallery/publisher/label submission requirements (these are *published* and authoritative) · real people who can be asked. **Not** Claude's model of how a fashion designer works.
+
 **Suggested shape when we run it:** one focused pass per question, sources named, findings marked *usable in copy* vs *internal only*. Not one big sweep.
 
 ---
