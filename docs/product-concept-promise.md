@@ -211,6 +211,22 @@ Most individual pieces already exist, with entrenched incumbents: catching → R
 | what it proves | **the market exists and is reachable** — creative people already adopt a tool like this, and adopt it for its *feeling* | **the feature bar** for structured data |
 | how we relate | **take the same audience, do more with it** | good-enough, never head-on (§6) |
 
+**⭐ AND THE SHARPER USE — Are.na as the SWITCHING PITCH, not a persona to serve (the owner, 2026-08-31):**
+
+> *"I don't think we have to go for exactly that Are.na user, but Are.na is a helpful comp for me to think about: OK, people DO want this, and this is what that app does — here's how I want to do it better. I really wanna sell people on the idea: your app does this, but come over here, buddy."*
+
+**Why this matters more than it looks.** It changes the *kind* of pitch we're making. There are two ways to sell a tool like this:
+- **Explain a new category** — "it's a home base for a creative practice, where material flows into…" → expensive, abstract, and you lose people before the second clause.
+- **Argue a switch from something they already use** — *"you already do this in Are.na. Here's the same thing, except it finishes."* → cheap, concrete, and **the person has already decided they want the behavior.**
+
+**The second is far easier, and Are.na is the only comp where it works** — because Are.na users have already self-selected into "I collect things beautifully, on purpose." No education needed; the entire pitch is the delta.
+
+**The delta, in one line each** *(🔵 raw seeds — ⚑ the owner writes the actual words)*: your blocks just sit there → here they feed the writing · you leave to make anything → here you don't leave · your channels are flat → here you arrange in space, by hand · you collect → **you finish**.
+
+⚠ **The discipline this implies:** a switching pitch is only honest if the switch is actually good. Every gap the persona passes surface (`product-concept-people.md`) is a place the switch would disappoint someone — so the pitch can't ship ahead of the build. **This is a reason to finish level 1 properly, not a reason to skip it.**
+
+⚪ **Still open, and it bites here:** Are.na is social; we are not. A switcher leaving Are.na leaves *being seen* behind. → `product-concept-privacy.md`.
+
 **Why Are.na is the right precedent and not just a competitor:** it proves the hardest thing — that creative people will adopt, love and stay in a beautiful single-purpose tool with no growth mechanics. What it can't do is **finish anything**: you collect, and then you leave to write. That's the exact gap this app is for.
 
 ⚪ **Open, and it matters:** Are.na is **social** — channels are public, people follow and re-block each other's finds, and a meaningful part of why people stay is being *seen*. This app is single-resident with no publish act. **If we're taking Are.na's market, are we taking it without the thing that makes Are.na sticky?** → straight into `product-concept-privacy.md`. This is the sharpest open question in the whole workstream.
