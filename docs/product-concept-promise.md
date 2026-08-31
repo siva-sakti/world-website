@@ -195,6 +195,21 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 ## 2d · ⭐ THE MISSING DIMENSION: SEQUENCE (surfaced 2026-08-31)
 
+**⚠ EVIDENCE CORRECTED (2026-08-31).** Claude first wrote *"four requests, one gap — the owner has described this absence four times."* **That was inflated: one ask is the owner's, three were Claude's own scenario drafts.** Counting my own generated scenarios as independent evidence is the same failure the owner corrected in the writer pass (*"critical mass"*) — I generated three plausible situations, noticed they shared an element, then cited the shared element as convergence. It is consistency with myself, not evidence.
+
+**The honest tally:**
+
+| # | the ask | whose |
+|---|---|---|
+| 1 | album track order | ❌ Claude's songwriter draft |
+| 2 | a setlist | ❌ Claude's — inferred from the owner's Sruthi seed, which named the **outfit**, not a setlist |
+| 3 | ordering talk points | ❌ Claude's writer-pass draft, **not yet owner-corrected** |
+| 4 | **a pitch deck** | ✅ **the owner's, unprompted (2026-08-31)** |
+
+**Sequence is still likely real** — a setlist plainly has an order — but it rests on **one confirmed ask**, and stays there until the owner confirms the others from life. ⚑ Re-entering parked A1 (document mode) needs that confirmation first; one ask is not the evidence bar that parked it.
+
+**The original (inflated) framing, kept as the record:**
+
 **Four requests, one gap.** The owner has now described the same absence four times without naming it:
 
 | where it appeared | what was missing |
