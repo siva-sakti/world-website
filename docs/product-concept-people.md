@@ -180,7 +180,34 @@ Three gaps, each showing up in more than one situation — which is the test of 
 
 **Why this persona first:** the owner *is* one, and the house method is *scenarios-from-life-never-from-plans*. This is the only persona with a live oracle attached. **Claude drafted the steps; the owner corrects them.** Everything below is 🔵 until she does.
 
-### ① Writing an essay
+### ⭐⭐ METHOD CORRECTION — trace MOVES ON MATERIAL, not a person's inner life (the owner, 2026-08-31)
+
+**Claude's first draft of ① traced psychology** — *"an idea nags," "it reaches critical mass," "you decide to write."* The owner rejected the frame, not the details:
+
+> *"You don't have to worry about the user reaching critical mass — remember, we're thinking from the perspective of the PRODUCT. What does a writer DO? Maybe they already have drafts of a couple of different documents they're trying to stitch into a new idea, so they lay those notes out on a board — those are compositions. Then they have a snippet from another writer that was interesting, they put that on the board. Then they start writing a new document, but it's just a draft and they don't like it, so they duplicate the board."*
+
+**Why the owner's frame is right and mine was wrong:** inner states are unfalsifiable and produce no features — I invented a "surface accumulation to the user" need out of a psychological guess. **Moves on material map 1:1 onto features**, because a feature *is* an operation on an object. **Every pass from here traces object-moves.** Inner experience belongs to level 2 (the journeys the owner writes), not to level 1.
+
+### ① Stitching a new piece from drafts you already have *(re-traced in the owner's frame)*
+
+| # | the move | needs | have it? |
+|---|---|---|---|
+| 1 | lay **several existing drafts** out on a board | compositions placed on a board | ⚠️ **yes, but the wrong way** — see F-A |
+| 2 | add **a snippet from another writer** | a bit with a source, on the board | ✅ built |
+| 3 | **start a new document** from what's on the board | board → composition as a move | ❌ **not a move** — see F-B |
+| 4 | draft is bad → **duplicate the board** and try again | duplicate a board | ❌ **doesn't exist** — F-C |
+
+**F-A · A composition on a board is a CLOSED DOOR, and stitching needs a window.** N3 renders a placed note as a page-shaped doorway card (~200×260, title only). That's right for *filing* a piece on a board; it's wrong for **stitching**, which is the move above. Laying three drafts side by side to find the new idea requires *seeing into them* — a door you open one at a time defeats the reason for putting them in space at all. ⚑ Likely fix: a placed composition can show its opening text (or expand in place), not just its title. **The board currently cannot do the job this scenario asks of it.**
+
+**F-B · Board → new composition is missing, and it's THE seam.** You can place a composition *onto* a board; you cannot start one *from* a board. Today you'd leave, open `/write`, and re-gather by hand the very things you were looking at. The board and the writing are the two halves of the flow, and the door only swings one way — **in exactly the place `product-concept-promise.md` §4 claims the product lives.**
+
+**F-C · Duplicate a board.** Absent. The owner's reason is the interesting part: not backup — ***try another arrangement without losing this one***. Variants of a thinking-space, which is a different idea from versioning a document. *(Owner flagged it herself mid-sentence: "that's a feature for you.")*
+
+**F-D · ⚠ "Reorder and pass along to editors"** *(owner, same breath — "I was calling it low-key Notion, but that could actually be pretty cool")*. **Reordering** is ordinary document editing. **"Pass along to editors" is another person touching your work** — which runs into the never-list (one resident · no collaboration, D-118). It may be fine as *read-only sharing*, or it may break the privacy model. ⚑ Flagged deliberately so it can't slip in unnoticed. → `product-concept-privacy.md`.
+
+---
+
+### ~~① Writing an essay~~ *(Claude's superseded psychology-framed draft — kept as the record of what the method correction replaced)*
 
 | # | the step | needs | have it? |
 |---|---|---|---|
