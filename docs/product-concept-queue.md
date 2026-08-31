@@ -39,6 +39,23 @@ Seven sittings, each with a deliverable. Ordered by dependency, not importance: 
 | **LEVEL 2** — outward | the **journeys**, as a person experiences them — story, not table | ⚑ **the owner** (it's voice) | **⑥b** |
 | **→ onboarding** | falls out of the journeys | — | graduates to `organize-phase-plan.md` N7 |
 
+### ⭐ What "COMPLETE" means, and how we know we're done (owner's sharpening, 2026-08-31)
+
+The owner framed level 1 not as *gap-finding* but as **"what makes a complete set of features."** That's a stronger question and it needs a **stopping rule**, or the passes run forever.
+
+> **The test is SATURATION: keep running persona × situation passes until new gaps stop appearing.** When a fresh pass surfaces mostly repeats, the set is complete enough and we move to ③b (the gap ruling).
+
+**The evidence so far — two passes in, NOT yet saturated:**
+
+| pass | gaps surfaced | new |
+|---|---|---|
+| **songwriter** | audio bits · ordered lists · a date you set | 3 new |
+| **writer** | ordered lists ✓ · a date you set ✓ · the wander-back surface · composition→composition gather · capture-from-where-you-read · restructuring long text spatially | **4 new** |
+
+**Two gaps have now repeated across two very different makers** (ordered lists · a date you set) — that's convergence beginning, and repetition across unlike personas is the signal that a gap is structural rather than personal. But four new ones appeared in the second pass, so the set is **not closed**.
+
+**Next two passes decide it:** the visual artist and the collector-thinker. Mostly repeats → complete, go to ③b. Still adding → keep going. *(The collector-thinker is the sharper test of the two: no output at all, so it probes whether the app holds up for someone who never converges.)*
+
 **Why level 1 must come first:** the steps *are* the journey, written analytically. But a journey should describe a **real app** — the writer pass has her ordering talk points, and ordered lists don't exist. Written today, the journey would either lie or route around a hole. So: gaps → **rule which ones close** → build → *then* the story is true.
 
 ---
