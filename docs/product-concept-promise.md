@@ -251,6 +251,32 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 ⚑ **Naming (step 2b):** "document" · "sheet" · "deck" are Google's words, not ours. Unruled.
 
+## 2c-ter · "WHERE DOES A CHECKLIST GO?" — the ambiguity is a SYMPTOM, not a model problem (2026-08-31)
+
+**The owner's question:** what is the difference between a checklist sitting *in a composition* and the same thing sitting *on a board as a sticky note* — and is that confusing? *(They ruled out to-do management explicitly: "I don't wanna get into to-do at all.")*
+
+**The clarification that resolved it:** a **checklist is a formatting primitive, not a feature** — like bullets, headings, bold, tables. Google Docs has checkboxes; Notion has a checkbox block. **Neither shipped "a to-do feature."** They shipped a capable document and people made to-do lists out of it.
+
+### ⭐ The Notion principle the owner named — capability without prescription
+
+> *"Notion — people use it for all purposes, but it's not like they really say 'you put your to-do here.' People start to use it to organise things because it's beautiful potential. That's what I mean."*
+
+**This is `one primitive, everywhere` (§2) seen from the USER's side instead of the builder's.** Don't tell people what the app is for; make the primitives capable and the surface beautiful, and they invent the uses. ⚑ A design rule for every surface we build, and a strong argument against use-case features of any kind.
+
+### Why the ambiguity dissolves
+
+**In Google Docs nobody wonders where a checklist goes** — obviously in the document. It is ambiguous *here* only because our document **cannot do checklists**, so the board becomes the only surface capable of holding one, and two surfaces end up competing for something that should have one obvious home.
+
+> **Make the convergent surface real, and most of this ambiguity resolves itself.** Checklists · tables · headings · ordered things → the document, because that is what documents are for. The board goes back to being for things in space.
+
+**So this is DOWNSTREAM of §2c-bis (the headline finding), not a separate model problem to solve first.** ⚑ Worth re-checking after the document surface is real: if ambiguity remains *then*, it's a genuine model gap.
+
+**And the sticky-note case stays fine** — the owner: *"some people think of to-dos in terms of little sticky cards or index notes, and in that case it makes sense that it's just a board or part of a board."* ✅ Already works. Two things that look alike, each with an obvious home once **both** surfaces are capable.
+
+### The one rule worth keeping from the deeper version of the question
+
+If it ever *does* need deciding — **does each item need its own life?** An item you'd tag, find, place on another board, or gather into writing (a gallery you're pitching · a quote) wants to be a **bit**. An item that means nothing outside its list ("email Sarah") is **just text in a document**, never a bit. *(This is also the answer to the central fork in `tables-and-structured-data.md` §2 — rows are bits when their items have lives, plain text when they don't. Same question, both places.)*
+
 ## 2d · ⭐ THE MISSING DIMENSION: SEQUENCE (surfaced 2026-08-31)
 
 **⚠ EVIDENCE CORRECTED (2026-08-31).** Claude first wrote *"four requests, one gap — the owner has described this absence four times."* **That was inflated: one ask is the owner's, three were Claude's own scenario drafts.** Counting my own generated scenarios as independent evidence is the same failure the owner corrected in the writer pass (*"critical mass"*) — I generated three plausible situations, noticed they shared an element, then cited the shared element as convergence. It is consistency with myself, not evidence.
