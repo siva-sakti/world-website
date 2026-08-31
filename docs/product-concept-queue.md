@@ -18,16 +18,28 @@ Seven sittings, each with a deliverable. Ordered by dependency, not importance: 
 | ① | **The writer pass** — 5 situations × steps, owner corrects from life (essay · pitching · research-toward-nothing · a talk · the commonplace thread) | ~1 hr | gaps table #2 + the journey method proven | the only persona with a live oracle |
 | ② | **The collector-thinker pass** — the no-output person, the median Are.na user | ~45 min | is *invitation-not-mandate* structurally true? is the Are.na market takeable without social? | tees up ④ |
 | ③ | **Claude homework between sittings** — visual-artist + video-essayist passes, songwriter expansion, drafted solo | none | corrected-ready drafts | the owner reacts in minutes instead of building |
+| ③b | **THE GAP RULING** — decide which gaps close (ordered lists · a date you set · the wander-back surface · composition→composition · highlight capture · document mode) | ~45 min | **feature decisions** → graduate to `organize-phase-plan.md` | **the hinge between level 1 and level 2.** Journeys can't be written until the app they describe is decided |
 | ④ | **The privacy/publishing session** — default · the publishable unit (pieces!) · key vs open web · what kind of social | ~1 hr | **the great unblocker**: brand, pieces-public, the Are.na answer | long-owed (`philosophy.md` flags it); everything downstream waits |
 | ⑤ | **The naming session** — composition · board · piece · the AND-collision, all at once | ~45 min | rulings → `lexicon.md`; ONE sweep handed to the build track | after ①②④ + research: name once, with maximum evidence |
 | ⑥ | **The line + the value-prop phrase** — the owner writes; Claude brings the material organized | owner's sitting | the outward line finished; "home base…" updated for the wide door | needs ⑤'s words and ⓪'s results |
+| ⑥b | **THE JOURNEYS** — the level-2 telling: each persona's path as a person experiences it, story not table | owner's sitting | the journeys — which **become the onboarding** | needs ③b (a real app to describe) + ⑥ (the words to describe it in) |
 | ⑦ | **Brand + the name** — the app's real name · identity vs in-app aesthetic · landing or not | ~1 hr | the name | last on purpose: a name compresses the argument, which is settled by now |
 
 **Then everything graduates and the workstream closes:** rulings → the settled docs · build items (audio bits · a date you set · ordered lists · the rename sweep · pieces · onboarding) → `organize-phase-plan.md` · the voice → the owner's re-voiced `vision-and-language.md`.
 
 **Parallel tracks, costing no sittings:** the `finished`-tag test in the live app (the owner's hands, ~2 weeks — feeds the pieces call) · the other window keeps building · research agents run between sittings.
 
-**The rule of the plan:** any sitting can be split or reordered EXCEPT ⑤ before ⑥ (words before voice) and ④ before ⑦ (publishing before brand).
+**The rule of the plan:** any sitting can be split or reordered EXCEPT ⑤ before ⑥ (words before voice), ④ before ⑦ (publishing before brand), and **③b before ⑥b** (decide the app before telling its story).
+
+### The two levels, and where each lands in this plan (owner-confirmed 2026-08-31)
+
+| | what it is | who does it | where in the plan |
+|---|---|---|---|
+| **LEVEL 1** — internal | situations × **actual steps** → gaps → **features** | Claude drafts, ⚑ owner corrects from life | ①②③ → **③b rules them** |
+| **LEVEL 2** — outward | the **journeys**, as a person experiences them — story, not table | ⚑ **the owner** (it's voice) | **⑥b** |
+| **→ onboarding** | falls out of the journeys | — | graduates to `organize-phase-plan.md` N7 |
+
+**Why level 1 must come first:** the steps *are* the journey, written analytically. But a journey should describe a **real app** — the writer pass has her ordering talk points, and ordered lists don't exist. Written today, the journey would either lie or route around a hole. So: gaps → **rule which ones close** → build → *then* the story is true.
 
 ---
 
