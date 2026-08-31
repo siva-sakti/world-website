@@ -106,6 +106,35 @@ Use areas to reason and check coverage; **use artifacts whenever a person is bei
 
 ⚠ **THE METHOD WARNING, and it is not optional.** The owner is the oracle for **one** discipline. For every other one, Claude will generate *plausible* workflows that no practitioner would recognise — convincing fiction we would then build features on. **Two honest sources only: real accounts (research, practitioner writing, video) and real people who can be asked.** Never invention. → this changes the research round, see `product-concept-frameworks.md` §5.
 
+### ⭐⭐ THE SORT — internal vs external, and the REDUCTION (owner, 2026-08-31)
+
+The owner: *"There's a couple components here — there's the core surfaces, the internal component, and I keep giving you external stuff too, so I want to sort that in the right place."* And on discipline knowledge: for onboarding, *"a gallerist wants you to have this — if you're an artist you can just have this easy workflow,"* but **for building features, "I don't think it's as relevant."**
+
+| | **EXTERNAL** — onboarding · demo · the pitch | **INTERNAL** — what we build |
+|---|---|---|
+| the question | *"You're an artist. A gallerist asks for a list of work. Here's how."* | *"What generic thing IS a list of work?"* |
+| needs | discipline knowledge · real artifacts · real names | **surfaces and formats** |
+| how many | as many as there are disciplines | **as few as possible** |
+| lands in | level 2 — journeys · onboarding | level 1 — the feature set |
+
+> **We never build a "list of work" feature. We build the generic thing it reduces to.** Discipline knowledge is demo material.
+
+### The reduction — every artifact → a generic type
+
+| generic type | the artifacts that ARE it | have it? |
+|---|---|---|
+| **prose document** | artist statement · bio · pitch · query letter · treatment · synopsis · liner notes | ✅ **composition** |
+| **spatial arrangement** | vision board · moodboard · shot board · album board | ✅ **board** |
+| **a table with fields** | gallery tracker · submission tracker · **list of work** · contact list | ❌ **structured data** → `tables-and-structured-data.md` |
+| **an ordered sequence** | pitch deck · setlist · track order · shot list · talk points | ❌ **sequence** → §2d |
+| **a file you hand someone** | the list-of-work **PDF** · portfolio · EPK · one-sheet | ❌ **an OUTPUT ARTIFACT — new, 2026-08-31** |
+
+> **Five generic types. We have two.**
+
+**The new one: an output artifact.** Something that *leaves the app as a file* for a person outside it. Surfaced first by the owner's gallerist/PDF example, and it generalises — every discipline's required artifacts eventually get handed over. Distinct from **export** (`/api/export` = your whole world as JSON, for ownership) and distinct from **publishing** (a live surface someone visits). This is *one document, made to be sent*. ⚑ Unruled, unnamed, unbuilt. ⚠ It also touches **pieces** (§Finding 3 — what you'd hand over is usually finished work).
+
+**Consequence for the research round:** this **downgrades** per-discipline research from blocking to level-2. If the feature set only needs the five generic types, discipline knowledge serves the **demo and onboarding**, not the build. *(Claude had ranked it as load-bearing an hour earlier — corrected.)*
+
 ### Each area, at length — because the table flattens what's actually going on
 
 **Material.** The one area that *is* well served — and even here it's fragmented across four tools that don't talk to each other. The screenshots are in the camera roll. The saved images are in Are.na. The quotes are in the notes app. The melodies are in voice memos. A person doesn't experience this as "I have good tools for material"; they experience it as *"I know I saved that somewhere."* So even the served area has an unserved version of the problem: **not capture, but reunion.**
