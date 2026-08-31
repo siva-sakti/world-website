@@ -68,7 +68,7 @@ export function BoardToolbar({
           {Math.round(zoomPct * 100)}%
         </span>
       </span>
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+      <input ref={fileRef} type="file" accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
       <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onPickAudio} />
       {error && (
         <span className="text-sm text-red-700">
