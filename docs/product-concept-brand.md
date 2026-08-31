@@ -56,6 +56,30 @@
 - **from the owner's own interests** *(the direction that feels most hers)*: astrology → **the houses** (the twelve domains of one life under one sky — exactly the multi-mind's many interests in one home) · constellation (already in the board-seed list)
 - **the concept-word to know even if never the name:** *umwelt* — biology's term for **the world as experienced by one particular mind**. Semantically a bullseye; as a sound, maybe too heavy. But it names the thing the name is trying to name.
 
+### The candidate list (2026-08-31)
+
+**The owner's steer:** *"spiritually mystical beautiful words for spaces/areas — or even just evocative. Names don't want to get too astrological but they can get astronomical. Things like umwelt I also like — words in that world seem good."* Plus **monde**, and *"more ethereal."* ⚑ **Logo: the owner has it in her own head** — no design help needed there.
+
+**Family A · the world-as-experienced** *(the umwelt family — the owner's named favorite direction)*
+**umwelt** *(the world as experienced by one particular mind)* · **eigenwelt** *(one's own world — Binswanger, sister term)* · **lebenswelt** *(Husserl: the "life-world," the world as actually lived)* · **monde** · **mundus** · **loka** *(Sanskrit: world, realm)*
+
+**Family B · sacred / bounded space**
+**temenos** *(Greek: ground cut off and dedicated; Jung used it for the protected space where transformation happens)* · **chora** · **vihara** *(Sanskrit: dwelling — and also wandering)* · **reliquary** *(a container for precious fragments)* · **sanctum** · **akasha** *(ether/space; the akashic record = the compendium of all thought — apt, with a new-age risk)*
+
+**Family C · astronomical**
+**ephemeris** · **orrery** · **parallax** · **meridian** · **firmament** · **penumbra** · **syzygy** · **zenith** · **aurora**
+
+**Family D · the room where the world comes inside**
+**obscura** · **atelier** *(matches the artist's-studio north star exactly, but common in fashion/design — less strange)* · **observatory**
+
+### Claude's three, with reasoning 🔵
+
+1. **chora** — Plato's word in the *Timaeus* for **the receptacle: the space in which things come to be.** Not a metaphor for the product — a definition of it. Two syllables, strange, sayable; "in my Chora" passes the possessive test.
+2. **ephemeris** — the astronomical table of where celestial bodies will be over time. Beautiful, and **"ephemera" is sitting inside it** — the fragments. A name that means two true things at once is rare.
+3. **orrery** — a brass mechanical model of a solar system: **a little world you can turn and look at from any side.** Tactile, obscure, astronomical — and the object is beautiful, which matters for a mark.
+
+**The dark horse: obscura.** A camera obscura *literally brings the outside world into a room where you can look at it* — the extended-mind idea (`product-concept-frameworks.md` §2) made into architecture.
+
 **Where this fits the run plan:** the naming *decision* stays sitting ⑦ (after publishing + the argument settles). This section **accumulates seeds passively until then** — add one-liners any time an idea strikes; nothing here commits to anything.
 
 ## 3 · Why this is blocked, and on what

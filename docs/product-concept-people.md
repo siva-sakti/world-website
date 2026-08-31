@@ -174,6 +174,85 @@ Three gaps, each showing up in more than one situation — which is the test of 
 | **ordered lists** | ②, ④ | sequencing and setlists. Boards are spatial; nothing says "this order" |
 | **a date you set** | ③, ⑤ | posting schedule, deadlines. → `tables-and-structured-data.md` |
 
+---
+
+## ⭐ THE WRITER PASS (drafted 2026-08-31 — ⚑ AWAITING THE OWNER'S CORRECTIONS FROM LIFE)
+
+**Why this persona first:** the owner *is* one, and the house method is *scenarios-from-life-never-from-plans*. This is the only persona with a live oracle attached. **Claude drafted the steps; the owner corrects them.** Everything below is 🔵 until she does.
+
+### ① Writing an essay
+
+| # | the step | needs | have it? |
+|---|---|---|---|
+| 1 | an idea nags — a half-thought while reading something else | jot, from wherever she is | ⚠️ jot ✅ · **phone capture ❌** |
+| 2 | over weeks she notices things that belong to it — a quote, a screenshot, a line from a podcast | catch + tag as belonging | ✅ bits · tags · source |
+| 3 | it reaches critical mass and she decides to write it | **something that says "you have 12 things about this"** | ⚠️ `tag_counts` exists but nothing *surfaces* accumulation to her |
+| 4 | she finds everything she caught for it | the pull · find | ✅ built |
+| 5 | she spreads them out to see the shape — what's the argument? | the board | ✅ **the strongest thing we have** |
+| 6 | she drafts, reaching for quotes as she writes | gather (`[[`) | ✅ built |
+| 7 | she restructures — moves whole sections around, cuts, reorders | **moving CHUNKS of a long text spatially** | ❌ a composition is one text body; this is *document mode* (parked) |
+| 8 | she checks a source she half-remembers | the source page | ✅ built |
+| 9 | it's finished and goes out into the world | **somewhere finished work lives** | ⚪ → **pieces** (proposed, unbuilt) |
+
+### ② Pitching publications *(the owner's own founding example)*
+
+| # | the step | needs | have it? |
+|---|---|---|---|
+| 1 | she reads a piece she admires and notes where it ran | catch with source | ✅ |
+| 2 | she looks up submission guidelines — a URL, a window, a fee | a link + **a date** | ⚠️ source ✅ · **date ❌** |
+| 3 | she keeps a running list of candidates | a list that's also spreadable | ⚪ → `tables-and-structured-data.md` |
+| 4 | she matches a finished piece to a publication | seeing both at once | ✅ **adjacency — the whole argument** |
+| 5 | she writes the pitch, **often reusing a previous pitch** | **a composition built from other compositions** | ❌ **notes-in-notes is UNDECIDED in the model** |
+| 6 | she sends it and records that she did | status | ⚠️ tags approximate it |
+| 7 | she follows up; a response comes back | date + status again | ❌ |
+
+### ③ Researching something that may never become anything
+
+| # | the step | needs | have it? |
+|---|---|---|---|
+| 1 | curiosity strikes — she starts reading about Gzhel pottery | catch, with no project attached | ✅ **a bit needs nothing to exist** |
+| 2 | she collects images, articles, a video, quotes | mixed media in one place | ✅ (video ❌) |
+| 3 | she doesn't know if this is going anywhere | **a home that doesn't demand an output** | ✅ — *this is the seventh area, and the app already allows it* |
+| 4 | it sits, accumulating, for months | nothing needed | ✅ |
+| 5 | **six months later, how does she find her way back?** | it isn't *alive*; she may not recall the word | ❌ **the wander-back surface — the browse/feed, deliberately deferred** |
+| 6 | it ends up feeding a different piece entirely | one bit in many constellations | ✅ tags + many boards |
+
+### ④ Prepping a talk, a speech, or a hard conversation
+
+| # | the step | needs | have it? |
+|---|---|---|---|
+| 1 | the occasion is known | — | — |
+| 2 | she gathers what she wants to say — points, stories, quotes | ✅ | ✅ |
+| 3 | **she puts them in order** — this, then this | **ordered sequence** | ❌ **ordered lists** *(same gap as the setlist)* |
+| 4 | she condenses to something glanceable in the moment | **a second, compact rendering of the same content** | ❌ |
+| 5 | afterward, what she actually said differs from the plan | catch the aftermath | ✅ jot |
+
+### ⑤ The commonplace thread *(the one that just accumulates)*
+
+| # | the step | needs | have it? |
+|---|---|---|---|
+| 1 | she reads constantly and marks lines that strike her | **capture from where she reads** — book, Kindle, article | ❌ phone/highlight capture (parked, Phase 5) |
+| 2 | no project — pure accumulation | ✅ | ✅ |
+| 3 | months later a line resurfaces and seeds something | **rediscovery by wandering, not searching** | ❌ **the browse surface again** |
+| 4 | she sometimes browses it just for pleasure | a surface worth visiting | ❌ *(`philosophy.md`: "wander back the way I used to wander through my own Tumblr")* |
+
+### What the writer pass exposes — six gaps
+
+| gap | appears in | status |
+|---|---|---|
+| **ordered lists** | ④ *(+ songwriter ②④)* | 🔴 **confirmed across two personas — the strongest signal so far** |
+| **a date you set** | ② *(+ songwriter ③⑤)* | 🔴 **confirmed across two personas** |
+| **the wander-back surface** (browse/feed) | ③, ⑤ | 🔴 **twice in one persona** — and `philosophy.md` names it as the point. Deliberately deferred; **this pass is the evidence to re-open it** |
+| **composition → composition gather** (notes-in-notes) | ② | 🆕 **NEW, and it's a live model question** — `parked` lists notes-in-notes as *undecided*. Pitching needs it |
+| **capture from where you read** (highlights) | ⑤ | parked (Phase 5) — now with a named use |
+| **restructuring long text spatially** | ① | *document mode* — parked, own design round |
+
+**Two observations worth the owner's eye:**
+1. **③ is the persona's happiest scenario and needs almost nothing built** — the app already allows curiosity with no output. That's evidence the *wide door* (§Finding 1) is real and mostly already true, not aspirational.
+2. **The one thing ③ and ⑤ both fail on is the same thing:** coming back by wandering rather than searching. Return was demoted to "amplifier" — correctly, as a *differentiator*. But as a **gap in the writer's actual week it shows up twice**, and `philosophy.md` still calls it the point. ⚑ Worth the owner's reconciliation: *not the pitch, but maybe still the build.*
+
+---
+
 ### The run order for the remaining passes (proposed 2026-08-30)
 
 1. **The writer — FIRST.** The owner *is* one; the house method is scenarios-from-life-never-from-plans, and this is the only persona with a live oracle attached. Situations to walk: writing an essay · pitching publications (the owner's own founding example) · researching a topic that may never become anything · prepping a talk · the commonplace thread that just accumulates.
