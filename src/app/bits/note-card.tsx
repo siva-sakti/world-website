@@ -116,6 +116,11 @@ export function NoteCard({
             <span className="inbox-card-kind">✎ sketch</span>
             {title && <span className="inbox-card-title">{title}</span>}
           </span>
+        ) : item.type === "audio" ? (
+          <span className="inbox-card-note inbox-card-note--audio">
+            <span className="inbox-card-kind">♪ recording</span>
+            {title && <span className="inbox-card-title">{title}</span>}
+          </span>
         ) : (
           <span className="inbox-card-note">
             {title ? (
@@ -173,7 +178,7 @@ export function NoteCard({
       </div>
 
       <div className="inbox-card-foot">
-        <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
+        <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
         <span className="inbox-card-actions">
           <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />

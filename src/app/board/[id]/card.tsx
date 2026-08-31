@@ -15,7 +15,7 @@ import type { Drawing } from "@/lib/types";
 export type CardVM = {
   placementId: string;
   bitId: string;
-  type: "text" | "drawing" | "image";
+  type: "text" | "drawing" | "image" | "audio";
   kind: "bit" | "note"; // a note (a written PIECE) renders as a page-shaped DOORWAY, not editable text (N3)
   x: number;
   y: number;
@@ -25,6 +25,7 @@ export type CardVM = {
   body?: string; // text (tiptap html → bit.body)
   drawing?: Drawing; // drawing (strokes + per-stroke pen width)
   imageUrl?: string; // image (resolved storage URL)
+  fileUrl?: string; // audio (resolved storage URL for the <audio> player); pdf reuses this later
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)
   sourceUrl?: string; // the source's optional clickable link
@@ -121,6 +122,11 @@ export function Card({
   }, []);
   const isNote = card.kind === "note";
   const isText = card.type === "text" && !isNote; // a note renders as a doorway, not editable text
+  // An <audio> player sizes like TEXT, not like an image: width-resizable, height
+  // follows the (fixed) player — NEVER aspect-locked/corner-scaled (that would stretch
+  // the controls). pdf will size the same way. `flexSized` = "width-flex, height-auto".
+  const isAudio = card.type === "audio";
+  const flexSized = isText || isAudio;
   // The doorway's face: the note's title (its `content`, else its first words) + a
   // faint preview of the body — read-only; clicking opens the note's page.
   const noteBody = isNote ? plainText(card.body) : "";
@@ -142,7 +148,7 @@ export function Card({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- re-measure per keystroke/width only
   }, [card.body, card.w, editing, isText]);
-  const size = isText
+  const size = flexSized
     ? { width: card.w, height: "auto" as const }
     : { width: card.w, height: card.h };
 
@@ -152,10 +158,10 @@ export function Card({
       size={size as { width: number | string; height: number | string }}
       disableDragging={editing}
       enableResizing={
-        selected && !editing ? (isText ? RESIZE_TEXT : RESIZE_SCALE) : false
+        selected && !editing ? (flexSized ? RESIZE_TEXT : RESIZE_SCALE) : false
       }
       resizeHandleStyles={coarse ? HANDLE_STYLES_COARSE : HANDLE_STYLES}
-      lockAspectRatio={!isText}
+      lockAspectRatio={!flexSized}
       scale={scale}
       minWidth={70}
       minHeight={28}
@@ -170,7 +176,7 @@ export function Card({
       onResizeStop={(_e, _dir, ref, _delta, pos) => {
         userSized.current = true; // the owner set this width — auto-widen backs off
         onChange(
-          isText
+          flexSized
             ? { x: pos.x, y: pos.y, w: ref.offsetWidth }
             : { x: pos.x, y: pos.y, w: ref.offsetWidth, h: ref.offsetHeight },
         );
@@ -261,6 +267,15 @@ export function Card({
             alt={card.content ?? ""}
             className="compose-img"
             draggable={false}
+          />
+        )}
+        {card.type === "audio" && card.fileUrl && (
+          <audio
+            className="compose-audio"
+            controls
+            preload="metadata"
+            src={card.fileUrl}
+            onPointerDown={(e) => e.stopPropagation()} // let the play scrubber work, don't start a drag
           />
         )}
         {card.type === "drawing" && card.drawing && (

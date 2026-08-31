@@ -12,13 +12,14 @@ import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 // board). Filtering is in-memory over the loaded set (snappy at this scale;
 // server-side search + paging is the named scale trigger). Reachable from a tab.
 
-type TypeFilter = "all" | "text" | "image" | "drawing";
+type TypeFilter = "all" | "text" | "image" | "drawing" | "audio";
 type Scope = "loose" | "this" | "other" | "all";
 type Kind = "all" | "bit" | "note"; // the drawer's primary split (owner: bits · notes · all)
 
 function faceOf(it: PanelBit): string {
   if (it.face) return it.face;
   if (it.type === "image") return it.file_name ?? "image";
+  if (it.type === "audio") return it.file_name ?? "recording";
   return it.type === "drawing" ? "drawing" : "";
 }
 
@@ -106,7 +107,7 @@ export function LooseColumn({
     if (sourceId && n.source?.id !== sourceId) return false;
     if (tagId && !n.tags.some((t) => t.id === tagId)) return false;
     if (hasWords) {
-      const hay = `${faceOf(n)} ${n.source?.name ?? ""} ${n.tags.map((t) => t.word).join(" ")}`.toLowerCase();
+      const hay = `${faceOf(n)} ${n.file_name ?? ""} ${n.source?.name ?? ""} ${n.tags.map((t) => t.word).join(" ")}`.toLowerCase();
       if (!matcher(hay)) return false;
     }
     return true;
@@ -221,6 +222,7 @@ export function LooseColumn({
               <option value="text">text</option>
               <option value="image">images</option>
               <option value="drawing">drawings</option>
+              <option value="audio">recordings</option>
             </select>
             {allTags.length > 0 && (
               <select value={tagId} onChange={(e) => setTagId(e.target.value)} aria-label="Filter by tag">

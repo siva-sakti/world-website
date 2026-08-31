@@ -45,11 +45,18 @@ export default async function BitPage({
     .map((bd) => ({ id: bd.id, title: bd.title }));
 
   let imageUrl: string | undefined;
+  let audioUrl: string | undefined;
   if (b.type === "image" && b.storage_path) {
     try {
       imageUrl = await signedUrl(supabase, b.storage_path);
     } catch {
       imageUrl = undefined;
+    }
+  } else if (b.type === "audio" && b.storage_path) {
+    try {
+      audioUrl = await signedUrl(supabase, b.storage_path);
+    } catch {
+      audioUrl = undefined;
     }
   }
   const drawing = b.type === "drawing" ? normalizeDrawing(b.strokes) : null;
@@ -103,6 +110,12 @@ export default async function BitPage({
         {b.type === "image" && imageUrl && (
           <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
         )}
+        {b.type === "audio" &&
+          (audioUrl ? (
+            <audio controls preload="metadata" src={audioUrl} className="w-full" />
+          ) : (
+            <p className="text-sm text-neutral-500">Couldn&rsquo;t load this recording — reload the page.</p>
+          ))}
         {drawing && dBounds && (
           <div
             className="rounded-md border border-neutral-200 bg-white p-3"

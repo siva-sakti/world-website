@@ -4,7 +4,7 @@
 // bit · board · placement directly and reads the board_cards / home views.
 
 export type Visibility = "public" | "private"; // "shared" joins later (§2a)
-export type BitType = "text" | "drawing" | "image"; // bookmark retired (D-102); pdf·audio later
+export type BitType = "text" | "drawing" | "image" | "audio"; // bookmark retired (D-102); pdf later
 export type DisplaySize = "full" | "small";
 
 // A pen stroke = an ordered list of [x, y, pressure] points (vector, tiny).

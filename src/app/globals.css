@@ -436,6 +436,13 @@ body {
   pointer-events: none;
   user-select: none;
 }
+/* An audio card's player fills the card width; it sizes like text (height follows
+   the native player, never aspect-locked). The player stays interactive (unlike the
+   pointer-events:none image), so play/scrub works. */
+.compose-audio {
+  display: block;
+  width: 100%;
+}
 /* The image/ink area stays the FULL card (height:100% from the base rule above) —
    it never shrinks, so adding a caption/source can't compress or squish it. For a
    drawing this also removes the old squish: the box aspect stays constant (= the
@@ -1227,8 +1234,27 @@ body {
   padding: 14px;
   width: 100%;
 }
-.inbox-card-note--drawing {
+.inbox-card-note--drawing,
+.inbox-card-note--audio {
   background: #fbfaf6;
+}
+/* The loose file door (/bits): the "+ recording" button + its inline caption. */
+.loose-file-intake {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.loose-file-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+}
+.loose-file-caption .tag-bar-input {
+  flex: 1;
 }
 .inbox-card-site {
   display: inline-flex;

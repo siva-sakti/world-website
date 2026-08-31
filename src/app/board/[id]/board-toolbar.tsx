@@ -15,6 +15,8 @@ export function BoardToolbar({
   zoomPct,
   fileRef,
   onPickImage,
+  audioRef,
+  onPickAudio,
   error,
   onDismissError,
 }: {
@@ -29,6 +31,8 @@ export function BoardToolbar({
   zoomPct: number;
   fileRef: RefObject<HTMLInputElement | null>;
   onPickImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  audioRef: RefObject<HTMLInputElement | null>;
+  onPickAudio: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
   onDismissError: () => void;
 }) {
@@ -36,6 +40,7 @@ export function BoardToolbar({
     <div className="compose-toolbar">
       <button className="compose-btn" onClick={onAddNote}>+ text</button>
       <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
+      <button className="compose-btn" onClick={() => audioRef.current?.click()}>+ audio</button>
       <button className="compose-btn" onClick={onPen}>✎ pen</button>
       <button
         className={`compose-btn${selectMode ? " is-on" : ""}`}
@@ -64,6 +69,7 @@ export function BoardToolbar({
         </span>
       </span>
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+      <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onPickAudio} />
       {error && (
         <span className="text-sm text-red-700">
           {error} <button className="underline" onClick={onDismissError}>ok</button>

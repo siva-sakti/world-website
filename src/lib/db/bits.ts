@@ -69,7 +69,45 @@ export async function createDrawingBit(
   return { bit: bit as Bit, placement };
 }
 
-/** An image bit — its bytes live in Storage; the row holds the path + facts (§7 layer B). */
+/** The shared file-bit insert (§7 layer B) — the bytes live in Storage; the row
+ * holds the path + facts. Every file-backed type (image, audio, later pdf) writes
+ * the SAME media columns, so they funnel through here. Media dimensions are
+ * OPTIONAL (audio has none). Placement is OPTIONAL too: pass placementId + boardId
+ * to land it on a board (image, board-born audio); omit both for a LOOSE file bit
+ * (like createLooseTextBit) — it appears in the inbox until called in. */
+export async function createFileBit(
+  supabase: SupabaseClient,
+  type: "image" | "audio",
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; thumbPath?: string;
+    mediaWidth?: number; mediaHeight?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  const { data: bit, error } = await supabase
+    .from("bit")
+    .insert({
+      id: args.bitId, type,
+      storage_path: args.storagePath, thumb_path: args.thumbPath ?? null,
+      media_width: args.mediaWidth ?? null, media_height: args.mediaHeight ?? null,
+      mime: args.mime, byte_size: args.byteSize, file_name: args.fileName ?? null,
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+  const placement =
+    args.placementId && args.boardId
+      ? await insertPlacement(supabase, {
+          id: args.placementId, boardId: args.boardId, bitId: args.bitId,
+          x: args.x, y: args.y, width: args.width, height: args.height, z: args.z,
+        })
+      : null;
+  return { bit: bit as Bit, placement };
+}
+
+/** An image bit — a thin wrapper over createFileBit (dimensions required; always
+ * board-born, so its placement is never null). Signature + behavior unchanged. */
 export async function createImageBit(
   supabase: SupabaseClient,
   args: {
@@ -79,22 +117,22 @@ export async function createImageBit(
     mime: string; byteSize: number; fileName?: string;
   } & Pos,
 ): Promise<{ bit: Bit; placement: Placement }> {
-  const { data: bit, error } = await supabase
-    .from("bit")
-    .insert({
-      id: args.bitId, type: "image",
-      storage_path: args.storagePath, thumb_path: args.thumbPath ?? null,
-      media_width: args.mediaWidth, media_height: args.mediaHeight,
-      mime: args.mime, byte_size: args.byteSize, file_name: args.fileName ?? null,
-    })
-    .select("*")
-    .single();
-  if (error) throw error;
-  const placement = await insertPlacement(supabase, {
-    id: args.placementId, boardId: args.boardId, bitId: args.bitId,
-    x: args.x, y: args.y, width: args.width, height: args.height, z: args.z,
-  });
-  return { bit: bit as Bit, placement };
+  const { bit, placement } = await createFileBit(supabase, "image", args);
+  return { bit, placement: placement! }; // placementId+boardId were passed → never null
+}
+
+/** An audio bit (a voice memo) — a file bit with no thumbnail and no image
+ * dimensions. `mediaWidth` optionally carries the recording's duration (seconds).
+ * Placement optional: board-born on a board, or LOOSE from the /bits door. */
+export async function createAudioBit(
+  supabase: SupabaseClient,
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; mediaWidth?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  return createFileBit(supabase, "audio", args);
 }
 
 /** A loose text bit — born on NO board (D-100). The bit is the atom; it needs no

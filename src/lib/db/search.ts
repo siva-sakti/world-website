@@ -121,7 +121,9 @@ export async function searchItems(
       mediaType: b.type,
       tags: b.tags,
       created_at: b.created_at,
-      searchText: `${b.content ?? ""} ${bodyText}`.toLowerCase(),
+      // file_name too, so a media bit (image/audio) is findable by its filename —
+      // the DB search_tsv indexes it, but the /search UI filters client-side on this.
+      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""}`.toLowerCase(),
     };
   });
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));
