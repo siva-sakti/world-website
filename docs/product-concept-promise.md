@@ -94,7 +94,11 @@ The owner asked for the cut to be checked before journeys got built on it. Check
 | **designer** | portfolio · case study · deck |
 | **filmmaker** | treatment · shot list · pitch deck |
 
-**Why this beats the six areas below.** The six are abstract categories Claude invented — "meaning," "outreach," "presentation." You cannot check them and you cannot show them to a person. **An artist reading "list of work" feels seen instantly; nobody feels seen by "presentation."** Keep the six as an internal sanity-check; **lead with artifacts everywhere a person is involved.**
+**⚠ CORRECTION (owner, same day):** Claude first wrote *"artifacts beat the six areas."* Over-corrected. The owner: *"I do think the six areas are helpful to start thinking about this — what I'm trying to do is drill down, which is what we're doing now. I don't wanna discard one or the other."*
+
+> **They are two levels of one thing. The six areas are the CATEGORIES; the artifacts are the INSTANCES inside them.** A *list of work* is an outreach/presentation artifact. An *artist statement* is a meaning artifact. **Areas organise the thinking; artifacts make it concrete and recognisable.**
+
+Use areas to reason and check coverage; **use artifacts whenever a person is being spoken to** — an artist reading "list of work" feels seen instantly; nobody feels seen by "presentation." And the pairing is what gives the research its grid (`product-concept-frameworks.md` §Q7).
 
 **It hands us the onboarding line, per discipline** (the owner's own phrasing): ***"You're an artist. You have to make a list of work. Here's how this app does that."*** — the switching pitch (§Are.na), made concrete one discipline at a time.
 
@@ -159,6 +163,32 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 | **a table *of bits*** 🔵 | each row **is a bit** — so the same list can also be spread on a board, tagged, filtered by tag, gathered into a pitch. Not a new data type; a new **view** of the one primitive. | medium | **nobody — and only we could** |
 
 **The third is the one consistent with "one primitive, everywhere"** and the only one that connects to the spatial half. ⚪ **Not decided — the owner has not chosen between them, and may mean the first while asking for the second.**
+
+## 2d · ⭐ THE MISSING DIMENSION: SEQUENCE (surfaced 2026-08-31)
+
+**Four requests, one gap.** The owner has now described the same absence four times without naming it:
+
+| where it appeared | what was missing |
+|---|---|
+| songwriter — track order on an album | sequence |
+| songwriter — a setlist | sequence |
+| writer — ordering points for a talk | sequence |
+| **a pitch deck** (2026-08-31) | **sequence, over arrangements** |
+
+**The owner's framing of the fourth:** *"pitch deck makes me think we need another composition surface too — like a PowerPoint. I don't think we actually need a PowerPoint feature, we just need something that's **in between** a document/composition surface and the board — because most people make presentations in Canva or even Photoshop; they use a **surface** to put things together instead of PowerPoint."*
+
+**Why the "in between" is exactly right, structurally:**
+- a **board** = space, **no order**
+- a **composition** = order, **no space** (linear prose)
+- a **deck** = **both** — an ordered run of arranged surfaces
+
+That is why creative people reach for Canva/Photoshop over PowerPoint: those are *surfaces you arrange*, that happen to be sequenced.
+
+> **So the gap is not "a presentation feature." The app has NO CONCEPT OF ORDER AT ALL.** One idea sits under all four requests — far better to build than four features.
+
+⭐ **And it is already half-designed:** **document mode** (parked A1 — *a board rendered as a vertical flow*) is precisely "give a board an order." **The deck question and the parked document-mode question are the same question.** ⚑ Re-enter A1 with this evidence: four independent asks, across two personas, is well past the evidence bar that parked it.
+
+⚑ **Naming warning (step 2b):** "sequence" · "order" · "flow" · "deck" are all unruled. Name before building — the D-128 lesson.
 
 ## 3 · The concepts
 

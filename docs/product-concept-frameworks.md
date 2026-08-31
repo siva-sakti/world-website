@@ -95,6 +95,24 @@ The owner's gallerist example (`product-concept-promise.md` §Required artifacts
 |---|---|---|
 | **7** | **Per discipline — what documents is a practitioner actually REQUIRED to produce that are not their art, and how do they make them today?** (artist: list of work · statement · CV. writer: pitch · query · bio. musician: one-sheet · EPK. designer: portfolio · case study. filmmaker: treatment · shot list.) | **Directly buildable.** Names real artifacts, real formats, and the real tool being suffered today — which is the switching pitch, per discipline. And it is the one thing Claude **must not invent**: the owner is the oracle for one discipline only; every other workflow Claude writes unaided is plausible fiction. |
 
+**⭐ THE GRID (owner's ask, 2026-08-31: *"specific research questions defined within the framework we're laying out, so it's not just pulling random stuff"*).** Q7 is not one question — it is a **grid**, and every cell is specific and answerable:
+
+**disciplines** (artist · musician · writer · designer · filmmaker) **× the six areas** (material · the work · meaning · outreach · opportunities · presentation)
+
+For each cell: **what artifact is required here, and how is it made today?**
+
+|  | material | the work | meaning | outreach | opportunities | presentation |
+|---|---|---|---|---|---|---|
+| **artist** | | | artist statement | | open calls · grants | **list of work** · exhibition proposal |
+| **musician** | | | | one-sheet · EPK | | setlist · liner notes |
+| **writer** | | | bio | pitch · query letter | submission windows | synopsis |
+| **designer** | | | case study | portfolio | | deck |
+| **filmmaker** | | | treatment | pitch deck | | shot list |
+
+*(Seeded from what we already believe — **research fills the blanks and CORRECTS the guesses**. The seeded cells are Claude's inference and must be verified like everything else.)*
+
+**Empty cells are findings too:** if an area has no required artifact for a discipline, that tells us the area doesn't apply there — worth knowing before we build for it.
+
 **Sources that count for Q7:** practitioner writing · how-to videos and guides for that discipline · gallery/publisher/label submission requirements (these are *published* and authoritative) · real people who can be asked. **Not** Claude's model of how a fashion designer works.
 
 **Suggested shape when we run it:** one focused pass per question, sources named, findings marked *usable in copy* vs *internal only*. Not one big sweep.
