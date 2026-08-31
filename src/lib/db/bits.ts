@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, Placement, Drawing } from "@/lib/types";
+import { removeObjects } from "@/lib/storage";
+import { setResting } from "./resting";
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
 // is the act of putting it on a board. Ids are client-supplied (crypto.randomUUID)
@@ -67,7 +69,46 @@ export async function createDrawingBit(
   return { bit: bit as Bit, placement };
 }
 
-/** An image bit — its bytes live in Storage; the row holds the path + facts (§7 layer B). */
+/** The shared file-bit insert (§7 layer B) — the bytes live in Storage; the row
+ * holds the path + facts. Every file-backed type (image, audio, pdf) writes the
+ * SAME media columns, so they funnel through here. Media dimensions are OPTIONAL
+ * (audio has none; a pdf carries its page-1 dims). Placement is OPTIONAL too: pass
+ * placementId + boardId to land it on a board (image, board-born audio/pdf); omit
+ * both for a LOOSE file bit (like createLooseTextBit) — it appears in the inbox
+ * until called in. */
+export async function createFileBit(
+  supabase: SupabaseClient,
+  type: "image" | "audio" | "pdf",
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; thumbPath?: string;
+    mediaWidth?: number; mediaHeight?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  const { data: bit, error } = await supabase
+    .from("bit")
+    .insert({
+      id: args.bitId, type,
+      storage_path: args.storagePath, thumb_path: args.thumbPath ?? null,
+      media_width: args.mediaWidth ?? null, media_height: args.mediaHeight ?? null,
+      mime: args.mime, byte_size: args.byteSize, file_name: args.fileName ?? null,
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+  const placement =
+    args.placementId && args.boardId
+      ? await insertPlacement(supabase, {
+          id: args.placementId, boardId: args.boardId, bitId: args.bitId,
+          x: args.x, y: args.y, width: args.width, height: args.height, z: args.z,
+        })
+      : null;
+  return { bit: bit as Bit, placement };
+}
+
+/** An image bit — a thin wrapper over createFileBit (dimensions required; always
+ * board-born, so its placement is never null). Signature + behavior unchanged. */
 export async function createImageBit(
   supabase: SupabaseClient,
   args: {
@@ -77,22 +118,38 @@ export async function createImageBit(
     mime: string; byteSize: number; fileName?: string;
   } & Pos,
 ): Promise<{ bit: Bit; placement: Placement }> {
-  const { data: bit, error } = await supabase
-    .from("bit")
-    .insert({
-      id: args.bitId, type: "image",
-      storage_path: args.storagePath, thumb_path: args.thumbPath ?? null,
-      media_width: args.mediaWidth, media_height: args.mediaHeight,
-      mime: args.mime, byte_size: args.byteSize, file_name: args.fileName ?? null,
-    })
-    .select("*")
-    .single();
-  if (error) throw error;
-  const placement = await insertPlacement(supabase, {
-    id: args.placementId, boardId: args.boardId, bitId: args.bitId,
-    x: args.x, y: args.y, width: args.width, height: args.height, z: args.z,
-  });
-  return { bit: bit as Bit, placement };
+  const { bit, placement } = await createFileBit(supabase, "image", args);
+  return { bit, placement: placement! }; // placementId+boardId were passed → never null
+}
+
+/** An audio bit (a voice memo) — a file bit with no thumbnail and no image
+ * dimensions. `mediaWidth` optionally carries the recording's duration (seconds).
+ * Placement optional: board-born on a board, or LOOSE from the /bits door. */
+export async function createAudioBit(
+  supabase: SupabaseClient,
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; mediaWidth?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  return createFileBit(supabase, "audio", args);
+}
+
+/** A pdf bit — a file bit that (like an image) carries a first-page thumbnail
+ * (thumb_path) + page-1 dimensions; the original PDF lives at storage_path for the
+ * bit-page viewer. thumbPath may be absent (an unrenderable page 1 → a document
+ * glyph fallback). Placement optional: board-born on a board, or LOOSE from /bits. */
+export async function createPdfBit(
+  supabase: SupabaseClient,
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; thumbPath?: string;
+    mediaWidth?: number; mediaHeight?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  return createFileBit(supabase, "pdf", args);
 }
 
 /** A loose text bit — born on NO board (D-100). The bit is the atom; it needs no
@@ -134,8 +191,8 @@ export async function callInBit(
   // mechanism, §2h FOR SHARE + keep-by-default, is the owed follow-up; this narrow
   // guard covers the call-in door.)
   const [bitLive, boardLive] = await Promise.all([
-    supabase.from("bit").select("id").eq("id", args.bitId).is("deleted_at", null).maybeSingle(),
-    supabase.from("board").select("id").eq("id", args.boardId).is("deleted_at", null).maybeSingle(),
+    supabase.from("bit").select("id").eq("id", args.bitId).eq("state", "live").maybeSingle(),
+    supabase.from("board").select("id").eq("id", args.boardId).eq("state", "live").maybeSingle(),
   ]);
   if (bitLive.error) throw bitLive.error;
   if (boardLive.error) throw boardLive.error;
@@ -258,13 +315,8 @@ export async function trashBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const { data, error } = await supabase
-    .from("bit")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", bitId)
-    .select("id");
-  if (error) throw error;
-  if (!data?.length) throw new Error("that note no longer exists — reload");
+  const n = await setResting(supabase, "bit", bitId, "deleted_at", true);
+  if (!n) throw new Error("that note no longer exists — reload");
 }
 
 /** Compensating erase of a bit created MOMENTS ago by a multi-step intake whose
@@ -279,10 +331,26 @@ export async function restoreBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
+  await setResting(supabase, "bit", bitId, "deleted_at", false);
+}
+
+/** DESTROY a bit permanently (I-L10) — only if trashed. Removes its media files,
+ *  then deletes the row; the schema cascades its placements (+ their connectors),
+ *  tag applications, gather ties both ways, and travel. Guarded to `deleted_at IS
+ *  NOT NULL`: a live bit can never be destroyed, even if this is mis-called. */
+export async function destroyBit(supabase: SupabaseClient, bitId: string): Promise<void> {
+  const { data } = await supabase
+    .from("bit")
+    .select("storage_path, thumb_path")
+    .eq("id", bitId)
+    .not("deleted_at", "is", null)
+    .maybeSingle();
+  if (data) await removeObjects(supabase, [data.storage_path, data.thumb_path]);
   const { error } = await supabase
     .from("bit")
-    .update({ deleted_at: null })
-    .eq("id", bitId);
+    .delete()
+    .eq("id", bitId)
+    .not("deleted_at", "is", null);
   if (error) throw error;
 }
 
@@ -291,7 +359,7 @@ export async function restoreBit(
 /** One bit for its page — null if missing or trashed. */
 export async function getBit(supabase: SupabaseClient, id: string): Promise<Bit | null> {
   const { data } = await supabase
-    .from("bit").select("*").eq("id", id).is("deleted_at", null).maybeSingle();
+    .from("bit").select("*").eq("id", id).eq("state", "live").maybeSingle();
   return (data as Bit) ?? null;
 }
 

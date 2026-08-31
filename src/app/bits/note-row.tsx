@@ -29,16 +29,16 @@ export function NoteRow({
 
   return (
     <li className="notes-row">
-      <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
+      <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
       <Link href={`/bit/${item.id}`} className="notes-row-title" title="open">
-        {item.type === "image" && img && (
+        {(item.type === "image" || item.type === "pdf") && img && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={img} alt="" className="notes-row-thumb" />
         )}
         {title ? (
           <span>{title}</span>
         ) : (
-          <span className="notes-row-empty">{item.type === "image" ? "image" : "empty note"}</span>
+          <span className="notes-row-empty">{item.type === "image" ? "image" : item.type === "pdf" ? "PDF" : item.type === "audio" ? "recording" : "empty note"}</span>
         )}
       </Link>
       {item.source && (

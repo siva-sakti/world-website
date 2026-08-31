@@ -10,7 +10,8 @@ import { bitLabel, boardLabel } from "@/lib/labels";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { NoteWorkspace } from "./note-workspace";
-import { BitTitle, BitTrash, BitArchive } from "@/app/bit/[id]/bit-controls";
+import { BitTitle, BitTrash } from "@/app/bit/[id]/bit-controls";
+import { ArchiveButton } from "@/app/archive/archive-controls";
 import { PinToggle } from "@/app/bits/note-card";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 
@@ -50,8 +51,8 @@ export default async function NotePage({
         <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} />
         <PlaceOnBoard bitId={b.id} boards={otherBoards} />
         <span className="note-actions-spacer" />
-        <BitArchive bitId={b.id} archived={Boolean(b.archived_at)} starred={Boolean(b.pinned_at)} />
-        <BitTrash bitId={b.id} returnTo="/notes" />
+        <ArchiveButton thing="bit" id={b.id} returnTo="/" />
+        <BitTrash bitId={b.id} returnTo="/" />
       </div>
 
       {/* The surface — title + the writing, central, full-width. */}

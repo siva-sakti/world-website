@@ -384,9 +384,13 @@ body {
   outline-offset: 1px;
   border-color: transparent;
 }
+/* Media card (§2b / expand-to-edit): the image/ink fills the whole card at its
+   resting footprint; the caption + source float in a panel BELOW the card (see
+   .compose-media-meta) so they NEVER compress the content — content is sacred.
+   No overflow:hidden, so that below-panel (and the source suggestions) aren't
+   clipped. Card-scoped: text/note cards untouched. */
 .compose-card-inner.is-image {
   padding: 0;
-  overflow: hidden;
 }
 .compose-card-inner.is-doodle {
   padding: 0;
@@ -446,6 +450,83 @@ body {
   border-radius: 5px;
   pointer-events: none;
   user-select: none;
+}
+/* An audio card's player fills the card width; it sizes like text (height follows
+   the native player, never aspect-locked). The player stays interactive (unlike the
+   pointer-events:none image), so play/scrub works. */
+.compose-audio {
+  display: block;
+  width: 100%;
+}
+/* A PDF card = its first-page thumbnail filling the card (like an image), with a
+   small "PDF" badge in the corner so it reads at a glance. */
+.compose-pdf {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.compose-pdf-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fffdfa;
+  background: rgba(54, 90, 140, 0.9);
+  border-radius: 4px;
+  pointer-events: none;
+  user-select: none;
+}
+/* An unrenderable PDF (no thumbnail): a quiet document sheet + optional caption. */
+.compose-pdf--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #fbfaf6;
+  border-radius: 5px;
+  padding: 12px;
+  text-align: center;
+}
+.compose-pdf-mark {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #365a8c;
+}
+.compose-pdf-name {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #6b6357;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+/* The image/ink area stays the FULL card (height:100% from the base rule above) —
+   it never shrinks, so adding a caption/source can't compress or squish it. For a
+   drawing this also removes the old squish: the box aspect stays constant (= the
+   drawing's native, aspect-locked ratio), so preserveAspectRatio="none" is an
+   undistorted identity fill. */
+
+/* The caption + source float just BELOW the card (absolute, out of the flow) so
+   they never eat into the image/ink area — the card keeps its footprint; the meta
+   simply appears beneath it. A small gap clears the resize handles; a light panel
+   so it reads as attached and stays legible over whatever's under it (it's frontmost
+   via the selected card's z-index). */
+.compose-media-meta {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 0.4em 0.6em 0.5em;
+  background: #fffdfa;
+  border: 1px solid #e7e1d5;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(60, 50, 35, 0.08);
 }
 .tiptap,
 .tiptap .ProseMirror {
@@ -878,7 +959,7 @@ body {
   border-color: #b7aea0;
 }
 
-/* Tags: the editor bar for the selected note, and chips used here + on /find. */
+/* Tags: the editor bar for the selected note, and chips used here + on /search. */
 .tag-bar {
   display: flex;
   flex-wrap: wrap;
@@ -968,6 +1049,32 @@ body {
 }
 .source-open:hover {
   text-decoration: underline;
+}
+
+/* The source picker sits INSIDE a board card (a ~240px surface): the default
+   .tag-bar min-widths (160/120px) would overflow it, so shrink it to fit —
+   compact, tight, quiet. Board card only; the note/bit pages keep the roomy bar. */
+.compose-card-inner .tag-bar {
+  margin: 6px 0 0;
+  padding: 4px 6px;
+  gap: 4px;
+  border-radius: 7px;
+  background: #fdfbf7;
+}
+.compose-card-inner .tag-bar-label {
+  font-size: 10px;
+  margin-right: 0;
+}
+.compose-card-inner .tag-bar-input {
+  min-width: 56px;
+  font-size: 12px;
+}
+.compose-card-inner .tag-bar-field {
+  min-width: 56px;
+}
+.compose-card-inner .tag-bar .tag-chip {
+  font-size: 11px;
+  padding: 3px 7px;
 }
 
 /* "from …" on a board card — quiet, secondary, below the words (§5). */
@@ -1190,8 +1297,27 @@ body {
   padding: 14px;
   width: 100%;
 }
-.inbox-card-note--drawing {
+.inbox-card-note--drawing,
+.inbox-card-note--audio {
   background: #fbfaf6;
+}
+/* The loose file door (/bits): the "+ recording" button + its inline caption. */
+.loose-file-intake {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.loose-file-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+}
+.loose-file-caption .tag-bar-input {
+  flex: 1;
 }
 .inbox-card-site {
   display: inline-flex;

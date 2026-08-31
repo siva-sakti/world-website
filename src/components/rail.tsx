@@ -73,15 +73,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button className="rail-link rail-btn">+ new board</button>
         </form>
         <div className="rail-sec">everything</div>
-        <Link href="/boards" className="rail-link">all boards</Link>
-        <Link href="/notes" className="rail-link">all notes</Link>
+        <Link href="/" className="rail-link">home</Link>
         <Link href="/bits" className="rail-link">bits</Link>
         <div className="rail-sec">lenses</div>
-        <Link href="/find" className="rail-link">find</Link>
+        <Link href="/search" className="rail-link">search</Link>
         <Link href="/graph" className="rail-link">graph</Link>
+        <Link href="/outline" className="rail-link">outline</Link>
         <Link href="/tags" className="rail-link">tags</Link>
         <div className="rail-foot">
           <Link href="/sources" className="rail-link">sources</Link>
+          <Link href="/archive" className="rail-link">archive</Link>
           <Link href="/trash" className="rail-link">trash</Link>
           <a href="/api/export" className="rail-link" title="Download all your data">export</a>
           <form action={logout}>

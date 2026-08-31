@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Board, BoardCard, HomeBoard } from "@/lib/types";
+import { removeObjects } from "@/lib/storage";
+import { setResting } from "./resting";
 
 // Data access for boards. Components call these; they never touch Supabase
 // directly (the one-door rule). Surfaces read the computed views (home,
@@ -22,7 +24,7 @@ export async function getBoard(
     .from("board")
     .select("*")
     .eq("id", id)
-    .is("deleted_at", null)
+    .eq("state", "live")
     .maybeSingle();
   if (error) throw error;
   return data as Board | null;
@@ -71,11 +73,7 @@ export async function trashBoard(
   supabase: SupabaseClient,
   id: string,
 ): Promise<void> {
-  const { error } = await supabase
-    .from("board")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) throw error;
+  await setResting(supabase, "board", id, "deleted_at", true);
 }
 
 /** Restore a trashed board — its arrangement returns exactly (§2g). */
@@ -83,11 +81,40 @@ export async function restoreBoard(
   supabase: SupabaseClient,
   id: string,
 ): Promise<void> {
+  await setResting(supabase, "board", id, "deleted_at", false);
+}
+
+/** DESTROY a board permanently (I-L6) — only if trashed. Cascade deletes its
+ *  placements (those on it AND board-cards of it), connectors, and tag
+ *  applications; NO bits (I-L7). Guarded to trashed-only. */
+export async function destroyBoard(supabase: SupabaseClient, id: string): Promise<void> {
   const { error } = await supabase
     .from("board")
-    .update({ deleted_at: null })
-    .eq("id", id);
+    .delete()
+    .eq("id", id)
+    .not("deleted_at", "is", null);
   if (error) throw error;
+}
+
+/** Empty the trash — destroy every trashed bit + board (I-L2 · I-L10 · I-L6). Removes
+ *  the trashed image bits' files first, then deletes all trashed rows (the schema
+ *  cascades the rest). Trashed-only by the `deleted_at IS NOT NULL` guard. */
+export async function emptyTrash(supabase: SupabaseClient): Promise<void> {
+  const { data: imgs } = await supabase
+    .from("bit")
+    .select("storage_path, thumb_path")
+    .eq("type", "image")
+    .not("deleted_at", "is", null);
+  if (imgs && imgs.length) {
+    await removeObjects(
+      supabase,
+      imgs.flatMap((b) => [b.storage_path as string | null, b.thumb_path as string | null]),
+    );
+  }
+  const bitDel = await supabase.from("bit").delete().not("deleted_at", "is", null);
+  if (bitDel.error) throw bitDel.error;
+  const boardDel = await supabase.from("board").delete().not("deleted_at", "is", null);
+  if (boardDel.error) throw boardDel.error;
 }
 
 /** The trash listing: the frozen things' one surface (§4 · I-T4). */

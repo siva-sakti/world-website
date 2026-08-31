@@ -85,8 +85,6 @@ export type BitHit = {
   type: string;
   // The bit's own words, so the picker searches full text like every other box
   // (the owner's ruling, 2026-08-28) instead of only the face.
-  content: string | null;
-  body: string | null;
   // Enough to draw a thumbnail in the organized picker (and the media chip): an
   // image's object path (sign at read time) or a drawing's vectors. Null on a text
   // bit — it shows by its words, not a picture.
@@ -111,8 +109,8 @@ export async function listGatherCandidates(
 ): Promise<BitHit[]> {
   let query = supabase
     .from("bit")
-    .select("id, face, type, content, body, thumb_path, storage_path, strokes")
-    .is("deleted_at", null)
+    .select("id, face, type, thumb_path, storage_path, strokes")
+    .eq("state", "live")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (excludeId) query = query.neq("id", excludeId);
@@ -122,8 +120,6 @@ export async function listGatherCandidates(
     id: b.id as string,
     face: (b.face as string | null) ?? "",
     type: b.type as string,
-    content: (b.content as string | null) ?? null,
-    body: (b.body as string | null) ?? null,
     thumbPath: (b.thumb_path as string | null) ?? null,
     storagePath: (b.storage_path as string | null) ?? null,
     strokes: (b.strokes as Stroke[] | null) ?? null,
@@ -147,16 +143,16 @@ export async function listGatheredInto(
 ): Promise<GatheredIntoRow[]> {
   const { data, error } = await supabase
     .from("reference")
-    .select("created_at, gatherer:from_bit_id(id, face, type, deleted_at)")
+    .select("created_at, gatherer:from_bit_id(id, face, type, state)")
     .eq("to_bit_id", bitId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   type Row = {
     created_at: string;
-    gatherer: { id: string; face: string | null; type: string; deleted_at: string | null } | null;
+    gatherer: { id: string; face: string | null; type: string; state: string } | null;
   };
   return ((data ?? []) as unknown as Row[])
-    .filter((r) => r.gatherer && r.gatherer.deleted_at === null)
+    .filter((r) => r.gatherer && r.gatherer.state === "live")
     .map((r) => ({
       bitId: r.gatherer!.id,
       face: r.gatherer!.face,
@@ -173,7 +169,7 @@ export type RefTargetRow = {
   storage_path: string | null;
   strokes: Stroke[] | null;
   face: string | null;
-  deleted_at: string | null;
+  state: string;
 };
 
 /** The target bit behind a gather chip — read once by the chip's inline thumbnail +
@@ -186,7 +182,7 @@ export async function getRefTarget(
 ): Promise<RefTargetRow | null> {
   const { data, error } = await supabase
     .from("bit")
-    .select("type, content, body, thumb_path, storage_path, strokes, face, deleted_at")
+    .select("type, content, body, thumb_path, storage_path, strokes, face, state")
     .eq("id", bitId)
     .maybeSingle();
   if (error) throw error;

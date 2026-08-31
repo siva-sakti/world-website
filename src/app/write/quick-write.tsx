@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { createLooseTextBit, updateBitBody, updateBitContent } from "@/lib/db/bits";
+import { createLooseTextBit, updateBitBody, updateBitContent, trashBit } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { registerSave } from "@/lib/save-guard";
 import { TextBit } from "@/app/board/[id]/text-bit";
+import { confirm } from "@/components/confirm";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
 // empty-note litter from opening the page and leaving — guarded by a SYNCHRONOUS
@@ -33,6 +33,8 @@ export function QuickWrite() {
   const [title, setTitle] = useState("");
   const titleRef = useRef("");
   const titleSaved = useRef("");
+  // Bumped on trash to remount the editor blank for a fresh start.
+  const [resetKey, setResetKey] = useState(0);
 
   function flushTitle() {
     const id = bitId.current;
@@ -99,9 +101,53 @@ export function QuickWrite() {
   leave.current = leaveNow;
   useEffect(() => registerSave(() => leave.current()), []);
   useEffect(() => () => leave.current(), []);
+  // Trash the just-written note in place — the same "trash" as everywhere else
+  // (restorable), then reset to a fresh blank writer. Only offered once it's born.
+  async function trashNote() {
+    const id = bitId.current;
+    if (!id) return;
+    if (
+      !(await confirm({
+        message: "Trash this note?",
+        confirmLabel: "Trash",
+        danger: true,
+      }))
+    )
+      return;
+    try {
+      await create.current; // never trash before the row exists (the settled gate)
+      await trashBit(supabase, id);
+    } catch (e) {
+      console.error("trash failed:", e);
+      setErr("Couldn't trash — check your connection.");
+      return;
+    }
+    if (timer.current) clearTimeout(timer.current);
+    bitId.current = null;
+    create.current = null; // any in-flight flush now reads a null id and aborts
+    latest.current = "";
+    titleRef.current = "";
+    titleSaved.current = "";
+    setTitle("");
+    setSelfId(null);
+    setErr(null);
+    setResetKey((k) => k + 1);
+  }
 
   return (
     <div>
+      {/* A stable action toolbar — always here, never popping in as you type. Trash is
+          always available; open lights up once the note exists. */}
+      <div className="mb-4 flex items-center justify-end gap-2 text-sm">
+        <button
+          type="button"
+          onClick={trashNote}
+          className="rounded-md border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
+          title="Trash this note (restorable)"
+        >
+          🗑 trash
+        </button>
+      </div>
       <input
         value={title}
         placeholder="title — optional"
@@ -116,25 +162,15 @@ export function QuickWrite() {
         }}
       />
       <div className="page-editor">
-        <TextBit html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
+        <TextBit key={resetKey} html="" editing onChange={onChange} selfBitId={selfId ?? undefined} />
       </div>
       <p className="mt-4 text-xs text-neutral-400" role="status">
         {err ? (
           <span className="text-red-700">{err}</span>
-        ) : selfId ? (
-          // Born — one quiet door to its surface. Nothing else at the writing
-          // moment (N1): placing, tagging, sourcing all live on the note's page.
-          <span>
-            saved ·{" "}
-            <Link href={`/note/${selfId}`} className="underline underline-offset-4 hover:no-underline">
-              open →
-            </Link>
-          </span>
         ) : (
           // The gather hint (O3): the page's superpower shouldn't be a secret.
           <span>
-            start writing — it saves itself · type <code className="rounded bg-neutral-100 px-1">[[</code> to
-            gather a note into your writing
+            type <code className="rounded bg-neutral-100 px-1">[[</code> to gather a note into your writing
           </span>
         )}
       </p>

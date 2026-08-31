@@ -22,7 +22,7 @@ export async function getWordGraph(supabase: SupabaseClient): Promise<WordGraph>
   // One pass over every bit-tag application, pulling the word + the bit's face.
   const { data, error } = await supabase
     .from("tag_application")
-    .select("tag:tag(id, word), bit:bit(id, face, type, deleted_at)")
+    .select("tag:tag(id, word), bit:bit(id, face, type, state)")
     .not("target_bit_id", "is", null);
   if (error) throw error;
 
@@ -31,9 +31,9 @@ export async function getWordGraph(supabase: SupabaseClient): Promise<WordGraph>
   for (const a of data ?? []) {
     const tag = a.tag as unknown as { id: string; word: string } | null;
     const bit = a.bit as unknown as
-      | { id: string; face: string | null; type: string; deleted_at: string | null }
+      | { id: string; face: string | null; type: string; state: string }
       | null;
-    if (!tag || !bit || bit.deleted_at) continue; // trashed bits are out of the web
+    if (!tag || !bit || bit.state !== "live") continue; // trashed/archived bits are out of the web
 
     const tagId = `tag_${tag.id}`;
     const bitId = `bit_${bit.id}`;

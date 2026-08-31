@@ -57,7 +57,7 @@ function resolveTarget(refId: string): Promise<Target> {
     if (!data) return dead;
     const face = (data.face as string | null) ?? "";
     const type = (data.type as string) ?? "text";
-    if (data.deleted_at) return { ...dead, face, type };
+    if (data.state !== "live") return { ...dead, face, type };
     let imageUrl: string | null = null;
     let drawing: Drawing | null = null;
     if (type === "image" && (data.thumb_path || data.storage_path)) {

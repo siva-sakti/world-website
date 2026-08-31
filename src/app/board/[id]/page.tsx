@@ -35,11 +35,15 @@ export default async function BoardPage({
     await Promise.all(
       rows.map(async (r): Promise<CardVM | null> => {
         if (r.thing !== "bit" || !r.type) return null;
-        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image") return null;
+        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image" && r.type !== "audio" && r.type !== "pdf") return null;
         const type = r.type;
         const kind = meta.get(r.target_bit_id!)?.kind ?? "bit";
         const isNoteCard = kind === "note"; // a note lands as a page-shaped doorway
+        // File types resolve a signed URL: image → its thumb/full (into imageUrl);
+        // pdf → its first-page thumb only (into imageUrl); audio → its stored object
+        // (into fileUrl, for the <audio> player).
         let imageUrl: string | undefined;
+        let fileUrl: string | undefined;
         if (type === "image") {
           const path = r.thumb_path ?? r.storage_path;
           if (path) {
@@ -49,6 +53,19 @@ export default async function BoardPage({
               imageUrl = undefined;
             }
           }
+        } else if (type === "pdf" && r.thumb_path) {
+          // thumb_path only — storage_path is the PDF binary, never an <img> src.
+          try {
+            imageUrl = await signedUrl(supabase, r.thumb_path);
+          } catch {
+            imageUrl = undefined;
+          }
+        } else if (type === "audio" && r.storage_path) {
+          try {
+            fileUrl = await signedUrl(supabase, r.storage_path);
+          } catch {
+            fileUrl = undefined;
+          }
         }
         return {
           placementId: r.placement_id,
@@ -57,12 +74,13 @@ export default async function BoardPage({
           kind,
           x: r.x ?? 40,
           y: r.y ?? 40,
-          w: r.width ?? (isNoteCard ? 200 : type === "text" ? 240 : 220),
-          h: r.height ?? (isNoteCard ? 260 : type === "text" ? 60 : 220),
+          w: r.width ?? (isNoteCard ? 200 : type === "text" ? 240 : type === "audio" ? 260 : 220),
+          h: r.height ?? (isNoteCard ? 260 : type === "text" ? 60 : type === "audio" ? 56 : type === "pdf" ? 280 : 220),
           z: r.z ?? 0,
           body: r.body ?? undefined,
           drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,
           imageUrl,
+          fileUrl,
           content: meta.get(r.target_bit_id!)?.content ?? undefined,
           sourceName: r.source_name ?? undefined,
           sourceUrl: r.source_url ?? undefined,

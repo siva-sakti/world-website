@@ -228,7 +228,7 @@ function Toolbar({ editor }: { editor: TiptapEditor }) {
       {btn(editor.isActive("bulletList"), "•", () => editor.chain().focus().toggleBulletList().run(), "bullet list")}
       {btn(editor.isActive("orderedList"), "1.", () => editor.chain().focus().toggleOrderedList().run(), "numbered list")}
       {btn(editor.isActive("blockquote"), "❝", () => editor.chain().focus().toggleBlockquote().run(), "quote")}
-      {btn(editor.isActive("link"), "link", () => toggleLink(editor), "link")}
+      {btn(editor.isActive("link"), "🔗", () => toggleLink(editor), "hyperlink")}
       {/* Gather by button (O3): inserts the `[[` trigger at the caret — the same
           watcher that handles typed `[[` opens the picker, so touch/stylus (the
           Daylight) reaches gather without a keyboard mode-switch. One code path. */}
@@ -242,7 +242,7 @@ async function toggleLink(editor: TiptapEditor) {
     editor.chain().focus().unsetLink().run();
     return;
   }
-  const prev = (editor.getAttributes("link").href as string | undefined) ?? "https://";
+  const prev = (editor.getAttributes("link").href as string | undefined) ?? "";
   const url = await promptText({ message: "Link URL", initial: prev, placeholder: "https://…" });
   if (url === null) return; // cancelled
   if (url.trim() === "") {

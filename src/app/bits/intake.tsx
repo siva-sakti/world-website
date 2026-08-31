@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { jumpWords, titleMatches } from "@/lib/jump-match";
 import { listSources, type Source } from "@/lib/db/sources";
 import { listTags, type TagChoice } from "@/lib/db/tags";
 import { addToInbox } from "./actions";
@@ -92,13 +93,15 @@ export function Intake() {
     }
   }
 
-  const q = draft.trim().toLowerCase();
-  const sourceSuggest = sources.filter((s) => !q || s.name.toLowerCase().includes(q)).slice(0, 10);
-  const tq = tagDraft.trim().toLowerCase();
+  // Word-START matching (jump-match.ts): each typed word must begin a word in the
+  // name — "art" → "Artforum"/"artist", never "cartography" — still completing as you type.
+  const sourceWords = jumpWords(draft);
+  const sourceSuggest = sources.filter((s) => titleMatches(s.name, sourceWords)).slice(0, 10);
+  const tagWordsQ = jumpWords(tagDraft);
   const tagSuggest = tagMenu
     .filter(
       (t) =>
-        (!tq || t.word.toLowerCase().includes(tq)) &&
+        titleMatches(t.word, tagWordsQ) &&
         !tagWords.some((w) => w.toLowerCase() === t.word.toLowerCase()),
     )
     .slice(0, 10);

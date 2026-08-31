@@ -2,7 +2,7 @@
 
 **What this is:** the one place the project's terms are pinned down, so nobody (owner, Claude, a future window) uses a word two ways. Functional names for now — *beautiful* names can come later; this is about precision, not poetry. Companion to `agreements.md` (the ruled model). Written 2026-07-20.
 
-**The one distinction everything hangs on: STORED vs COMPUTED.** Nine kinds of thing — in three families, **things · acts · vocabulary** — are written to the database, alongside a dormant tenth and one **derived index** (`reference`, gather's ties — grown from writing, §6). Everything else you see — the pull, find, the graph, a bit's page, a bit's *face* — is *computed on the fly* from those nine. Never confuse a stored thing with a computed view of it.
+**The one distinction everything hangs on: STORED vs COMPUTED.** Nine kinds of thing — in three families, **things · acts · vocabulary** — are written to the database, alongside a dormant tenth and one **derived index** (`reference`, gather's ties — grown from writing, §6). Everything else you see — the pull, search, the graph, a bit's page, a bit's *face* — is *computed on the fly* from those nine. Never confuse a stored thing with a computed view of it.
 
 ---
 
@@ -29,7 +29,7 @@
 | term | precise meaning |
 |---|---|
 | **the pull** | tap a tag → *everything* carrying it (bits and boards), complete and automatic. Not a board; not curated. |
-| **find** | search over words + filter by tag (include/exclude) and by type/subtype. Results: topics, boards, bits. **Empty query = the ledger: every live bit, newest first — the reachability floor (I-T1).** |
+| **search** *(renamed from "find", 2026-08-29)* | the **broad** look: full-text over the *content* of bits + notes (a bit's words, a note's writing), across everything; narrow by tag/type. **A board never appears** — no content of its own; reach a board by title via **jump to** (the *targeted* look — an instant title filter on a list). **Empty query = the ledger: every live bit, newest first (I-T1).** |
 | **home** | what opens the app: **your boards**, most-recently-touched first. |
 | **a bit's page** | one bit + everything connected to it (its content, tags, the boards it's on — **and its travel**: has been on, arrived, left). |
 | **the graph** | dots (bits · boards · tags) joined by shared words + shared places. Local-neighborhood first. *(later phase)* |
@@ -64,7 +64,7 @@
 
 ## The three surface domains (ruled 2026-07-20 — every surface belongs to exactly one)
 
-- **world** — what *is*: excludes trash (the render rules). The pull, find, home, boards, the graph.
+- **world** — what *is*: excludes trash (the render rules). The pull, search, home, boards, the graph.
 - **trash** — the frozen: its one surface is the **trash listing**.
 - **history** — what *happened*, indifferent to current state: a bit's travel; a board's ever-placed list *(board side deferred)*.
 

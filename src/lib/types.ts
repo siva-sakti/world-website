@@ -4,7 +4,7 @@
 // bit · board · placement directly and reads the board_cards / home views.
 
 export type Visibility = "public" | "private"; // "shared" joins later (§2a)
-export type BitType = "text" | "drawing" | "image"; // bookmark retired (D-102); pdf·audio later
+export type BitType = "text" | "drawing" | "image" | "audio" | "pdf"; // bookmark retired (D-102)
 export type DisplaySize = "full" | "small";
 
 // A pen stroke = an ordered list of [x, y, pressure] points (vector, tiny).
@@ -36,13 +36,14 @@ export type Bit = {
   byte_size: number | null;
   visibility: Visibility;
   deleted_at: string | null; // trash = a freeze (§2g)
+  archived_at: string | null; // archive = hide-but-keep, its own resting state
+  state: "live" | "archived" | "trashed"; // generated: the single source of truth for "in the world"
   created_at: string;
   updated_at: string;
   face: string | null; // computed headline (read-only)
   pinned_at: string | null; // the shelf (O1): pinned floats atop notes; null = unpinned
   group_id: string | null; // the shelf (O1b): a note can sit in a folder, like a board
   kind: "bit" | "note"; // V2 (D-118): a fragment, or a written PIECE (first-class beside boards)
-  archived_at: string | null; // N5: put away — out of your rooms, still findable; null = not archived
 };
 
 export type Board = {
@@ -52,6 +53,8 @@ export type Board = {
   group_id: string | null; // the shelf (O1): which home section this board sits in
   pinned_at: string | null; // pinned floats to the top of the shelf; null = unpinned
   deleted_at: string | null;
+  archived_at: string | null; // archive = hide-but-keep, its own resting state
+  state: "live" | "archived" | "trashed"; // generated: the single source of truth
   created_at: string;
   updated_at: string;
 };

@@ -40,12 +40,14 @@ export function BoardSurface({
   const [drawMode, setDrawMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
-  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" } | null>(null);
+  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" } | null>(null);
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
 
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLInputElement>(null);
+  const pdfRef = useRef<HTMLInputElement>(null);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
@@ -119,7 +121,7 @@ export function BoardSurface({
 
   // Create doors — every way a card is born onto the surface, plus the board-born
   // bit's evaporate-if-empty lifecycle and the editor's markContentIfReal.
-  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, bringIn, markContentIfReal } =
+  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal } =
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
@@ -263,6 +265,10 @@ export function BoardSurface({
         zoomPct={cam.scale}
         fileRef={fileRef}
         onPickImage={onPickImage}
+        audioRef={audioRef}
+        onPickAudio={onPickAudio}
+        pdfRef={pdfRef}
+        onPickPdf={onPickPdf}
         error={error}
         onDismissError={() => setError(null)}
       />
@@ -340,6 +346,18 @@ export function BoardSurface({
                 patchCard(c.placementId, c.bitId, patch);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
+              onSourceChange={(src) =>
+                // The source was already persisted (bit.source_id) by the picker;
+                // patch ONLY this card's VM so its resting "from …" stamp updates
+                // without a reload. No DB write here.
+                setCards((cs) =>
+                  cs.map((x) =>
+                    x.placementId === c.placementId
+                      ? { ...x, sourceName: src?.name, sourceUrl: src?.url ?? undefined }
+                      : x,
+                  ),
+                )
+              }
               onDragStart={() => onCardDragStart(c.placementId)}
               onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
               onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}

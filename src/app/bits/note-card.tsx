@@ -104,16 +104,23 @@ export function NoteCard({
     <li className={`inbox-card inbox-card--${item.type}`}>
       {/* Open → the workspace, where full editing / tagging / source live. */}
       <Link href={`/bit/${item.id}`} className="inbox-card-body" title="open">
-        {item.type === "image" ? (
+        {item.type === "image" || item.type === "pdf" ? (
           img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img} alt={title ?? ""} className="inbox-card-media" />
           ) : (
-            <span className="inbox-card-media inbox-card-media--empty">image</span>
+            <span className="inbox-card-media inbox-card-media--empty">
+              {item.type === "pdf" ? "PDF" : "image"}
+            </span>
           )
         ) : item.type === "drawing" ? (
           <span className="inbox-card-note inbox-card-note--drawing">
             <span className="inbox-card-kind">✎ sketch</span>
+            {title && <span className="inbox-card-title">{title}</span>}
+          </span>
+        ) : item.type === "audio" ? (
+          <span className="inbox-card-note inbox-card-note--audio">
+            <span className="inbox-card-kind">♪ recording</span>
             {title && <span className="inbox-card-title">{title}</span>}
           </span>
         ) : (
@@ -173,7 +180,7 @@ export function NoteCard({
       </div>
 
       <div className="inbox-card-foot">
-        <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type}</span>
+        <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
         <span className="inbox-card-actions">
           <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />

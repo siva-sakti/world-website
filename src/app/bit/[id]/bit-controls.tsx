@@ -100,7 +100,15 @@ export function BitTitle({
 // Trash, from the note's own page — the same honest multi-board confirm the board
 // uses (F16), the same one-door act. Afterwards you land in your notes (the inbox):
 // the page you were on no longer shows its note.
-export function BitTrash({ bitId, returnTo = "/bits" }: { bitId: string; returnTo?: string }) {
+export function BitTrash({
+  bitId,
+  returnTo = "/bits",
+  compact = false,
+}: {
+  bitId: string;
+  returnTo?: string;
+  compact?: boolean; // small/grey to match a row's board-trash (home list); default = the page style
+}) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -129,7 +137,11 @@ export function BitTrash({ bitId, returnTo = "/bits" }: { bitId: string; returnT
 
   return (
     <button
-      className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+      className={
+        compact
+          ? "text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-50"
+          : "text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+      }
       onClick={onTrash}
       disabled={busy}
       title="Move this note to the trash — hidden everywhere, restorable"

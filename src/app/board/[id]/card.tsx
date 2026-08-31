@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
+import { SourcePicker } from "./source-picker";
+import type { Source } from "@/lib/db/sources";
 import type { Drawing } from "@/lib/types";
 
 // The client view-model for a card on the board: a placement joined to its bit's
@@ -13,7 +15,7 @@ import type { Drawing } from "@/lib/types";
 export type CardVM = {
   placementId: string;
   bitId: string;
-  type: "text" | "drawing" | "image";
+  type: "text" | "drawing" | "image" | "audio" | "pdf";
   kind: "bit" | "note"; // a note (a written PIECE) renders as a page-shaped DOORWAY, not editable text (N3)
   x: number;
   y: number;
@@ -22,7 +24,8 @@ export type CardVM = {
   z: number;
   body?: string; // text (tiptap html → bit.body)
   drawing?: Drawing; // drawing (strokes + per-stroke pen width)
-  imageUrl?: string; // image (resolved storage URL)
+  imageUrl?: string; // image thumbnail/full URL — also a PDF's first-page thumbnail (signed thumb_path)
+  fileUrl?: string; // audio (resolved storage URL for the <audio> player)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)
   sourceUrl?: string; // the source's optional clickable link
@@ -81,6 +84,7 @@ export function Card({
   onOpen,
   onChange,
   onContentSave,
+  onSourceChange,
   onDragStart,
   onDragMove,
   onDragEnd,
@@ -96,6 +100,10 @@ export function Card({
   onOpen?: () => void; // a note doorway → open the note's page (N3)
   onChange: (patch: Partial<CardVM>) => void;
   onContentSave: (value: string) => void;
+  // The card's editable source picker changed the bit's source — patch the resting
+  // "from …" stamp into this card's VM so it appears without a reload (SourcePicker
+  // already persisted bit.source_id; this only refreshes the local view).
+  onSourceChange?: (source: Source | null) => void;
   // Drag reporting for move-together: the board moves the OTHER selected cards; this
   // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
   onDragStart?: () => void;
@@ -114,6 +122,11 @@ export function Card({
   }, []);
   const isNote = card.kind === "note";
   const isText = card.type === "text" && !isNote; // a note renders as a doorway, not editable text
+  // An <audio> player sizes like TEXT, not like an image: width-resizable, height
+  // follows the (fixed) player — NEVER aspect-locked/corner-scaled (that would stretch
+  // the controls). pdf will size the same way. `flexSized` = "width-flex, height-auto".
+  const isAudio = card.type === "audio";
+  const flexSized = isText || isAudio;
   // The doorway's face: the note's title (its `content`, else its first words) + a
   // faint preview of the body — read-only; clicking opens the note's page.
   const noteBody = isNote ? plainText(card.body) : "";
@@ -135,7 +148,7 @@ export function Card({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- re-measure per keystroke/width only
   }, [card.body, card.w, editing, isText]);
-  const size = isText
+  const size = flexSized
     ? { width: card.w, height: "auto" as const }
     : { width: card.w, height: card.h };
 
@@ -145,10 +158,10 @@ export function Card({
       size={size as { width: number | string; height: number | string }}
       disableDragging={editing}
       enableResizing={
-        selected && !editing ? (isText ? RESIZE_TEXT : RESIZE_SCALE) : false
+        selected && !editing ? (flexSized ? RESIZE_TEXT : RESIZE_SCALE) : false
       }
       resizeHandleStyles={coarse ? HANDLE_STYLES_COARSE : HANDLE_STYLES}
-      lockAspectRatio={!isText}
+      lockAspectRatio={!flexSized}
       scale={scale}
       minWidth={70}
       minHeight={28}
@@ -163,7 +176,7 @@ export function Card({
       onResizeStop={(_e, _dir, ref, _delta, pos) => {
         userSized.current = true; // the owner set this width — auto-widen backs off
         onChange(
-          isText
+          flexSized
             ? { x: pos.x, y: pos.y, w: ref.offsetWidth }
             : { x: pos.x, y: pos.y, w: ref.offsetWidth, h: ref.offsetHeight },
         );
@@ -175,7 +188,7 @@ export function Card({
         className={`compose-card-inner${
           isNote
             ? " is-note"
-            : card.type === "image"
+            : card.type === "image" || card.type === "pdf"
               ? " is-image"
               : card.type === "drawing"
                 ? " is-doodle"
@@ -199,8 +212,9 @@ export function Card({
         }}
       >
         {/* Owner words (§2b): a text bit's optional TITLE above its body (D-087);
-            a media bit's CAPTION below it. Editable while selected, not editing. */}
-        {isText && selected && !editing && (
+            a media bit's CAPTION below it. Editable the moment you're on the bit —
+            selected, whether or not you're writing the body. */}
+        {isText && selected && (
           <ContentLine
             value={card.content ?? ""}
             placeholder="title — optional"
@@ -208,7 +222,7 @@ export function Card({
             onSave={onContentSave}
           />
         )}
-        {isText && !(selected && !editing) && card.content && (
+        {isText && !selected && card.content && (
           <div className="compose-title-line">{card.content}</div>
         )}
         {isText && (
@@ -218,9 +232,9 @@ export function Card({
             onChange={(body) => onChange({ body })}
           />
         )}
-        {/* "from …" — the bit's source travels with it (P8). Quiet, below the
-            words; hidden while editing to keep the writing surface clean. */}
-        {isText && !editing && card.sourceName && (
+        {/* "from …" — the bit's source travels with it (P8). RESTING: a quiet
+            read-only stamp below the words (only when a source exists). */}
+        {isText && !selected && card.sourceName && (
           <div className="compose-source-line">
             from {card.sourceName}
             {card.sourceUrl && (
@@ -237,6 +251,16 @@ export function Card({
             )}
           </div>
         )}
+        {/* ACTIVE: an editable source picker at the bottom of the card — add or
+            change the "from …" in place (writes bit.source_id via SourcePicker). */}
+        {isText && selected && (
+          <SourcePicker
+            bitId={card.bitId}
+            initial={null}
+            label="source"
+            onChange={onSourceChange}
+          />
+        )}
         {card.type === "image" && card.imageUrl && (
           <img
             src={card.imageUrl}
@@ -245,6 +269,34 @@ export function Card({
             draggable={false}
           />
         )}
+        {card.type === "audio" && card.fileUrl && (
+          <audio
+            className="compose-audio"
+            controls
+            preload="metadata"
+            src={card.fileUrl}
+            onPointerDown={(e) => e.stopPropagation()} // let the play scrubber work, don't start a drag
+          />
+        )}
+        {/* A PDF looks like itself — its first-page thumbnail, with a small "PDF"
+            badge. An unrenderable PDF (no thumb) falls back to a document sheet. */}
+        {card.type === "pdf" &&
+          (card.imageUrl ? (
+            <div className="compose-pdf">
+              <img
+                src={card.imageUrl}
+                alt={card.content ?? ""}
+                className="compose-img"
+                draggable={false}
+              />
+              <span className="compose-pdf-badge">PDF</span>
+            </div>
+          ) : (
+            <div className="compose-pdf compose-pdf--empty">
+              <span className="compose-pdf-mark">PDF</span>
+              {card.content && <span className="compose-pdf-name">{card.content}</span>}
+            </div>
+          ))}
         {card.type === "drawing" && card.drawing && (
           <DoodleBit drawing={card.drawing} />
         )}
@@ -256,17 +308,55 @@ export function Card({
             {notePreview && <p className="compose-note-preview">{notePreview}</p>}
           </div>
         )}
-        {!isText && !isNote && selected && !offeringWords && (
-          <ContentLine
-            value={card.content ?? ""}
-            placeholder="add a few words — optional"
-            className="compose-caption-input"
-            onSave={onContentSave}
-          />
-        )}
-        {!isText && !isNote && !selected && card.content && (
-          <div className="compose-caption-line">{card.content}</div>
-        )}
+        {/* Media meta (§2b): the caption + source strip BELOW the image — its own,
+            never-clipped area (review M2). Editable the moment you're on the card;
+            a quiet stamp at rest. Held back while the WordsOffer prompt owns a
+            freshly-added image/drawing's caption (offeringWords). */}
+        {!isText &&
+          !isNote &&
+          (selected ? !offeringWords : !!(card.content || card.sourceName)) && (
+            <div className="compose-media-meta">
+              {selected ? (
+                <>
+                  <ContentLine
+                    value={card.content ?? ""}
+                    placeholder="add a few words — optional"
+                    className="compose-caption-input"
+                    onSave={onContentSave}
+                  />
+                  <SourcePicker
+                    bitId={card.bitId}
+                    initial={null}
+                    label="source"
+                    onChange={onSourceChange}
+                  />
+                </>
+              ) : (
+                <>
+                  {card.content && (
+                    <div className="compose-caption-line">{card.content}</div>
+                  )}
+                  {card.sourceName && (
+                    <div className="compose-source-line">
+                      from {card.sourceName}
+                      {card.sourceUrl && (
+                        <a
+                          href={card.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="compose-source-open"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          ↗
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
       </div>
     </Rnd>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { jumpWords, titleMatches } from "@/lib/jump-match";
 import {
   listTags,
   getThingTags,
@@ -87,9 +88,11 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   }
 
   const onBit = new Set(tags.map((t) => t.id));
-  const q = draft.trim().toLowerCase();
+  // Word-START matching (jump-match.ts): "art" surfaces "artist"/"article", never
+  // "cartography" — while still completing as you type.
+  const words = jumpWords(draft);
   const suggestions = all
-    .filter((a) => !onBit.has(a.id) && (!q || a.word.toLowerCase().includes(q)))
+    .filter((a) => !onBit.has(a.id) && titleMatches(a.word, words))
     .slice(0, 10);
 
   return (

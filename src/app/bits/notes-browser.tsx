@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { PanelBit } from "@/lib/db/inbox";
+import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
 import type { ShelfGroup } from "@/lib/db/shelf";
@@ -11,7 +12,7 @@ import type { ShelfGroup } from "@/lib/db/shelf";
 // own landing page. The loose tab IS the old page, unchanged.
 type View = "loose" | "all";
 type Sort = "new" | "old" | "edited";
-type Kind = "text" | "image" | "drawing";
+type Kind = "text" | "image" | "drawing" | "audio" | "pdf";
 
 export function NotesBrowser({
   items,
@@ -41,8 +42,11 @@ export function NotesBrowser({
   const shown = useMemo(() => {
     let xs = view === "loose" ? items.filter((b) => b.boards.length === 0) : items;
     if (kind) xs = xs.filter((b) => b.type === kind);
-    const needle = q.trim().toLowerCase();
-    if (needle) {
+    // Same search language as the global search (search-query.ts): whole word by
+    // default · word* starts-with · "phrase" · -exclude — never a partial word.
+    const parsed = parseQuery(q);
+    if (!isEmptyQuery(parsed)) {
+      const matcher = compileMatcher(parsed);
       xs = xs.filter((b) => {
         const hay = [
           b.face ?? "",
@@ -53,7 +57,7 @@ export function NotesBrowser({
         ]
           .join(" ")
           .toLowerCase();
-        return hay.includes(needle);
+        return matcher(hay);
       });
     }
     const by = {
@@ -101,13 +105,13 @@ export function NotesBrowser({
           aria-label="search bits"
         />
         <div className="loose-scope" role="group" aria-label="type filter">
-          {(["text", "image", "drawing"] as Kind[]).map((k) => (
+          {(["text", "image", "drawing", "audio", "pdf"] as Kind[]).map((k) => (
             <button
               key={k}
               className={`loose-scope-tab${kind === k ? " is-on" : ""}`}
               onClick={() => setKind(kind === k ? null : k)}
             >
-              {k === "text" ? "notes" : k === "image" ? "images" : "sketches"}
+              {k === "text" ? "notes" : k === "image" ? "images" : k === "drawing" ? "sketches" : k === "audio" ? "recordings" : "PDFs"}
             </button>
           ))}
         </div>

@@ -3,8 +3,9 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { createBoard, trashBoard, restoreBoard } from "@/lib/db/boards";
-import { restoreBit } from "@/lib/db/bits";
+import { createBoard, trashBoard, restoreBoard, destroyBoard, emptyTrash } from "@/lib/db/boards";
+import { restoreBit, destroyBit } from "@/lib/db/bits";
+import { archiveBit, unarchiveBit, archiveBoard, unarchiveBoard } from "@/lib/db/resting";
 
 /** Create a new (untitled) board and open it. */
 export async function newBoard() {
@@ -36,4 +37,40 @@ export async function restoreBoardAction(formData: FormData) {
   await restoreBoard(supabase, id);
   revalidatePath("/trash");
   revalidatePath("/");
+}
+
+/** DESTROY one trashed thing permanently (I-L10/I-L6). The db layer guards it to
+ *  trashed-only; the double-confirm lives in the UI (this is the point of no return). */
+export async function destroyItemAction(thing: "bit" | "board", id: string) {
+  const supabase = await createClient();
+  if (thing === "board") await destroyBoard(supabase, id);
+  else await destroyBit(supabase, id);
+  revalidatePath("/trash");
+  revalidatePath("/");
+}
+
+/** Empty the entire trash — destroy every trashed thing (I-L2). */
+export async function emptyTrashAction() {
+  const supabase = await createClient();
+  await emptyTrash(supabase);
+  revalidatePath("/trash");
+  revalidatePath("/");
+}
+
+/** Archive a thing — set aside (hide-but-keep, its own area); reversible, never deletes. */
+export async function archiveItemAction(thing: "bit" | "board", id: string) {
+  const supabase = await createClient();
+  if (thing === "board") await archiveBoard(supabase, id);
+  else await archiveBit(supabase, id);
+  revalidatePath("/");
+  revalidatePath("/archive");
+}
+
+/** Un-archive — return a thing to the world, exactly where it was. */
+export async function unarchiveItemAction(thing: "bit" | "board", id: string) {
+  const supabase = await createClient();
+  if (thing === "board") await unarchiveBoard(supabase, id);
+  else await unarchiveBit(supabase, id);
+  revalidatePath("/");
+  revalidatePath("/archive");
 }

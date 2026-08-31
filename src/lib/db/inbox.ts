@@ -22,7 +22,7 @@ export async function listAllBits(supabase: SupabaseClient): Promise<PanelBit[]>
   const { data, error } = await supabase
     .from("bit")
     .select("*")
-    .is("deleted_at", null)
+    .eq("state", "live")
     .order("created_at", { ascending: false });
   if (error) throw error;
   const bits = (data ?? []) as Bit[];
@@ -33,14 +33,14 @@ export async function listAllBits(supabase: SupabaseClient): Promise<PanelBit[]>
   // (a placement links board two ways); we want the board it SITS ON.
   const { data: places, error: pErr } = await supabase
     .from("placement")
-    .select("target_bit_id, board:board!placement_board_id_fkey(id, title, deleted_at)")
+    .select("target_bit_id, board:board!placement_board_id_fkey(id, title, state)")
     .is("left_at", null)
     .in("target_bit_id", ids);
   if (pErr) throw pErr;
   const boardsByBit = new Map<string, BoardRef[]>();
   for (const p of places ?? []) {
-    const bd = p.board as unknown as { id: string; title: string | null; deleted_at: string | null } | null;
-    if (!bd || bd.deleted_at) continue; // trashed board renders nothing → not a live membership
+    const bd = p.board as unknown as { id: string; title: string | null; state: string } | null;
+    if (!bd || bd.state !== "live") continue; // trashed/archived board renders nothing → not a live membership
     const arr = boardsByBit.get(p.target_bit_id as string) ?? [];
     arr.push({ id: bd.id, title: bd.title });
     boardsByBit.set(p.target_bit_id as string, arr);

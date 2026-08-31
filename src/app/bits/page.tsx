@@ -4,6 +4,7 @@ import { listBoards } from "@/lib/db/boards";
 import { listGroups } from "@/lib/db/shelf";
 import { signThumbs } from "@/lib/storage";
 import { Intake } from "./intake";
+import { LooseFileIntake } from "./loose-file-intake";
 import { NotesBrowser } from "./notes-browser";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,10 @@ export default async function NotesPage({
       {/* Intake: jot a note with an optional source + tags; each add makes a loose
           text bit and the box fully resets. Full editing → the workspace. */}
       <Intake />
+
+      {/* Loose file door: upload a voice memo straight into the pile (no board),
+          with an inline caption — the same createFileBit as the board's + audio. */}
+      <LooseFileIntake />
 
       <NotesBrowser
         items={bits}

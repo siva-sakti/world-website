@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSource } from "@/lib/db/sources";
-import { bitsFromSource } from "@/lib/db/find";
+import { bitsFromSource } from "@/lib/db/search";
 import { bitLabel } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
@@ -63,7 +63,7 @@ export default async function SourcePage({
               </Link>
               <span className="flex shrink-0 items-baseline gap-2">
                 {b.tags.map((t) => (
-                  <Link key={t.id} href={`/find?tag=${t.id}`} className="tag-chip">
+                  <Link key={t.id} href={`/search?tag=${t.id}`} className="tag-chip">
                     {t.word}
                   </Link>
                 ))}
