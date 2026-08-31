@@ -20,10 +20,15 @@ export function SourcePicker({
   bitId,
   initial = null,
   label = "source",
+  onChange,
 }: {
   bitId: string;
   initial?: Source | null;
   label?: string;
+  // Fired when the bit's source is picked/created (the Source) or cleared (null).
+  // Optional — the note/bit pages don't pass it; the board card uses it to refresh
+  // its resting "from …" stamp without a reload.
+  onChange?: (source: Source | null) => void;
 }) {
   const [supabase] = useState(() => createClient());
   const [current, setCurrent] = useState<Source | null>(initial);
@@ -62,6 +67,7 @@ export function SourcePicker({
     try {
       const src = await setSource(supabase, bitId, nm);
       setCurrent(src);
+      onChange?.(src);
       setAll((a) => (a.some((s) => s.id === src.id) ? a : [src, ...a]));
     } catch (e) {
       console.error("set source failed:", e);
@@ -83,11 +89,13 @@ export function SourcePicker({
     setErr(null);
     const prev = current;
     setCurrent(null);
+    onChange?.(null);
     try {
       await clearSource(supabase, bitId);
     } catch (e) {
       console.error("clear source failed:", e);
       setCurrent(prev); // put it back
+      onChange?.(prev); // and the card's resting stamp with it
       setErr("Couldn't clear the source — try again.");
     }
   }

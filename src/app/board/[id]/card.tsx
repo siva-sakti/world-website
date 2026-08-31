@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
+import { SourcePicker } from "./source-picker";
+import type { Source } from "@/lib/db/sources";
 import type { Drawing } from "@/lib/types";
 
 // The client view-model for a card on the board: a placement joined to its bit's
@@ -81,6 +83,7 @@ export function Card({
   onOpen,
   onChange,
   onContentSave,
+  onSourceChange,
   onDragStart,
   onDragMove,
   onDragEnd,
@@ -96,6 +99,10 @@ export function Card({
   onOpen?: () => void; // a note doorway → open the note's page (N3)
   onChange: (patch: Partial<CardVM>) => void;
   onContentSave: (value: string) => void;
+  // The card's editable source picker changed the bit's source — patch the resting
+  // "from …" stamp into this card's VM so it appears without a reload (SourcePicker
+  // already persisted bit.source_id; this only refreshes the local view).
+  onSourceChange?: (source: Source | null) => void;
   // Drag reporting for move-together: the board moves the OTHER selected cards; this
   // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
   onDragStart?: () => void;
@@ -199,8 +206,9 @@ export function Card({
         }}
       >
         {/* Owner words (§2b): a text bit's optional TITLE above its body (D-087);
-            a media bit's CAPTION below it. Editable while selected, not editing. */}
-        {isText && selected && !editing && (
+            a media bit's CAPTION below it. Editable the moment you're on the bit —
+            selected, whether or not you're writing the body. */}
+        {isText && selected && (
           <ContentLine
             value={card.content ?? ""}
             placeholder="title — optional"
@@ -208,7 +216,7 @@ export function Card({
             onSave={onContentSave}
           />
         )}
-        {isText && !(selected && !editing) && card.content && (
+        {isText && !selected && card.content && (
           <div className="compose-title-line">{card.content}</div>
         )}
         {isText && (
@@ -218,9 +226,9 @@ export function Card({
             onChange={(body) => onChange({ body })}
           />
         )}
-        {/* "from …" — the bit's source travels with it (P8). Quiet, below the
-            words; hidden while editing to keep the writing surface clean. */}
-        {isText && !editing && card.sourceName && (
+        {/* "from …" — the bit's source travels with it (P8). RESTING: a quiet
+            read-only stamp below the words (only when a source exists). */}
+        {isText && !selected && card.sourceName && (
           <div className="compose-source-line">
             from {card.sourceName}
             {card.sourceUrl && (
@@ -236,6 +244,16 @@ export function Card({
               </a>
             )}
           </div>
+        )}
+        {/* ACTIVE: an editable source picker at the bottom of the card — add or
+            change the "from …" in place (writes bit.source_id via SourcePicker). */}
+        {isText && selected && (
+          <SourcePicker
+            bitId={card.bitId}
+            initial={null}
+            label="source"
+            onChange={onSourceChange}
+          />
         )}
         {card.type === "image" && card.imageUrl && (
           <img

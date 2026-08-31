@@ -955,6 +955,32 @@ body {
   text-decoration: underline;
 }
 
+/* The source picker sits INSIDE a board card (a ~240px surface): the default
+   .tag-bar min-widths (160/120px) would overflow it, so shrink it to fit —
+   compact, tight, quiet. Board card only; the note/bit pages keep the roomy bar. */
+.compose-card-inner .tag-bar {
+  margin: 6px 0 0;
+  padding: 4px 6px;
+  gap: 4px;
+  border-radius: 7px;
+  background: #fdfbf7;
+}
+.compose-card-inner .tag-bar-label {
+  font-size: 10px;
+  margin-right: 0;
+}
+.compose-card-inner .tag-bar-input {
+  min-width: 56px;
+  font-size: 12px;
+}
+.compose-card-inner .tag-bar-field {
+  min-width: 56px;
+}
+.compose-card-inner .tag-bar .tag-chip {
+  font-size: 11px;
+  padding: 3px 7px;
+}
+
 /* "from …" on a board card — quiet, secondary, below the words (§5). */
 .compose-source-line {
   font-size: 11px;

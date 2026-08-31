@@ -330,6 +330,18 @@ export function BoardSurface({
                 patchCard(c.placementId, c.bitId, patch);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
+              onSourceChange={(src) =>
+                // The source was already persisted (bit.source_id) by the picker;
+                // patch ONLY this card's VM so its resting "from …" stamp updates
+                // without a reload. No DB write here.
+                setCards((cs) =>
+                  cs.map((x) =>
+                    x.placementId === c.placementId
+                      ? { ...x, sourceName: src?.name, sourceUrl: src?.url ?? undefined }
+                      : x,
+                  ),
+                )
+              }
               onDragStart={() => onCardDragStart(c.placementId)}
               onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
               onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}
