@@ -369,14 +369,21 @@ body {
   outline-offset: 1px;
   border-color: transparent;
 }
+/* Media card, restructured (§2b / review M2): a flex COLUMN — the image/ink area
+   above, a meta strip (caption + source) below. No overflow:hidden, so the meta
+   is visible (not clipped) and the source picker's suggestions can escape the
+   card like the text card's do. Card-scoped: text/note cards untouched. */
 .compose-card-inner.is-image {
   padding: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .compose-card-inner.is-doodle {
   padding: 0;
   background: transparent;
   border-color: transparent;
+  display: flex;
+  flex-direction: column;
 }
 /* A NOTE placed on a board = a page-shaped DOORWAY (N3): a quiet sheet showing the
    note's title + a faint preview; clicking (once selected) opens the note's page.
@@ -431,6 +438,22 @@ body {
   border-radius: 5px;
   pointer-events: none;
   user-select: none;
+}
+/* The image/ink AREA fits the room left ABOVE the meta strip instead of filling
+   the whole card (M2) — flex:1 takes what's left, min-height:0 lets it shrink,
+   height:auto hands sizing to flexbox. object-fit:contain keeps images undistorted. */
+.compose-card-inner.is-image .compose-img,
+.compose-card-inner.is-doodle .compose-doodle-svg {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+/* The meta strip below the (edge-to-edge) image: caption + source. Its own
+   horizontal padding since the image area sits full-bleed above it. Compact —
+   at rest it shows at most one caption line + a quiet "from …". */
+.compose-media-meta {
+  flex: 0 0 auto;
+  padding: 0 0.6em 0.5em;
 }
 .tiptap,
 .tiptap .ProseMirror {

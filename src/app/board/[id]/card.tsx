@@ -274,17 +274,55 @@ export function Card({
             {notePreview && <p className="compose-note-preview">{notePreview}</p>}
           </div>
         )}
-        {!isText && !isNote && selected && !offeringWords && (
-          <ContentLine
-            value={card.content ?? ""}
-            placeholder="add a few words — optional"
-            className="compose-caption-input"
-            onSave={onContentSave}
-          />
-        )}
-        {!isText && !isNote && !selected && card.content && (
-          <div className="compose-caption-line">{card.content}</div>
-        )}
+        {/* Media meta (§2b): the caption + source strip BELOW the image — its own,
+            never-clipped area (review M2). Editable the moment you're on the card;
+            a quiet stamp at rest. Held back while the WordsOffer prompt owns a
+            freshly-added image/drawing's caption (offeringWords). */}
+        {!isText &&
+          !isNote &&
+          (selected ? !offeringWords : !!(card.content || card.sourceName)) && (
+            <div className="compose-media-meta">
+              {selected ? (
+                <>
+                  <ContentLine
+                    value={card.content ?? ""}
+                    placeholder="add a few words — optional"
+                    className="compose-caption-input"
+                    onSave={onContentSave}
+                  />
+                  <SourcePicker
+                    bitId={card.bitId}
+                    initial={null}
+                    label="source"
+                    onChange={onSourceChange}
+                  />
+                </>
+              ) : (
+                <>
+                  {card.content && (
+                    <div className="compose-caption-line">{card.content}</div>
+                  )}
+                  {card.sourceName && (
+                    <div className="compose-source-line">
+                      from {card.sourceName}
+                      {card.sourceUrl && (
+                        <a
+                          href={card.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="compose-source-open"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          ↗
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
       </div>
     </Rnd>
   );
