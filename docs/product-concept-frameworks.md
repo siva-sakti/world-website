@@ -87,6 +87,12 @@ Offered earlier in the session, on the owner's *"is there ground to stand on her
 | 5 | **Where does the arc actually break in practice** — what do practitioner accounts say about where the gather→make handoff fails, and what do people currently do instead? | Tests **the seams claim** empirically instead of asserting it. |
 | 6 | **What is the serious critique of diverge/converge and the Double Diamond?** | The owner asked for honest, not hype. If the pitch rests on this frame we should know where it's weak **before** a smart user does. |
 
+### ⚠ PRIORITY CORRECTED (2026-08-31, later the same day)
+
+**Q7 is level-2 material — for the demo and onboarding, NOT a blocker on the build.** The owner's internal/external sort (`product-concept-promise.md` §The sort) showed the feature set needs only the **five generic types** (prose document · spatial arrangement · table with fields · ordered sequence · a file you hand someone), not per-discipline knowledge. The owner, plainly: onboarding needs it — *"a gallerist wants you to have this, if you're an artist you can just have this easy workflow"* — but for building features, *"I don't think it's as relevant."*
+
+**So:** run Q7 when writing personas and onboarding. **Do not hold the build for it.** *(Claude had ranked it as load-bearing an hour earlier and was wrong — recorded because the same over-ranking already happened once with `return`.)*
+
 ### ⭐ ADDED 2026-08-31 — the research round is now TWO questions wide
 
 The owner's gallerist example (`product-concept-promise.md` §Required artifacts) changed the brief. It isn't only about creative *frameworks* any more. **Question 7 may matter more than 1–6:**
