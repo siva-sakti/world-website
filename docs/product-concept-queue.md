@@ -8,6 +8,29 @@
 
 ---
 
+## ⭐ THE RUN PLAN — the sequence to knock this out (laid out 2026-08-31)
+
+Seven sittings, each with a deliverable. Ordered by dependency, not importance: async work first, evidence-gathering before naming, naming before voice, voice before brand.
+
+| # | sitting | time | what it produces | why this position |
+|---|---|---|---|---|
+| ⓪ | **Kickoff: sharpen the 6 framework questions → dispatch research** | ~30 min | agents running in the background | async — results land before ⑤ needs them |
+| ① | **The writer pass** — 5 situations × steps, owner corrects from life (essay · pitching · research-toward-nothing · a talk · the commonplace thread) | ~1 hr | gaps table #2 + the journey method proven | the only persona with a live oracle |
+| ② | **The collector-thinker pass** — the no-output person, the median Are.na user | ~45 min | is *invitation-not-mandate* structurally true? is the Are.na market takeable without social? | tees up ④ |
+| ③ | **Claude homework between sittings** — visual-artist + video-essayist passes, songwriter expansion, drafted solo | none | corrected-ready drafts | the owner reacts in minutes instead of building |
+| ④ | **The privacy/publishing session** — default · the publishable unit (pieces!) · key vs open web · what kind of social | ~1 hr | **the great unblocker**: brand, pieces-public, the Are.na answer | long-owed (`philosophy.md` flags it); everything downstream waits |
+| ⑤ | **The naming session** — composition · board · piece · the AND-collision, all at once | ~45 min | rulings → `lexicon.md`; ONE sweep handed to the build track | after ①②④ + research: name once, with maximum evidence |
+| ⑥ | **The line + the value-prop phrase** — the owner writes; Claude brings the material organized | owner's sitting | the outward line finished; "home base…" updated for the wide door | needs ⑤'s words and ⓪'s results |
+| ⑦ | **Brand + the name** — the app's real name · identity vs in-app aesthetic · landing or not | ~1 hr | the name | last on purpose: a name compresses the argument, which is settled by now |
+
+**Then everything graduates and the workstream closes:** rulings → the settled docs · build items (audio bits · a date you set · ordered lists · the rename sweep · pieces · onboarding) → `organize-phase-plan.md` · the voice → the owner's re-voiced `vision-and-language.md`.
+
+**Parallel tracks, costing no sittings:** the `finished`-tag test in the live app (the owner's hands, ~2 weeks — feeds the pieces call) · the other window keeps building · research agents run between sittings.
+
+**The rule of the plan:** any sitting can be split or reordered EXCEPT ⑤ before ⑥ (words before voice) and ④ before ⑦ (publishing before brand).
+
+---
+
 ## The queue
 
 **⚑ = waiting on the owner.**
