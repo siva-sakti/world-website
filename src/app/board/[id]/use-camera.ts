@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { CardVM } from "./card";
+import { anchorToCamera, cameraToAnchor, loadAnchor, saveAnchor, type Anchor, type Size } from "./camera-storage";
 
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 3;
@@ -13,7 +14,7 @@ export type Camera = { x: number; y: number; scale: number };
 // zoom (the wheel is mouse-only; touch-action:none turns the browser's own pinch
 // off). The board's pointer handlers dispatch to pinchDown/Move/Up exactly like
 // the marquee's start/move/end pattern (board-touch-zoom-plan.md).
-export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
+export function useCamera(boardRef: RefObject<HTMLDivElement | null>, boardId: string) {
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
   const camRef = useRef(cam);
   // Touch pointers currently down on empty board space (touch pointers get
@@ -28,6 +29,62 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     camRef.current = cam; // latest camera for imperative reads (was assigned in render)
   }, [cam]);
+
+  // --- Per-device view memory (camera-storage). Save only on USER gestures (wheel / pinch
+  // / pan), debounced; restore on open; flush a pending save on unmount so a quick leave
+  // still captures the last view. Programmatic moves (fitView / centerOn / restore) never
+  // call scheduleSave, so the smart fit-all default stands until you deliberately move. We
+  // store an anchor (the world-point at the viewport centre + zoom), not raw x/y — see
+  // camera-storage.ts. ---
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Fit snap-back (session-only, in memory): the view just before the last fit, and whether
+  // the current view still IS that fit — so a second fit press returns to it. Any deliberate
+  // move (scheduleSave) clears the flag, making the next fit a fresh fit.
+  const preFitAnchor = useRef<Anchor | null>(null);
+  const justFitted = useRef(false);
+
+  const currentSize = useCallback((): Size | null => {
+    const el = boardRef.current;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { width: r.width, height: r.height };
+  }, [boardRef]);
+
+  const saveNow = useCallback(() => {
+    const size = currentSize();
+    if (size) saveAnchor(boardId, cameraToAnchor(camRef.current, size));
+  }, [boardId, currentSize]);
+
+  const scheduleSave = useCallback(() => {
+    justFitted.current = false; // a deliberate move → the next fit is a fresh fit, not a snap-back
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveTimer.current = null;
+      saveNow();
+    }, 400);
+  }, [saveNow]);
+
+  // Flush a still-pending save when the board unmounts (navigate away inside the debounce).
+  useEffect(
+    () => () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveNow();
+      }
+    },
+    [saveNow],
+  );
+
+  // Restore this board's saved view; returns true when one was applied (the caller then
+  // skips its fit/center default). Falls through (false) when there's nothing valid saved.
+  const restoreView = useCallback((): boolean => {
+    const size = currentSize();
+    if (!size) return false;
+    const anchor = loadAnchor(boardId);
+    if (!anchor) return false;
+    setCam(anchorToCamera(anchor, size));
+    return true;
+  }, [boardId, currentSize]);
 
   function screenToWorld(clientX: number, clientY: number) {
     const r = boardRef.current!.getBoundingClientRect();
@@ -49,10 +106,11 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
         const k = scale / c.scale;
         return { scale, x: px - (px - c.x) * k, y: py - (py - c.y) * k };
       });
+      scheduleSave(); // user zoom → remember the new view (debounced)
     }
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [boardRef]);
+  }, [boardRef, scheduleSave]);
 
   // Frame every card in view — the "where am I?" rescue on an endless canvas.
   // No cards → home to the origin. Never magnifies past 100%.
@@ -64,12 +122,18 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
       setCam({ x: 0, y: 0, scale: 1 });
       return;
     }
+    // Text/audio cards render at height:auto, so their stored h is stale (smaller than the
+    // real card) — measure the actual rendered box via data-pid so fit never crops a grown
+    // card (the same measure findClearSpot uses; offsetW/H are pre-transform world units).
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const c of cards) {
+      const elc = document.querySelector(`[data-pid="${c.placementId}"]`);
+      const w = elc instanceof HTMLElement ? elc.offsetWidth : c.w;
+      const h = elc instanceof HTMLElement ? elc.offsetHeight : c.h;
       minX = Math.min(minX, c.x);
       minY = Math.min(minY, c.y);
-      maxX = Math.max(maxX, c.x + c.w);
-      maxY = Math.max(maxY, c.y + c.h);
+      maxX = Math.max(maxX, c.x + w);
+      maxY = Math.max(maxY, c.y + h);
     }
     const bw = Math.max(1, maxX - minX);
     const bh = Math.max(1, maxY - minY);
@@ -92,6 +156,21 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
       x: r.width / 2 - (card.x + card.w / 2) * s,
       y: r.height / 2 - (card.y + card.h / 2) * s,
     });
+  }
+
+  // The fit button. First press frames all cards, remembering where you were; press again
+  // (without moving) to snap back to that pre-fit view. scheduleSave clears justFitted on any
+  // deliberate move, so after you pan/zoom, fit is a fresh fit again. Session-only (in memory).
+  function fitOrToggleBack(cards: CardVM[]) {
+    const size = currentSize();
+    if (justFitted.current && preFitAnchor.current && size) {
+      setCam(anchorToCamera(preFitAnchor.current, size));
+      justFitted.current = false;
+      return;
+    }
+    if (size) preFitAnchor.current = cameraToAnchor(camRef.current, size);
+    fitView(cards);
+    justFitted.current = true;
   }
 
   /** A touch finger landed on empty board space. Returns true when it makes a
@@ -132,6 +211,7 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
     const s = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pz.s0 * (d / pz.d0)));
     // Keep the recorded world point under the fingers' current midpoint.
     setCam({ scale: s, x: midX - pz.w0.x * s, y: midY - pz.w0.y * s });
+    scheduleSave(); // user pinch → remember the new view (debounced)
     return true;
   }
 
@@ -146,5 +226,5 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>) {
     return wasPinching;
   }
 
-  return { cam, camRef, setCam, screenToWorld, fitView, centerOn, pinchDown, pinchMove, pinchUp };
+  return { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView };
 }

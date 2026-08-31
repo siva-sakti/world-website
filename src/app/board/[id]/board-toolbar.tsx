@@ -66,7 +66,7 @@ export function BoardToolbar({
         </span>
       )}
       <span className="compose-zoom">
-        <button className="compose-btn" onClick={onFit} title="Bring all your cards into view">
+        <button className="compose-btn" onClick={onFit} title="Bring all your cards into view — press again to go back">
           ⊹ fit
         </button>
         <span className="compose-zoom-pct" title="current zoom">

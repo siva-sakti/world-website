@@ -54,8 +54,8 @@ export function BoardSurface({
   const router = useRouter();
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
-  const { cam, camRef, setCam, screenToWorld, fitView, centerOn, pinchDown, pinchMove, pinchUp } =
-    useCamera(boardRef);
+  const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
+    useCamera(boardRef, boardId);
   const marquee = useMarqueeSelect(boardRef, screenToWorld, setSelectedIds, clearSelection);
 
   function onErr(e: unknown) {
@@ -104,7 +104,8 @@ export function BoardSurface({
   // one tap away for the overview. z ties (inbox-placed cards are all z=0)
   // resolve to the last in load order — arbitrary but stable (plan finding 8).
   useEffect(() => {
-    if (!initialCards.length) return;
+    if (restoreView()) return; // a remembered view wins — restores exactly where you left off
+    if (!initialCards.length) return; // no memory + empty board → origin default
     if (window.matchMedia("(max-width: 640px)").matches) {
       let top = initialCards[0];
       for (const c of initialCards) if (c.z >= top.z) top = c;
@@ -221,6 +222,7 @@ export function BoardSurface({
     if (!p.moved && Math.hypot(dx, dy) < 4) return;
     if (!p.moved) { p.moved = true; setIsPanning(true); }
     setCam((c) => ({ ...c, x: p.cx + dx, y: p.cy + dy }));
+    scheduleSave(); // user pan → remember the new view (debounced)
   }
 
   // An interrupted gesture (OS gesture, alert, tab switch) must strand no state.
@@ -261,7 +263,7 @@ export function BoardSurface({
         selectedCount={selectedIds.size}
         onBulkUnplace={bulkUnplace}
         onBulkTrash={bulkTrash}
-        onFit={() => fitView(cards)}
+        onFit={() => fitOrToggleBack(cards)}
         zoomPct={cam.scale}
         fileRef={fileRef}
         onPickImage={onPickImage}
