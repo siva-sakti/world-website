@@ -369,21 +369,18 @@ body {
   outline-offset: 1px;
   border-color: transparent;
 }
-/* Media card, restructured (§2b / review M2): a flex COLUMN — the image/ink area
-   above, a meta strip (caption + source) below. No overflow:hidden, so the meta
-   is visible (not clipped) and the source picker's suggestions can escape the
-   card like the text card's do. Card-scoped: text/note cards untouched. */
+/* Media card (§2b / expand-to-edit): the image/ink fills the whole card at its
+   resting footprint; the caption + source float in a panel BELOW the card (see
+   .compose-media-meta) so they NEVER compress the content — content is sacred.
+   No overflow:hidden, so that below-panel (and the source suggestions) aren't
+   clipped. Card-scoped: text/note cards untouched. */
 .compose-card-inner.is-image {
   padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 .compose-card-inner.is-doodle {
   padding: 0;
   background: transparent;
   border-color: transparent;
-  display: flex;
-  flex-direction: column;
 }
 /* A NOTE placed on a board = a page-shaped DOORWAY (N3): a quiet sheet showing the
    note's title + a faint preview; clicking (once selected) opens the note's page.
@@ -439,21 +436,27 @@ body {
   pointer-events: none;
   user-select: none;
 }
-/* The image/ink AREA fits the room left ABOVE the meta strip instead of filling
-   the whole card (M2) — flex:1 takes what's left, min-height:0 lets it shrink,
-   height:auto hands sizing to flexbox. object-fit:contain keeps images undistorted. */
-.compose-card-inner.is-image .compose-img,
-.compose-card-inner.is-doodle .compose-doodle-svg {
-  flex: 1;
-  min-height: 0;
-  height: auto;
-}
-/* The meta strip below the (edge-to-edge) image: caption + source. Its own
-   horizontal padding since the image area sits full-bleed above it. Compact —
-   at rest it shows at most one caption line + a quiet "from …". */
+/* The image/ink area stays the FULL card (height:100% from the base rule above) —
+   it never shrinks, so adding a caption/source can't compress or squish it. For a
+   drawing this also removes the old squish: the box aspect stays constant (= the
+   drawing's native, aspect-locked ratio), so preserveAspectRatio="none" is an
+   undistorted identity fill. */
+
+/* The caption + source float just BELOW the card (absolute, out of the flow) so
+   they never eat into the image/ink area — the card keeps its footprint; the meta
+   simply appears beneath it. A small gap clears the resize handles; a light panel
+   so it reads as attached and stays legible over whatever's under it (it's frontmost
+   via the selected card's z-index). */
 .compose-media-meta {
-  flex: 0 0 auto;
-  padding: 0 0.6em 0.5em;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 0.4em 0.6em 0.5em;
+  background: #fffdfa;
+  border: 1px solid #e7e1d5;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(60, 50, 35, 0.08);
 }
 .tiptap,
 .tiptap .ProseMirror {
