@@ -70,14 +70,15 @@ export async function createDrawingBit(
 }
 
 /** The shared file-bit insert (§7 layer B) — the bytes live in Storage; the row
- * holds the path + facts. Every file-backed type (image, audio, later pdf) writes
- * the SAME media columns, so they funnel through here. Media dimensions are
- * OPTIONAL (audio has none). Placement is OPTIONAL too: pass placementId + boardId
- * to land it on a board (image, board-born audio); omit both for a LOOSE file bit
- * (like createLooseTextBit) — it appears in the inbox until called in. */
+ * holds the path + facts. Every file-backed type (image, audio, pdf) writes the
+ * SAME media columns, so they funnel through here. Media dimensions are OPTIONAL
+ * (audio has none; a pdf carries its page-1 dims). Placement is OPTIONAL too: pass
+ * placementId + boardId to land it on a board (image, board-born audio/pdf); omit
+ * both for a LOOSE file bit (like createLooseTextBit) — it appears in the inbox
+ * until called in. */
 export async function createFileBit(
   supabase: SupabaseClient,
-  type: "image" | "audio",
+  type: "image" | "audio" | "pdf",
   args: {
     bitId: string; placementId?: string; boardId?: string;
     storagePath: string; thumbPath?: string;
@@ -133,6 +134,22 @@ export async function createAudioBit(
   } & Pos,
 ): Promise<{ bit: Bit; placement: Placement | null }> {
   return createFileBit(supabase, "audio", args);
+}
+
+/** A pdf bit — a file bit that (like an image) carries a first-page thumbnail
+ * (thumb_path) + page-1 dimensions; the original PDF lives at storage_path for the
+ * bit-page viewer. thumbPath may be absent (an unrenderable page 1 → a document
+ * glyph fallback). Placement optional: board-born on a board, or LOOSE from /bits. */
+export async function createPdfBit(
+  supabase: SupabaseClient,
+  args: {
+    bitId: string; placementId?: string; boardId?: string;
+    storagePath: string; thumbPath?: string;
+    mediaWidth?: number; mediaHeight?: number;
+    mime: string; byteSize: number; fileName?: string;
+  } & Pos,
+): Promise<{ bit: Bit; placement: Placement | null }> {
+  return createFileBit(supabase, "pdf", args);
 }
 
 /** A loose text bit — born on NO board (D-100). The bit is the atom; it needs no

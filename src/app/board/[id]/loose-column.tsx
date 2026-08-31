@@ -12,7 +12,7 @@ import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 // board). Filtering is in-memory over the loaded set (snappy at this scale;
 // server-side search + paging is the named scale trigger). Reachable from a tab.
 
-type TypeFilter = "all" | "text" | "image" | "drawing" | "audio";
+type TypeFilter = "all" | "text" | "image" | "drawing" | "audio" | "pdf";
 type Scope = "loose" | "this" | "other" | "all";
 type Kind = "all" | "bit" | "note"; // the drawer's primary split (owner: bits · notes · all)
 
@@ -20,6 +20,7 @@ function faceOf(it: PanelBit): string {
   if (it.face) return it.face;
   if (it.type === "image") return it.file_name ?? "image";
   if (it.type === "audio") return it.file_name ?? "recording";
+  if (it.type === "pdf") return it.file_name ?? "PDF";
   return it.type === "drawing" ? "drawing" : "";
 }
 
@@ -117,10 +118,13 @@ export function LooseColumn({
     filtered = [...filtered].sort((a, b) => (isLoose(b) ? 1 : 0) - (isLoose(a) ? 1 : 0));
   }
 
-  // Lazy thumbnails: sign only the image bits actually SHOWN, once each (F8) — never
-  // every image upfront (would fan out at "all bits" scale).
+  // Lazy thumbnails: sign only the thumbnailed bits actually SHOWN, once each (F8) —
+  // never every one upfront (would fan out at "all bits" scale). An image signs its
+  // thumb/full; a pdf signs its page-1 thumb ONLY (its storage_path is the binary).
+  const thumbPathOf = (n: PanelBit): string | null =>
+    n.thumb_path ?? (n.type === "image" ? n.storage_path : null);
   const needThumbs = filtered.filter(
-    (n) => n.type === "image" && (n.thumb_path || n.storage_path) && !thumbs.has(n.id),
+    (n) => (n.type === "image" || n.type === "pdf") && thumbPathOf(n) && !thumbs.has(n.id),
   );
   const needKey = needThumbs.map((n) => n.id).join(",");
   useEffect(() => {
@@ -129,7 +133,7 @@ export function LooseColumn({
     Promise.all(
       needThumbs.map(async (n) => {
         try {
-          return [n.id, await signedUrl(supabase, (n.thumb_path ?? n.storage_path)!)] as const;
+          return [n.id, await signedUrl(supabase, thumbPathOf(n)!)] as const;
         } catch {
           return null;
         }
@@ -223,6 +227,7 @@ export function LooseColumn({
               <option value="image">images</option>
               <option value="drawing">drawings</option>
               <option value="audio">recordings</option>
+              <option value="pdf">PDFs</option>
             </select>
             {allTags.length > 0 && (
               <select value={tagId} onChange={(e) => setTagId(e.target.value)} aria-label="Filter by tag">
@@ -264,7 +269,7 @@ export function LooseColumn({
                   onClick={() => bring(it)}
                   title={here ? "already on this board" : "place on this board"}
                 >
-                  {it.type === "image" && thumbs.get(it.id) ? (
+                  {(it.type === "image" || it.type === "pdf") && thumbs.get(it.id) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img className="loose-thumb" src={thumbs.get(it.id)} alt="" />
                   ) : (

@@ -15,7 +15,7 @@ import type { Drawing } from "@/lib/types";
 export type CardVM = {
   placementId: string;
   bitId: string;
-  type: "text" | "drawing" | "image" | "audio";
+  type: "text" | "drawing" | "image" | "audio" | "pdf";
   kind: "bit" | "note"; // a note (a written PIECE) renders as a page-shaped DOORWAY, not editable text (N3)
   x: number;
   y: number;
@@ -24,8 +24,8 @@ export type CardVM = {
   z: number;
   body?: string; // text (tiptap html → bit.body)
   drawing?: Drawing; // drawing (strokes + per-stroke pen width)
-  imageUrl?: string; // image (resolved storage URL)
-  fileUrl?: string; // audio (resolved storage URL for the <audio> player); pdf reuses this later
+  imageUrl?: string; // image thumbnail/full URL — also a PDF's first-page thumbnail (signed thumb_path)
+  fileUrl?: string; // audio (resolved storage URL for the <audio> player)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)
   sourceUrl?: string; // the source's optional clickable link
@@ -188,7 +188,7 @@ export function Card({
         className={`compose-card-inner${
           isNote
             ? " is-note"
-            : card.type === "image"
+            : card.type === "image" || card.type === "pdf"
               ? " is-image"
               : card.type === "drawing"
                 ? " is-doodle"
@@ -278,6 +278,25 @@ export function Card({
             onPointerDown={(e) => e.stopPropagation()} // let the play scrubber work, don't start a drag
           />
         )}
+        {/* A PDF looks like itself — its first-page thumbnail, with a small "PDF"
+            badge. An unrenderable PDF (no thumb) falls back to a document sheet. */}
+        {card.type === "pdf" &&
+          (card.imageUrl ? (
+            <div className="compose-pdf">
+              <img
+                src={card.imageUrl}
+                alt={card.content ?? ""}
+                className="compose-img"
+                draggable={false}
+              />
+              <span className="compose-pdf-badge">PDF</span>
+            </div>
+          ) : (
+            <div className="compose-pdf compose-pdf--empty">
+              <span className="compose-pdf-mark">PDF</span>
+              {card.content && <span className="compose-pdf-name">{card.content}</span>}
+            </div>
+          ))}
         {card.type === "drawing" && card.drawing && (
           <DoodleBit drawing={card.drawing} />
         )}

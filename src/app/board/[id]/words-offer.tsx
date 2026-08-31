@@ -9,7 +9,7 @@ export function WordsOffer({
   onSave,
   onSkip,
 }: {
-  kind: "image" | "drawing" | "audio";
+  kind: "image" | "drawing" | "audio" | "pdf";
   onSave: (v: string) => void;
   onSkip: () => void;
 }) {
@@ -24,7 +24,9 @@ export function WordsOffer({
             ? "add a few words so you can find this image later?"
             : kind === "audio"
               ? "add a few words so you can find this recording later?"
-              : "add a few words to make this drawing findable?"
+              : kind === "pdf"
+                ? "add a few words so you can find this PDF later?"
+                : "add a few words to make this drawing findable?"
         }
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {

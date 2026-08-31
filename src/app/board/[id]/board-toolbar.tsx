@@ -17,6 +17,8 @@ export function BoardToolbar({
   onPickImage,
   audioRef,
   onPickAudio,
+  pdfRef,
+  onPickPdf,
   error,
   onDismissError,
 }: {
@@ -33,6 +35,8 @@ export function BoardToolbar({
   onPickImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
   audioRef: RefObject<HTMLInputElement | null>;
   onPickAudio: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  pdfRef: RefObject<HTMLInputElement | null>;
+  onPickPdf: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string | null;
   onDismissError: () => void;
 }) {
@@ -41,6 +45,7 @@ export function BoardToolbar({
       <button className="compose-btn" onClick={onAddNote}>+ text</button>
       <button className="compose-btn" onClick={() => fileRef.current?.click()}>+ image</button>
       <button className="compose-btn" onClick={() => audioRef.current?.click()}>+ audio</button>
+      <button className="compose-btn" onClick={() => pdfRef.current?.click()}>+ pdf</button>
       <button className="compose-btn" onClick={onPen}>✎ pen</button>
       <button
         className={`compose-btn${selectMode ? " is-on" : ""}`}
@@ -70,6 +75,7 @@ export function BoardToolbar({
       </span>
       <input ref={fileRef} type="file" accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
       <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onPickAudio} />
+      <input ref={pdfRef} type="file" accept="application/pdf,.pdf" hidden onChange={onPickPdf} />
       {error && (
         <span className="text-sm text-red-700">
           {error} <button className="underline" onClick={onDismissError}>ok</button>

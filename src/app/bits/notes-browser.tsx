@@ -12,7 +12,7 @@ import type { ShelfGroup } from "@/lib/db/shelf";
 // own landing page. The loose tab IS the old page, unchanged.
 type View = "loose" | "all";
 type Sort = "new" | "old" | "edited";
-type Kind = "text" | "image" | "drawing" | "audio";
+type Kind = "text" | "image" | "drawing" | "audio" | "pdf";
 
 export function NotesBrowser({
   items,
@@ -105,13 +105,13 @@ export function NotesBrowser({
           aria-label="search bits"
         />
         <div className="loose-scope" role="group" aria-label="type filter">
-          {(["text", "image", "drawing", "audio"] as Kind[]).map((k) => (
+          {(["text", "image", "drawing", "audio", "pdf"] as Kind[]).map((k) => (
             <button
               key={k}
               className={`loose-scope-tab${kind === k ? " is-on" : ""}`}
               onClick={() => setKind(kind === k ? null : k)}
             >
-              {k === "text" ? "notes" : k === "image" ? "images" : k === "drawing" ? "sketches" : "recordings"}
+              {k === "text" ? "notes" : k === "image" ? "images" : k === "drawing" ? "sketches" : k === "audio" ? "recordings" : "PDFs"}
             </button>
           ))}
         </div>

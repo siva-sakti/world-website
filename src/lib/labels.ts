@@ -7,6 +7,7 @@ const BIT_FALLBACK: Record<string, string> = {
   drawing: "a drawing",
   image: "an image",
   audio: "a recording",
+  pdf: "a PDF",
 };
 
 /** A bit's display face, or a per-type fallback (grammatical — "an image"). */

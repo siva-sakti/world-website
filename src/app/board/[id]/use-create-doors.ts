@@ -6,12 +6,14 @@ import {
   createDrawingBit,
   createImageBit,
   createAudioBit,
+  createPdfBit,
   callInBit,
   abortBitCreate,
 } from "@/lib/db/bits";
 import { uploadObject, signedUrl } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
+import { importPdf } from "@/lib/media-pdf";
 import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
 import type { PanelBit } from "@/lib/db/inbox";
@@ -47,7 +49,7 @@ export function useCreateDoors(deps: {
   settled: (placementId: string) => Promise<string>;
   reconcileId: (oldId: string, newId: string) => void;
   setConverting: Dispatch<SetStateAction<boolean>>;
-  setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" } | null>>;
+  setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" } | null>>;
   onErr: (e: unknown) => void;
 }) {
   const {
@@ -264,9 +266,64 @@ export function useCreateDoors(deps: {
     trackCreate(placementId, chain);
   }
 
-  // Route a dropped/pasted file to the right door (audio → recording, else image).
+  const PDF_W = 240; // an unrenderable pdf card's default width (portrait sheet)
+  const PDF_H = 300; //  ... and height, when there is no page-1 thumbnail to size to
+  const isPdfFile = (f: File) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+
+  // PDF → a card showing its first page. The original bytes store as-is (for the
+  // viewer); a 600px page-1 JPEG stores as the thumbnail (like an image's). The card
+  // is added AFTER page 1 renders (so it can size to the page aspect), like the image
+  // door. An unrenderable PDF still uploads — a document sheet, no thumbnail.
+  function importPdfFile(file: File, wx: number, wy: number) {
+    const bitId = crypto.randomUUID();
+    const placementId = crypto.randomUUID();
+    const z = nextZ();
+    const chain = importPdf(file)
+      .then(async (pdf) => {
+        let w = PDF_W;
+        let h = PDF_H;
+        let localUrl: string | undefined;
+        if (pdf.thumb && pdf.width && pdf.height) {
+          const dispScale = Math.min(1, MAX_DISP / pdf.width);
+          w = Math.max(1, Math.round(pdf.width * dispScale));
+          h = Math.max(1, Math.round(pdf.height * dispScale));
+          localUrl = URL.createObjectURL(pdf.thumb);
+        }
+        setCards((cs) => [
+          ...cs,
+          { placementId, bitId, type: "pdf", kind: "bit", x: wx, y: wy, w, h, z, imageUrl: localUrl },
+        ]);
+        selectOne(placementId);
+        const storagePath = `pdfs/${bitId}.pdf`;
+        const thumbPath = pdf.thumb ? `thumbs/${bitId}.jpg` : undefined;
+        // The uploads are independent — the PDF plus (when present) its page-1 thumb.
+        const uploads = [
+          uploadObject(supabase, { path: storagePath, body: pdf.file, contentType: "application/pdf" }),
+        ];
+        if (pdf.thumb && thumbPath) {
+          uploads.push(uploadObject(supabase, { path: thumbPath, body: pdf.thumb, contentType: "image/jpeg" }));
+        }
+        await Promise.all(uploads);
+        await createPdfBit(supabase, {
+          bitId, placementId, boardId, storagePath, thumbPath,
+          mediaWidth: pdf.width ?? undefined, mediaHeight: pdf.height ?? undefined,
+          mime: pdf.mime, byteSize: pdf.byteSize, fileName: pdf.fileName,
+          x: wx, y: wy, width: w, height: h, z,
+        });
+        setWordsFor({ bitId, kind: "pdf" });
+      })
+      .catch((e) => {
+        setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        onErr(e);
+      });
+    trackCreate(placementId, chain);
+  }
+
+  // Route a dropped/pasted file to the right door (audio → recording, pdf → PDF,
+  // else image).
   function placeDroppedFile(file: File, wx: number, wy: number) {
     if (isAudioFile(file)) importAudioFile(file, wx, wy);
+    else if (isPdfFile(file)) importPdfFile(file, wx, wy);
     else importImageFile(file, wx, wy);
   }
 
@@ -297,6 +354,15 @@ export function useCreateDoors(deps: {
     e.target.value = "";
   }
 
+  function onPickPdf(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const p = findClearSpot(PDF_W, PDF_H); // real dims arrive after page-1 render
+      importPdfFile(file, p.x, p.y);
+    }
+    e.target.value = "";
+  }
+
   // Paste onto the board: an image → an image card; TEXT → a bit holding it
   // (plan v1.1-D — one paste, one bit, no cleverness). Never while an editor or
   // input has focus: those own their own paste.
@@ -305,7 +371,7 @@ export function useCreateDoors(deps: {
       const t = e.target as HTMLElement | null;
       if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
       const file = Array.from(e.clipboardData?.files ?? []).find(
-        (f) => f.type.startsWith("image/") || isAudioFile(f),
+        (f) => f.type.startsWith("image/") || isAudioFile(f) || isPdfFile(f),
       );
       if (file) {
         const p = findClearSpot(320, 260);
@@ -333,10 +399,10 @@ export function useCreateDoors(deps: {
   // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
-    if (type !== "text" && type !== "drawing" && type !== "image" && type !== "audio") return;
+    if (type !== "text" && type !== "drawing" && type !== "image" && type !== "audio" && type !== "pdf") return;
     const isNote = bit.kind === "note"; // a note lands page-shaped (a doorway), not receipt-shaped
     const width = isNote ? 200 : type === "text" ? 400 : type === "audio" ? AUDIO_W : 220;
-    const height = isNote ? 260 : type === "text" ? 60 : type === "audio" ? AUDIO_H : 220;
+    const height = isNote ? 260 : type === "text" ? 60 : type === "audio" ? AUDIO_H : type === "pdf" ? 280 : 220;
     // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
     // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate;
     // a note has a real fixed height, so use it directly.
@@ -354,6 +420,10 @@ export function useCreateDoors(deps: {
       }
     } else if (type === "audio" && bit.storage_path) {
       try { fileUrl = await signedUrl(supabase, bit.storage_path); } catch {}
+    } else if (type === "pdf" && bit.thumb_path) {
+      // A PDF shows its first-page thumbnail (thumb_path only — the storage_path is
+      // the PDF binary, not an image). No thumb → the card's document-sheet fallback.
+      try { imageUrl = await signedUrl(supabase, bit.thumb_path); } catch {}
     }
     setCards((cs) => [
       ...cs,
@@ -395,5 +465,5 @@ export function useCreateDoors(deps: {
     return p;
   }
 
-  return { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, bringIn, markContentIfReal };
+  return { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal };
 }

@@ -46,6 +46,7 @@ export default async function BitPage({
 
   let imageUrl: string | undefined;
   let audioUrl: string | undefined;
+  let pdfUrl: string | undefined;
   if (b.type === "image" && b.storage_path) {
     try {
       imageUrl = await signedUrl(supabase, b.storage_path);
@@ -57,6 +58,12 @@ export default async function BitPage({
       audioUrl = await signedUrl(supabase, b.storage_path);
     } catch {
       audioUrl = undefined;
+    }
+  } else if (b.type === "pdf" && b.storage_path) {
+    try {
+      pdfUrl = await signedUrl(supabase, b.storage_path);
+    } catch {
+      pdfUrl = undefined;
     }
   }
   const drawing = b.type === "drawing" ? normalizeDrawing(b.strokes) : null;
@@ -115,6 +122,29 @@ export default async function BitPage({
             <audio controls preload="metadata" src={audioUrl} className="w-full" />
           ) : (
             <p className="text-sm text-neutral-500">Couldn&rsquo;t load this recording — reload the page.</p>
+          ))}
+        {b.type === "pdf" &&
+          (pdfUrl ? (
+            <div>
+              {/* The signed private URL renders inline (Supabase serves application/
+                  pdf, no X-Frame-Options: DENY); the "open" link is the hedge if a
+                  browser refuses to embed. */}
+              <iframe
+                src={pdfUrl}
+                title={b.face ?? "PDF"}
+                className="h-[75vh] w-full rounded-md border border-neutral-200"
+              />
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-block text-sm underline underline-offset-4 hover:no-underline"
+              >
+                open PDF ↗
+              </a>
+            </div>
+          ) : (
+            <p className="text-sm text-neutral-500">Couldn&rsquo;t load this PDF — reload the page.</p>
           ))}
         {drawing && dBounds && (
           <div

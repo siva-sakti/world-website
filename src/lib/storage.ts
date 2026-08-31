@@ -38,8 +38,11 @@ export async function signedUrl(
   return data.signedUrl;
 }
 
-/** Sign display thumbnails for a set of bits (thumb preferred, full fallback) —
- * the V4 broom for the copy-pasted per-page loops. Failures skip quietly. */
+/** Sign display thumbnails for a set of bits — anything with a `thumb_path` (image
+ * + pdf's first-page render; a future thumbnailed type lights up with no re-edit).
+ * An image with no thumb still falls back to its full object; audio (thumb null,
+ * storage_path is not an image) is skipped. The V4 broom for the copy-pasted
+ * per-page loops. Failures skip quietly. */
 export async function signThumbs(
   supabase: Parameters<typeof signedUrl>[0],
   bits: { id: string; type: string; thumb_path: string | null; storage_path: string | null }[],
@@ -47,8 +50,9 @@ export async function signThumbs(
   const out: Record<string, string> = {};
   await Promise.all(
     bits.map(async (b) => {
-      if (b.type !== "image") return;
-      const path = b.thumb_path ?? b.storage_path;
+      // Sign a thumb_path for any type; for an image with none, fall back to the
+      // full object (a PDF/audio never falls back — their storage_path is not an image).
+      const path = b.thumb_path ?? (b.type === "image" ? b.storage_path : null);
       if (!path) return;
       try {
         out[b.id] = await signedUrl(supabase, path);

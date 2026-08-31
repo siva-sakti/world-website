@@ -121,7 +121,7 @@ export async function searchItems(
       mediaType: b.type,
       tags: b.tags,
       created_at: b.created_at,
-      // file_name too, so a media bit (image/audio) is findable by its filename —
+      // file_name too, so a media bit (image/audio/pdf) is findable by its filename —
       // the DB search_tsv indexes it, but the /search UI filters client-side on this.
       searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""}`.toLowerCase(),
     };
