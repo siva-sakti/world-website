@@ -135,6 +135,31 @@ The owner: *"There's a couple components here — there's the core surfaces, the
 
 **Consequence for the research round:** this **downgrades** per-discipline research from blocking to level-2. If the feature set only needs the five generic types, discipline knowledge serves the **demo and onboarding**, not the build. *(Claude had ranked it as load-bearing an hour earlier — corrected.)*
 
+### ⭐⭐ TEMPLATES — the bridge between the external and the internal (the owner, 2026-08-31)
+
+> *"An easy document type to have is just like a template — you know, Google does that too. I'm not talking about the very complicated stuff."*
+
+**Why this resolves the split.** The sort above put discipline knowledge on the *external* side (demo, onboarding) and generic types on the *internal* side (what we build) — which left an unanswered question: **how does discipline knowledge ever reach a person INSIDE the app, without us building "list of work" as a feature?**
+
+> **A template is the bridge. The FEATURE is "templates" — one generic thing. The discipline knowledge lives IN the templates, as content.**
+
+| the artifact | is not a feature — it's a… |
+|---|---|
+| **list of work** | **table template** — columns already there: title · year · medium · dimensions |
+| **artist statement** | **composition template** — the prompts already there |
+| **setlist** · **shot list** | **sequence template** |
+| **EPK** · **one-sheet** | **output-artifact template** |
+| **moodboard** | **board template** |
+
+**Three things this buys, and they're large:**
+1. **We build ONE thing, not seven professions' worth of features.** The never-build-domain-modules rule (§2) holds completely — a template is content, not a module.
+2. **The research (Q7) stops being background reading and becomes the product.** Every filled cell of the discipline × area grid **is a template we ship.** That re-raises Q7's value without re-raising its risk: it feeds content, never architecture.
+3. **The onboarding line becomes literal.** *"You're an artist. Here's your list of work"* → and it opens with the columns already in place. The switching pitch (§Are.na) delivered as a working document rather than a claim.
+
+**And it is cheap in the way the owner meant** — Google Docs templates are not machinery; they're a starting document. ⚑ Depends on the three missing generic types existing first (a table template needs tables). **Templates are the layer ON TOP, not a substitute.**
+
+⚑ **Naming (step 2b):** "template" is unruled — and it's a software word. Worth checking against something more the owner's own (a *starting point*? a *setup*?) before it reaches a button.
+
 ### Each area, at length — because the table flattens what's actually going on
 
 **Material.** The one area that *is* well served — and even here it's fragmented across four tools that don't talk to each other. The screenshots are in the camera roll. The saved images are in Are.na. The quotes are in the notes app. The melodies are in voice memos. A person doesn't experience this as "I have good tools for material"; they experience it as *"I know I saved that somewhere."* So even the served area has an unserved version of the problem: **not capture, but reunion.**
