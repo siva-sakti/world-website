@@ -1259,8 +1259,13 @@ body {
   font-size: 12px;
   color: #9c5744;
 }
-.intake-foot .compose-btn {
+/* The buttons ride together at the right end. The auto margin lives on the GROUP —
+   put it on each button and a second one (clear) would get its own push and split them. */
+.intake-actions {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .inbox-grid {
   display: grid;

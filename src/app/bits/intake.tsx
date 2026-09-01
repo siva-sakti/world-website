@@ -6,13 +6,15 @@ import { jumpWords, titleMatches } from "@/lib/jump-match";
 import { listSources, type Source } from "@/lib/db/sources";
 import { listTags, type TagChoice } from "@/lib/db/tags";
 import { addToInbox } from "./actions";
+import { loadDraft, saveDraft, isEmptyDraft, type PickedSource } from "./jot-draft";
 
 // The intake (plan §5 Stage 2, + the reset/tags pass): pile notes under a source,
 // with tags, from one calm box. Source and tags autosuggest; both apply on add
 // whether or not you pressed Enter (nothing typed is silently dropped), and the
 // whole box RESETS after each add — note cleared, textarea shrunk, source + tags
 // wiped — so the next note starts fresh. "As a quote" is formatting (a blockquote).
-type PickedSource = { name: string; url: string | null };
+// The box also MIRRORS itself to device-local storage (jot-draft.ts) so a reload,
+// a navigation or an evicted phone tab doesn't lose what you were writing.
 
 export function Intake() {
   const [supabase] = useState(() => createClient());
@@ -28,6 +30,7 @@ export function Intake() {
   const [tagFocused, setTagFocused] = useState(false);
   const [pending, setPending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false); // gates the mirror until the restore has run
   const noteRef = useRef<HTMLTextAreaElement>(null);
 
   // Reloadable (review R3.17): a source/tag created by one add must autosuggest on
@@ -50,6 +53,46 @@ export function Intake() {
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [note]);
+
+  // Restore the draft ONCE, on mount. Read in an effect, never in render: localStorage
+  // in render is a hydration mismatch. Functional setState so anything typed before
+  // this lands (fast fingers / StrictMode's double mount) WINS over the stored draft —
+  // the restore fills an empty box, it never overwrites live typing.
+  // I-D3: this puts words back in the BOX. It never submits them.
+  useEffect(() => {
+    const d = loadDraft();
+    if (d) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
+      setNote((p) => p || d.note);
+      setAsQuote((p) => p || d.asQuote);
+      setSticky((p) => p ?? d.sticky);
+      setDraft((p) => p || d.draft);
+      setTagWords((p) => (p.length ? p : d.tagWords));
+      setTagDraft((p) => p || d.tagDraft);
+    }
+    setHydrated(true);
+  }, []);
+
+  // Mirror the box into storage on every change. localStorage is synchronous, so there
+  // is nothing to debounce and nothing in flight to race an add's reset against: the
+  // reset re-runs this with an empty box, which REMOVES the key. Gated on `hydrated`
+  // so the first paint's empty box can't wipe the draft before it's read back.
+  useEffect(() => {
+    if (!hydrated) return;
+    saveDraft({ note, asQuote, sticky, draft, tagWords, tagDraft });
+  }, [hydrated, note, asQuote, sticky, draft, tagWords, tagDraft]);
+
+  // One reset, used by BOTH a successful add and "clear" — so the two can't drift apart
+  // and leave a field behind. The mirror effect above turns this into a key removal.
+  const resetBox = useCallback(() => {
+    setNote("");
+    setAsQuote(false);
+    setSticky(null);
+    setDraft("");
+    setTagWords([]);
+    setTagDraft("");
+    setErr(null);
+  }, []);
 
   function pickSource(name: string, url: string | null) {
     const nm = name.trim();
@@ -81,13 +124,7 @@ export function Intake() {
       const res = await addToInbox({ note: body, asQuote, sourceName, sourceUrl, tags });
       if (res.error) { setErr(res.error); return; }
       reloadSuggestions(); // a source/tag born in THIS add must autosuggest on the next (fire-and-forget)
-      // Full reset — a fresh box for the next note (the "better reset").
-      setNote("");
-      setAsQuote(false);
-      setSticky(null);
-      setDraft("");
-      setTagWords([]);
-      setTagDraft("");
+      resetBox(); // a fresh box for the next note — and the mirror drops the saved draft
       noteRef.current?.focus();
     } catch {
       // The action call itself rejected (offline / flaky network — the phone case).
@@ -97,6 +134,10 @@ export function Intake() {
       setPending(false);
     }
   }
+
+  // Is there anything in the box? Same predicate the mirror uses to decide whether a
+  // draft is worth keeping, so "clear is offered" and "a draft is saved" never disagree.
+  const anything = !isEmptyDraft({ note, asQuote, sticky, draft, tagWords, tagDraft });
 
   // Word-START matching (jump-match.ts): each typed word must begin a word in the
   // name — "art" → "Artforum"/"artist", never "cartography" — still completing as you type.
@@ -214,14 +255,23 @@ export function Intake() {
           as a quote
         </label>
         {err && <span className="intake-err">{err}</span>}
-        <button
-          className="compose-btn is-primary"
-          type="button"
-          disabled={pending || !note.trim()}
-          onClick={add}
-        >
-          {pending ? "adding…" : "add"}
-        </button>
+        <span className="intake-actions">
+          {/* Shown only when there's something to lose. Says "clear" — the two × marks
+              already on this box mean narrower things (drop the source, drop a tag). */}
+          {anything && (
+            <button className="compose-btn" type="button" disabled={pending} onClick={resetBox}>
+              clear
+            </button>
+          )}
+          <button
+            className="compose-btn is-primary"
+            type="button"
+            disabled={pending || !note.trim()}
+            onClick={add}
+          >
+            {pending ? "adding…" : "add"}
+          </button>
+        </span>
       </div>
     </div>
   );
