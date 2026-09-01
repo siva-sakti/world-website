@@ -12,8 +12,9 @@ import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { NoteWorkspace } from "./note-workspace";
 import { BitTitle, BitTrash } from "@/app/bit/[id]/bit-controls";
 import { ArchiveButton } from "@/app/archive/archive-controls";
-import { PinToggle } from "@/app/bits/note-card";
+import { PinToggle, GroupPicker } from "@/app/bits/note-card";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
+import { listGroups } from "@/lib/db/shelf";
 
 export const dynamic = "force-dynamic";
 
@@ -34,11 +35,12 @@ export default async function NotePage({
   if (!b) notFound();
   if (b.kind !== "note") redirect(`/bit/${id}`); // fragments live on the bit page
 
-  const [boards, source, gatheredInto, allBoards] = await Promise.all([
+  const [boards, source, gatheredInto, allBoards, groups] = await Promise.all([
     getBitBoards(supabase, id),
     getBitSource(supabase, id),
     listGatheredInto(supabase, id),
     listBoards(supabase),
+    listGroups(supabase),
   ]);
   const otherBoards = allBoards
     .filter((bd) => !boards.some((cur) => cur.id === bd.id))
@@ -70,6 +72,12 @@ export default async function NotePage({
         </div>
         <div className="mt-3">
           <TagBar target={{ bitId: b.id }} />
+        </div>
+        {/* Folder — same control as the bit page (folder-story-plan.md): the name
+            links to the folder's page, the ▾ changes it. */}
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-xs uppercase tracking-wide text-neutral-400">folder</span>
+          <GroupPicker bitId={b.id} groupId={b.group_id} groups={groups} />
         </div>
 
         {gatheredInto.length > 0 && (
