@@ -238,6 +238,9 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `composition-definition.md` — 🟢 THE SOURCE OF TRUTH: what a composition is (2026-09-02)
+**Contains:** the concept over everything (diverge→converge; the board converges *privately*, the composition is **convergence made legible** — the owner's cut) · the definition · every action, shipped-ideal · what's deliberately open · where the depth lives. **Owner-blessed as the starting source of truth; amend only on her ruling. The language transitions here: it says "composition."**
+
 ### `composition-base-spec.md` — 🟠 THE BASE SPEC: the composition re-derived, bottom-up (2026-09-01)
 **Contains:** the post-split model · the entity defined conceptually + technically (the surface-table shape) · relations reshaped (placement · reference · tags — one link mechanism) · **every act traced, no blank cells** · doors in/out · what it sheds from bit-hood, each chosen · invariants touched · the migration sketch · **§9: the nine questions the owner answers to settle the base.**
 **Gate:** owner answers §9 → 🟢 → enactment in the code window's lane. The capability layer (`composition-surface-spec.md`) builds on this after.
