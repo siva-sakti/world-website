@@ -22,7 +22,7 @@ import { useBoardActs } from "./use-board-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
 import { UndoDevReadout } from "./undo-dev-readout";
-import { tidyPatches, backZ } from "./board-arrange";
+import { tidyPatches, backZ, groupDragPatches, nextZ as zAbove } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
 
 // The board's compose surface, on real data, on an infinite canvas. Local state
@@ -96,9 +96,9 @@ export function BoardSurface({
   // THE UNDO SEAM (dark — stage 2b): arranging acts RECORD; nothing on screen can
   // act on an entry until stage 5's buttons. The dev readout below is the soak's
   // evidence surface. onErr here takes the seam's owner-facing copy directly.
-  const { record, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
+  const { record, onBeforeRecord, fail, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
   void undo; void redo; void undoLabel; void redoLabel; // stage 5 wires the buttons
-  const arrange = useArrangeActs({ supabase, cardsRef, record, patchCard, setCards, settled, chain });
+  const arrange = useArrangeActs({ supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain });
   // Before-captures for the two gestures whose acts finish elsewhere:
   const dragBefore = useRef<{ bitId: string; x: number; y: number } | null>(null);   // single drag
   const resizeBefore = useRef<{ bitId: string; x: number; y: number; w: number; h?: number } | null>(null);
@@ -171,7 +171,7 @@ export function BoardSurface({
   }, []);
 
   function nextZ() {
-    return cards.reduce((m, c) => Math.max(m, c.z), 0) + 1;
+    return zAbove(cards); // one definition (board-arrange) — no drifting twin (M1)
   }
 
   // Create doors — every way a card is born onto the surface, plus the board-born
@@ -246,13 +246,15 @@ export function BoardSurface({
     const s = starts.get(dragged.bitId)!;
     const dx = x - s.x;
     const dy = y - s.y;
-    setCards((cs) =>
-      cs.map((c) => {
-        if (c.placementId === placementId || !starts.has(c.bitId)) return c; // dragged card + non-selected: untouched
-        const p0 = starts.get(c.bitId)!;
-        return { ...c, x: p0.x + dx, y: p0.y + dy };
-      }),
-    );
+    setCards((cs) => {
+      // THROUGH the tested pure function (antagonist M1: the regression test must
+      // guard the code that runs, not a twin nobody calls).
+      const byBit = new Map(groupDragPatches(cs, starts, dragged.bitId, dx, dy).map((p) => [p.bitId, p]));
+      return cs.map((c) => {
+        const p = byBit.get(c.bitId);
+        return p ? { ...c, x: p.x, y: p.y } : c;
+      });
+    });
   }
   function onCardDragEnd(placementId: string, x: number, y: number) {
     const starts = dragStart.current;
@@ -263,11 +265,9 @@ export function BoardSurface({
     const dx = x - s.x;
     const dy = y - s.y;
     const moves: { bitId: string; before: { x: number; y: number }; after: { x: number; y: number } }[] = [];
-    for (const c of cards) {
-      if (c.placementId === placementId || !starts.has(c.bitId)) continue;
-      const p0 = starts.get(c.bitId)!;
-      patchCard(c.placementId, c.bitId, { x: p0.x + dx, y: p0.y + dy }); // per-card independent save
-      moves.push({ bitId: c.bitId, before: p0, after: { x: p0.x + dx, y: p0.y + dy } });
+    for (const p of groupDragPatches(cards, starts, dragged.bitId, dx, dy)) {
+      patchCard(p.placementId, p.bitId, { x: p.x, y: p.y }); // per-card independent save
+      moves.push({ bitId: p.bitId, before: starts.get(p.bitId)!, after: { x: p.x, y: p.y } });
     }
     // ONE entry for the whole gesture — the dragged card's own onChange("move") was
     // record-suppressed (starts still populated when it fired; see onChange below).
@@ -320,22 +320,28 @@ export function BoardSurface({
   }
   // Lock / unlock the selected card's POSITION (B+): optimistic, rolled back on failure.
   // `applyLock` is the reversible core — undo replays it with the opposite state.
-  function applyLock(bitId: string, on: boolean) {
+  async function applyLock(bitId: string, on: boolean): Promise<void> {
     const cur = cardsRef.current.find((x) => x.bitId === bitId);
-    if (!cur) return;
+    if (!cur) throw new Error("that card no longer exists on this board");
     setCards((cs) => cs.map((x) => (x.bitId === bitId ? { ...x, locked: on } : x)));
-    settled(cur.placementId)
-      .then((id) => setPlacementLock(supabase, id, on))
-      .catch((e) => {
-        // keyed by bitId — a call-in reconcile can rename the placementId mid-flight
-        setCards((cs) => cs.map((x) => (x.bitId === bitId ? { ...x, locked: !on } : x)));
-        onErr(e);
-      });
+    try {
+      const id = await settled(cur.placementId);
+      await setPlacementLock(supabase, id, on);
+    } catch (e) {
+      // keyed by bitId — a call-in reconcile can rename the placementId mid-flight
+      setCards((cs) => cs.map((x) => (x.bitId === bitId ? { ...x, locked: !on } : x)));
+      throw e; // the caller decides: banner for the act, classify for a reverse (D3)
+    }
   }
   function toggleLock(c: CardVM) {
     const on = !c.locked;
-    applyLock(c.bitId, on);
-    arrange.recordLock(c.bitId, on, applyLock);
+    const entry = arrange.recordLock(c.bitId, on, applyLock);
+    // A rolled-back act must never sit LIVE in the stack (antagonist D3) — the
+    // screen un-happened, so the entry is marked failed and can never replay.
+    applyLock(c.bitId, on).catch((e) => {
+      fail(entry);
+      onErr(e);
+    });
   }
 
   // Send the selected card behind everything (the demote valve — click-to-front stays, ruled).

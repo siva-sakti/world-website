@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { movePlacementForced } from "@/lib/db/bits";
 import type { CardVM } from "./card";
@@ -29,12 +29,13 @@ export function useArrangeActs(deps: {
   supabase: SupabaseClient;
   cardsRef: React.RefObject<CardVM[]>;
   record: ReturnType<typeof useUndo>["record"];
+  onBeforeRecord: ReturnType<typeof useUndo>["onBeforeRecord"];
   patchCard: (placementId: string, bitId: string, patch: Partial<CardVM>) => void;
   setCards: React.Dispatch<React.SetStateAction<CardVM[]>>;
   settled: (placementId: string) => Promise<string>;
   chain: (realId: string, fn: () => Promise<void>) => Promise<void>;
 }) {
-  const { supabase, cardsRef, record, patchCard, setCards, settled, chain } = deps;
+  const { supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain } = deps;
 
   /** Write a position onto a card AS IT IS NOW. Missing → terminal (the classify
    *  list matches "no longer exists" — the entry dies honestly, never silently). */
@@ -44,19 +45,43 @@ export function useArrangeActs(deps: {
     if (cur.locked) {
       // Screen first (patchCard would schedule into the lock-filtered door and
       // silently no-op at the DB — the named divergence), then the forced door
-      // behind the row's write chain.
+      // behind the row's write chain. ROLLED BACK on failure (antagonist D2): the
+      // forced door is one-shot with no retry queue — a screen left showing the
+      // reversed position with nothing behind it would snap back on reload.
+      const prev = { x: cur.x, y: cur.y };
       setCards((cs) => cs.map((c) => (c.bitId === bitId ? { ...c, x: pos.x, y: pos.y } : c)));
-      const realId = await settled(cur.placementId);
-      await chain(realId, () => movePlacementForced(supabase, realId, pos));
+      try {
+        const realId = await settled(cur.placementId);
+        await chain(realId, () => movePlacementForced(supabase, realId, pos));
+      } catch (e) {
+        setCards((cs) => cs.map((c) => (c.bitId === bitId ? { ...c, x: prev.x, y: prev.y } : c)));
+        throw e;
+      }
       return;
     }
     patchCard(cur.placementId, cur.bitId, { x: pos.x, y: pos.y });
   }
 
+  /** Apply a set of positions, skipping cards that no longer exist (antagonist D4:
+   *  aborting mid-way left the board HALF-undone and killed the entry — a gone card
+   *  has nothing to reverse and must not block its neighbours). The entry fails
+   *  (terminal) only when NOTHING could be applied. */
+  async function applyAll(entries: { bitId: string; pos: Pos }[]): Promise<void> {
+    let applied = 0;
+    let firstErr: unknown = null;
+    for (const e of entries) {
+      try {
+        await applyPos(e.bitId, e.pos);
+        applied++;
+      } catch (err) {
+        if (firstErr === null) firstErr = err;
+      }
+    }
+    if (applied === 0 && firstErr !== null) throw firstErr;
+  }
+
   async function applyMoves(moves: Move[], dir: "before" | "after"): Promise<void> {
-    // Sequential, not parallel: N is small, and a thrown "gone" mid-way still
-    // surfaces once through the stack's classify. Position writes coalesce anyway.
-    for (const m of moves) await applyPos(m.bitId, m[dir]);
+    await applyAll(moves.map((m) => ({ bitId: m.bitId, pos: m[dir] })));
   }
 
   function label(n: number, verb: string): string {
@@ -85,10 +110,15 @@ export function useArrangeActs(deps: {
    *  legal on locked cards (the lock filter is x/y-scoped), so the reverse splits:
    *  size via patchCard always, position via applyPos (which handles the lock). */
   function recordResize(bitId: string, before: Pos & { w: number; h?: number }, after: Pos & { w: number; h?: number }) {
+    // A handle-click without a drag is not an act (mirrors recordMove's no-op filter).
+    if (before.x === after.x && before.y === after.y && before.w === after.w && before.h === after.h) return;
+    // A flex card (after.h undefined — height is auto) must ignore its STALE stored
+    // before.h too, or undo writes an h the card never truly had (antagonist blemish).
+    const flex = after.h === undefined;
     const apply = async (v: Pos & { w: number; h?: number }) => {
       const cur = cardsRef.current?.find((c) => c.bitId === bitId);
       if (!cur) throw new Error("that card no longer exists on this board");
-      patchCard(cur.placementId, cur.bitId, v.h === undefined ? { w: v.w } : { w: v.w, h: v.h });
+      patchCard(cur.placementId, cur.bitId, flex || v.h === undefined ? { w: v.w } : { w: v.w, h: v.h });
       await applyPos(bitId, { x: v.x, y: v.y });
     };
     record("resize card", [bitId], () => apply(before), () => apply(after));
@@ -121,21 +151,23 @@ export function useArrangeActs(deps: {
       w.timer = setTimeout(closeNudgeWindow, 800);
       return;
     }
-    closeNudgeWindow();
     const afters = new Map(moves.map((m) => [m.bitId, m.after]));
     const befores = new Map(moves.map((m) => [m.bitId, m.before]));
-    nudgeWindow.current = { key, afters, timer: setTimeout(closeNudgeWindow, 800) };
+    // record() FIRST — it closes any open window (ours included, via onBeforeRecord);
+    // the new window opens AFTER, so it can't be closed by its own act (D1).
     record(
       label(moves.length, "nudge"),
       moves.map((m) => m.bitId),
-      async () => {
-        for (const [bitId, pos] of befores) await applyPos(bitId, pos);
-      },
-      async () => {
-        for (const [bitId, pos] of afters) await applyPos(bitId, pos); // reads the EXTENDED afters
-      },
+      () => applyAll([...befores].map(([bitId, pos]) => ({ bitId, pos }))),
+      () => applyAll([...afters].map(([bitId, pos]) => ({ bitId, pos }))), // reads the EXTENDED afters
     );
+    nudgeWindow.current = { key, afters, timer: setTimeout(closeNudgeWindow, 800) };
   }
+
+  // Every push — from ANY act layer, this one or stages 3-4's — closes an open
+  // burst first (the D1 class fix lives in useUndo; this registers our window).
+  useEffect(() => onBeforeRecord(closeNudgeWindow), [onBeforeRecord]);
+  useEffect(() => closeNudgeWindow, []); // and the timer dies with the board
 
   /** Tidy-up: the entry replays the STORED patches — never re-runs tidy (it
    *  measures live DOM and would compute a different grid; antagonist catch). */
@@ -144,15 +176,8 @@ export function useArrangeActs(deps: {
     record(
       `tidy up ${patches.length} cards`,
       patches.map((p) => p.bitId),
-      async () => {
-        for (const p of patches) {
-          const b = befores.get(p.bitId);
-          if (b) await applyPos(p.bitId, b);
-        }
-      },
-      async () => {
-        for (const p of patches) await applyPos(p.bitId, { x: p.x, y: p.y });
-      },
+      () => applyAll(patches.flatMap((p) => { const b = befores.get(p.bitId); return b ? [{ bitId: p.bitId, pos: b }] : []; })),
+      () => applyAll(patches.map((p) => ({ bitId: p.bitId, pos: { x: p.x, y: p.y } }))),
     );
   }
 
@@ -166,11 +191,14 @@ export function useArrangeActs(deps: {
     record("send to back", [bitId], () => applyZ(fromZ), () => applyZ(toZ));
   }
 
-  /** Lock/unlock — the toggle reversed is the opposite toggle. */
-  function recordLock(bitId: string, on: boolean, doToggle: (bitId: string, on: boolean) => void) {
-    record(on ? "lock card" : "unlock card", [bitId],
-      async () => doToggle(bitId, !on),
-      async () => doToggle(bitId, on));
+  /** Lock/unlock — the toggle reversed is the opposite toggle. Returns the entry so
+   *  the caller can fail() it when the act's own write fails (antagonist D3: a
+   *  rolled-back lock must never sit live in the stack). The closures AWAIT the
+   *  toggle so a failed reverse reaches classify instead of fake-succeeding. */
+  function recordLock(bitId: string, on: boolean, doToggle: (bitId: string, on: boolean) => Promise<void>) {
+    return record(on ? "lock card" : "unlock card", [bitId],
+      () => doToggle(bitId, !on),
+      () => doToggle(bitId, on));
   }
 
   return { recordMove, recordGroupMove, recordResize, noteNudge, closeNudgeWindow, recordTidy, recordSendToBack, recordLock };

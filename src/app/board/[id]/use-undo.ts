@@ -41,6 +41,18 @@ type UndoView = {
 type UndoStackT = ReturnType<typeof createUndoStack>;
 
 export function useUndo(onErr: (msg: string) => void) {
+  // THE CLASS FIX for the antagonist's D1 (reproduced: a 399px teleport): any act
+  // layer holding an OPEN coalescing window (the nudge burst) must close it before
+  // ANY entry is pushed — from any act, any stage — or a later extension mutates a
+  // BURIED entry and undo-all lands in the wrong place. Registered callbacks run
+  // at the top of every record(); stages 3-4 inherit the guarantee for free.
+  const beforeRecord = useRef<Set<() => void>>(new Set());
+  const onBeforeRecord = useCallback((cb: () => void) => {
+    beforeRecord.current.add(cb);
+    return () => {
+      beforeRecord.current.delete(cb);
+    };
+  }, []);
   const stack = useRef<UndoStackT | null>(null);
   if (stack.current === null) stack.current = createUndoStack();
   const s = () => stack.current!;
@@ -69,6 +81,7 @@ export function useUndo(onErr: (msg: string) => void) {
       redoFn: () => Promise<void>,
       settled?: Promise<unknown>,
     ): UndoEntry => {
+      for (const cb of beforeRecord.current) cb(); // close open coalescing windows FIRST (D1)
       const e = s().push({ label, bitIds, undo: undoFn, redo: redoFn, settled });
       sync();
       return e;
@@ -100,6 +113,7 @@ export function useUndo(onErr: (msg: string) => void) {
 
   return {
     record,
+    onBeforeRecord,
     fail,
     undo,
     redo,
