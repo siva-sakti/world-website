@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { unplaceBit, trashBit, getBitBoards, abortBitCreate } from "@/lib/db/bits";
+import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, abortBitCreate } from "@/lib/db/bits";
+import type { useUndo } from "./use-undo";
 import { confirm } from "@/components/confirm";
 import type { CardVM } from "./card";
 
@@ -19,7 +20,14 @@ import type { CardVM } from "./card";
 // screen is then CORRECT; restoring would resurrect an un-removable zombie.
 export function useBoardActs(deps: {
   supabase: SupabaseClient;
+  boardId: string; // the revive (undo of un-place) needs its board
   cards: CardVM[];
+  cardsRef: React.RefObject<CardVM[]>; // reverse-time truth (never snapshots) — the house rule
+  record: ReturnType<typeof useUndo>["record"];
+  fail: ReturnType<typeof useUndo>["fail"];
+  trackCreate: (placementId: string, p: Promise<unknown>) => void;
+  reconcileId: (oldId: string, newId: string) => void;
+  chain: (realId: string, fn: () => Promise<void>) => Promise<void>;
   selectedIds: Set<string>;
   setCards: Dispatch<SetStateAction<CardVM[]>>;
   clearSelection: () => void;
@@ -45,7 +53,8 @@ export function useBoardActs(deps: {
   clearFresh: (placementId: string) => void;
 }) {
   const {
-    supabase, cards, selectedIds, setCards, clearSelection,
+    supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
+    selectedIds, setCards, clearSelection,
     setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   } = deps;
 
@@ -75,6 +84,66 @@ export function useBoardActs(deps: {
     setCards((cs) => (cs.some((c) => c.placementId === snap.placementId) ? cs : [...cs, snap]));
   }
 
+  // ---- FLOOR 3: the keeping acts' reverses (undo plan §5, all amendments) ----
+
+  /** Undo of an un-place = REVIVE at the snapshot's spot. Travel preserved by
+   *  construction: callInBit with the CAPTURED placementId collides on the departed
+   *  row and revives it — same row, arrival intact, reconcileId a no-op. The re-add
+   *  is optimistic and ROLLED BACK on failure; the revive registers via trackCreate
+   *  so a drag on the restored card can't race the in-flight insert (the bringIn
+   *  choreography, mirrored); the LOCK is re-applied (unplaceBit clears it — the
+   *  review's catch: without this, undo returns the card unlocked). */
+  async function reviveOne(snap: CardVM): Promise<void> {
+    if (cardsRef.current?.some((c) => c.bitId === snap.bitId)) return; // already back (another door)
+    setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
+    try {
+      const p = callInBit(supabase, {
+        bitId: snap.bitId, boardId, placementId: snap.placementId,
+        x: snap.x, y: snap.y, width: snap.w ?? null, height: snap.h ?? null, z: snap.z ?? 0,
+      });
+      trackCreate(snap.placementId, p);
+      const placement = await p;
+      if (placement.id !== snap.placementId) {
+        // the twin/stale case — rename in flight, exactly as bringIn does
+        reconcileId(snap.placementId, placement.id);
+        setCards((cs) => cs.map((c) => (c.placementId === snap.placementId ? { ...c, placementId: placement.id } : c)));
+      }
+      if (snap.locked) await chain(placement.id, () => setPlacementLock(supabase, placement.id, true));
+      setLooseRefresh((n) => n + 1); // no longer loose — the column must stop offering it
+    } catch (e) {
+      setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId)); // roll the re-add back out
+      throw e; // TRASHED_BIT/TRASHED_BOARD classify terminal; network stays retryable
+    }
+  }
+
+  /** Redo of an un-place = remove again, resolved against the CURRENT card. */
+  async function unplaceOne(bitId: string): Promise<void> {
+    const cur = cardsRef.current?.find((c) => c.bitId === bitId);
+    if (!cur) throw new Error("that card no longer exists on this board");
+    setCards((cs) => cs.filter((c) => c.bitId !== bitId));
+    try {
+      const id = await settled(cur.placementId);
+      if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+      await unplaceBit(supabase, id);
+      forget(cur.placementId);
+      setLooseRefresh((n) => n + 1);
+    } catch (e) {
+      setCards((cs) => (cs.some((c) => c.bitId === bitId) ? cs : [...cs, cur]));
+      throw e;
+    }
+  }
+
+  /** N-legged reverse: every survivor is applied; terminal only when NOTHING could
+   *  be (the floor-2 antagonist's D4 rule, reused here). One banner, not N. */
+  async function allLegs(legs: (() => Promise<void>)[]): Promise<void> {
+    let applied = 0;
+    let firstErr: unknown = null;
+    for (const leg of legs) {
+      try { await leg(); applied++; } catch (e) { if (firstErr === null) firstErr = e; }
+    }
+    if (applied === 0 && firstErr !== null) throw firstErr;
+  }
+
   function handleRemoveFailure(snap: CardVM, e: unknown) {
     if (isGoneError(e)) {
       console.error("remove hit an already-gone row (leftover of a failed create?) — staying removed:", e);
@@ -91,20 +160,33 @@ export function useBoardActs(deps: {
     setCards((cs) => cs.filter((c) => c.placementId !== placementId));
     clearSelection();
     setEditingId(null);
+    const act = settled(placementId)
+      .then(async (id) => {
+        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6: words first, POST-reconcile key
+        return unplaceBit(supabase, id);
+      })
+      .then(() => {
+        forget(placementId); // the card is gone — drop any queued/restored writes for it
+        setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
+      });
+    // The entry rides the act's own promise (`settled` field): pressing ↶ 200ms in
+    // waits for the un-place to land before reviving (stage-1 D6). Lifecycle: a
+    // refused/failed act un-happened → entry FAILED (never replays); the already-
+    // gone carve → the reverse can't succeed → entry DEAD (plan §5).
+    const entry = snap
+      ? record(
+          "remove card from board", [snap.bitId],
+          () => reviveOne(snap),
+          () => unplaceOne(snap.bitId),
+          act,
+        )
+      : null;
     trackRemove(
-      settled(placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6: words first, POST-reconcile key
-          return unplaceBit(supabase, id);
-        })
-        .then(() => {
-          forget(placementId); // the card is gone — drop any queued/restored writes for it
-          setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
-        })
-        .catch((e) => {
-          if (isFlushRefused(e)) { if (snap) restore(snap); return; } // banner already up; the card stays
-          if (snap) handleRemoveFailure(snap, e);
-        }),
+      act.catch((e) => {
+        if (entry) fail(entry);
+        if (isFlushRefused(e)) { if (snap) restore(snap); return; } // banner already up; the card stays
+        if (snap) handleRemoveFailure(snap, e);
+      }),
     );
   }
 
@@ -126,17 +208,43 @@ export function useBoardActs(deps: {
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     clearSelection();
     setEditingId(null);
+    const act = settled(placementId)
+      .then(async (id) => {
+        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+      })
+      .then(() => trashBit(supabase, bitId))
+      .then(() => forget(placementId));
+    // Undo = RESTORE (global — the bit returns everywhere trash froze it), then the
+    // card back on screen; DB first so a failed restore never paints a ghost. Redo
+    // re-trashes WITHOUT re-asking the confirm (ruled). A restore refused because
+    // the bit was destroyed → "no longer in the trash" → terminal → dead, honestly.
+    const entry = snap
+      ? record(
+          "trash card", [snap.bitId],
+          async () => {
+            await restoreBit(supabase, bitId);
+            setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
+          },
+          async () => {
+            const cur = cardsRef.current?.find((c) => c.bitId === snap.bitId);
+            setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId));
+            try {
+              await trashBit(supabase, bitId);
+              if (cur) forget(cur.placementId);
+            } catch (e) {
+              if (cur) setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, cur]));
+              throw e;
+            }
+          },
+          act,
+        )
+      : null;
     trackRemove(
-      settled(placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-        })
-        .then(() => trashBit(supabase, bitId))
-        .then(() => forget(placementId))
-        .catch((e) => {
-          if (isFlushRefused(e)) { if (snap) restore(snap); return; }
-          if (snap) handleRemoveFailure(snap, e);
-        }),
+      act.catch((e) => {
+        if (entry) fail(entry);
+        if (isFlushRefused(e)) { if (snap) restore(snap); return; }
+        if (snap) handleRemoveFailure(snap, e);
+      }),
     );
   }
 
@@ -162,26 +270,43 @@ export function useBoardActs(deps: {
       settledCount++;
       if (settledCount === chosen.length && landed > 1) setLooseRefresh((n) => n + 1);
     };
+    // ONE entry for the whole gesture (plan §5): undo revives every survivor, redo
+    // un-places them again — the D4 survivor rule via allLegs. The entry rides the
+    // WHOLE gesture's writes; if EVERY leg fails the gesture un-happened → FAILED.
+    const snaps = chosen.map((c) => ({ ...c }));
+    const legs: Promise<unknown>[] = [];
+    let failedLegs = 0;
+    const entry = snaps.length
+      ? record(
+          snaps.length === 1 ? "remove card from board" : `remove ${snaps.length} cards from board`,
+          snaps.map((c) => c.bitId),
+          () => allLegs(snaps.map((c) => () => reviveOne(c))),
+          () => allLegs(snaps.map((c) => () => unplaceOne(c.bitId))),
+        )
+      : null;
     for (const c of chosen) {
-      trackRemove(
-        settled(c.placementId)
-          .then(async (id) => {
-            if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-            return unplaceBit(supabase, id);
-          })
-          .then(() => {
-            forget(c.placementId);
-            landed++;
-            if (landed === 1) setLooseRefresh((n) => n + 1);
-            done();
-          })
-          .catch((e) => {
-            if (isFlushRefused(e)) restore(c);
-            else handleRemoveFailure(c, e);
-            done();
-          }),
-      );
+      const leg = settled(c.placementId)
+        .then(async (id) => {
+          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+          return unplaceBit(supabase, id);
+        })
+        .then(() => {
+          forget(c.placementId);
+          landed++;
+          if (landed === 1) setLooseRefresh((n) => n + 1);
+          done();
+        })
+        .catch((e) => {
+          failedLegs++;
+          if (entry && failedLegs === chosen.length) fail(entry); // nothing happened → no memory
+          if (isFlushRefused(e)) restore(c);
+          else handleRemoveFailure(c, e);
+          done();
+        });
+      legs.push(leg);
+      trackRemove(leg);
     }
+    if (entry) entry.settled = Promise.allSettled(legs); // ↶ waits for the gesture to land (D6)
   }
 
   async function bulkTrash() {
@@ -209,20 +334,55 @@ export function useBoardActs(deps: {
     setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
     clearSelection();
     setEditingId(null);
+    const snaps = chosen.map((c) => ({ ...c }));
+    const legs: Promise<unknown>[] = [];
+    let failedLegs = 0;
+    const entry = snaps.length
+      ? record(
+          snaps.length === 1 ? "trash card" : `trash ${snaps.length} cards`,
+          snaps.map((c) => c.bitId),
+          // Undo = restore each bit (DB first), then its card back; redo re-trashes
+          // without re-asking (ruled). The D4 survivor rule both ways.
+          () =>
+            allLegs(
+              snaps.map((c) => async () => {
+                await restoreBit(supabase, c.bitId);
+                setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, c]));
+              }),
+            ),
+          () =>
+            allLegs(
+              snaps.map((c) => async () => {
+                const cur = cardsRef.current?.find((x) => x.bitId === c.bitId);
+                setCards((cs) => cs.filter((x) => x.bitId !== c.bitId));
+                try {
+                  await trashBit(supabase, c.bitId);
+                  if (cur) forget(cur.placementId);
+                } catch (e) {
+                  if (cur) setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, cur]));
+                  throw e;
+                }
+              }),
+            ),
+        )
+      : null;
     for (const c of chosen) {
-      trackRemove(
-        settled(c.placementId)
-          .then(async (id) => {
-            if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-          })
-          .then(() => trashBit(supabase, c.bitId))
-          .then(() => forget(c.placementId))
-          .catch((e) => {
-            if (isFlushRefused(e)) restore(c);
-            else handleRemoveFailure(c, e);
-          }),
-      );
+      const leg = settled(c.placementId)
+        .then(async (id) => {
+          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+        })
+        .then(() => trashBit(supabase, c.bitId))
+        .then(() => forget(c.placementId))
+        .catch((e) => {
+          failedLegs++;
+          if (entry && failedLegs === chosen.length) fail(entry);
+          if (isFlushRefused(e)) restore(c);
+          else handleRemoveFailure(c, e);
+        });
+      legs.push(leg);
+      trackRemove(leg);
     }
+    if (entry) entry.settled = Promise.allSettled(legs); // ↶ waits for the gesture to land (D6)
   }
 
   return { unplaceSelected, trashSelected, bulkUnplace, bulkTrash };

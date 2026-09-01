@@ -194,7 +194,8 @@ export function BoardSurface({
     void p.finally(() => removesInFlight.current.delete(p));
   };
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
-    supabase, cards, selectedIds, setCards, clearSelection,
+    supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
+    selectedIds, setCards, clearSelection,
     setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   });
 
