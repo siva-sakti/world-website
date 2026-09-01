@@ -13,5 +13,14 @@ Tap any bit or piece → its dated biography: caught March 12 · landed on [boar
 A board's view toggle: the same bits laid along a **time axis** (by when caught, or when they arrived on this board — pick one, probably arrived). Read-only rendering like the outline lens; placements untouched. Spec sketch: a third view mode beside canvas (and the outline), horizontal time axis, cards small.
 *(Siblings, not rivals — F-2 is one thought across surfaces; F-3 is one surface across time. Decide separately, later.)*
 
+## F-4 · The piece seen as a board *(the owner's — 2026-09-02)*
+A view of a composition **as a board**: everything it pulled in, spread spatially. The mirror of parked document-mode (a board read as flowing text); this is a piece read as space. *"Maybe there's something cool there."* Spec sketch: a view toggle on the piece; its pulled-in bits as cards; read-only v1 (arranging them = a real board, which "make this a board" could mint).
+
+## F-5 · "Make this a bit" from inside writing *(from the owner's paste principle — 2026-09-02)*
+Select anything in your writing → the deliberate catch act, performable mid-flow. The completion of the paste ruling: the composition never catches automatically (it's a saying surface); the deliberate act stays available everywhere.
+
+## The full cool-ideas list (owner-requested tracker — keep current)
+resurfacing (V2, F-1) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
+
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
