@@ -160,6 +160,7 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 
 ## ⭐ HANDOFF TO THE CODE WINDOW (owner-directed, 2026-09-03): three builds, safe now
 1. **Checklist formatting** (task-list extension, shared editor) — no schema · 2. **Table formatting** (table extension, same) — no schema · 3. **Generic FILE bit type** — schema CHECK + upload (generalize the pdf/audio machinery) + a card; migration-independent (bits stay bits).
+**The handoff is written for the code window: `editor-formatting-and-file-bit-plan.md` (repo root)** — full context, three builds, verification, the don't list. **Owner nuance folded in:** the checklist capability is formatting in the ONE shared editor, and the *choosing* is a **"+ checklist" door** on the board (births a pre-shaped text bit; subtype stamping deferred to the owner's vocabulary call).
 **⛔ Explicitly NOT yet:** anything touching note/composition behavior (floater · note-page block UX) — lands AFTER the storage migration, per sequencing.
 
 ## Open (only these)
