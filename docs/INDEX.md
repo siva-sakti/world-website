@@ -241,6 +241,8 @@ INDEX.md ................ this file — where everything is
 
 ## 8 · RESEARCH — findings don't expire with plans
 
+- **`research-block-editors.md`** — ⚪ the landing doc for the composition-surface research (Claude's 3-question mechanics agent + the owner's Notion feel-protocol). Folds into `composition-surface-spec.md` when both halves land.
+
 - **`research-knowledge-layer.md`** — tags, backlinks, forward-links, graph; the connector's binding model came from here. Reference at build time.
 - **`research-canvas.md`** — how canvas apps are built (JSON Canvas · tldraw · Heptabase · Excalidraw), marked ADOPT / SKIP.
 - ⚑ **Not yet run:** the **creative-frameworks round.** Diverge/converge landed and the owner asked for more of that caliber. Questions to be defined jointly first. → `product-concept-promise.md` §9.
