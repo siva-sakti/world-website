@@ -24,8 +24,14 @@ Select anything in your writing → the deliberate catch act, performable mid-fl
 **The interaction — never ask, never do it for them; the affordance WAITS:** pasted content carries a quiet hover/tap "make this a bit" forever · highlighted text gets it on the existing selection toolbar. No prompts, no interruption — the keeping-impulse often arrives later, and the act is sitting there when it does. Detection trivial (pasted ≠ pulled).
 **Three design points for enactment:** the selected text STAYS (never replaced by a chip — no mutating the writing); the minted bit is born already tied to its piece; source offered at minting (the intake pattern), skippable. **Owner refinements (2026-09-02, late):** minted-from-selection text gets a **subtle underline, toggleable off** (her mark: a whisper that "this text also lives as a bit"). **The minted bit's origin = the composition it was born from** — "made from [composition]," recorded automatically; not the external-source field. **⚠ Design once with EXCERPT** — both are "a bit born from inside something, remembering its parent."
 
+## F-6 · The board-peek on the composition *(the owner's — 2026-09-03; the true content of the "board-connection itch")*
+**The want, finally located:** *"when I'm writing, I wanna be able to see my vision board — maybe multiple — in my composition surface, as opposed to the opposite."* The mirror of the floater: on the board, the board is big and typing small; here **typing is big, boards are small.** Same need, two postures — *either surface can host a small window of the other.*
+**Feasibility (against the owner's "too difficult" hedge):** a **read-only board-peek** is cheap — the board already renders at any zoom (camera + fit-to-content); small + locked + click-through-to-open is the board running small. **Editing both at once is the hard thing, and nobody wants it — glancing is the want.**
+**The ladder:** ① second browser window (today, legal, scaffolding) → ② **a board tab in the drawer** (read-only, fit-to-view — Claude's first-step lean) → ③ **floating board-peeks, multiple** (the true mirror). Coexist fine.
+**Sequencing:** composition-surface behavior → after the migration, with the floater. Filed so it can't slip.
+
 ## The full cool-ideas list (owner-requested tracker — keep current)
-resurfacing (V2, F-1) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
+resurfacing (V2, F-1) · board-peek on the composition (F-6) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
 
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
