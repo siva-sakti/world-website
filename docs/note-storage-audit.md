@@ -48,7 +48,7 @@ If notes move to live beside boards — one **surface** table, a `form` marker (
 
 ## 4 · What actually gates the migration — ONE narrow ruling
 
-Not flow/frame capability. Not the Notion session. Just: **do notes move into the board table (one `surface` table, `form: canvas|document`), or into their own table?** The column evidence leans hard to the first — a board's columns are a note's minus `body`/`source_id`, and `surfaces.ts` already declares the union the storage lacks. ⚪ **Owner rules.** *(Sub-question riding along: does a composition keep `source_id`? A caught thing has a "from"; a made thing may not.)*
+Not flow/frame capability. Not the Notion session. Just: **do notes move into the board table (one `surface` table, `form: canvas|document`), or into their own table?** The column evidence leans hard to the first — a board's columns are a note's minus `body`/`source_id`, and `surfaces.ts` already declares the union the storage lacks. ⚪ **Owner rules.** *(Sub-question since ANSWERED: source dropped — owner 2026-09-01, base spec §9b.)*
 
 ## 5 · 🔵 Claude's updated recommendation
 

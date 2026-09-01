@@ -10,7 +10,7 @@
 
 > ⭐ **THE NORTH STAR, the owner verbatim (2026-09-02):** *"**Notion, with Obsidian-like knowledge connection and graph capabilities** — is the ideal."* Notion's editing; Obsidian's fabric. Part 1 now holds the WHOLE ideal — base + capabilities — one picture. *(The capability detail worked out in `composition-surface-spec.md` is folded in as §1.10; that doc remains the working-out.)*
 
-**Word pins (be exact, always):** **composition** = the writing surface only (formerly "note") — never a board. **board** = board. **link** = a `[[` reference in writing. **tag** = a word-label — a different mechanism entirely.
+**Word pins (be exact, always):** **composition** = the writing surface only (formerly "note") — never a board. **board** = board. **a `[[` tie** = the in-writing reference — ⚠ deliberately NOT called "link": the lexicon (D-129, repo root) gives *link* exactly one live meaning — **the `link` bit type the other window shipped** — and keeps the relationship-sense dead. What Obsidian calls backlinks = our **"gathered into."** All placeholders until Q9. **tag** = a word-label — a different mechanism entirely.
 
 ## 1.1 What a composition is
 A **surface where you weave material into writing** — one made whole with a throughline. A peer of the board: the board arranges material in space; the composition weaves it into words. **Never material itself** — never loose, never in the inbox, never gatherable *as* a scrap. Born a composition, always a composition (no conversion, ever).
@@ -46,14 +46,14 @@ A placed composition appears as a card. ⚪ **its look: a door (title only) or a
 **Consequence: the board-backlink wrinkle dissolves** — boards receive no writing-links, so they need no "linked from"; placement is their relation and the canvas already shows it.
 - `[[` behavior: ✅ **opens by search — type, results come up — in two sections** (material · surfaces).
 - **backlinks: ✅ the FULL treatment** — a clickable backlink panel + **a graph view, the way Obsidian does it**. ⚪ **the graph's lines** — the owner: *"what are the lines — I'm not sure actually."* Parked for its own round (options/mocks, not argument). Dots almost certainly all three kinds; lines = links only vs. links+placements+shared-tags is the open choice.
-Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (placed) · a composition onto a board (the card) · a board onto a board (doorway). ⚪ Open cells: composition→composition · board→composition · what the `[[` picker offers · where backlinks show per target · whether the pull mixes all three kinds.
+Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (placed) · a composition onto a board (the card) · a board onto a board (doorway). ⚪ Open cells: composition→composition · what the `[[` picker offers · where backlinks show per target · whether the pull mixes all three kinds.
 
 ### 1.7a The sit-down agenda (nine cells, three questions each: makes sense? looks like? exists?)
 | bring → into | a composition | a board |
 |---|---|---|
 | a bit | ✅ chip (+ the full block, capability layer) | ✅ placed |
 | a composition | ⚪ a link-chip? its backlink? | ✅ the card (look ⚪) |
-| a board | ⚪ a door in the sentence? | ✅ doorway (UI dormant) |
+| a board | ❌ ruled out (the direction principle; a plain hyperlink stays legal) | ✅ doorway (UI dormant) |
 Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink surfaces (a bit has "gathered into"; a board needs a "linked from"?) · ⚪ the pull with three kinds.
 
 ## 1.10 The capabilities (the Notion half — summarized from `composition-surface-spec.md`)
@@ -68,15 +68,32 @@ Not material · not a container you place things ON (*"text-forward, like Notion
 ---
 
 # PART 2 · WHAT EXISTS TODAY (honest, short)
-A "note": a bit-row wearing `kind='note'` — architecturally material (public-default, gatherable-as-scrap, "loose"; the ~30-file seam — `note-storage-audit.md`). The editor: rich text + `[[` + drawer + save-guard, on its own page. The card on a board: a title-only door that navigates away. No floater, no panel, no deliberate board-door (paste births notes today — contradicting §1.2).
+A "note": a bit-row wearing `kind='note'` — architecturally material (public-default, gatherable-as-scrap, "loose"; the ~30-file seam — `note-storage-audit.md`). The editor: rich text + `[[` + drawer + save-guard, on its own page. The card on a board: **title + a faint body preview** (N3 — already *between* §1.6's two options; the mock chooses refinement, not direction), and tap navigates away. No floater, no panel, no deliberate compose door. **⭐ Paste and type-a-card ALREADY birth bits** (landed with N3, verified `use-create-doors.ts:120,458`) — §1.2's principle was independently already true in code; the checker caught Part 2 claiming otherwise. ⚪ reconcile at enactment: `model.md` flags notes lacking trash/archive UI in their room vs N1's built claim.
 
 # PART 3 · THE GAP → THE PLAN
 1. **Settle Part 1's ⚪ marks** (the fabric sit-down + Q1 storage shape + the card mock + naming).
-2. **The migration** (code window's lane, house method): the surface shape · repoint relations · the sweep — sketch in `note-storage-audit.md` + the superseded §8 below.
-3. **The board-side re-aim:** paste/type births bits · the deliberate compose door · the floater + panel + chain.
+2. **The migration** (code window's lane, house method): the surface shape · the full repoint list (reference.from · placement targets · tag_application · search_tsv/face · RLS · export · trash listing) · the sweep — base sketch in `note-storage-audit.md` §5; **a real enactment plan doc is owed before any build** (the checker: Part 3 as pointers is not buildable).
+3. **The board-side build:** ~~paste/type births bits~~ **already true in code** — what remains is ONLY the deliberate compose door + the floater + panel + chain. *(As previously written an engineer would have re-scoped done work.)*
 4. **Then the capability layer** (`composition-surface-spec.md`) on the corrected base.
 
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
 ## Open (only these)
 Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · **the words (Q9)**.
+
+---
+
+## Checker findings folded (independent audit, 2026-09-02 — full report in the session log)
+**Verdict: comprehensive-with-holes; NOT yet buildable.** Fixed same-day: the ghost §8 pointer · two false Part-2 claims (paste already births bits; the card already previews) · stale board-cell leftovers · the "link" word collision (D-129 shipped a `link` bit type — *link* is now TAKEN; Q9 tightens).
+**Owed before enactment (the author's debt):** the explicit **invariant map + full lifecycle trace** (gates 1–2, run and written — incl. what a chip shows when its target composition is *trashed*, what "loose" means post-migration) · floater mechanics + error states · frame-handoff (unsaved edits across floater→panel→page; the same composition open twice) · board-machinery parity (connectors · marquee · tidy-up on a composition's card) · the real migration plan doc.
+
+## ⚑ NEW owner questions (the checker's — it was barred from answering)
+| # | question |
+|---|---|
+| N1 | Existing notes were born `visibility='public'`. At migration: flip all to private, or keep stored values? |
+| N2 | The auto-filled date/time title: **written into** the row (a machine write to an owner field — collides with I-R1) or **shown** when blank, like a face? |
+| N3 | A composition that other writing ties to gets **trashed** — its chips elsewhere: frozen? greyed? gone? |
+| N4 | The floater/panel: the **full block toolkit** (slash menu, drag, tables) or the light editor, full kit page-only? |
+| N5 | On a **phone**, what do the floater and docked panel become? |
+| N6 | An **empty just-born composition**: evaporate like an empty bit, or persist under its stand-in title? |
+| N7 | Do **arrows (connectors)** get to point at a composition's card, like any other card? |
