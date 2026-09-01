@@ -10,6 +10,28 @@
 
 ---
 
+## ⭐ HOW WE WORK WITH THESE DOCS (the rules — owner-prompted 2026-09-01)
+
+**The owner's position:** *"I'm OK to have many documents, as long as we're tracking what is where and we are not redoing content — or creating new things just to spawn new things because I asked."* Many docs = fine. **Redundancy and reflex-spawning = not fine.**
+
+**The failure that actually happened** (audited 2026-09-01): not spawning-to-please — **13 of 16 docs here were explicitly requested.** The real fault: **Claude ADDS instead of REPLACING.** Three times the owner said a doc wasn't landing; three times Claude wrote a *new* doc at a *different altitude* rather than fixing the one that failed. Result: `convergent-surfaces-overview` (synthesis) → `composition-surface-spec` (spec) → `app-things-inventory` (concrete) — one picture, three files.
+
+### The five rules
+
+1. **REPLACE, DON'T ADD.** If the owner says a doc isn't landing, **fix or rewrite that doc.** A different altitude is not a new document — it is that document, written better. Adding a layer is the failure mode, not the fix.
+2. **A request for CONTENT is not a request for a FILE.** *"What are the actual things I need to see"* asks for an answer, not a new `.md`. Default: write into the doc that owns the question.
+3. **Name the home before writing.** Before any new doc, state in one line: *what does this hold that no existing doc does?* If that line is hard to write, it isn't a new doc.
+4. **Two docs per topic, maximum: the ANSWER and the REASONING.** One doc says what we're doing; one holds why, including the trail. **Three altitudes on one subject is always a merge waiting to happen.**
+5. **Every new doc gets its INDEX row in the same commit** — and any doc it supersedes gets marked here in that same commit, never later.
+
+### Where a thing goes — the routing test
+- *what are we building?* → **`app-things-inventory.md`** (the concrete list, kept current)
+- *why / what's still open?* → the topic doc that owns it (`product-concept-*`)
+- *what's next?* → **`product-concept-queue.md`**
+- *where is anything?* → **this file**
+- *a finding with sources* → a `research-*.md` (findings don't expire with plans)
+- **anything else → an existing doc, until rule 3's line is easy to write**
+
 ## 🔎 "I'm looking for…" — straight to the answer
 
 | I want to know… | go to |
