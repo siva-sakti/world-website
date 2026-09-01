@@ -10,6 +10,21 @@
 
 ---
 
+## 00 · ⭐ THE TOP-DOWN PICTURE (the owner's rethink, 2026-09-01) — read before everything
+
+**Why things felt tangled:** four questions at four layers were open at once, all wearing the word "note." Untangled:
+
+| layer | the question | state | moves when |
+|---|---|---|---|
+| **1 · concept** | what IS a composition? | 🟢 near-ruled: **a different LAYER of the creative process — the convergent one. Not on par with bits** (the owner, repeatedly). Taggable ✅ · folderable ✅ · placeable on boards ✅ — all already true today | needs saying once, on purpose |
+| **2 · links** | what can reference what? | 🟡 **composition→bit built both ways.** ⚪ **composition→composition UNDECIDED — and it is the Obsidian primitive** (in Obsidian the whole fabric is note→note; we filed our equivalent as an edge case all week). comp→board ❌ small (A15) · comp→source ❌ small | one-line rulings each — **next** |
+| **3 · capability** | what can you DO in one? | 🟡 spec'd (`composition-surface-spec.md`); waits on ⚑ the owner's Notion feel-session | after the session |
+| **4 · storage** | where does it live in the DB? | 🟠 the other window's thread: a note is a text bit wearing a label (true; **5 occurrences in 3 files, 2 bugs, both fixed/cheap** — small seam, not sprawl). D-121 made this bet deliberately | **LAST — once 1–3 settle, aimed at a known target, once.** The other window's own conclusion too |
+
+**The fabric, plainly:** a reference is one row — *"this writing reached for that thing."* The `[[` chip is the forward link · "gathered into" is the backlink · the graph reads the rows · **placement is the fabric's other half** (linking by space instead of by writing).
+
+**The way forward: rule top-down, build bottom-up.** Say the layer-1 sentence → rule the link cells (esp. comp→comp) → capabilities per spec → storage decides itself last. Bugs from the storage seam get fixed locally, never with a migration.
+
 ## 0 · ⚠⚠ READ THIS FIRST — an independent stress-test (2026-09-01) challenges most of what follows
 
 Full findings + sources: **`convergent-surfaces-stress-test.md`**. Headline:
