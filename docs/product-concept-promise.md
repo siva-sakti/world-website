@@ -271,6 +271,18 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 3. **The artifact map is complete:** statement/essay/script → doc · tracker/list-of-work → sheet · deck/lookbook/portfolio → deck. No orphans found (a one-pager = a one-slide deck).
 4. **Fits D-121 without surgery:** three kinds of composition, fixed at birth, never converted — Google's model too.
 
+### 🟡 WHERE THE OWNER LANDED FOR TONIGHT (2026-08-31, end of the session — MID-DISCUSSION, not complete)
+
+**The build lean** (lean, not ruling): **① Notion-like capability on the composing surface first** — real blocks, tables, checklists; the doc made genuinely capable. **② Then, maybe, the Figma/Canva-like frame surface** for presentations. *"At least we would need all of the functionality"* — the bar per surface is *actually usable*, not a gesture.
+
+**The identity evolution — the north star grows for the first time since it was set.** The project's original north star (D-053) was *"Obsidian, but an interactive canvas."* The owner tonight: *"first I was architecting like Obsidian — backlinks and all of that, and that's cool to me — but now I'm like, oh, THAT PLUS MORE would be helpful, is essential."*
+
+> **The Obsidian fabric (links · backlinks · graph) doesn't go away — it's what the new surfaces sit ON.** Every doc still gathers and backlinks; every deck still draws from the board. The linking layer was never the whole identity; it was the connective tissue waiting for more organs. **New working statement of the whole: the link fabric + the free board (diverge) + the formatted surfaces (converge).**
+
+**⚑ Explicitly incomplete — the owner: *"this doesn't feel complete, we're in the middle of discussing this."* Still open when this resumes:** whether the whole shape is ruled at all · the sheet's place (third surface vs a block that grows) · deck interiors as mini-boards (🔵) · every word (flow · frame · doc · deck — step 2b) · the choosing moment beyond templates · and the doc-first lean itself.
+
+*(Housekeeping note: this file has grown past its best size; today's convergence thread deserves its own doc when the discussion settles — noted, deliberately not done mid-stream.)*
+
 ### ⭐⭐ THE JOINT — two composition types, riding the two mechanics we already have (owner's insight, 2026-08-31)
 
 **The owner closed the project's original circle.** The first question of this whole inquiry was *"should a board be gatherable into a note inline?"* — and it kept resisting an answer. **It was a membership question asked before the container was defined**: with only one thin convergent surface, "inline or side-by-side?" had no stable answer. The owner: *"that whole question about how to construct the compositional surface led to this inquiry… things can flow in and be linked, or just be side-by-side… maybe that's two types of composition surfaces — the Figma-like presentation one, and the more [flow]-based one."*
