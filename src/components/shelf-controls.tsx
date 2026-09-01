@@ -58,8 +58,21 @@ export function GroupPicker({
   );
 }
 
-/** The ★/☆ pin toggle (O1) — shared by the card, the row, and the pages. */
-export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean }) {
+/** The ★/☆ pin toggle (O1) — shared by the card, the row, and the pages.
+ *  `greetsHome` tells the truth about what starring THIS thing does: home's desk
+ *  lists surfaces (boards + notes), so a starred NOTE greets you there, while a
+ *  starred BIT only floats to the top of /bits. The tooltip used to promise the
+ *  desk in both cases (flow review F5). Whether a starred bit *should* reach the
+ *  desk is an open model question for the owner — recorded, not decided here. */
+export function PinToggle({
+  bitId,
+  pinned,
+  greetsHome = false,
+}: {
+  bitId: string;
+  pinned: boolean;
+  greetsHome?: boolean;
+}) {
   const [supabase] = useState(() => createClient());
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -68,7 +81,15 @@ export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean })
     <button
       className={`shelf-pin${failed ? " text-red-700" : ""}`}
       disabled={busy}
-      title={failed ? "that didn't save — click to try again" : pinned ? "no longer alive" : "mark alive — it greets you on home"}
+      title={
+        failed
+          ? "that didn't save — click to try again"
+          : pinned
+            ? "no longer alive"
+            : greetsHome
+              ? "mark alive — it greets you on home"
+              : "mark alive — it floats to the top of your bits"
+      }
       onClick={async () => {
         setBusy(true);
         setFailed(false);

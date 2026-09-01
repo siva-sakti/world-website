@@ -61,10 +61,10 @@ export default async function GroupPage({
       </section>
 
       <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">notes</h2>
+        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">bits &amp; notes</h2>
         {bits.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            No notes in this folder — pick this folder on a note.
+            Nothing else in this folder — pick this folder on a bit or a note.
           </p>
         ) : (
           <GroupNotes items={bits} imgs={imgs} boards={allBoards} groups={groups} />

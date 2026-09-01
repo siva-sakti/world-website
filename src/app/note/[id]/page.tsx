@@ -50,7 +50,7 @@ export default async function NotePage({
     <main className="mx-auto max-w-2xl px-6 py-10">
       {/* Action bar — everything that ISN'T writing (owner: never in the writing). */}
       <div className="note-actions">
-        <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} />
+        <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} greetsHome />
         <PlaceOnBoard bitId={b.id} boards={otherBoards} />
         <span className="note-actions-spacer" />
         <ArchiveButton thing="bit" id={b.id} returnTo="/" />
