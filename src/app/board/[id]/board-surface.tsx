@@ -191,16 +191,21 @@ export function BoardSurface({
       dragStart.current = null;
     }
   }
+  // The map above is keyed by BIT id (see the comment there) — so every reader must
+  // translate the incoming placementId to its card's bitId first. R1 changed the keys
+  // and missed the readers: starts.has(placementId) was always false, and multi-select
+  // drag silently moved only the grabbed card (senior review, 2026-09-01).
   function onCardDragMove(placementId: string, x: number, y: number) {
     const starts = dragStart.current;
-    if (!starts || !starts.has(placementId)) return;
-    const s = starts.get(placementId)!;
+    const dragged = cards.find((c) => c.placementId === placementId);
+    if (!starts || !dragged || !starts.has(dragged.bitId)) return;
+    const s = starts.get(dragged.bitId)!;
     const dx = x - s.x;
     const dy = y - s.y;
     setCards((cs) =>
       cs.map((c) => {
-        if (c.placementId === placementId || !starts.has(c.placementId)) return c; // dragged card + non-selected: untouched
-        const p0 = starts.get(c.placementId)!;
+        if (c.placementId === placementId || !starts.has(c.bitId)) return c; // dragged card + non-selected: untouched
+        const p0 = starts.get(c.bitId)!;
         return { ...c, x: p0.x + dx, y: p0.y + dy };
       }),
     );
@@ -208,13 +213,14 @@ export function BoardSurface({
   function onCardDragEnd(placementId: string, x: number, y: number) {
     const starts = dragStart.current;
     dragStart.current = null;
-    if (!starts || !starts.has(placementId)) return; // single drag: the card's own onChange persisted it
-    const s = starts.get(placementId)!;
+    const dragged = cards.find((c) => c.placementId === placementId);
+    if (!starts || !dragged || !starts.has(dragged.bitId)) return; // single drag: the card's own onChange persisted it
+    const s = starts.get(dragged.bitId)!;
     const dx = x - s.x;
     const dy = y - s.y;
     for (const c of cards) {
-      if (c.placementId === placementId || !starts.has(c.placementId)) continue;
-      const p0 = starts.get(c.placementId)!;
+      if (c.placementId === placementId || !starts.has(c.bitId)) continue;
+      const p0 = starts.get(c.bitId)!;
       patchCard(c.placementId, c.bitId, { x: p0.x + dx, y: p0.y + dy }); // per-card independent save
     }
   }
