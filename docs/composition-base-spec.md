@@ -133,6 +133,11 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 - **board↔board seeing-side, answered:** shows today only as the doorway card on the holding board; the reverse shows nowhere. Natural spots if wanted: the held board's header ("held by: …") or the outline lens. **Parked WITH the dormant doorway UI** — design the seeing with the doorway, not before.
 - **A piece on multiple boards, answered:** placements, exactly like bits — N boards, each card independent (own position), un-place one leaves the rest, born on the birth-board, more from its page; the hide-pieces toggle is per board.
 
+## ⭐ THE SILENT BIT-HOOD RULE + THE BACKWARDS CHECK (2026-09-02, late)
+**The design rule (from the owner's "annoying for everything to be bit-shaped" worry):** in the writing, a pulled-in thing **looks like normal content** — an image is an image, a quote reads as a quote; **bit-hood is silent until summoned** (tap/hover → source · tags · life). Annoyance = ceremony; there is none. Docs-calm, superpowers on demand.
+**⚑ The open cell the worry exposed:** content **pasted fresh** into writing (an image dropped straight in, never from your world) — does the composition *catch* it as a bit (one class of content; the bits room slowly gains one-off images, managed by filters — Claude's lean, quietly-yes) or is it mere document content (lighter; two classes of image, one dead)? The board's parallel is ruled ("the board catches material"); the composition's isn't. For the walk.
+**The backwards check (all cardinalities):** every relation many-to-many EXCEPT two deliberate singulars — **one folder per thing** · **one source per bit**. Mutual piece↔piece reference allowed (two pointers); self-reference already constraint-blocked. **🆕 Found by the check: no guard stops a board holding a doorway to ITSELF** — absurd, harmless while the UI is dormant, added to the enactment list for a constraint.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
