@@ -25,6 +25,9 @@ export function useBoardActs(deps: {
   clearSelection: () => void;
   setEditingId: Dispatch<SetStateAction<string | null>>;
   settled: (placementId: string) => Promise<string>;
+  // Drop a removed card's queued writes once the removal LANDS — a restored patch
+  // (F3) must not outlive its card and teleport it after a later call-in (F3e).
+  forget: (placementId: string) => void;
   setLooseRefresh: Dispatch<SetStateAction<number>>;
   onErr: (e: unknown) => void;
   // Evaporate's contract reaches the remove acts (R1.3a): a NEVER-had-content
@@ -34,7 +37,7 @@ export function useBoardActs(deps: {
 }) {
   const {
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   } = deps;
 
   // The evaporate-instead-of-remove path: drop the card from state and abort the bit
@@ -76,7 +79,10 @@ export function useBoardActs(deps: {
     setEditingId(null);
     settled(placementId)
       .then((id) => unplaceBit(supabase, id))
-      .then(() => setLooseRefresh((n) => n + 1)) // loose again — only once it's TRUE
+      .then(() => {
+        forget(placementId); // the card is gone — drop any queued/restored writes for it
+        setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
+      })
       .catch((e) => snap && handleRemoveFailure(snap, e));
   }
 
@@ -100,6 +106,7 @@ export function useBoardActs(deps: {
     setEditingId(null);
     settled(placementId)
       .then(() => trashBit(supabase, bitId))
+      .then(() => forget(placementId))
       .catch((e) => snap && handleRemoveFailure(snap, e));
   }
 
@@ -129,6 +136,7 @@ export function useBoardActs(deps: {
       settled(c.placementId)
         .then((id) => unplaceBit(supabase, id))
         .then(() => {
+          forget(c.placementId);
           landed++;
           if (landed === 1) setLooseRefresh((n) => n + 1);
           done();
@@ -168,6 +176,7 @@ export function useBoardActs(deps: {
     for (const c of chosen) {
       settled(c.placementId)
         .then(() => trashBit(supabase, c.bitId))
+        .then(() => forget(c.placementId))
         .catch((e) => handleRemoveFailure(c, e));
     }
   }

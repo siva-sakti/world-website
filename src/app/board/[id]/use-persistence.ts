@@ -88,12 +88,51 @@ export function usePersistence(
           await reconcileReferences(supabase, p.bitId, extractRefIds(p.body));
         }
       })
-      .catch(onErr);
+      .catch((e) => {
+        // The patch was captured-at-fire and deleted, so a failure used to strand
+        // the change in React state forever while the banner said "your work is
+        // still here" (review F3). Put it BACK so the next edit — or the flushAll
+        // when you leave the board / the tab hides — writes it. Keyed by realId:
+        // the optimistic id may have been reconciled away.
+        restorePending(realId, p);
+        onErr(e);
+      });
     chains.current.set(realId, tail);
     void tail.finally(() => {
       if (chains.current.get(realId) === tail) chains.current.delete(realId);
     });
     await tail;
+  }
+
+  /** Put a FAILED patch back into `pending` so a later flush retries it. Field-level
+   *  merge with the CURRENT entry winning: anything already pending was scheduled
+   *  after this patch was captured, so it is genuinely newer. (Safe because no call
+   *  site ever patches x without y — a mixed old-x/new-y position can't arise.)
+   *  Deliberately does NOT re-arm a timer: an offline board would become a request
+   *  storm re-firing the error banner every 350ms. The natural retry points are the
+   *  next edit to this card and flushAll. */
+  function restorePending(key: string, p: { bitId: string; placement: PlacementPatch; body?: string }) {
+    const cur = pending.current.get(key);
+    if (!cur) {
+      pending.current.set(key, p);
+      return;
+    }
+    cur.placement = { ...p.placement, ...cur.placement };
+    if (cur.body === undefined && p.body !== undefined) cur.body = p.body;
+  }
+
+  /** Drop everything queued for a card — called by the remove acts once the removal
+   *  LANDS. Without it a restored patch could outlive the card: un-place it, call it
+   *  back in later (callInBit's revive rewrites position), and a stale flush would
+   *  teleport it to where it used to be. */
+  function forget(placementId: string) {
+    const key = renamed.current.get(placementId) ?? placementId;
+    for (const k of new Set([placementId, key])) {
+      const t = timers.current.get(k);
+      if (t) clearTimeout(t);
+      timers.current.delete(k);
+      pending.current.delete(k);
+    }
   }
 
   // Re-point a card's in-flight persistence from its optimistic id to the real one.
@@ -138,7 +177,9 @@ export function usePersistence(
    *  the snapshot, the await misses exactly the write it exists to include). */
   function flushAll(): Promise<void> {
     const fired: Promise<void>[] = [];
-    for (const id of [...timers.current.keys()]) {
+    // timers ∪ pending: a RESTORED patch (review F3) has no timer by design, so a
+    // timers-only sweep would never retry the very writes this exists to rescue.
+    for (const id of new Set([...timers.current.keys(), ...pending.current.keys()])) {
       const t = timers.current.get(id);
       if (t) clearTimeout(t);
       fired.push(flush(id));
@@ -154,5 +195,5 @@ export function usePersistence(
     return Promise.allSettled([...creates.current.values()]).then(() => {});
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush, flushAll, pendingCreates };
+  return { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow: flush, flushAll, pendingCreates };
 }

@@ -74,7 +74,7 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow, flushAll, pendingCreates } =
+  const { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow, flushAll, pendingCreates } =
     usePersistence(supabase, setCards, onErr);
 
   // Don't lose a move or a keystroke to the 350ms debounce. One stable door to
@@ -156,7 +156,7 @@ export function BoardSurface({
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {
