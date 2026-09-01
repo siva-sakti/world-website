@@ -104,6 +104,12 @@ Not material · not a container you place things ON (*"text-forward, like Notion
 A "note": a bit-row wearing `kind='note'` — architecturally material (public-default, gatherable-as-scrap, "loose"; the ~30-file seam — `note-storage-audit.md`). The editor: rich text + `[[` + drawer + save-guard, on its own page. The card on a board: **title + a faint body preview** (N3 — already *between* §1.6's two options; the mock chooses refinement, not direction), and tap navigates away. No floater, no panel, no deliberate compose door. **⭐ Paste and type-a-card ALREADY birth bits** (landed with N3, verified `use-create-doors.ts:120,458`) — §1.2's principle was independently already true in code; the checker caught Part 2 claiming otherwise. ⚪ reconcile at enactment: `model.md` flags notes lacking trash/archive UI in their room vs N1's built claim.
 
 # PART 3 · THE GAP → THE PLAN
+
+## ⭐ THE THREE TIERS (owner's criticality triage, 2026-09-03 — the enactment plan lives by this line)
+**T1 · the functional floor:** the migration · a real document (headings/lists/checklists/tables — editor work part-handed-off) · pulling-in + piece↔piece `[[` · list/page/cards. *Functional = T1 alone.*
+**T2 · the identity:** the floater + panel ("part of our entire thing") · auto-place · the distinct card · the hide toggle · silent bit-hood · the drawer's in-this-piece tab. *The product = T1+T2.*
+**T3 · the shelf:** all F-features incl. the board-peek (F-6 — owner: *"doesn't seem like the most critical feature"*, correctly). *Never blocks anything.*
+
 1. **Settle Part 1's ⚪ marks** (the fabric sit-down + Q1 storage shape + the card mock + naming).
 2. **The migration** (code window's lane, house method): the surface shape · the full repoint list (reference.from · placement targets · tag_application · search_tsv/face · RLS · export · trash listing) · the sweep — base sketch in `note-storage-audit.md` §5; **a real enactment plan doc is owed before any build** (the checker: Part 3 as pointers is not buildable).
 3. **The board-side build:** ~~paste/type births bits~~ **already true in code** — what remains is ONLY the deliberate compose door + the floater + panel + chain. *(As previously written an engineer would have re-scoped done work.)*
