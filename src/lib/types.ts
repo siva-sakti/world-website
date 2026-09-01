@@ -1,6 +1,6 @@
 // Row + view types matching supabase/migrations/20260721000001_init.sql (the
 // proven schema). Hand-written; can be replaced with `supabase gen types` later.
-// The eight record kinds live in three families (agreements §7); v1 UI touches
+// The nine record kinds live in three families (agreements §7; source joined at D-102); v1 UI touches
 // bit · board · placement directly and reads the board_cards / home views.
 
 export type Visibility = "public" | "private"; // "shared" joins later (§2a)
@@ -25,8 +25,8 @@ export type Bit = {
   content: string | null; // owner-authored words; on a text bit, the optional title (D-087)
   body: string | null; // a text bit's rich-text words
   strokes: Stroke[] | null; // a drawing's vectors
-  url: string | null; // a bookmark's saved URL
-  captured_title: string | null; // a bookmark's page title, read once (§2b)
+  url: string | null; // a LINK bit's substance (D-129 revived the D-102-dormant column)
+  captured_title: string | null; // a link's page title, read once at save (§2b)
   storage_path: string | null;
   thumb_path: string | null;
   media_width: number | null;
@@ -102,6 +102,7 @@ export type BoardCard = {
   storage_path: string | null;
   thumb_path: string | null;
   target_visibility: Visibility | null;
+  source_id: string | null; // the source row's id (the view exposes it beside the name)
   source_name: string | null; // "from …" — the bit's source travels with it (P8)
   source_url: string | null; // the source's optional clickable link
 };

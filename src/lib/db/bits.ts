@@ -359,6 +359,8 @@ export async function restoreBit(
  *  tag applications, gather ties both ways, and travel. Guarded to `deleted_at IS
  *  NOT NULL`: a live bit can never be destroyed, even if this is mis-called. */
 export async function destroyBit(supabase: SupabaseClient, bitId: string): Promise<void> {
+  // Best-effort media cleanup: a failed READ here only skips object removal (an
+  // orphaned file, not lost data) — the row delete below still proceeds.
   const { data } = await supabase
     .from("bit")
     .select("storage_path, thumb_path")
@@ -378,8 +380,9 @@ export async function destroyBit(supabase: SupabaseClient, bitId: string): Promi
 
 /** One bit for its page — null if missing or trashed. */
 export async function getBit(supabase: SupabaseClient, id: string): Promise<Bit | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("bit").select("*").eq("id", id).eq("state", "live").maybeSingle();
+  if (error) throw error; // a network blip must not read as "no bit" (a false 404)
   return (data as Bit) ?? null;
 }
 
@@ -414,6 +417,18 @@ export async function getBitTravel(
   return (data ?? []) as BitTravelLeg[];
 }
 
+/** Every live NOTE (kind='note'), recently-edited first — the home list's read. */
+export async function listNotes(supabase: SupabaseClient): Promise<Bit[]> {
+  const { data, error } = await supabase
+    .from("bit")
+    .select("*")
+    .eq("kind", "note")
+    .eq("state", "live")
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Bit[];
+}
+
 /** Raw per-bit fields the board_cards view doesn't expose: `content` (the title
  * editor needs the raw column, not the computed face) and `kind` (so a placed NOTE
  * renders as a doorway, not editable text — N3). One indexed query for the board. */
@@ -423,7 +438,8 @@ export async function getBitMeta(
 ): Promise<Map<string, { content: string | null; kind: "bit" | "note" }>> {
   const out = new Map<string, { content: string | null; kind: "bit" | "note" }>();
   if (!ids.length) return out;
-  const { data } = await supabase.from("bit").select("id, content, kind").in("id", ids);
+  const { data, error } = await supabase.from("bit").select("id, content, kind").in("id", ids);
+  if (error) throw error; // a failed read must not silently render notes as editable text (kind fallback)
   for (const b of data ?? [])
     out.set(b.id as string, {
       content: (b.content as string | null) ?? null,

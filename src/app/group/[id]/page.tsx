@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
 import { listAllBits } from "@/lib/db/inbox";
-import { listGroups } from "@/lib/db/shelf";
+import { listGroups, getGroup } from "@/lib/db/shelf";
 import { signThumbs } from "@/lib/storage";
 import { boardLabel } from "@/lib/labels";
 import { GroupNotes } from "./group-notes";
@@ -21,17 +21,13 @@ export default async function GroupPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: group, error } = await supabase
-    .from("shelf_group")
-    .select("id, name")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw error;
+  const group = await getGroup(supabase, id);
   if (!group) notFound();
 
-  const boards = (await listBoards(supabase)).filter((b) => b.group_id === id);
+  const boardsAll = await listBoards(supabase); // once — the page needs both views of it
+  const boards = boardsAll.filter((b) => b.group_id === id);
   const bits = (await listAllBits(supabase)).filter((b) => b.group_id === id);
-  const allBoards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
+  const allBoards = boardsAll.map((b) => ({ id: b.id, title: b.title }));
   const groups = await listGroups(supabase);
 
   const imgs = await signThumbs(supabase, bits);

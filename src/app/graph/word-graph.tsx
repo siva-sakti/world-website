@@ -32,9 +32,12 @@ export function WordGraph({ nodes, links }: { nodes: GraphNode[]; links: GraphLi
   const [dims, setDims] = useState({ w: 800, h: 560 });
   const [hovered, setHovered] = useState<string | null>(null);
 
+  const [loadErr, setLoadErr] = useState(false);
   useEffect(() => {
     let alive = true;
-    import("react-force-graph-2d").then((m) => alive && setFG(() => m.default));
+    import("react-force-graph-2d")
+      .then((m) => alive && setFG(() => m.default))
+      .catch(() => alive && setLoadErr(true)); // a failed chunk-load must not spin "loading" forever
     return () => {
       alive = false;
     };
@@ -74,6 +77,7 @@ export function WordGraph({ nodes, links }: { nodes: GraphNode[]; links: GraphLi
 
   return (
     <div ref={wrapRef} className="graph-canvas">
+      {loadErr && <p className="p-4 text-sm text-neutral-500">Couldn&rsquo;t load the graph — reload the page.</p>}
       {FG && (
         <FG
           ref={fgRef}

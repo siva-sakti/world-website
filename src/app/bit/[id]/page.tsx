@@ -12,6 +12,7 @@ import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
+import { hostOf } from "@/lib/page-meta";
 import { fmt } from "@/lib/dates";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
 import { TagBar } from "@/app/board/[id]/tag-bar";
@@ -116,7 +117,7 @@ export default async function BitPage({
 
       {/* The bit itself — a workspace for text (editable rich text, rendered
           through the tiptap pipeline so links/chips render — finding #6); media
-          stays read-only for now. Bookmark is retired (D-102), so no such branch.
+          stays read-only for now; a LINK shows its card + open-↗ (D-129).
           .page-editor = the comfortable document treatment (plan v1.2). */}
       <div className="mt-6">
         {b.type === "text" && (
@@ -143,7 +144,7 @@ export default async function BitPage({
                 >
                   open the page ↗
                 </a>
-                <span className="ml-3 text-neutral-400">{new URL(b.url).hostname.replace(/^www\./, "")}</span>
+                <span className="ml-3 text-neutral-400">{hostOf(b.url)}</span>
               </p>
             )}
           </div>

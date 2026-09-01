@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { listBoards } from "@/lib/db/boards";
 import { listGroups } from "@/lib/db/shelf";
-import type { Bit } from "@/lib/types";
+import { listNotes } from "@/lib/db/bits";
 import { toSurfaces } from "@/lib/surfaces";
 import { DeskAlive } from "./desk-alive";
 import { HomeSurfaces } from "./home-surfaces";
@@ -15,14 +15,7 @@ export default async function Home() {
   const supabase = await createClient();
   const boards = await listBoards(supabase);
   const groups = await listGroups(supabase);
-  const { data: noteRows, error } = await supabase
-    .from("bit")
-    .select("*")
-    .eq("kind", "note")
-    .eq("state", "live")
-    .order("updated_at", { ascending: false });
-  if (error) throw error;
-  const notes = (noteRows ?? []) as Bit[];
+  const notes = await listNotes(supabase);
 
   const surfaces = toSurfaces(boards, notes);
   const alive = surfaces

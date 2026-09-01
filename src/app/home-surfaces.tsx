@@ -73,14 +73,18 @@ export function HomeSurfaces({
   }
   const showBody = deskEmpty || !collapsed;
 
+  const [actErr, setActErr] = useState<string | null>(null);
   async function act(fn: () => Promise<unknown>) {
     if (busy) return;
     setBusy(true);
+    setActErr(null);
     try {
       await fn();
       router.refresh();
     } catch (e) {
       console.error(e);
+      // A failed pin/folder/duplicate must be VISIBLE — the busy flag releasing is not feedback.
+      setActErr("Couldn't save that — check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -324,6 +328,14 @@ export function HomeSurfaces({
 
   return (
     <div>
+      {actErr && (
+        <p className="mb-3 text-sm text-red-700" role="status">
+          {actErr}{" "}
+          <button className="underline" onClick={() => setActErr(null)}>
+            ok
+          </button>
+        </p>
+      )}
       <div className="mb-4 border-t border-neutral-100 pt-6">
         <button
           onClick={toggleCollapsed}

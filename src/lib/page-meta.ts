@@ -223,6 +223,16 @@ export async function fetchImageBlob(
   }
 }
 
+/** The site's display name for a URL — hostname minus www, GUARDED (a malformed stored
+ * url must never throw mid-render). The one shared copy (card strip · bit page · meta). */
+export function hostOf(url: string | null | undefined): string {
+  try {
+    return url ? new URL(url).hostname.replace(/^www\./, "") : "";
+  } catch {
+    return "";
+  }
+}
+
 /** Normalize what the owner pasted into a savable URL (adds https:// if missing). */
 export function normalizeUrl(raw: string): string {
   const t = raw.trim();

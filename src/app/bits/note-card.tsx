@@ -23,32 +23,38 @@ export function GroupPicker({
 }) {
   const [supabase] = useState(() => createClient());
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const router = useRouter();
   async function run(fn: () => Promise<unknown>) {
     setBusy(true);
+    setFailed(false);
     try {
       await fn();
       router.refresh();
     } catch (e) {
       console.error(e);
+      setFailed(true); // visible — a silent busy-release is not feedback
     } finally {
       setBusy(false);
     }
   }
   return (
-    <FolderPicker
-      value={groupId}
-      groups={groups}
-      busy={busy}
-      title="which folder"
-      onPick={(gid) => run(() => setBitGroup(supabase, bitId, gid))}
-      onNew={(name) =>
-        run(async () => {
-          const g = await createGroup(supabase, name);
-          await setBitGroup(supabase, bitId, g.id);
-        })
-      }
-    />
+    <>
+      <FolderPicker
+        value={groupId}
+        groups={groups}
+        busy={busy}
+        title="which folder"
+        onPick={(gid) => run(() => setBitGroup(supabase, bitId, gid))}
+        onNew={(name) =>
+          run(async () => {
+            const g = await createGroup(supabase, name);
+            await setBitGroup(supabase, bitId, g.id);
+          })
+        }
+      />
+      {failed && <span className="text-xs text-red-700" title="that folder change didn't save — try again">failed</span>}
+    </>
   );
 }
 
@@ -56,19 +62,22 @@ export function GroupPicker({
 export function PinToggle({ bitId, pinned }: { bitId: string; pinned: boolean }) {
   const [supabase] = useState(() => createClient());
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const router = useRouter();
   return (
     <button
-      className="shelf-pin"
+      className={`shelf-pin${failed ? " text-red-700" : ""}`}
       disabled={busy}
-      title={pinned ? "no longer alive" : "mark alive — it greets you on home"}
+      title={failed ? "that didn't save — click to try again" : pinned ? "no longer alive" : "mark alive — it greets you on home"}
       onClick={async () => {
         setBusy(true);
+        setFailed(false);
         try {
           await pinBit(supabase, bitId, !pinned);
           router.refresh();
         } catch (e) {
           console.error(e);
+          setFailed(true); // visible — a silent busy-release is not feedback
         } finally {
           setBusy(false);
         }

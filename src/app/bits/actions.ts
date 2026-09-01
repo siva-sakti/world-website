@@ -10,11 +10,31 @@ import { anchorNearContent, pointForIndex } from "./placement-anchor";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, fetchImageBlob, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
+import { textToParagraphs } from "@/lib/html";
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+/** The ONE link-substance fetch (both link doors — intake + board paste): read-once
+ * meta, then the stored copy of the page-card image. Best-effort — a failed fetch or
+ * upload only means a plainer card, never a blocked capture. */
+async function fetchLinkSubstance(
+  supabase: Parameters<typeof createLinkBit>[0],
+  bitId: string,
+  url: string,
+): Promise<{ title: string | null; thumbPath: string | null }> {
+  const meta = await fetchPageMeta(url);
+  let thumbPath: string | null = null;
+  if (meta?.image) {
+    const img = await fetchImageBlob(meta.image);
+    if (img) {
+      const path = `thumbs/${bitId}.jpg`;
+      try {
+        await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
+        thumbPath = path;
+      } catch (e) {
+        console.error("link thumb upload failed (plainer card):", e);
+      }
+    }
+  }
+  return { title: meta?.title ?? null, thumbPath };
 }
 
 export type IntakeInput = {
@@ -45,22 +65,11 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
   try {
     if (isLink) {
       const url = normalizeUrl(note);
-      const meta = await fetchPageMeta(url);
-      if (meta?.image) {
-        const img = await fetchImageBlob(meta.image);
-        if (img) {
-          const path = `thumbs/${bitId}.jpg`;
-          try {
-            await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
-            thumbPath = path;
-          } catch (e) {
-            console.error("link thumb upload failed (plainer card):", e);
-          }
-        }
-      }
-      await createLinkBit(supabase, { bitId, url, capturedTitle: meta?.title ?? null, thumbPath });
+      const sub = await fetchLinkSubstance(supabase, bitId, url);
+      thumbPath = sub.thumbPath;
+      await createLinkBit(supabase, { bitId, url, capturedTitle: sub.title, thumbPath });
     } else {
-      const inner = note.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+      const inner = textToParagraphs(note);
       const body = input.asQuote ? `<blockquote>${inner}</blockquote>` : inner;
       await createLooseTextBit(supabase, { bitId, body });
     }
@@ -159,20 +168,9 @@ export async function captureLink(
   const url = normalizeUrl(rawUrl);
   let thumbPath: string | null = null;
   try {
-    const meta = await fetchPageMeta(url);
-    if (meta?.image) {
-      const img = await fetchImageBlob(meta.image);
-      if (img) {
-        const path = `thumbs/${bitId}.jpg`;
-        try {
-          await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
-          thumbPath = path;
-        } catch (e) {
-          console.error("captureLink thumb upload failed (plainer card):", e);
-        }
-      }
-    }
-    const bit = await createLinkBit(supabase, { bitId, url, capturedTitle: meta?.title ?? null, thumbPath });
+    const sub = await fetchLinkSubstance(supabase, bitId, url);
+    thumbPath = sub.thumbPath;
+    const bit = await createLinkBit(supabase, { bitId, url, capturedTitle: sub.title, thumbPath });
     revalidatePath("/bits");
     return { bit };
   } catch (e) {

@@ -5,6 +5,7 @@ import { Rnd } from "react-rnd";
 import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
 import { SourcePicker } from "./source-picker";
+import { hostOf } from "@/lib/page-meta";
 import type { Source } from "@/lib/db/sources";
 import type { Drawing } from "@/lib/types";
 
@@ -399,15 +400,6 @@ function LinkOut({ url }: { url?: string }) {
       ↗
     </a>
   );
-}
-
-// The site's name for a bare link card — derived from the url, never stored.
-function hostOf(url?: string): string {
-  try {
-    return url ? new URL(url).hostname.replace(/^www\./, "") : "";
-  } catch {
-    return "";
-  }
 }
 
 // A quiet single-line editor for a bit's owner words. Saves on Enter/blur;

@@ -15,6 +15,7 @@ import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
 import { looksLikeUrl } from "@/lib/page-meta";
+import { textToParagraphs } from "@/lib/html";
 import { captureLink } from "@/app/bits/actions";
 import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
@@ -68,9 +69,6 @@ export function useCreateDoors(deps: {
   // The /write test, board-side: real content = visible text or a gather chip.
   function hasRealContent(html: string): boolean {
     return html.replace(/<[^>]+>/g, "").trim() !== "" || html.includes("data-ref");
-  }
-  function escapeHtml(s: string): string {
-    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate
@@ -390,7 +388,7 @@ export function useCreateDoors(deps: {
         void captureLinkToBoard(text.trim());
         return;
       }
-      const html = text.split(/\r?\n/).map((ln) => `<p>${escapeHtml(ln)}</p>`).join("");
+      const html = textToParagraphs(text);
       const p = findClearSpot(400, 160);
       createTextCard(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
     }

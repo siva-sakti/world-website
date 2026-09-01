@@ -16,6 +16,20 @@ export async function listGroups(supabase: SupabaseClient): Promise<ShelfGroup[]
 }
 
 /** Create a section at the end of the shelf (position = after the last). */
+/** One group/folder by id (the folder page's read), or null. */
+export async function getGroup(
+  supabase: SupabaseClient,
+  id: string,
+): Promise<{ id: string; name: string } | null> {
+  const { data, error } = await supabase
+    .from("shelf_group")
+    .select("id, name")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as { id: string; name: string }) ?? null;
+}
+
 export async function createGroup(supabase: SupabaseClient, name: string): Promise<ShelfGroup> {
   const clean = name.trim();
   if (!clean) throw new Error("a group needs a name");

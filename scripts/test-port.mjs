@@ -225,7 +225,7 @@ try {
 
   // The `[[` picker matched the FACE ONLY before N4b, so a word inside a note's
   // body was unreachable from the picker. Its candidate query must now carry the
-  // words the shared matcher (lib/search) needs.
+  // words the shared matcher (lib/search-query) needs.
   r = await sb.from("bit")
     .select("id, face, type, content, body, thumb_path, storage_path, strokes")
     .eq("id", bit2Id).single();

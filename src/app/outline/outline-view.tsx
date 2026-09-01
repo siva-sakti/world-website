@@ -42,7 +42,9 @@ export function OutlineView({ outline }: { outline: Outline }) {
       const raw = window.localStorage.getItem("outlineCollapsed");
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
       if (raw) setCollapsed(new Set(JSON.parse(raw) as string[]));
-    } catch {}
+    } catch {
+      /* storage blocked or corrupt — start expanded */
+    }
   }, []);
 
   function toggle(id: string) {
@@ -52,7 +54,9 @@ export function OutlineView({ outline }: { outline: Outline }) {
       else next.add(id);
       try {
         window.localStorage.setItem("outlineCollapsed", JSON.stringify([...next]));
-      } catch {}
+      } catch {
+        /* storage full or blocked — the collapse just won't persist */
+      }
       return next;
     });
   }

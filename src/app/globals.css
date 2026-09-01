@@ -616,10 +616,6 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.gather-suggest-type {
-  font-size: 0.72rem;
-  color: #9a9a93;
-}
 .gather-suggest-empty {
   padding: 6px 8px;
   color: #9a9a93;
@@ -1306,7 +1302,6 @@ body {
   color: #b7aea0;
   font-size: 13px;
 }
-.inbox-card-bookmark,
 .inbox-card-note {
   display: flex;
   flex-direction: column;
@@ -1335,18 +1330,6 @@ body {
 }
 .loose-file-caption .tag-bar-input {
   flex: 1;
-}
-.inbox-card-site {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #8a8175;
-}
-.inbox-card-favicon {
-  width: 15px;
-  height: 15px;
-  border-radius: 3px;
 }
 .inbox-card-title,
 .inbox-card-text {
@@ -1524,13 +1507,6 @@ body {
 .folder-drop:hover { color: var(--ink); }
 .folder-drop:disabled { color: #cfc8bb; cursor: default; }
 .folder-drop--none { color: #b3a998; }
-.inbox-card-open {
-  color: #365a8c;
-  text-decoration: none;
-}
-.inbox-card-open:hover {
-  text-decoration: underline;
-}
 .inbox-card-kind-tag {
   color: #b3a998;
 }
@@ -1892,20 +1868,6 @@ body {
 .desk-tile-kind { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #b3a58c; }
 .desk-tile-name { font-size: 15px; font-weight: 550; margin-top: 6px; line-height: 1.3; flex: 1; }
 .desk-tile-meta { font-size: 11px; color: #a89f92; margin-top: 10px; }
-.desk-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-.desk-chip {
-  border: 1px solid #e2ddd2; border-radius: 999px;
-  padding: 5px 14px; font-size: 13px; color: #57503f;
-  background: #fffdfa; cursor: pointer;
-}
-.desk-chip:hover { background: #f6f1e6; }
-.desk-chip.is-starred { border-color: #d9c68a; background: #fbf6e8; }
-.desk-chip.is-open { border-color: #b3a58c; }
-.desk-chip-n { color: #b3a58c; font-size: 11.5px; margin-left: 5px; }
-.desk-open h3 { font-size: 13.5px; font-weight: 600; color: #57503f; margin-bottom: 8px; }
-.desk-open ul { list-style: none; margin: 0; padding-left: 14px; border-left: 2px solid #ece5d4; }
-.desk-open li { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; font-size: 14.5px; color: #3a3323; }
-.desk-open-kind { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #b3a58c; width: 40px; flex: 0 0 auto; }
 @media (max-width: 640px) {
   .home-shell { flex-direction: column; }
   .rail { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; padding: 14px 16px; border-right: none; border-bottom: 1px solid #ece7de; }
