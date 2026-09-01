@@ -79,6 +79,14 @@ One idea carries it: **a deck = a SEQUENCE of frames; each frame's interior is a
 2. **Notion's synced blocks are their retrofit of transclusion** (Ted Nelson's term — content living in multiple places, bi-directionally). It's their newest-ish, most bolted-on primitive, and access-permission-bound. **Our model has transclusion natively** — a bit is independent by birth; `reference`/`placement` ARE the transclusion records. Validation that §4.2 is architecturally downhill for us and uphill for them.
 3. Block taxonomy baseline (Notion's block set) informed §4.1's in/out cut.
 
+## 6a · ⭐ MECHANICS RESEARCH LANDED (2026-08-31 — full report + sources: `research-block-editors.md`)
+
+**What it changes in this spec:**
+1. **§4.1's cut is validated almost exactly** — ~10 text-first blocks is the converged core; **zero database blocks in v1** is not just our instinct, it's the unanimous informed-cut of every personal-tool alternative (Craft · Bear · Anytype · Capacities). And the report's sharpest line for us: *the personal tools replaced databases with something native to their own model —* **bits/boards/tags already fill that slot here.**
+2. **⚠ One disagreement with §4.1's draft: TOGGLE.** The research puts toggle in Notion's core tier (practitioner lists + Notion's shortcut investment); our draft had it out. **Left to the owner's feel-test** — if toggles land on her never-touched list, out stands; if she reaches for them, in.
+3. **§4.1's interactions become a concrete 8-point must-have checklist** (Enter-split · list-sibling · explicit-`/`-only slash menu · schema-aware turn-into · hover drag-handle · structure-preserving paste · cross-block selection · never-empty invariant) **+ 4 named jank traps to design against** — incl. the BlockNote lesson: a team abandoned the pre-baked framework over rigid schemas and rebuilt on raw tiptap. We start on raw tiptap.
+4. **Deferrable, confirmed:** paste-URL menus · nested drag-drop · synced-block-style anything.
+
 ## 6b · ⚑ THE OWNER'S FEEL-RESEARCH PROTOCOL (offered 2026-08-31 — she volunteered; each task feeds a named spec section)
 
 Hands-on in Notion, ~45 min total. **Write real content, never lorem** — feel-data is only real when the stakes are.
