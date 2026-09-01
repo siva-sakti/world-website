@@ -42,9 +42,9 @@ A placed composition appears as a card. ⚪ **its look: a door (title only) or a
 ## 1.7 The fabric — what links to what (the sit-down, in progress 2026-09-02)
 - bit → composition: ✅ the chip (and the full bit-block, §1.10)
 - **composition → composition: 🟡 leaning YES** (the owner: `[[` "could tag another note" — read as link; pin 2 pending confirm). A chip **visually distinct** from a bit-chip.
-- **board → composition: ⚪ genuinely open** — the owner: *"I don't know if it should link a board… should a board be inside a composition surface? We're still thinking."* Drill questions posed; not pushed.
+- **board → composition: ❌ RULED OUT (owner, 2026-09-02)** — via ⭐ **THE DIRECTION PRINCIPLE:** *containment flows one way — the board HOLDS the composition; the composition never holds the board.* A piece that belongs with a board sits ON it; "click and see the board quickly" is served by the piece's existing **"on these boards"** list. `[[` reaches material and compositions; never boards. *(Closed TWICE over: the project's founding question — "gather a board into a note?" — reached the same no weeks ago by a different route: "you don't paste a room into a sentence." Independent re-derivation = the model's strongest truth signal.)* **Consequence: the board-backlink wrinkle dissolves** — boards receive no writing-links, so they need no "linked from"; placement is their relation and the canvas already shows it.
 - `[[` behavior: ✅ **opens by search — type, results come up — in two sections** (material · surfaces).
-- **backlinks: ✅ the FULL treatment** — a clickable backlink panel + **a graph view, the way Obsidian does it**. ⚪ what the graph's dots and lines are — drill question D. ⚪ where a board's backlinks live (it has no page).
+- **backlinks: ✅ the FULL treatment** — a clickable backlink panel + **a graph view, the way Obsidian does it**. ⚪ **the graph's lines** — the owner: *"what are the lines — I'm not sure actually."* Parked for its own round (options/mocks, not argument). Dots almost certainly all three kinds; lines = links only vs. links+placements+shared-tags is the open choice.
 Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (placed) · a composition onto a board (the card) · a board onto a board (doorway). ⚪ Open cells: composition→composition · board→composition · what the `[[` picker offers · where backlinks show per target · whether the pull mixes all three kinds.
 
 ### 1.7a The sit-down agenda (nine cells, three questions each: makes sense? looks like? exists?)
@@ -78,4 +78,4 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
 ## Open (only these)
-Q1 storage drawer (shared/own — plain-words version asked) · card look (mock it) · the fabric cells (§1.7a) · auto-place on birth-board · floater count · drawer docking · **the words (Q9)**.
+Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · **the words (Q9)**.
