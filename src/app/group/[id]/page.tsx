@@ -42,13 +42,12 @@ export default async function GroupPage({
         <span className="text-sm font-semibold">folder</span>
       </header>
 
-      <p className="text-xs uppercase tracking-wide text-neutral-400">group</p>
       <h1 className="mt-1 text-2xl font-semibold tracking-tight">{group.name}</h1>
 
       <section className="mt-8">
         <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">boards</h2>
         {boards.length === 0 ? (
-          <p className="text-sm text-neutral-500">No boards in this group — shelve one from home.</p>
+          <p className="text-sm text-neutral-500">No boards in this folder — shelve one from home.</p>
         ) : (
           <ul className="space-y-2 text-sm">
             {boards.map((b) => (
@@ -66,7 +65,7 @@ export default async function GroupPage({
         <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">notes</h2>
         {bits.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            No notes in this group — pick this group on a note (in your notes view).
+            No notes in this folder — pick this folder on a note.
           </p>
         ) : (
           <GroupNotes items={bits} imgs={imgs} boards={allBoards} groups={groups} />

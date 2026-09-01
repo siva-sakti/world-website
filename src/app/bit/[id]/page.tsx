@@ -5,6 +5,8 @@ import { getBit, getBitBoards, getBitTravel } from "@/lib/db/bits";
 import { listBoards } from "@/lib/db/boards";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { getBitSource } from "@/lib/db/sources";
+import { listGroups } from "@/lib/db/shelf";
+import { GroupPicker } from "@/app/bits/note-card";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";
@@ -30,12 +32,13 @@ export default async function BitPage({
   if (!b) notFound();
   if (b.kind === "note") redirect(`/note/${id}`); // a note is a surface — its own page (N1)
 
-  const [boards, travel, source, gatheredInto, allBoards] = await Promise.all([
+  const [boards, travel, source, gatheredInto, allBoards, groups] = await Promise.all([
     getBitBoards(supabase, id),
     getBitTravel(supabase, id),
     getBitSource(supabase, id),
     listGatheredInto(supabase, id),
     listBoards(supabase),
+    listGroups(supabase),
   ]);
   // Boards it's NOT already on — the "place on a board…" door (board-side placement
   // stays too; both directions, the owner's ruling). callInBit revives a departed
@@ -164,6 +167,13 @@ export default async function BitPage({
       {/* Tags — editable (any bit, loose or placed — §3a, §7). */}
       <div className="mt-6">
         <TagBar target={{ bitId: b.id }} />
+      </div>
+
+      {/* Folder — where this bit is shelved (folders cut across boards, notes, and bits — O1b).
+          The name links to the folder's page; the ▾ changes it (folder-story-plan.md). */}
+      <div className="mt-3 flex items-baseline gap-2">
+        <span className="text-xs uppercase tracking-wide text-neutral-400">folder</span>
+        <GroupPicker bitId={b.id} groupId={b.group_id} groups={groups} />
       </div>
 
       {/* Gathered into — the backward half of gather (plan v1.2): every live

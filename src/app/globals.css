@@ -1446,18 +1446,56 @@ body {
   align-items: center;
   gap: 10px;
 }
-.inbox-card-place {
-  font-size: 12px;
-  color: #365a8c;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  outline: none;
+/* ── Shared searchable picker (SearchablePicker): type-to-search, a quiet dropdown forms below.
+   One control for boards / tags / folders / sources / merges — replaces the plain <select>s. ── */
+.picker { display: inline-block; }
+.picker-input {
+  font: inherit; font-size: 12px; color: var(--ink);
+  background: transparent; border: none; border-bottom: 1px solid transparent;
+  padding: 2px 0; outline: none; width: 76px;
+  transition: border-color 0.12s, width 0.12s;
 }
-.inbox-card-place:disabled {
-  color: #a89f92;
-  cursor: default;
+.picker-input::placeholder { color: #365a8c; } /* reads like the quiet "place on…" action it replaces */
+.picker-input:hover::placeholder { text-decoration: underline; }
+.picker-input:focus { border-bottom-color: #365a8c; width: 130px; }
+.picker-input:focus::placeholder { color: #b3a998; text-decoration: none; }
+.picker-input:disabled { cursor: default; }
+.picker-input:disabled::placeholder { color: #a89f92; }
+/* The menu is PORTALED to <body> and positioned inline (fixed, by the input's rect) so a card's
+   overflow:hidden can never clip it — only its look lives here. */
+.picker-menu {
+  z-index: 80;
+  margin: 0; padding: 4px; list-style: none;
+  max-height: 240px; overflow-y: auto;
+  background: #fffdfa; border: 1px solid #ece7de; border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(60, 50, 35, 0.12);
 }
+.picker-row {
+  padding: 7px 9px; font-size: 13.5px; color: var(--ink);
+  border-radius: 6px; cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.picker-row.is-hi { background: #f3efe7; }
+.picker-row--special { color: #365a8c; }
+/* The folder menu's search line (lives INSIDE the menu — the display never becomes a text box). */
+.picker-search { padding: 2px 4px 6px; border-bottom: 1px solid #ece7de; margin-bottom: 4px; }
+.picker-search input {
+  width: 100%; font: inherit; font-size: 13px; color: var(--ink);
+  background: transparent; border: none; outline: none; padding: 3px 5px;
+}
+.picker-search input::placeholder { color: #b3a998; }
+
+/* The folder control: NAME = a real link to the folder's page; ▾ = the change-folder menu. */
+.folder-ctl { display: inline-flex; align-items: baseline; gap: 2px; }
+.folder-name { font-size: 12px; color: #365a8c; text-decoration: none; }
+.folder-name:hover { text-decoration: underline; }
+.folder-drop {
+  font-size: 12px; color: #8f8676; background: none; border: none;
+  cursor: pointer; padding: 2px 3px;
+}
+.folder-drop:hover { color: var(--ink); }
+.folder-drop:disabled { color: #cfc8bb; cursor: default; }
+.folder-drop--none { color: #b3a998; }
 .inbox-card-open {
   color: #365a8c;
   text-decoration: none;

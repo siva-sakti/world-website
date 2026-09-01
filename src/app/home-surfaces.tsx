@@ -254,6 +254,13 @@ export function HomeSurfaces({
                   {isOpen ? "▾" : "▸"}
                 </button>
                 <span className="normal-case tracking-normal">
+                  <Link
+                    href={`/group/${g.id}`}
+                    className="shelf-move"
+                    title="the folder's own page"
+                  >
+                    →
+                  </Link>
                   <button
                     className="shelf-pin"
                     disabled={busy}

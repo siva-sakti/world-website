@@ -7,6 +7,7 @@ import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
 import { placeBitsOnBoard } from "./actions";
+import { SearchablePicker } from "@/components/searchable-picker";
 import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
@@ -240,20 +241,13 @@ export function NotesBrowser({
       {selectMode && (
         <div className="mt-4 flex items-center gap-3 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm">
           <span>{selectedIds.size} selected</span>
-          <select
-            value=""
+          <SearchablePicker
+            options={boards.map((b) => ({ id: b.id, label: b.title || "untitled board" }))}
+            onPick={bulkSend}
+            placeholder={bulkPending ? "sending…" : "send to…"}
             disabled={bulkPending || selectedIds.size === 0}
-            onChange={(e) => bulkSend(e.target.value)}
-            className="inbox-card-place"
-            aria-label="send selected bits to a board"
-          >
-            <option value="">{bulkPending ? "sending…" : "send to…"}</option>
-            {boards.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.title || "untitled board"}
-              </option>
-            ))}
-          </select>
+            title="send the selected bits to a board"
+          />
           {bulkErr && <span className="text-red-700">{bulkErr}</span>}
           <button onClick={exitSelect} className="ml-auto text-neutral-500 underline underline-offset-2">
             clear

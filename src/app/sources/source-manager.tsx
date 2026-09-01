@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { editSource, mergeSources, deleteSource, type ManagedSource } from "@/lib/db/sources";
 import { confirm } from "@/components/confirm";
+import { SearchablePicker } from "@/components/searchable-picker";
 
 // The source manager (mirrors the tag manager, §3e — single-valued): rename +
 // re-URL a source in place (id-referenced, every note follows — I-Src3), merge
@@ -162,21 +163,12 @@ export function SourceManager({ initial }: { initial: ManagedSource[] }) {
                 </Link>
               </span>
               <span className="flex items-baseline gap-3 text-sm">
-                <select
-                  value=""
-                  onChange={(e) => e.target.value && doMerge(s, e.target.value)}
-                  className="border-b border-neutral-200 bg-transparent text-neutral-500 outline-none"
+                <SearchablePicker
+                  options={sources.filter((o) => o.id !== s.id).map((o) => ({ id: o.id, label: o.name }))}
+                  onPick={(id) => id && doMerge(s, id)}
+                  placeholder="merge into…"
                   title="merge into another source"
-                >
-                  <option value="">merge into…</option>
-                  {sources
-                    .filter((o) => o.id !== s.id)
-                    .map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.name}
-                      </option>
-                    ))}
-                </select>
+                />
                 <button
                   onClick={() => doDelete(s)}
                   className="text-neutral-400 underline underline-offset-4 hover:text-red-700"

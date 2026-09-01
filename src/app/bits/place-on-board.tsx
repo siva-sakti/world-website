@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { placeOnBoard } from "./actions";
+import { SearchablePicker } from "@/components/searchable-picker";
 
 // Door B (call-in plan §2/⑤): from the inbox, send a loose note to a board. A quiet
 // "place on…" dropdown of your live boards; picking one lands the note there (blind —
@@ -38,20 +39,11 @@ export function PlaceOnBoard({
   }
 
   return (
-    <select
-      className="inbox-card-place"
-      value=""
+    <SearchablePicker
+      options={boards.map((b) => ({ id: b.id, label: b.title || "untitled board" }))}
+      onPick={pick}
+      placeholder={err ? "try again…" : pending ? "placing…" : "place on…"}
       disabled={pending}
-      onChange={(e) => pick(e.target.value)}
-      title="place on a board"
-      aria-label="Place on a board"
-    >
-      <option value="">{err ? "try again…" : pending ? "placing…" : "place on…"}</option>
-      {boards.map((b) => (
-        <option key={b.id} value={b.id}>
-          {b.title || "untitled board"}
-        </option>
-      ))}
-    </select>
+    />
   );
 }

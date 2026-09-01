@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { renameTag, mergeTags, deleteTag, type ManagedTag } from "@/lib/db/tags";
 import { confirm } from "@/components/confirm";
+import { SearchablePicker } from "@/components/searchable-picker";
 
 // The tag manager (§3e): rename (free, follows everywhere), merge (dedupes by
 // construction), delete (with a count that reckons with the frozen — I-T2).
@@ -113,21 +114,12 @@ export function TagManager({ initial }: { initial: ManagedTag[] }) {
               <span className="text-xs text-neutral-400">{countLabel(t)}</span>
             </span>
             <span className="flex items-baseline gap-3 text-sm">
-              <select
-                value=""
-                onChange={(e) => e.target.value && doMerge(t, e.target.value)}
-                className="border-b border-neutral-200 bg-transparent text-neutral-500 outline-none"
+              <SearchablePicker
+                options={tags.filter((o) => o.id !== t.id).map((o) => ({ id: o.id, label: o.word }))}
+                onPick={(id) => id && doMerge(t, id)}
+                placeholder="merge into…"
                 title="merge into another tag"
-              >
-                <option value="">merge into…</option>
-                {tags
-                  .filter((o) => o.id !== t.id)
-                  .map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.word}
-                    </option>
-                  ))}
-              </select>
+              />
               <button
                 onClick={() => doDelete(t)}
                 className="text-neutral-400 underline underline-offset-4 hover:text-red-700"
