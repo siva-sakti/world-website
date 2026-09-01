@@ -201,6 +201,42 @@ shown/hidden in a side or floating panel) and **bit-to-bit links**.
   feels heavy) · geometry registry (F3, when links get ruled in) · own-drag (F2, when links land
   OR the phone check convicts react-rnd) · culling (F4, last).
 
+## Part 2d · The APP-WIDE act surface — the senior verdict (owner-asked, 2026-09-01)
+
+*(Not just the board: every action on boards AND bits, judged as a senior review would.)*
+
+**Split verdict, and the split is the finding.**
+
+**The data layer: sign it.** One db door per concern · RLS as the boundary · invariants proven
+on throwaway DBs before cloud · model-driven semantics (travel, evaporate, liveness). Rarely
+this good at this size; four adversarial rounds keep confirming it.
+
+**The act layer app-wide: culture-by-accretion — workable, never "best." The five picks:**
+
+| # | pick | verified evidence |
+|---|---|---|
+| P1 | **two act transports, no stated rule** | 3 `"use server"` files vs **19** browser-writer components; `archive-controls.tsx` uses BOTH in one file. Felt: board-trash is instant/optimistic, home-row-trash is a form round-trip — same act, different physics |
+| P2 | **~11 hand-rolled copies** of busy/failed/rollback | the review's board five + create doors ×5 + `board-title` + `shelf-controls`' run() + bit-controls |
+| P3 | **three refresh strategies** (revalidatePath / router.refresh / optimistic setState) | chosen per-site, never by rule |
+| P4 | **acts have no names** outside button copy | the undo track names the BOARD's; nothing else has a vocabulary |
+| P5 | **two act cultures forming NOW** | the board gains an act layer while 19 surfaces stay unstructured — divergence unless the rule is stated |
+
+### The three rules (binding on future work from this date)
+
+1. **Transport:** an act on a thing you're LOOKING AT writes from the browser through `lib/db`
+   (optimistic, instant). An act that NAVIGATES or regenerates a page is a server action
+   (+ requireUser, as all 13 do). Most existing code accidentally obeys this; it is now law,
+   not accident.
+2. **One engine, on touch:** the shared busy/failed/rollback helper (review §8) is adopted by
+   any surface WHEN TOUCHED — fix-the-class discipline, never a big-bang rewrite of the 19.
+3. **Naming:** every NEW act gets a name; the undo vocabulary is the registry; an unnamed act
+   is a review flag.
+
+**Migration stance, stated:** nothing here is broken at one-writer scale — these are felt as
+inconsistency, not breakage. No file is rewritten for the rules' sake; the rules bind new work
+and touched work. The act layer the undo track builds on the board is the app-wide pattern,
+spreading on contact.
+
 ## Review outcome (2026-09-01) — the AMENDED design
 
 The review's verdict: **the diagnosis is sound, the direction right, and the formal act-object
