@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { registerSave } from "@/lib/save-guard";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { uploadObject, removeObjects } from "@/lib/storage";
@@ -149,6 +150,16 @@ export function LooseFileIntake() {
       setErr(`Couldn't save the caption — you can add it later on the ${captionNoun}'s page.`);
     }
   }
+
+  // Page-hide commit (hunt #8): backgrounding the phone mid-caption fired nothing —
+  // the typed words died with the tab. Commit only when words exist (an empty
+  // caption on hide must not auto-skip the offer).
+  const captionCommit = useRef<() => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the effect below commits the current caption
+  captionCommit.current = () => {
+    if (captionFor && caption.trim()) void saveCaption();
+  };
+  useEffect(() => registerSave(() => captionCommit.current()), []);
 
   return (
     <div className="loose-file-intake">

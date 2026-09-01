@@ -30,6 +30,10 @@ export function useBoardActs(deps: {
   // so type-then-remove within the 350ms debounce lost the typed words. Flush
   // first, and the tail lands; forget keeps its teleport-guard job untouched.
   flushNow: (placementId: string) => Promise<boolean>; // true = the words/positions LANDED (hunt #3)
+  // Hunt #9: duplicate-board awaits flushAll + pendingCreates — but removes are
+  // NEITHER, so a copy could include a card whose removal was in flight. Every
+  // remove's chain registers here (self-cleaning); duplicateThis awaits the set.
+  trackRemove: (p: Promise<unknown>) => void;
   // Drop a removed card's queued writes once the removal LANDS — a restored patch
   // (F3) must not outlive its card and teleport it after a later call-in (F3e).
   forget: (placementId: string) => void;
@@ -42,7 +46,7 @@ export function useBoardActs(deps: {
 }) {
   const {
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, flushNow, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   } = deps;
 
   // The evaporate-instead-of-remove path: drop the card from state and abort the bit
@@ -87,19 +91,21 @@ export function useBoardActs(deps: {
     setCards((cs) => cs.filter((c) => c.placementId !== placementId));
     clearSelection();
     setEditingId(null);
-    settled(placementId)
-      .then(async (id) => {
-        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6: words first, POST-reconcile key
-        return unplaceBit(supabase, id);
-      })
-      .then(() => {
-        forget(placementId); // the card is gone — drop any queued/restored writes for it
-        setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
-      })
-      .catch((e) => {
-        if (isFlushRefused(e)) { if (snap) restore(snap); return; } // banner already up; the card stays
-        if (snap) handleRemoveFailure(snap, e);
-      });
+    trackRemove(
+      settled(placementId)
+        .then(async (id) => {
+          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6: words first, POST-reconcile key
+          return unplaceBit(supabase, id);
+        })
+        .then(() => {
+          forget(placementId); // the card is gone — drop any queued/restored writes for it
+          setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
+        })
+        .catch((e) => {
+          if (isFlushRefused(e)) { if (snap) restore(snap); return; } // banner already up; the card stays
+          if (snap) handleRemoveFailure(snap, e);
+        }),
+    );
   }
 
   // Trash the whole bit — hidden everywhere, restorable from /trash. With multi-board,
@@ -120,16 +126,18 @@ export function useBoardActs(deps: {
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
     clearSelection();
     setEditingId(null);
-    settled(placementId)
-      .then(async (id) => {
-        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-      })
-      .then(() => trashBit(supabase, bitId))
-      .then(() => forget(placementId))
-      .catch((e) => {
-        if (isFlushRefused(e)) { if (snap) restore(snap); return; }
-        if (snap) handleRemoveFailure(snap, e);
-      });
+    trackRemove(
+      settled(placementId)
+        .then(async (id) => {
+          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+        })
+        .then(() => trashBit(supabase, bitId))
+        .then(() => forget(placementId))
+        .catch((e) => {
+          if (isFlushRefused(e)) { if (snap) restore(snap); return; }
+          if (snap) handleRemoveFailure(snap, e);
+        }),
+    );
   }
 
   // Bulk acts (multi-select, ②c) — the same I-W1 acts, looped, each through the
@@ -155,22 +163,24 @@ export function useBoardActs(deps: {
       if (settledCount === chosen.length && landed > 1) setLooseRefresh((n) => n + 1);
     };
     for (const c of chosen) {
-      settled(c.placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-          return unplaceBit(supabase, id);
-        })
-        .then(() => {
-          forget(c.placementId);
-          landed++;
-          if (landed === 1) setLooseRefresh((n) => n + 1);
-          done();
-        })
-        .catch((e) => {
-          if (isFlushRefused(e)) restore(c);
-          else handleRemoveFailure(c, e);
-          done();
-        });
+      trackRemove(
+        settled(c.placementId)
+          .then(async (id) => {
+            if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+            return unplaceBit(supabase, id);
+          })
+          .then(() => {
+            forget(c.placementId);
+            landed++;
+            if (landed === 1) setLooseRefresh((n) => n + 1);
+            done();
+          })
+          .catch((e) => {
+            if (isFlushRefused(e)) restore(c);
+            else handleRemoveFailure(c, e);
+            done();
+          }),
+      );
     }
   }
 
@@ -200,16 +210,18 @@ export function useBoardActs(deps: {
     clearSelection();
     setEditingId(null);
     for (const c of chosen) {
-      settled(c.placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-        })
-        .then(() => trashBit(supabase, c.bitId))
-        .then(() => forget(c.placementId))
-        .catch((e) => {
-          if (isFlushRefused(e)) restore(c);
-          else handleRemoveFailure(c, e);
-        });
+      trackRemove(
+        settled(c.placementId)
+          .then(async (id) => {
+            if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
+          })
+          .then(() => trashBit(supabase, c.bitId))
+          .then(() => forget(c.placementId))
+          .catch((e) => {
+            if (isFlushRefused(e)) restore(c);
+            else handleRemoveFailure(c, e);
+          }),
+      );
     }
   }
 

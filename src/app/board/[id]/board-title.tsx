@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { renameBoard } from "@/lib/db/boards";
+import { registerSave } from "@/lib/save-guard";
 
 // Click the board's name to rename it, inline. Enter/blur saves; Esc cancels.
 // Untitled boards stay legal (§5) — clearing the field saves "no title".
@@ -30,6 +31,21 @@ export function BoardTitle({
       setValue(saved); // revert; the header never lies about what's stored
     }
   }
+
+  // Page-hide + unmount commit (hunt #8): blur alone misses a phone backgrounding
+  // mid-rename and a navigation that unmounts the header — the typed name must land.
+  const saveRef = useRef<() => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the effect below commits the current draft
+  saveRef.current = () => {
+    if (editing) void save();
+  };
+  useEffect(() => {
+    const un = registerSave(() => saveRef.current());
+    return () => {
+      un();
+      saveRef.current();
+    };
+  }, []);
 
   if (editing) {
     return (

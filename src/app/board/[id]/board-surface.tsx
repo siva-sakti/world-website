@@ -44,7 +44,13 @@ export function BoardSurface({
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(0); // COUNT of HEICs mid-decode (a counter — the first of three finishing must not hide the notice)
   const [capturing, setCapturing] = useState(false); // a pasted link's server capture is slow — tell the user
-  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>(null);
+  // The words-offer QUEUE (hunt #4): a multi-photo drop fires N imports; each offer
+  // waits its turn — the prompt the owner is typing in is never replaced (it used to
+  // remount blank on the next upload landing, and keep typing saved to the WRONG bit).
+  const [wordsQueue, setWordsQueue] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" }[]>([]);
+  const wordsFor = wordsQueue[0] ?? null;
+  const enqueueWords = (v: { bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" }) =>
+    setWordsQueue((q) => (q.some((x) => x.bitId === v.bitId) ? q : [...q, v]));
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
   const [duplicating, setDuplicating] = useState(false); // the ⧉ act is in flight
@@ -95,6 +101,7 @@ export function BoardSurface({
     try {
       await flushAll();
       await pendingCreates(); // a just-dropped card's row must exist before the copy reads the board
+      await Promise.allSettled([...removesInFlight.current]); // a just-removed card must be GONE before it (hunt #9)
       const copy = await duplicateBoard(supabase, boardId);
       const go = await confirm({
         message: `Duplicated — “${copy.title || "untitled board"}” now sits on your shelf, arranging these same bits.`,
@@ -155,13 +162,20 @@ export function BoardSurface({
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
-      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor, onErr,
+      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr,
     });
 
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
+  // In-flight removes registered so duplicateThis can await them (hunt #9): they are
+  // neither pending patches nor creates, so flushAll + pendingCreates both miss them.
+  const removesInFlight = useRef(new Set<Promise<unknown>>());
+  const trackRemove = (p: Promise<unknown>) => {
+    removesInFlight.current.add(p);
+    void p.finally(() => removesInFlight.current.delete(p));
+  };
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, flushNow, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {
@@ -534,13 +548,14 @@ export function BoardSurface({
           <WordsOffer
             key={wordsFor.bitId}
             kind={wordsFor.kind}
+            initial={cards.find((c) => c.bitId === wordsFor.bitId)?.content ?? ""}
             onSave={(v) => {
               const card = cards.find((c) => c.bitId === wordsFor.bitId);
               if (card) saveContent(card.placementId, card.bitId, v);
               else updateBitContent(supabase, wordsFor.bitId, v).catch(onErr);
-              setWordsFor(null);
+              setWordsQueue((q) => q.slice(1)); // the next waiting offer steps up
             }}
-            onSkip={() => setWordsFor(null)}
+            onSkip={() => setWordsQueue((q) => q.slice(1))}
           />
         )}
       </div>

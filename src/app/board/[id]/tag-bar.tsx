@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { registerSave } from "@/lib/save-guard";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
 import {
   listTags,
@@ -75,7 +76,15 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
     const w = draft.trim();
     if (w) void add(w);
   };
-  useEffect(() => () => commitRef.current(), []);
+  useEffect(() => {
+    // Page-hide too (hunt #8): a phone backgrounding fires visibilitychange, not
+    // blur and not unmount — the typed word must land then as well.
+    const un = registerSave(() => commitRef.current());
+    return () => {
+      un();
+      commitRef.current();
+    };
+  }, []);
 
   async function remove(tag: Tag) {
     setErr(null);

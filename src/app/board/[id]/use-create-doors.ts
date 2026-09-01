@@ -53,7 +53,9 @@ export function useCreateDoors(deps: {
   reconcileId: (oldId: string, newId: string) => void;
   setConverting: Dispatch<SetStateAction<number>>; // COUNT of HEICs mid-decode (a counter — multi-file drops overlap)
   setCapturing: Dispatch<SetStateAction<boolean>>; // the board-paste link capture is slow (~seconds) — show a notice
-  setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>>;
+  // ENQUEUES a words-offer (hunt #4): a second upload finishing must never replace
+  // the prompt the owner is typing in — offers wait their turn in board-surface.
+  setWordsFor: (v: { bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" }) => void;
   onErr: (e: unknown) => void;
 }) {
   const {

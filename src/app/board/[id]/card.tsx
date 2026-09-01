@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
+import { registerSave } from "@/lib/save-guard";
 import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
 import { SourcePicker } from "./source-picker";
@@ -424,6 +425,22 @@ function ContentLine({
   useEffect(() => {
     if (!focused.current) setDraft(value);
   }, [value]);
+  // Unmount + page-hide commit (boundary hunt #2/#8): unmounting a focused input
+  // fires NO blur — so a caption typed while its upload finished (the WordsOffer
+  // swap), or before a click-away deselect, or before a phone backgrounding, was
+  // silently dropped. Same rule as blur: commit only while focused-and-dirty.
+  const commitRef = useRef<() => void>(() => {});
+  // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the effects below commit the current draft
+  commitRef.current = () => {
+    if (focused.current && draft.trim() !== value.trim()) onSave(draft);
+  };
+  useEffect(() => {
+    const un = registerSave(() => commitRef.current());
+    return () => {
+      un();
+      commitRef.current();
+    };
+  }, []);
   return (
     <input
       value={draft}

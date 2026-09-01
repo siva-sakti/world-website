@@ -6,14 +6,16 @@ import { useState } from "react";
 // findability surface for a screenshot-heavy owner). Enter saves; skip is a tap.
 export function WordsOffer({
   kind,
+  initial,
   onSave,
   onSkip,
 }: {
   kind: "image" | "drawing" | "audio" | "pdf" | "link";
+  initial?: string; // a caption already saved (e.g. ContentLine's unmount commit) — offered back, never blanked
   onSave: (v: string) => void;
   onSkip: () => void;
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initial ?? "");
   return (
     <div className="compose-words-offer">
       <input

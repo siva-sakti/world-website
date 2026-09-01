@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { registerSave } from "@/lib/save-guard";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
 import {
   listSources,
@@ -83,7 +84,15 @@ export function SourcePicker({
     const nm = draft.trim();
     if (nm) void pick(nm);
   };
-  useEffect(() => () => commitRef.current(), []);
+  useEffect(() => {
+    // Page-hide too (hunt #8): a phone backgrounding fires visibilitychange, not
+    // blur and not unmount — the typed word must land then as well.
+    const un = registerSave(() => commitRef.current());
+    return () => {
+      un();
+      commitRef.current();
+    };
+  }, []);
 
   async function clear() {
     setErr(null);
