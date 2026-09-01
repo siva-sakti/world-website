@@ -71,6 +71,24 @@ Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink sur
 
 **Birth/list ruling (2026-09-02):** every composition auto-appears in the compositions list, always; one opened from within a board is additionally connected to that board (⚑ pin: "connected" = placed as a card — one-word confirm). **Floaters: MANY allowed** — display/management = design pass. Right side: panel + drawer share flexibly; details at design.
 
+## 1.7c ⭐ WHAT CONNECTION MEANS — why tie, when the board exists (worked with the owner, 2026-09-02)
+
+**The board gives CO-PRESENCE** (near, in one room, seen at once). **Connection gives four things co-presence can't:**
+1. **Crossing rooms** — nearness exists only inside one board; a tie doesn't care where things live. *The board is local; the web is global.*
+2. **Walkability** — standing at a thing: *where else does this idea live? what reached for it?* Backlinks · the pull · the graph. A board answers "what's in this room"; connection answers "where does this thread go" — the question that compounds over years.
+3. **No layout duty** — placing = deciding where it goes; for the logical mind that's a TAX. A tie is relatedness with the spatial work stripped out.
+4. **Undesigned structure** — a board is composed top-down; the web accrues bottom-up from hundreds of small acts and one day shows a shape nobody planned. The Obsidian magic; structurally impossible for a board.
+
+**The three minds** (the owner: *"we're a tool for thought for different kinds of minds"*): spatial → the board ✅ · verbal → the composition 🟡 (this spec) · **connective → THE WEB** ⚠ — exists as records, **thin as a PLACE**. The July line again: *"thoughts connect three ways: shared words, shared places, threads tied on purpose."* ⚪ **The named big-open: where does the connective mind LIVE?** ("gathered into" + a pre-ties graph is all the room it has; the reference-threaded graph is parked. Not a build proposal — a flagged hole so it can't be the neglected big thing.)
+
+### ⚪ New cells found by self-check (2026-09-02) — pending the owner's word
+| cell | lean |
+|---|---|
+| a trashed **bit's** chip in writing | same rule as compositions: grey · frozen · restore door — *one rule for any tied thing* |
+| an **archived composition's CARD** on a board | greys like its chips, still enterable — the class that broke archive-v1; needs an explicit word |
+| the same piece open in **two frames** at once | design debt (frame-handoff) — Claude's to solve, tracked |
+| the same piece in **two floaters** | no — one live editor per piece |
+
 ## 1.10 The capabilities (the Notion half — summarized from `composition-surface-spec.md`)
 Blocks: ~10 text-first (paragraph · headings · lists · **checklist** · quote · divider · code · **a table in the writing** · image) — **zero database blocks** (the unanimous informed cut) · drag-handle reorder · `/` insert menu · turn-into · structure-preserving paste · never-empty · **the bit-block**: a gathered bit shown in full (quote/image itself, source attached — the provenance dividend) as the grown form of the chip. Word count. *(The 8-behavior feel checklist + jank traps live in the spec; the owner's Notion feel-session still feeds the fine cut.)*
 
