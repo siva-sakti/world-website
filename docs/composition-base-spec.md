@@ -1,115 +1,69 @@
-# The composition, re-derived — base spec
+# The composition — the feature, whole
 
-> ## STATUS · 2026-09-01 · 🟠 WORKING — the base entity, bottom-up, awaiting the owner's answers to §9
-> **What this is:** the owner-commissioned re-derivation: *"what is a composition, mechanically — conceptually, technically, all inputs, outputs, cases — the base needs to be functional and sensible before added features."* Supersedes the bit-inherited answers; nothing is carried over unexamined.
-> **Relation to other docs:** `composition-surface-spec.md` = the CAPABILITY layer (blocks, Notion-feel) that builds ON this base later · `note-storage-audit.md` = the evidence this responds to · `convergent-surfaces-overview.md` §00 = the layer map.
-> **The gate:** §9's questions answered by the owner → this doc goes 🟢 → enactment (the migration) in the code window's lane.
+> ## STATUS · updated 2026-09-02 (morning session) · 🟠 WORKING — the single document for this feature
+> **The process (owner-set):** Part 1 is the **ideal future state**, drafted whole and refined **additively** — new rulings amend it in place, so nothing lives only in chat. Then Part 2 (today), Part 3 (the gap → plan). ⚪ marks the spots still unruled.
+> **Companions:** `note-storage-audit.md` (the evidence) · `composition-surface-spec.md` (the capability layer — blocks/Notion-feel — built AFTER this base) · `convergent-surfaces-overview.md` §00 (the layer map).
 
 ---
 
-## 1 · The model after the split
+# PART 1 · THE IDEAL STATE — the feature as it should be
 
-```
-MATERIAL     bit ........... what you caught. tags · source · can be loose. UNTOUCHED by this change.
-SURFACES     board ......... material arranged in space        (canvas form)
-             composition ... material woven into writing       (document form)
-THE ACT      bring material onto a surface — PLACED (space) or GATHERED (flow)
-THE LINKS    surface ↔ surface — always a door, never exploded contents; one mechanism
-CROSS-CUT    tags · folders · find · states — on everything, carried by the thing itself
-```
+## 1.1 What a composition is
+A **surface where you weave material into writing** — one made whole with a throughline. A peer of the board: the board arranges material in space; the composition weaves it into words. **Never material itself** — never loose, never in the inbox, never gatherable *as* a scrap. Born a composition, always a composition (no conversion, ever).
 
-## 2 · The composition, defined
+## 1.2 The principle that governs the board's side
+> **The board catches material; surfaces are made on purpose.**
 
-**Conceptually:** a surface where you weave material into writing — one made whole with a throughline. Born by composing (never by conversion — the D-121 hard line survives: an entity's kind is fixed at birth). A peer of the board; never material; never "loose."
+Everything that lands on a board by quick gesture — paste, drop, typing a card — is **a bit**. Starting a composition is always **a deliberate act**. (An empty just-born text bit still evaporates; uncontroversial now that it's a bit.)
 
-**Technically (the proposed shape — Q1):** a row in ONE `surface` table shared with boards:
+## 1.3 Birth — three doors, all deliberate
+1. **`/write`** — the composing room itself.
+2. **From a board** — a "compose" door on the board. What you get is §1.4's floater, over the board you were looking at. ⚪ *is it auto-placed on that board?* (lean: yes — you made it here)
+3. **Opening an existing one from a board** — same experience as 2.
 
-| column | boards | compositions | note |
-|---|---|---|---|
-| `form` | `'canvas'` | `'document'` | NEW — the marker; CHECK-constrained |
-| `title` | ✅ | ✅ nullable (Q3) | born-untitled stays legal |
-| `body` | null | ✅ the writing (HTML) | NEW column; null for canvas |
-| `visibility` | private | **private** | the public-bit default dies here |
-| `group_id` · `pinned_at` · state (live/archived/trashed) · timestamps | ✅ | ✅ inherited | the board's proven machinery, incl. resting-state D-127 |
-| `source_id` | — | **❌ dropped (Q2)** | a made thing's provenance is its gathered material |
-| `search_tsv` | title | title + body | extend the generated column by form |
-| face · loose-ness · bit.kind | — | **gone** | face → title + derived preview; loose can't apply; `kind` dropped from `bit` entirely |
+## 1.4 The three frames — one editor, and the open chain (ruled)
+The same editor lives in three frames, because *the entire point is looking at the board while you compose*:
+- **the FLOATER** — a draggable mini compose window over the canvas. **The default**: tapping a placed composition opens this.
+- **the SIDE PANEL** — the floater can dock into a right-side pane; board still visible.
+- **the FULL PAGE** — one click from either; the composing room.
 
-## 3 · The relations, reshaped
+**The chain: tap → floater → (dock) panel → (open) page.** Escalating commitment, never forced. ⚪ one floater at a time (lean: yes, v1) · ⚪ the panel and the drawer both want the right side (lean: the drawer docks inside the compose context — browse material, drop it into the writing, see the board, all at once).
 
-- **`placement`** — host: a **canvas-form surface only** (Q8). Target: `target_bit_id` | `target_surface_id` (CHECK one non-null). One column change covers bits-on-boards ✅, boards-on-boards ✅, **compositions-on-boards** ✅ — three cases, one shape.
-- **`reference`** (gather + links) — `from_surface_id` (the writing; document-form) → `to_bit_id` | `to_surface_id` (CHECK one non-null). Delivers comp→bit ✅ · **comp→comp** ✅ · **comp→board** ✅ (A15 dissolves) — one mechanism, uniformly backlinkable, graph-readable.
-- **`tag_application`** — `target_bit_id` | `target_surface_id`. Compositions keep their tags through the move.
-- **travel/history** — placements of former note-rows repoint to surface ids; history preserved (I-L2 holds).
-- **the chip** — serialized `<span data-ref>` gains a target-kind attr (or reconcile resolves by lookup); `extractRefIds` extended, not replaced. *(Enactment detail; flagged so it isn't forgotten.)*
+## 1.5 Its shape
+**Title:** auto-fills with date/time when blank — a replaceable stand-in, never locked. *(Boards get the same rule; "untitled board" retires.)* **Body:** the writing. **Private by default.** **No source** — *"think of it like a board: there's multiple things happening there"*; citing something is a link, which is richer. **Tags · folder · star · states** (live/archived/trashed) — identical to a board's, one consistent machinery.
 
-## 4 · Lifecycle — every act traced (gate #2: no blank cells)
+## 1.6 On a board
+A placed composition appears as a card. ⚪ **its look: a door (title only) or a window (title + opening lines, resizable)** — decide by mock, not argument. Tap-behavior: §1.4's chain.
 
-| act | what happens | notes |
+## 1.7 The fabric — what links to what ⚪ (the sit-down; agenda in §1.7a)
+Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (placed) · a composition onto a board (the card) · a board onto a board (doorway). ⚪ Open cells: composition→composition · board→composition · what the `[[` picker offers · where backlinks show per target · whether the pull mixes all three kinds.
+
+### 1.7a The sit-down agenda (nine cells, three questions each: makes sense? looks like? exists?)
+| bring → into | a composition | a board |
 |---|---|---|
-| **create** | `/write` (born on first content, title held until birth) · board paste-text (Q7) · "start a composition from this board"? (future door) | born private, unlisted until it has content |
-| **edit** | body via the editor; 350ms debounce + save-guard; reconcile references on save | unchanged mechanics |
-| **title / rename** | inline, nullable | preview = opening words when untitled |
-| **tag / untag · folder · star** | as today | polymorphic, survives the move |
-| **place on a board** | a placement (surface-target); appears per Q4's answer | un-place stamps left_at; travel kept |
-| **link into another composition** | a reference (surface-target) via `[[` or the drawer (Q5) | backlink appears on its page |
-| **archive** | the board/resting-state model (D-127) | inherited, consistent at last |
-| **trash → restore** | state flip; hidden by render rules; restore returns it whole (star intact) | the D-127 symmetry, now uniform |
-| **destroy** | takes its references (both directions), placements, tags — cascade | the evaporate door (Q6) is the only automatic destroy |
-| **export** | the surface table joins `/api/export` in the same migration — **I-G1 lockstep, non-negotiable** | |
+| a bit | ✅ chip (+ the full block, capability layer) | ✅ placed |
+| a composition | ⚪ a link-chip? its backlink? | ✅ the card (look ⚪) |
+| a board | ⚪ a door in the sentence? | ✅ doorway (UI dormant) |
+Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink surfaces (a bit has "gathered into"; a board needs a "linked from"?) · ⚪ the pull with three kinds.
 
-## 5 · Doors in / doors out
-**In:** `/write` · paste-text on a board (Q7) · (future: templates · "compose from this board").
-**Out:** its own page (`/note/[id]` → renamed route) · listed beside boards (home, its room) · placed on boards · linked from other compositions · found (title+body) · the pull via tags · export · *(future: publish · PDF — the output-artifact thread, untouched here)*.
+## 1.8 In its room and in the world
+Listed beside boards (home, its room) · starred/alive · found by full text · pulled by tag · exported always (I-G1) · *(later: published; handed over as a file — tracked, not here)*.
 
-## 6 · What it sheds from bit-hood — each one CHOSEN
-public-default → **private** · loose/inbox membership → **never** · gatherable-as-material → **linkable-as-surface instead** (the I-K2 line becomes enforceable: `reference.to_bit_id` can only be material now) · the computed face → title+preview · `bit.kind` → **dropped entirely; the bit table returns to pure material**.
+## 1.9 What it explicitly is not
+Not material · not a container you place things ON (*"text-forward, like Notion"*) · not convertible to/from a bit · not public by default · never auto-created.
 
-## 7 · Invariants touched
-- **I-K1** (kind fixed at birth) → restated: *an entity's table and form are fixed at birth; no conversion bit↔surface, canvas↔document*.
-- **I-K2** (gather takes material) → **finally enforceable at the DB**: material = the bit table; linking surfaces is the separate `to_surface_id` arm.
-- **I-N1 / loose** → compositions exit its scope by construction.
-- **I-G1** (export completeness) → surface table in the same migration.
-- **I-L1/L2** (placement uniqueness/durability) → carried to surface targets.
-- NEW: *a document-form surface has a body; a canvas-form surface does not* (CHECK).
+---
 
-## 8 · Migration sketch (enactment — the code window's lane, house method: backup → throwaway-proven → owner's go → cloud)
-1. `surface` table (or extend `board`) + form + body · 2. copy `kind='note'` rows over · 3. repoint placements / references / tags / travel · 4. delete note-rows from `bit`; drop `kind` · 5. sweep the ~30 app files (mostly deletions) · 6. views + export + search regenerated · 7. proofs re-run (`verification/`).
+# PART 2 · WHAT EXISTS TODAY (honest, short)
+A "note": a bit-row wearing `kind='note'` — architecturally material (public-default, gatherable-as-scrap, "loose"; the ~30-file seam — `note-storage-audit.md`). The editor: rich text + `[[` + drawer + save-guard, on its own page. The card on a board: a title-only door that navigates away. No floater, no panel, no deliberate board-door (paste births notes today — contradicting §1.2).
 
-## 9b · ⭐ SETTLED BY THE OWNER (2026-09-01, the talk-through) — plus two ruled features
+# PART 3 · THE GAP → THE PLAN
+1. **Settle Part 1's ⚪ marks** (the fabric sit-down + Q1 storage shape + the card mock + naming).
+2. **The migration** (code window's lane, house method): the surface shape · repoint relations · the sweep — sketch in `note-storage-audit.md` + the superseded §8 below.
+3. **The board-side re-aim:** paste/type births bits · the deliberate compose door · the floater + panel + chain.
+4. **Then the capability layer** (`composition-surface-spec.md`) on the corrected base.
 
-| q | ruling |
-|---|---|
-| **Q2 source** | ✅ **dropped** — the owner's reasoning, better than the lean: *"think of it like a board — there's multiple things happening there."* |
-| **Q3 titles** | ✅ **auto-fill with date/time when blank — for BOTH compositions and boards** (replaceable stand-in, never locked). Supersedes "untitled board." |
-| **Q7 what a board births** | ✅ ⭐ **THE PRINCIPLE: the board catches MATERIAL; surfaces are made ON PURPOSE.** Everything placed on a board is a bit by default (paste · drop · type-a-card); a composition is always an intentional step. **Cascades:** the "+ note" door → a text-bit door · paste → a bit · **Q6 dissolves** (evaporate now concerns empty bits — keep, uncontroversial) · the board needs its own deliberate "compose" door. |
-| **Q8 placed-on-composition** | ✅ **no** — *"composition is more text-forward, it's like Notion."* |
-| **Q4b opening** | ✅ **ruled, and extended into the feature's heart:** tap a placed composition → a **side compose panel** (full page one click away) **+ a draggable mini compose window** over the canvas — *"that's part of our entire thing: you're looking at the board to compose something."* Same editor, three frames: page · panel · floater. |
-
-### 🆕 The sibling gesture (Claude's, owner-invited): **compose-from-selection**
-Multi-select cards on a board → **"compose from these"** → the panel opens with a fresh composition, those bits pre-gathered in selection order. The category's most common convergent gesture (Figma/FigJam/Freeform/Notion all have "selection becomes a thing"), aimed at our exact seam. 🔵 awaiting the owner's yes.
-
-### Still open, and only these
-| # | question |
-|---|---|
-| **Q1** | shared drawer or own drawer (the storage shape — re-asked in plain words, unanswered) |
-| **Q4a** | the card on the board: a **door** (title) or a **window** (title + opening lines, resizable) |
-| **Q5 + the fabric** | what `[[` offers · what links to what, appearing how — ⚑ **the owner wants this thought through together; the next sit-down** |
-| new | is a board-born composition **auto-placed** on that board? (lean: yes) |
-| new | **panel vs drawer real estate** — both want the right side (lean: the drawer docks inside the compose context) |
-| **Q9** | the words — unavoidable before UI |
-
-## 9 · ⚑ THE QUESTIONS — original set (answers folded above)
-*(each with options + Claude's lean 🔵 — leans are inputs, not defaults)*
-
-| # | question | options | lean |
-|---|---|---|---|
-| **Q1** | **One `surface` table (form: canvas/document), or a separate composition table?** | one / two | **one** — near-identical columns; the link fabric unifies; the code's union type already says it |
-| **Q2** | **Does a composition have a `source`?** | keep · optional · drop | **drop** — a made thing's "from" is its gathered material; citing a source inline is a *link*, richer than a column |
-| **Q3** | **Can a composition be untitled?** | yes (preview stands in) · no (title required) | **yes** — born-on-first-content is good; titles shouldn't gate writing |
-| **Q4** | **On a board, a composition appears as…** | a) a door (title card — today) · b) a **window** (title + opening words, resizable) · c) owner picks per placement | **b** — your stitching scene showed the closed door fails the board's whole job |
-| **Q5** | **What does `[[` offer now?** | a) bits only; surfaces linked another way · b) **one picker, sectioned** (material first, then surfaces), chips visually distinct | **b** — one gesture; the section break teaches the material/surface line |
-| **Q6** | **Keep the evaporate rule?** (a board-born composition that ends empty un-exists) | keep · drop | **keep** — but it remains the app's only silent destroy; worth one confirm at enactment |
-| **Q7** | **Paste-text on a board births a…?** | composition (today's behavior) · a text **bit** | ⚪ genuinely unsure — pasted text is *caught*, which smells like material; but today's flow makes notes. **Talk through** |
-| **Q8** | **Can anything be placed ON a document-form surface?** | no (flow only) · yes | **no for the base** — flow holds things by gather; leaves the freeform door for later without blocking it |
-| **Q9** | **The words** — "composition"? the route `/note`? | — | the naming session is now **unavoidable before the UI ships**; this spec uses placeholders throughout |
+## Settled-rulings log (additive)
+2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
+## Open (only these)
+Q1 storage drawer (shared/own — plain-words version asked) · card look (mock it) · the fabric cells (§1.7a) · auto-place on birth-board · floater count · drawer docking · **the words (Q9)**.
