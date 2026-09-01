@@ -271,6 +271,27 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 3. **The artifact map is complete:** statement/essay/script → doc · tracker/list-of-work → sheet · deck/lookbook/portfolio → deck. No orphans found (a one-pager = a one-slide deck).
 4. **Fits D-121 without surgery:** three kinds of composition, fixed at birth, never converted — Google's model too.
 
+### ⭐⭐ THE JOINT — two composition types, riding the two mechanics we already have (owner's insight, 2026-08-31)
+
+**The owner closed the project's original circle.** The first question of this whole inquiry was *"should a board be gatherable into a note inline?"* — and it kept resisting an answer. **It was a membership question asked before the container was defined**: with only one thin convergent surface, "inline or side-by-side?" had no stable answer. The owner: *"that whole question about how to construct the compositional surface led to this inquiry… things can flow in and be linked, or just be side-by-side… maybe that's two types of composition surfaces — the Figma-like presentation one, and the more [flow]-based one."*
+
+**The mapping — no new mechanics anywhere:**
+
+| composition type | how a thing joins | mechanic | exists as |
+|---|---|---|---|
+| **FLOW** (doc — words with a throughline) | flows in, **linked inline** | **gather** (`reference`) | the `[[` chip |
+| **FRAME** (deck — arranged, bounded, sequenced pages) | sits **side-by-side, placed** | **placement** | the board's own mechanic |
+
+`model.md` already holds the symmetry — *"placement is to a board what a reference is to a note."* **The doc inherits gather; the deck inherits placement; the frame type is board-machinery inside bounded, sequenced pages.** *(The sheet remains the third, grid-shaped thing — or a block that grows; fork open in `tables-and-structured-data.md`.)*
+
+**The original question, decomposed — one question, two honest answers:**
+- **flow type:** a board in a sentence is only ever **a door** (a chip you tap) — *"you don't paste a room into a sentence"* holds; a door in a sentence is fine and cheap.
+- **frame type:** side-by-side gives a board room to be **seen** — a live miniature of the arrangement in the frame. The version where linking a board is genuinely good, not merely permitted.
+
+**Does two types make sense for people?** Yes — **the split already exists in their lives** (Docs/Notion for words · Canva/Figma for visual comps; two tools open today). We house a distinction people already make. **The one named risk: the CHOOSING moment** — three-ish options at the create button is where confusion would live. The answer is already in this doc: **templates** (§Templates). Nobody picks "flow vs frame"; they pick *"an artist statement"* or *"a lookbook"* and the right surface opens. The template layer is what makes the trio navigable, not decoration on it.
+
+⚑ Status: the owner's insight + Claude's synthesis 🔵, engaged — **not ruled.** Words ("flow" · "frame" · "doc" · "deck") unruled, step 2b.
+
 **Where Claude pushes (critical, held open):**
 1. **The deck is where pure structure fails — by the owner's own observation** (creatives present from Canva/Photoshop *because those are surfaces you arrange*). The candidate answer, using machinery we own: **each slide's interior is a small bounded board** — the *sequence* is the format; freedom lives only inside a frame. The Canva pattern, on our board tech. 🔵 unruled.
 2. **The sheet is the scope trap:** sort/filter yes · typed columns probably · formulas/pivots = the cliff where it becomes Excel. The fork lives in `tables-and-structured-data.md`, now live.
