@@ -108,8 +108,16 @@ export function useBoardActs(deps: {
         reconcileId(snap.placementId, placement.id);
         setCards((cs) => cs.map((c) => (c.placementId === snap.placementId ? { ...c, placementId: placement.id } : c)));
       }
-      if (snap.locked) await chain(placement.id, () => setPlacementLock(supabase, placement.id, true));
       setLooseRefresh((n) => n + 1); // no longer loose — the column must stop offering it
+      // The lock re-apply sits OUTSIDE the rollback (antagonist J5): the revive
+      // LANDED — un-painting the card over a lock hiccup would make the screen lie
+      // the other way. A failed re-lock is surfaced, not fatal; retrying the entry
+      // would early-return on the already-back guard anyway.
+      if (snap.locked) {
+        await chain(placement.id, () => setPlacementLock(supabase, placement.id, true)).catch((e) =>
+          console.error("revive landed but the lock could not be re-applied:", e),
+        );
+      }
     } catch (e) {
       setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId)); // roll the re-add back out
       throw e; // TRASHED_BIT/TRASHED_BOARD classify terminal; network stays retryable
@@ -229,6 +237,13 @@ export function useBoardActs(deps: {
             const cur = cardsRef.current?.find((c) => c.bitId === snap.bitId);
             setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId));
             try {
+              // The redo honors the owner-found seam exactly like the act (antagonist
+              // D4): type into the restored card, press ↷ inside the debounce, and
+              // without this the typed tail would be forgotten with the freeze.
+              if (cur) {
+                const id = await settled(cur.placementId);
+                if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+              }
               await trashBit(supabase, bitId);
               if (cur) forget(cur.placementId);
             } catch (e) {
@@ -276,12 +291,18 @@ export function useBoardActs(deps: {
     const snaps = chosen.map((c) => ({ ...c }));
     const legs: Promise<unknown>[] = [];
     let failedLegs = 0;
+    // J1: a leg that FAILED (its card was restored) leaves `alive` — the reverses
+    // iterate only what actually landed, so undo-then-redo never does more than the
+    // gesture did. The label still counts the GESTURE (a deliberate overstatement,
+    // one word of noise beats a shifting label).
+    const landedSet = new Set(snaps.map((c) => c.bitId));
+    const live = () => snaps.filter((c) => landedSet.has(c.bitId));
     const entry = snaps.length
       ? record(
           snaps.length === 1 ? "remove card from board" : `remove ${snaps.length} cards from board`,
           snaps.map((c) => c.bitId),
-          () => allLegs(snaps.map((c) => () => reviveOne(c))),
-          () => allLegs(snaps.map((c) => () => unplaceOne(c.bitId))),
+          () => allLegs(live().map((c) => () => reviveOne(c))),
+          () => allLegs(live().map((c) => () => unplaceOne(c.bitId))),
         )
       : null;
     for (const c of chosen) {
@@ -298,6 +319,7 @@ export function useBoardActs(deps: {
         })
         .catch((e) => {
           failedLegs++;
+          landedSet.delete(c.bitId); // this card never left — the reverses skip it (J1)
           if (entry && failedLegs === chosen.length) fail(entry); // nothing happened → no memory
           if (isFlushRefused(e)) restore(c);
           else handleRemoveFailure(c, e);
@@ -337,6 +359,8 @@ export function useBoardActs(deps: {
     const snaps = chosen.map((c) => ({ ...c }));
     const legs: Promise<unknown>[] = [];
     let failedLegs = 0;
+    const landedSet = new Set(snaps.map((c) => c.bitId)); // J1 — see bulkUnplace
+    const live = () => snaps.filter((c) => landedSet.has(c.bitId));
     const entry = snaps.length
       ? record(
           snaps.length === 1 ? "trash card" : `trash ${snaps.length} cards`,
@@ -345,17 +369,21 @@ export function useBoardActs(deps: {
           // without re-asking (ruled). The D4 survivor rule both ways.
           () =>
             allLegs(
-              snaps.map((c) => async () => {
+              live().map((c) => async () => {
                 await restoreBit(supabase, c.bitId);
                 setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, c]));
               }),
             ),
           () =>
             allLegs(
-              snaps.map((c) => async () => {
+              live().map((c) => async () => {
                 const cur = cardsRef.current?.find((x) => x.bitId === c.bitId);
                 setCards((cs) => cs.filter((x) => x.bitId !== c.bitId));
                 try {
+                  if (cur) {
+                    const id = await settled(cur.placementId); // the D4 flush gate, bulk leg
+                    if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+                  }
                   await trashBit(supabase, c.bitId);
                   if (cur) forget(cur.placementId);
                 } catch (e) {
@@ -375,6 +403,7 @@ export function useBoardActs(deps: {
         .then(() => forget(c.placementId))
         .catch((e) => {
           failedLegs++;
+          landedSet.delete(c.bitId); // J1
           if (entry && failedLegs === chosen.length) fail(entry);
           if (isFlushRefused(e)) restore(c);
           else handleRemoveFailure(c, e);

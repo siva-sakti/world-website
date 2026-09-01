@@ -21,14 +21,18 @@ export function useMeaningActs(deps: {
   cardsRef: React.RefObject<CardVM[]>;
   record: ReturnType<typeof useUndo>["record"];
   setCards: React.Dispatch<React.SetStateAction<CardVM[]>>;
-  bumpMeta: () => void; // the refresh signal the bars refetch on
+  bumpMeta: (bitId: string) => void; // per-bit (J3): only THIS bit's bars refetch
 }) {
   const { supabase, cardsRef, record, setCards, bumpMeta } = deps;
 
   /** A removed-then-reapplied tag can come back under a FRESH id (the word was
    *  renamed/merged/deleted in the manager meanwhile — narrow, named, accepted).
    *  The mutable box carries the CURRENT id across undo/redo cycles so each
-   *  reverse targets the row that actually exists. */
+   *  reverse targets the row that actually exists.
+   *  KNOWN LIE, accepted out loud (antagonist J2): removeTag never asserts, so a
+   *  word MERGED in the manager between cycles makes the reverse a silent 0-row
+   *  no-op — the entry reports ok while the merged word stays. Needs the manager
+   *  open in another tab mid-undo-cycle; recorded, not defended. */
   function recordTagAdd(bitId: string, tag: { id: string; word: string }) {
     const box = { id: tag.id };
     record(
@@ -39,12 +43,12 @@ export function useMeaningActs(deps: {
         // zero-count word in suggestions — accepted (deleting vocabulary as an
         // undo side effect would violate "destroy never"; ruled default).
         await removeTag(supabase, { bitId, tagId: box.id });
-        bumpMeta();
+        bumpMeta(bitId);
       },
       async () => {
         const t = await applyTag(supabase, { bitId, word: tag.word }); // idempotent, re-finds by word
         box.id = t.id;
-        bumpMeta();
+        bumpMeta(bitId);
       },
     );
   }
@@ -57,11 +61,11 @@ export function useMeaningActs(deps: {
       async () => {
         const t = await applyTag(supabase, { bitId, word: tag.word }); // id-stable while the word survives
         box.id = t.id;
-        bumpMeta();
+        bumpMeta(bitId);
       },
       async () => {
         await removeTag(supabase, { bitId, tagId: box.id });
-        bumpMeta();
+        bumpMeta(bitId);
       },
     );
   }
@@ -82,7 +86,7 @@ export function useMeaningActs(deps: {
           ),
         );
       }
-      bumpMeta();
+      bumpMeta(bitId);
     };
     record(
       next ? `set source “${next.name}” (everywhere)` : "clear source (everywhere)",

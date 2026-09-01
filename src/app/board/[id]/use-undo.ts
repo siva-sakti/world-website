@@ -19,6 +19,10 @@ const TERMINAL = [
   "TRASHED_BOARD",
   "no longer exists",
   "no longer in the trash",
+  // J7: a reverse pointing at a DELETED row (e.g. a prior source destroyed in the
+  // manager) FK-refuses forever — "try again" would be a lie on loop.
+  "23503",
+  "foreign key",
 ];
 
 function classify(e: unknown): "retryable" | "terminal" {

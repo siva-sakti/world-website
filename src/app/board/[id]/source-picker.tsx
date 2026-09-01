@@ -108,13 +108,17 @@ export function SourcePicker({
 
   async function clear() {
     setErr(null);
-    if (loading) return; // prior unknown — a recorded clear would lie (D10)
+    // D10 gates the RECORD, never the write (antagonist D2: an early return here
+    // made the × a silent dead click on /bit and /note while their source list
+    // loaded). The clear always happens; only the entry is withheld when the
+    // prior is unknown.
+    const known = !loading;
     const prev = current;
     setCurrent(null);
     onChange?.(null);
     try {
       await clearSource(supabase, bitId);
-      onSourceAct?.(prev, null); // AFTER the write lands
+      if (known) onSourceAct?.(prev, null); // AFTER the write lands; prior known
     } catch (e) {
       console.error("clear source failed:", e);
       setCurrent(prev); // put it back

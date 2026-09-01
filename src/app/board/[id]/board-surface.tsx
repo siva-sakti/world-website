@@ -101,10 +101,14 @@ export function BoardSurface({
   void undo; void redo; void undoLabel; void redoLabel; // stage 5 wires the buttons
   const arrange = useArrangeActs({ supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain });
   // The meaning acts (undo §6 — tags + source, GLOBAL reach, honest labels) + the
-  // per-bit refresh signal their reverses bump so mounted bars repaint themselves.
-  const [metaRefresh, setMetaRefresh] = useState(0);
+  // refresh signal their reverses bump so mounted bars repaint themselves. Scoped
+  // PER BIT (antagonist J3): a global counter set every bar loading on any reverse,
+  // and the loading carve then swallowed LEGITIMATE records on other cards.
+  const [meta, setMeta] = useState<{ bitId: string | null; n: number }>({ bitId: null, n: 0 });
+  const metaSignalFor = (bitId: string) => (meta.bitId === bitId ? meta.n : 0);
   const meaning = useMeaningActs({
-    supabase, cardsRef, record, setCards, bumpMeta: () => setMetaRefresh((n) => n + 1),
+    supabase, cardsRef, record, setCards,
+    bumpMeta: (bitId) => setMeta((m) => ({ bitId, n: m.n + 1 })),
   });
   // Before-captures for the two gestures whose acts finish elsewhere:
   const dragBefore = useRef<{ bitId: string; x: number; y: number } | null>(null);   // single drag
@@ -472,7 +476,7 @@ export function BoardSurface({
           <TagBar
             key={selectedBit.bitId}
             target={{ bitId: selectedBit.bitId }}
-            refreshSignal={metaRefresh}
+            refreshSignal={metaSignalFor(selectedBit.bitId)}
             onTagAct={(kind, tag) =>
               kind === "add"
                 ? meaning.recordTagAdd(selectedBit.bitId, tag)
@@ -594,7 +598,7 @@ export function BoardSurface({
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
               onSourceAct={(prev, next) => meaning.recordSourceChange(c.bitId, prev, next)}
-              metaRefresh={metaRefresh}
+              metaRefresh={metaSignalFor(c.bitId)}
               onSourceChange={(src) =>
                 // The source was already persisted (bit.source_id) by the picker;
                 // patch ONLY this card's VM so its resting "from …" stamp updates

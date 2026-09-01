@@ -89,6 +89,12 @@ export function createUndoStack(cap = 20) {
     bump();
     try {
       if (e.settled) await e.settled.catch(() => {}); // the act's write is done, either way
+      // The act may have FAILED while we waited (its .catch marks the entry before
+      // ours resumes — attachment order, deterministic; antagonist D1, reproduced):
+      // a failed act un-happened, and its reverse would write against a world it
+      // misread — the already-gone carve's zombie would be resurrected. The corpse
+      // stays on top; the next press discards it.
+      if (e.state !== "live") return null;
       await (dir === "undo" ? e.undo() : e.redo());
       from.pop();
       to.push(e);

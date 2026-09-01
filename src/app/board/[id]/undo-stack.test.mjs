@@ -130,3 +130,22 @@ test("version() bumps on push, run, and state flips — the render mirror's food
   await s.undo(retryable); // discards the corpse — still a mutation
   assert.ok(s.version() > v2);
 });
+
+test("D1 regression: an act that FAILS while ↶ waits never runs its reverse", async () => {
+  const s = createUndoStack();
+  let reversed = false;
+  let rejectAct;
+  const act = new Promise((_res, rej) => { rejectAct = rej; });
+  const e = s.push(entry("remove card", {
+    settled: act,
+    undo: async () => { reversed = true; },
+  }));
+  const pressed = s.undo(retryable); // ↶ while the act is in flight
+  // the act fails; its own catch marks the entry BEFORE the stack resumes
+  act.catch(() => s.markFailed(e));
+  rejectAct(new Error("offline"));
+  const r = await pressed;
+  assert.equal(r, null, "nothing ran");
+  assert.equal(reversed, false, "the reverse never fired");
+  assert.equal(s.snapshot().redos.length, 0, "nothing promoted");
+});

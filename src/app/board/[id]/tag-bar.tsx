@@ -60,7 +60,11 @@ export function TagBar({ target, label = "tags", onTagAct, refreshSignal = 0 }: 
     if (!w || tags.some((t) => t.word.toLowerCase() === w.toLowerCase())) return;
     try {
       const tag = await applyTag(supabase, { ...target, word: w });
-      if (report) onTagAct?.("add", tag); // AFTER the write lands — a failed add records nothing
+      // AFTER the write lands — and never while loading (antagonist D3): with the
+      // chips not yet fetched, the duplicate guard can miss, applyTag idempotently
+      // returns an EXISTING tag, and the entry would claim an act that changed
+      // nothing — its undo would strip a tag that predates the gesture.
+      if (report && !loading) onTagAct?.("add", tag);
       setTags((ts) => (ts.some((t) => t.id === tag.id) ? ts : [...ts, tag]));
       setAll((a) =>
         a.some((x) => x.id === tag.id)
