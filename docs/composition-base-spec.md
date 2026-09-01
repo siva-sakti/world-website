@@ -139,6 +139,13 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 **⚑ The original open-cell note (superseded above, kept for trail):** content **pasted fresh** into writing (an image dropped straight in, never from your world) — does the composition *catch* it as a bit (one class of content; the bits room slowly gains one-off images, managed by filters — Claude's lean, quietly-yes) or is it mere document content (lighter; two classes of image, one dead)? The board's parallel is ruled ("the board catches material"); the composition's isn't. For the walk.
 **The backwards check (all cardinalities):** every relation many-to-many EXCEPT two deliberate singulars — **one folder per thing** · **one source per bit**. Mutual piece↔piece reference allowed (two pointers); self-reference already constraint-blocked. **🆕 Found by the check: no guard stops a board holding a doorway to ITSELF** — absurd, harmless while the UI is dormant, added to the enactment list for a constraint.
 
+## ⭐ LATE ADDITIONS (owner, 2026-09-02, closing the night)
+- **The line, her words:** *composition = LINEAR — lines · board = FREE SPACE — drag anywhere.* The cleanest statement of the two surfaces yet.
+- **Text WRAPS around images in a composition — "but not as flying":** wrapped and anchored in the flow (book-page style), never free-floating (that's the board's nature). The founding wish ("wrap a paragraph around a sketch") landing right-sized: **wrap yes, float no.** → the document surface's capability cut.
+- **The bit roster, explicit:** text · image · drawing · voice recording · PDF · saved link — **+ TABLE as the leading candidate type** (a tracker living loose / on a board / pulled into writing — the sheet question's small end; ties to `tables-and-structured-data.md`).
+- **Terminology discipline:** "composition" consistently as the placeholder (Claude had drifted to "piece"); the real word = the naming session.
+- **Excerpt + make-this-a-bit + PDF/audio-passages = ONE design, three cases** — a bit born from inside something, remembering its parent. All unbuilt; designed together at enactment.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
