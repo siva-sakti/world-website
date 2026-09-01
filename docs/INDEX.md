@@ -238,6 +238,9 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `integration-scenes.md` — 🟠 the joints as scenes (2026-09-02)
+**Contains:** the eight moments of use — the settled baseline, pitch-from-pitch, writing beside the board, the recurring bit, two-bits-no-board, the one-sentence excerpt, the piece-that-knows-its-job (frame), the project seen whole — each with its open choice ⚑ embedded where the owner can *feel* it. **The connection/frame sitting's material.**
+
 ### `composition-definition.md` — 🟢 THE SOURCE OF TRUTH: what a composition is (2026-09-02)
 **Contains:** the concept over everything (diverge→converge; the board converges *privately*, the composition is **convergence made legible** — the owner's cut) · the definition · every action, shipped-ideal · what's deliberately open · where the depth lives. **Owner-blessed as the starting source of truth; amend only on her ruling. The language transitions here: it says "composition."**
 
