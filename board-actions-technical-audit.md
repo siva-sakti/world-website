@@ -130,6 +130,77 @@ being swallowed by the library, the right restructuring is our own pointer-based
 never speculatively. Until then, the undo track fixes stage 3, and stages 1–2 stay as they are,
 now at least *mapped*.
 
+## Part 2c · The seeing machinery: how what's on the board gets rendered
+
+*(Added 2026-09-01 — the display half, read file-by-file: `card.tsx` in full, `text-bit.tsx`,
+the render body of `board-surface.tsx`, `lib/storage.ts`.)*
+
+### The pipeline
+
+1. **Server assembles** (`board/[id]/page.tsx`, force-dynamic): the `board_cards` view join →
+   one signed storage URL per media card (1-hour TTL, `storage.ts:34`) → `CardVM[]` as props.
+2. **The world is DOM, not `<canvas>`**: one div carrying `translate(cam.x,cam.y) scale(cam.scale)`;
+   every card an absolutely-positioned `react-rnd` at world coordinates, `zIndex: card.z`
+   (monotonic ints, unbounded, fine). Hit-testing is the browser's — elegantly:
+   `.compose-world { pointer-events:none }`, `.compose-card { pointer-events:auto }`, so empty
+   space falls through to pan and cards catch their own input.
+3. **Per-type rendering** (`card.tsx`): text = a tiptap editor; note = a computed doorway
+   (title + body-plaintext preview, never editable on canvas — N3/D-121); image/pdf/link =
+   `<img>` + a degrade ladder; audio = the native element (with a stopPropagation shield so the
+   scrubber doesn't start a drag); drawing = `DoodleBit` SVG from strokes.
+4. **Two coordinate spaces already exist, cleanly**: the camera-transformed WORLD (cards,
+   marquee math) vs the SCREEN band (toolbar · selected-bar · drawer · pen overlay · notices) —
+   the exact split a future panel system needs, already proven by the drawer.
+
+### Senior findings — what bends under the coming load
+
+- **F1 · Every text card mounts a FULL tiptap instance, always.** `text-bit.tsx:67` calls
+  `useEditor` unconditionally; "editable only while editing" is implemented as
+  `setEditable(false)`, not as not-mounting. N text cards = N live ProseMirror docs. Invisible
+  at dozens; the first perf cliff at hundreds — *before* raw DOM count. Fix when felt: render
+  static HTML at rest, mount the editor only for `editingId`. Named, not built.
+- **F2 · The dragged card is uncontrolled mid-drag** (deliberate — the controlled-position
+  stutter workaround). Consequence: **nothing else can visually track a card while it is being
+  dragged.** The moment bit-to-bit ARROWS exist, their endpoints freeze mid-drag and snap on
+  drop. So owning the drag is load-bearing for connectors — a second, independent reason beyond
+  the phone (the group-drag path already mirrors positions through state per-move, proving live
+  mirroring is feasible; react-rnd is the obstacle, not React).
+- **F3 · Card geometry is not fully in state.** Text/audio cards store `height:auto`; the real
+  height lives only in the DOM (tidy already has to query `[data-pid]`). Anything that anchors
+  to a card's EDGES — arrows, snap guides, a minimap — needs real boxes. The unifying fix is a
+  small **geometry registry** (each card reports its measured world-box via ResizeObserver; one
+  ref-map, cheap): arrows, tidy, fit, and placement-anchor all read one truth instead of four
+  ad-hoc measurements.
+- **F4 · No viewport culling** — every card renders regardless of visibility. Correct at
+  one-writer scale; the second cliff after F1. Trigger: a board that feels heavy, or ~150+ cards.
+- **F5 · Signed URLs expire at 1 hour** — a board left open past TTL shows broken media on the
+  next re-render. Minor (already-painted `<img>`s keep their pixels); worth a refresh-on-error
+  someday.
+
+### The ideal, sized for what's coming
+
+The two named loads: **notes as composition surfaces within a board** (brought in · composed on ·
+shown/hidden in a side or floating panel) and **bit-to-bit links**.
+
+- **Name the two spaces as the architecture.** WORLD (cards · a future arrows layer · the
+  camera) and SCREEN (toolbar · drawer · panels). Everything below follows from it.
+- **The note panel is a SCREEN-space thing, and the drawer is its proven ancestor.** Generalize
+  the drawer into the panel: dock-right or float, hosting the *same* note workspace the `/note`
+  page uses. **No new model**: the placed note stays a placement rendering as a doorway; the
+  panel is a *view* of the note. Panel-open state is view-state (per-device, like the camera),
+  never world-state.
+- **Composing ON the canvas is already proven feasible** — `text-bit` runs editable rich text
+  under the camera transform today. If a note ever composes in place, it is the same machinery
+  behind a kind='note' guard (D-121 holds: born a note, never converted; the doorway stays its
+  resting form).
+- **Links need three things, in order**: the geometry registry (F3) → live dragged-position
+  (F2, own-drag or a mid-path: keep rnd but mirror the dragged card's `onDrag` into a
+  ref-driven overlay) → then the arrows layer itself is small: world-space SVG between world
+  and cards, endpoints derived from the registry.
+- **The maturity track, each step evidence-gated:** editor-mount-on-demand (F1, when a board
+  feels heavy) · geometry registry (F3, when links get ruled in) · own-drag (F2, when links land
+  OR the phone check convicts react-rnd) · culling (F4, last).
+
 ## Review outcome (2026-09-01) — the AMENDED design
 
 The review's verdict: **the diagnosis is sound, the direction right, and the formal act-object
