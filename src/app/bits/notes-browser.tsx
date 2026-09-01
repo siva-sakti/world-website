@@ -16,7 +16,7 @@ import type { ShelfGroup } from "@/lib/db/shelf";
 // own landing page. The loose tab IS the old page, unchanged.
 type View = "loose" | "all";
 type Sort = "new" | "old" | "edited";
-type Kind = "text" | "image" | "drawing" | "audio" | "pdf";
+type Kind = "text" | "image" | "drawing" | "audio" | "pdf" | "link";
 
 export function NotesBrowser({
   items,
@@ -143,6 +143,8 @@ export function NotesBrowser({
           b.face ?? "",
           b.content ?? "",
           (b.body ?? "").replace(/<[^>]+>/g, " "),
+          b.captured_title ?? "", // a captioned link's title (the face hides it)
+          (b.url ?? "").replace(/[^\p{L}\p{N}]+/gu, " "), // a link's url, as words
           b.source?.name ?? "",
           ...b.tags.map((t) => t.word),
         ]
@@ -196,13 +198,13 @@ export function NotesBrowser({
           aria-label="search bits"
         />
         <div className="loose-scope" role="group" aria-label="type filter">
-          {(["text", "image", "drawing", "audio", "pdf"] as Kind[]).map((k) => (
+          {(["text", "image", "drawing", "audio", "pdf", "link"] as Kind[]).map((k) => (
             <button
               key={k}
               className={`loose-scope-tab${kind === k ? " is-on" : ""}`}
               onClick={() => setKind(kind === k ? null : k)}
             >
-              {k === "text" ? "notes" : k === "image" ? "images" : k === "drawing" ? "sketches" : k === "audio" ? "recordings" : "PDFs"}
+              {k === "text" ? "notes" : k === "image" ? "images" : k === "drawing" ? "sketches" : k === "audio" ? "recordings" : k === "pdf" ? "PDFs" : "links"}
             </button>
           ))}
         </div>

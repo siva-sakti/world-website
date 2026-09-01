@@ -1478,6 +1478,33 @@ body {
 .picker-row.is-hi { background: #f3efe7; }
 .picker-row--special { color: #365a8c; }
 .picker-empty { padding: 7px 9px; font-size: 13px; color: #b3a998; }
+
+/* ── The link card (link-bit-plan): the page-card image, cover-fit, with a quiet
+   title strip; the ladder degrades to a title card (site + title on plain ground).
+   The ↗ opens the real page. Fills the card like an image (is-image treatment). ── */
+.compose-linkcard { position: relative; width: 100%; height: 100%; }
+.compose-linkcard-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.compose-linkcard-strip {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: baseline; gap: 6px;
+  padding: 5px 8px; font-size: 11.5px; line-height: 1.3;
+  color: #fffdfa; background: linear-gradient(transparent, rgba(28, 24, 19, 0.62));
+}
+.compose-linkcard-title {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.compose-linkcard-out { color: inherit; text-decoration: none; flex: none; opacity: 0.85; }
+.compose-linkcard-out:hover { opacity: 1; text-decoration: underline; }
+.compose-linkcard--bare {
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  padding: 12px; background: #f7f4ee;
+}
+.compose-linkcard--bare .compose-linkcard-title {
+  white-space: normal; color: var(--ink); font-size: 13px;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+}
+.compose-linkcard--bare .compose-linkcard-out { color: #365a8c; }
+.compose-linkcard-site { font-size: 11px; color: #8f8676; letter-spacing: 0.02em; }
 /* The folder menu's search line (lives INSIDE the menu — the display never becomes a text box). */
 .picker-search { padding: 2px 4px 6px; border-bottom: 1px solid #ece7de; margin-bottom: 4px; }
 .picker-search input {

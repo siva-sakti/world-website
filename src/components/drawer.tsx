@@ -22,7 +22,7 @@ import { SearchablePicker } from "@/components/searchable-picker";
 // `variant`, not four booleans. Filtering is in-memory over the loaded set (snappy
 // at this scale; server-side search + paging is the named scale trigger).
 
-type TypeFilter = "all" | "text" | "image" | "drawing" | "audio" | "pdf";
+type TypeFilter = "all" | "text" | "image" | "drawing" | "audio" | "pdf" | "link";
 type Scope = "loose" | "this" | "other" | "all";
 type Kind = "all" | "bit" | "note"; // the drawer's primary split (owner: bits · notes · all)
 
@@ -31,6 +31,7 @@ function faceOf(it: PanelBit): string {
   if (it.type === "image") return it.file_name ?? "image";
   if (it.type === "audio") return it.file_name ?? "recording";
   if (it.type === "pdf") return it.file_name ?? "PDF";
+  if (it.type === "link") return it.url ?? "link"; // face is never empty for a link, so this is belt-and-braces
   return it.type === "drawing" ? "drawing" : "";
 }
 
@@ -156,7 +157,7 @@ export function Drawer(props: BoardMode | NoteMode) {
   const thumbPathOf = (n: PanelBit): string | null =>
     n.thumb_path ?? (n.type === "image" ? n.storage_path : null);
   const needThumbs = filtered.filter(
-    (n) => (n.type === "image" || n.type === "pdf") && thumbPathOf(n) && !thumbs.has(n.id),
+    (n) => (n.type === "image" || n.type === "pdf" || n.type === "link") && thumbPathOf(n) && !thumbs.has(n.id),
   );
   const needKey = needThumbs.map((n) => n.id).join(",");
   useEffect(() => {
@@ -269,6 +270,7 @@ export function Drawer(props: BoardMode | NoteMode) {
               <option value="drawing">drawings</option>
               <option value="audio">recordings</option>
               <option value="pdf">PDFs</option>
+              <option value="link">links</option>
             </select>
             {allTags.length > 0 && (
               <SearchablePicker
@@ -321,7 +323,7 @@ export function Drawer(props: BoardMode | NoteMode) {
                         : "gather into your writing"
                   }
                 >
-                  {(it.type === "image" || it.type === "pdf") && thumbs.get(it.id) ? (
+                  {(it.type === "image" || it.type === "pdf" || it.type === "link") && thumbs.get(it.id) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img className="loose-thumb" src={thumbs.get(it.id)} alt="" />
                   ) : (

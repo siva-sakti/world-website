@@ -47,6 +47,7 @@ Triage (2026-07-20): **no parked item needs re-opening.** But five have a schema
 | A21 | **Drag-to-drop-exact call-in** — drag a loose note from the column to a precise spot (v1 is click → view-center) | pure polish on the working gesture; re-enter if view-center landing ever annoys | call-in plan §12 |
 | A22 | **Server-side loose-note filtering** — the column filters in-memory today | re-enter only if the loose pile grows past snappy (single-writer scale says: not soon) | call-in plan §6/§12 |
 | A23 | **Source URL-conflict surfacing** — pasting a URL whose fetched title matches an existing source keeps the existing source's url; a *conflicting* url is dropped silently after the D-106 back-fill fix (a NULL url now back-fills) | the collision's resolution is the owner's ruling to make (I-Src3: re-URLing is deliberate); re-enter when it first bites | D-106 review |
+| A25 | **Link-bit embeds** (a YouTube/Spotify player playing in place on the card) + a deliberate **re-fetch act** (re-read a link's title/image on the owner's click — read-once means an unlucky early fetch stays plain) | embeds: the card leaves the owner wanting play (iframes/tracking/weight were the v1 no); re-fetch: a plain card annoys at scale | D-129 · link-bit-plan.md |
 
 ## B. Phase-scheduled promises — deferred by choice to a named phase (re-blessed by the owner)
 

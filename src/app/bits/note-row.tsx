@@ -52,7 +52,7 @@ export function NoteRow({
     >
       <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
       <Link href={`/bit/${item.id}`} className="notes-row-title" title="open">
-        {(item.type === "image" || item.type === "pdf") && img && (
+        {(item.type === "image" || item.type === "pdf" || item.type === "link") && img && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={img} alt="" className="notes-row-thumb" />
         )}

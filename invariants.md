@@ -80,8 +80,8 @@
 
 **Retired / moot with the bookmark (D-102, part of the same edit so the doc doesn't drift):**
 - **I-S3** ("a bookmark's source is itself") · **I-S4** ("a bookmark may carry a preview") — **retired**: there are no bookmarks, and I-S4's preview relax is reverted by the migration.
-- **I-R3** ("captured-once titles") — **moot** for live rows (no bookmarks); the `captured_title` column persists, unused.
-- **I-R2**'s per-type face fallback still lists a `bookmark:` branch — a **dead but harmless** branch in `bit_face()` (it never matches; kept on purpose). Note it as dead; **no function edit.**
+- **I-R3** ("captured-once titles") — ~~moot for live rows; the `captured_title` column persists, unused~~ **LIVE AGAIN (D-129):** the **link** bit revives `url` + `captured_title` (and adds a read-once stored card image in `thumb_path`); captured-once applies to the link's title + image exactly as it did to the bookmark's title. Every *other* type still forces both columns null (the substance CHECK).
+- **I-R2**'s face fallback ~~still lists a dead `bookmark:` branch; no function edit~~ **edited (D-129):** `bit_face()`'s branch is now **`link:`** (captured title, else the URL) — same rule, live name (`20260901000001_link_type.sql`, CREATE OR REPLACE).
 
 **Looseness / the inbox / call-in (I-N):**
 - **I-N1 — Loose is computed, never stored.** A bit is loose ⇔ it is **in the world** (`state = 'live'`) **and** no board actually shows it (no un-departed placement on a **live** board (`state = 'live'`) — the exact rule boards already use, now archive-aware). No flag, no column. → `computed`.

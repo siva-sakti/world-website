@@ -13,9 +13,12 @@
 
 export type PageMeta = {
   title: string | null;
+  image: string | null; // og:image, RESOLVED against the final (post-redirect) page URL — absolute or null
+  siteName: string | null; // og:site_name, else the final URL's hostname
+  finalUrl: string; // where the fetch actually landed (redirects followed) — relative og:image resolves against THIS
 };
 
-const MAX_HTML = 512 * 1024; // read at most ~512 KB of markup
+const MAX_HTML = 1024 * 1024; // read at most ~1 MB of markup (YouTube's og tags sit ~700KB deep — measured)
 const TIMEOUT_MS = 6000;
 
 function isPrivateHost(host: string): boolean {
@@ -46,6 +49,31 @@ function decodeEntities(s: string): string {
     .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, " ");
 }
 
+// One og:<name> property, both attribute orders (the title extractor's pattern) — first match wins.
+function extractOg(html: string, name: string): string | null {
+  const raw =
+    firstMatch(html, new RegExp(`<meta[^>]+property=["']og:${name}["'][^>]+content=["']([^"']+)["']`, "i")) ||
+    firstMatch(html, new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:${name}["']`, "i"));
+  if (!raw) return null;
+  const clean = decodeEntities(raw).trim(); // entity-decode (&amp; in query strings)
+  return clean || null;
+}
+
+// The page's card image, as an ABSOLUTE https URL or null. og:image is frequently
+// relative (/img/card.jpg) or protocol-relative (//cdn…) — resolve against the final
+// page URL. data: URIs are rejected (not fetchable safely); http-on-https and other
+// unsafe hosts are rejected later by fetchImageBlob's own safeUrl guard.
+function resolveImage(html: string, finalUrl: string): string | null {
+  const raw = extractOg(html, "image");
+  if (!raw || raw.startsWith("data:")) return null;
+  try {
+    const abs = new URL(raw, finalUrl);
+    return abs.protocol === "https:" ? abs.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function extractTitle(html: string): string | null {
   const og =
     firstMatch(html, /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) ||
@@ -72,10 +100,52 @@ async function readCapped(res: Response): Promise<string> {
   return html.slice(0, MAX_HTML);
 }
 
+// Known oEmbed providers — the OFFICIAL unfurl route (a tiny JSON of title +
+// thumbnail, built for exactly this). YouTube needs it: its watch page buries the
+// og tags ~700KB into 1.4MB of markup and never serves them to a capped read.
+function oembedEndpoint(u: URL): { endpoint: string; site: string } | null {
+  const h = u.hostname.replace(/^www\.|^m\./, "");
+  if (h === "youtube.com" || h === "youtu.be") {
+    return { endpoint: `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(u.toString())}`, site: "YouTube" };
+  }
+  return null;
+}
+
+async function tryOEmbed(u: URL): Promise<PageMeta | null> {
+  const prov = oembedEndpoint(u);
+  if (!prov) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(prov.endpoint, {
+      signal: ctrl.signal,
+      headers: { "user-agent": "worldbot/1.0 (+link-card)", accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const j: unknown = await res.json();
+    if (typeof j !== "object" || j === null) return null;
+    const { title, thumbnail_url } = j as Record<string, unknown>;
+    return {
+      title: typeof title === "string" && title.trim() ? title.trim().slice(0, 300) : null,
+      image: typeof thumbnail_url === "string" && thumbnail_url.startsWith("https://") ? thumbnail_url : null,
+      siteName: prov.site,
+      finalUrl: u.toString(),
+    };
+  } catch {
+    return null; // fall through to the page fetch
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function fetchPageMeta(rawUrl: string): Promise<PageMeta | null> {
   const u = safeUrl(rawUrl);
   if (!u) return null;
-  const fallback: PageMeta = { title: null };
+  const fallback: PageMeta = { title: null, image: null, siteName: null, finalUrl: u.toString() };
+
+  // Known providers answer via oEmbed — exact, tiny, official; a miss falls through.
+  const oe = await tryOEmbed(u);
+  if (oe?.title) return oe;
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
@@ -91,9 +161,63 @@ export async function fetchPageMeta(rawUrl: string): Promise<PageMeta | null> {
     const ct = res.headers.get("content-type") ?? "";
     if (!ct.includes("text/html")) return fallback;
     const html = await readCapped(res);
-    return { title: extractTitle(html) };
+    const finalUrl = res.url || u.toString();
+    let siteName: string | null = extractOg(html, "site_name");
+    if (!siteName) {
+      try { siteName = new URL(finalUrl).hostname.replace(/^www\./, ""); } catch { siteName = null; }
+    }
+    return { title: extractTitle(html), image: resolveImage(html, finalUrl), siteName, finalUrl };
   } catch {
     return fallback; // timeout / network / parse — the capture still saves
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ── The card image download (link bits — link-bit-plan.md) ──────────────────
+// Fetch the og:image itself, under the SAME hygiene as the page fetch: https-only +
+// private-host guard (re-checked after redirect), timeout, content-type must be an
+// image, and a STREAMED size cap (a hostile "image" must not balloon the function).
+// Returns the bytes + their content-type, or null — never throws: a failed image
+// only means a plainer card, capture is never blocked.
+const MAX_IMAGE = 4 * 1024 * 1024; // 4MB — og:images are typically 50–500KB
+
+export async function fetchImageBlob(
+  rawUrl: string,
+): Promise<{ bytes: Uint8Array; contentType: string } | null> {
+  const u = safeUrl(rawUrl);
+  if (!u) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(u.toString(), {
+      signal: ctrl.signal,
+      redirect: "follow",
+      headers: { "user-agent": "worldbot/1.0 (+link-card)", accept: "image/*" },
+    });
+    try { if (isPrivateHost(new URL(res.url).hostname)) return null; } catch { return null; }
+    if (!res.ok) return null;
+    const ct = (res.headers.get("content-type") ?? "").split(";")[0].trim();
+    if (!ct.startsWith("image/")) return null;
+    const len = Number(res.headers.get("content-length") ?? 0);
+    if (len > MAX_IMAGE) return null;
+    if (!res.body) return null;
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_IMAGE) { reader.cancel().catch(() => {}); return null; }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(total);
+    let off = 0;
+    for (const c of chunks) { bytes.set(c, off); off += c.byteLength; }
+    return { bytes, contentType: ct };
+  } catch {
+    return null;
   } finally {
     clearTimeout(timer);
   }

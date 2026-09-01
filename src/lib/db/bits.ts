@@ -154,6 +154,26 @@ export async function createPdfBit(
 
 /** A loose text bit — born on NO board (D-100). The bit is the atom; it needs no
  * board (finally honored). It appears in the inbox until placed (call-in). */
+/** A LINK bit (link-bit-plan.md): the url is the substance; captured_title + a stored
+ * copy of the page's card image (thumb_path) are read-once artifacts — a dead page
+ * never rewrites the card. Media facts stay null (they describe a stored FILE;
+ * bit_media_facts_only_with_file exempts thumb_path alone for type='link'). */
+export async function createLinkBit(
+  supabase: SupabaseClient,
+  args: { bitId: string; url: string; capturedTitle?: string | null; thumbPath?: string | null },
+): Promise<Bit> {
+  const { data, error } = await supabase
+    .from("bit")
+    .insert({
+      id: args.bitId, type: "link", url: args.url,
+      captured_title: args.capturedTitle ?? null, thumb_path: args.thumbPath ?? null,
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as Bit;
+}
+
 export async function createLooseTextBit(
   supabase: SupabaseClient,
   args: { bitId: string; body?: string; kind?: "bit" | "note" },

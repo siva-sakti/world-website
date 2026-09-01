@@ -113,7 +113,10 @@ export async function searchItems(
     // else the body's first words) so a result shows its ACTUAL text, not the generic
     // "a note" fallback. Media with no caption still falls back per-type in bitLabel.
     const bodyText = (b.body ?? "").replace(/<[^>]+>/g, " ").trim();
-    const face = b.content?.trim() || (bodyText ? bodyText.slice(0, 80) : null);
+    const face = b.content?.trim() || (bodyText ? bodyText.slice(0, 80) : null) || b.captured_title?.trim() || null;
+    // A link's url, split into WORDS — the DB tsvector only tokenizes hosts whole
+    // ("barewall.example.net"), so word-level url search lives here (link-bit-plan §9).
+    const urlWords = (b.url ?? "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
     return {
       kind: b.kind,
       id: b.id,
@@ -121,9 +124,9 @@ export async function searchItems(
       mediaType: b.type,
       tags: b.tags,
       created_at: b.created_at,
-      // file_name too, so a media bit (image/audio/pdf) is findable by its filename —
-      // the DB search_tsv indexes it, but the /search UI filters client-side on this.
-      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""}`.toLowerCase(),
+      // file_name too (media findable by filename), and a link's title + url words —
+      // the DB search_tsv indexes them, but the /search UI filters client-side on this.
+      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""} ${b.captured_title ?? ""} ${urlWords}`.toLowerCase(),
     };
   });
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));

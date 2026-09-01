@@ -14,16 +14,21 @@ import { SearchablePicker } from "@/components/searchable-picker";
 // (mirrors notes-browser). A board with zero matches under a filter hides; the
 // per-section collapse is remembered (home-surfaces' localStorage pattern).
 
-type Cat = "note" | "text" | "image" | "drawing";
+type Cat = "note" | "text" | "image" | "drawing" | "audio" | "pdf" | "link";
 
 // note → composition (rename pending): kind==='note' items read as "notes" HERE
 // and only here; the stored value stays kind='note' (lexicon.md is the naming
-// authority — this label flips when the rename lands).
-const CAT_LABEL: Record<Cat, string> = { note: "notes", text: "text", image: "images", drawing: "sketches" };
-const CAT_ORDER: Cat[] = ["note", "text", "image", "drawing"];
+// authority — this label flips when the rename lands). audio/pdf were missing
+// from this map (a pre-existing hole — an audio bit yielded an unlabeled facet);
+// fixed alongside adding link.
+const CAT_LABEL: Record<Cat, string> = {
+  note: "notes", text: "text", image: "images", drawing: "sketches",
+  audio: "recordings", pdf: "PDFs", link: "links",
+};
+const CAT_ORDER: Cat[] = ["note", "text", "image", "drawing", "audio", "pdf", "link"];
 
 function itemCat(b: PanelBit): Cat {
-  return b.kind === "note" ? "note" : (b.type as "text" | "image" | "drawing");
+  return b.kind === "note" ? "note" : (b.type as Exclude<Cat, "note">);
 }
 
 export function OutlineView({ outline }: { outline: Outline }) {

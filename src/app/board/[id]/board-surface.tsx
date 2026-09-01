@@ -40,7 +40,8 @@ export function BoardSurface({
   const [drawMode, setDrawMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
-  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" } | null>(null);
+  const [capturing, setCapturing] = useState(false); // a pasted link's server capture is slow — tell the user
+  const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>(null);
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
 
@@ -126,7 +127,7 @@ export function BoardSurface({
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
-      trackCreate, settled, reconcileId, setConverting, setWordsFor, onErr,
+      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor, onErr,
     });
 
   function select(placementId: string, bitId: string, additive: boolean) {
@@ -319,6 +320,12 @@ export function BoardSurface({
           <div className="compose-converting" role="status">
             Converting your photo…
             <span>HEICs take a few seconds</span>
+          </div>
+        )}
+        {capturing && (
+          <div className="compose-converting" role="status">
+            Capturing the page…
+            <span>fetching its title and image</span>
           </div>
         )}
         <div

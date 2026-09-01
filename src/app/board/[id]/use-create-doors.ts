@@ -14,6 +14,8 @@ import { uploadObject, signedUrl } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
+import { looksLikeUrl } from "@/lib/page-meta";
+import { captureLink } from "@/app/bits/actions";
 import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
 import type { PanelBit } from "@/lib/db/inbox";
@@ -49,13 +51,14 @@ export function useCreateDoors(deps: {
   settled: (placementId: string) => Promise<string>;
   reconcileId: (oldId: string, newId: string) => void;
   setConverting: Dispatch<SetStateAction<boolean>>;
-  setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" } | null>>;
+  setCapturing: Dispatch<SetStateAction<boolean>>; // the board-paste link capture is slow (~seconds) — show a notice
+  setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>>;
   onErr: (e: unknown) => void;
 }) {
   const {
     supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
     setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
-    trackCreate, settled, reconcileId, setConverting, setWordsFor, onErr,
+    trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor, onErr,
   } = deps;
 
   const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
@@ -380,6 +383,13 @@ export function useCreateDoors(deps: {
       }
       const text = e.clipboardData?.getData("text/plain") ?? "";
       if (!text.trim()) return;
+      // A BARE URL → a link bit (link-bit-plan: "what you give is what it becomes") —
+      // captured server-side (read-once title + card image), then placed in view via
+      // the normal call-in path. Words with it → an ordinary text bit, as ever.
+      if (looksLikeUrl(text)) {
+        void captureLinkToBoard(text.trim());
+        return;
+      }
       const html = text.split(/\r?\n/).map((ln) => `<p>${escapeHtml(ln)}</p>`).join("");
       const p = findClearSpot(400, 160);
       createTextCard(p.x, p.y, { body: html, edit: false }); // select it, but don't grab the keyboard
@@ -394,15 +404,34 @@ export function useCreateDoors(deps: {
     createTextCard(p.x, p.y);
   }
 
+  // The board-paste link door: capture server-side (slow — the notice covers the wait),
+  // then place the fresh loose bit right here via bringIn, and offer the caption.
+  async function captureLinkToBoard(raw: string) {
+    setCapturing(true);
+    try {
+      const res = await captureLink(raw);
+      if (!res.bit) {
+        onErr(new Error(res.error ?? "Couldn't capture that link."));
+        return;
+      }
+      await bringIn({ ...res.bit, source: null, tags: [], boards: [] });
+      setWordsFor({ bitId: res.bit.id, kind: "link" });
+    } catch (e) {
+      onErr(e);
+    } finally {
+      setCapturing(false);
+    }
+  }
+
   // Call-in: bring a loose bit onto THIS board, where you're looking. Optimistic like
   // createTextCard; callInBit inserts-or-revives and returns the TRUE placement, so we
   // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
-    if (type !== "text" && type !== "drawing" && type !== "image" && type !== "audio" && type !== "pdf") return;
+    if (type !== "text" && type !== "drawing" && type !== "image" && type !== "audio" && type !== "pdf" && type !== "link") return;
     const isNote = bit.kind === "note"; // a note lands page-shaped (a doorway), not receipt-shaped
     const width = isNote ? 200 : type === "text" ? 400 : type === "audio" ? AUDIO_W : 220;
-    const height = isNote ? 260 : type === "text" ? 60 : type === "audio" ? AUDIO_H : type === "pdf" ? 280 : 220;
+    const height = isNote ? 260 : type === "text" ? 60 : type === "audio" ? AUDIO_H : type === "pdf" ? 280 : type === "link" ? 180 : 220;
     // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
     // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate;
     // a note has a real fixed height, so use it directly.
@@ -424,6 +453,9 @@ export function useCreateDoors(deps: {
       // A PDF shows its first-page thumbnail (thumb_path only — the storage_path is
       // the PDF binary, not an image). No thumb → the card's document-sheet fallback.
       try { imageUrl = await signedUrl(supabase, bit.thumb_path); } catch {}
+    } else if (type === "link" && bit.thumb_path) {
+      // A link shows its stored page-card image; no thumb → the title/URL card.
+      try { imageUrl = await signedUrl(supabase, bit.thumb_path); } catch {}
     }
     setCards((cs) => [
       ...cs,
@@ -435,6 +467,8 @@ export function useCreateDoors(deps: {
         imageUrl,
         fileUrl,
         content: bit.content ?? undefined,
+        url: type === "link" ? (bit.url ?? undefined) : undefined,
+        label: type === "link" ? (bit.face ?? undefined) : undefined,
         sourceName: bit.source?.name ?? undefined,
         sourceUrl: bit.source?.url ?? undefined,
       },

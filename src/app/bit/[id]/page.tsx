@@ -68,6 +68,13 @@ export default async function BitPage({
     } catch {
       pdfUrl = undefined;
     }
+  } else if (b.type === "link" && b.thumb_path) {
+    // the stored page-card image (a link has no storage_path)
+    try {
+      imageUrl = await signedUrl(supabase, b.thumb_path);
+    } catch {
+      imageUrl = undefined;
+    }
   }
   const drawing = b.type === "drawing" ? normalizeDrawing(b.strokes) : null;
   const dBounds = drawing ? strokesBounds(drawing.strokes) : null;
@@ -119,6 +126,27 @@ export default async function BitPage({
         )}
         {b.type === "image" && imageUrl && (
           <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
+        )}
+        {b.type === "link" && (
+          <div>
+            {imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={imageUrl} alt={b.face ?? ""} className="max-h-[50vh] rounded-md border border-neutral-200" />
+            )}
+            {b.url && (
+              <p className="mt-2 text-sm">
+                <a
+                  href={b.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-4 hover:no-underline"
+                >
+                  open the page ↗
+                </a>
+                <span className="ml-3 text-neutral-400">{new URL(b.url).hostname.replace(/^www\./, "")}</span>
+              </p>
+            )}
+          </div>
         )}
         {b.type === "audio" &&
           (audioUrl ? (

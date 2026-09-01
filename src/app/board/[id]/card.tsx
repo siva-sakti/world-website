@@ -15,7 +15,7 @@ import type { Drawing } from "@/lib/types";
 export type CardVM = {
   placementId: string;
   bitId: string;
-  type: "text" | "drawing" | "image" | "audio" | "pdf";
+  type: "text" | "drawing" | "image" | "audio" | "pdf" | "link";
   kind: "bit" | "note"; // a note (a written PIECE) renders as a page-shaped DOORWAY, not editable text (N3)
   x: number;
   y: number;
@@ -27,6 +27,8 @@ export type CardVM = {
   imageUrl?: string; // image thumbnail/full URL — also a PDF's first-page thumbnail (signed thumb_path)
   fileUrl?: string; // audio (resolved storage URL for the <audio> player)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
+  url?: string; // a LINK bit's substance — the card's open-↗ target
+  label?: string; // a link bit's computed face (caption → read-once title → url) for the title strip
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)
   sourceUrl?: string; // the source's optional clickable link
 };
@@ -188,7 +190,7 @@ export function Card({
         className={`compose-card-inner${
           isNote
             ? " is-note"
-            : card.type === "image" || card.type === "pdf"
+            : card.type === "image" || card.type === "pdf" || card.type === "link"
               ? " is-image"
               : card.type === "drawing"
                 ? " is-doodle"
@@ -297,6 +299,25 @@ export function Card({
               {card.content && <span className="compose-pdf-name">{card.content}</span>}
             </div>
           ))}
+        {/* A LINK looks like the thing it points at (link-bit-plan): its page-card
+            image, cover-fit, with a quiet title strip — the ladder degrades to a
+            title card, then a bare URL card. The ↗ opens the real page. */}
+        {card.type === "link" &&
+          (card.imageUrl ? (
+            <div className="compose-linkcard">
+              <img src={card.imageUrl} alt={card.label ?? ""} className="compose-img compose-linkcard-img" draggable={false} />
+              <div className="compose-linkcard-strip">
+                <span className="compose-linkcard-title">{card.label}</span>
+                <LinkOut url={card.url} />
+              </div>
+            </div>
+          ) : (
+            <div className="compose-linkcard compose-linkcard--bare">
+              <span className="compose-linkcard-site">{hostOf(card.url)}</span>
+              <span className="compose-linkcard-title">{card.label}</span>
+              <LinkOut url={card.url} />
+            </div>
+          ))}
         {card.type === "drawing" && card.drawing && (
           <DoodleBit drawing={card.drawing} />
         )}
@@ -360,6 +381,33 @@ export function Card({
       </div>
     </Rnd>
   );
+}
+
+// A link card's ↗ — opens the real page; stops propagation so it never starts a drag.
+function LinkOut({ url }: { url?: string }) {
+  if (!url) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="compose-linkcard-out"
+      title="open the page"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      ↗
+    </a>
+  );
+}
+
+// The site's name for a bare link card — derived from the url, never stored.
+function hostOf(url?: string): string {
+  try {
+    return url ? new URL(url).hostname.replace(/^www\./, "") : "";
+  } catch {
+    return "";
+  }
 }
 
 // A quiet single-line editor for a bit's owner words. Saves on Enter/blur;

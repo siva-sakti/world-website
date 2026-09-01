@@ -8,6 +8,7 @@ const BIT_FALLBACK: Record<string, string> = {
   image: "an image",
   audio: "a recording",
   pdf: "a PDF",
+  link: "a link",
 };
 
 /** A bit's display face, or a per-type fallback (grammatical — "an image"). */

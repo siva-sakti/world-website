@@ -35,7 +35,7 @@ export default async function BoardPage({
     await Promise.all(
       rows.map(async (r): Promise<CardVM | null> => {
         if (r.thing !== "bit" || !r.type) return null;
-        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image" && r.type !== "audio" && r.type !== "pdf") return null;
+        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image" && r.type !== "audio" && r.type !== "pdf" && r.type !== "link") return null;
         const type = r.type;
         const kind = meta.get(r.target_bit_id!)?.kind ?? "bit";
         const isNoteCard = kind === "note"; // a note lands as a page-shaped doorway
@@ -66,6 +66,13 @@ export default async function BoardPage({
           } catch {
             fileUrl = undefined;
           }
+        } else if (type === "link" && r.thumb_path) {
+          // the stored page-card image (thumb_path only — a link has no storage_path)
+          try {
+            imageUrl = await signedUrl(supabase, r.thumb_path);
+          } catch {
+            imageUrl = undefined;
+          }
         }
         return {
           placementId: r.placement_id,
@@ -75,13 +82,15 @@ export default async function BoardPage({
           x: r.x ?? 40,
           y: r.y ?? 40,
           w: r.width ?? (isNoteCard ? 200 : type === "text" ? 240 : type === "audio" ? 260 : 220),
-          h: r.height ?? (isNoteCard ? 260 : type === "text" ? 60 : type === "audio" ? 56 : type === "pdf" ? 280 : 220),
+          h: r.height ?? (isNoteCard ? 260 : type === "text" ? 60 : type === "audio" ? 56 : type === "pdf" ? 280 : type === "link" ? 180 : 220),
           z: r.z ?? 0,
           body: r.body ?? undefined,
           drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,
           imageUrl,
           fileUrl,
           content: meta.get(r.target_bit_id!)?.content ?? undefined,
+          url: type === "link" ? (r.url ?? undefined) : undefined,
+          label: type === "link" ? (r.label ?? undefined) : undefined,
           sourceName: r.source_name ?? undefined,
           sourceUrl: r.source_url ?? undefined,
         };

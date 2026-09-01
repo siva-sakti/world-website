@@ -127,7 +127,7 @@ export function NoteCard({
           click-through (.inbox-card--selecting *), so a click anywhere selects instead of opening. */}
       {/* Open → the workspace, where full editing / tagging / source live. */}
       <Link href={`/bit/${item.id}`} className="inbox-card-body" title="open">
-        {item.type === "image" || item.type === "pdf" ? (
+        {item.type === "image" || item.type === "pdf" || (item.type === "link" && img) ? (
           img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img} alt={title ?? ""} className="inbox-card-media" />

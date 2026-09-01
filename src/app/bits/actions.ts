@@ -3,12 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
-import { createLooseTextBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
+import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
+import { uploadObject, removeObjects } from "@/lib/storage";
 import { getBoardCards } from "@/lib/db/boards";
 import { anchorNearContent, pointForIndex } from "./placement-anchor";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
-import { fetchPageMeta, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
+import { fetchPageMeta, fetchImageBlob, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
 
 function escapeHtml(s: string): string {
   return s
@@ -24,32 +25,45 @@ export type IntakeInput = {
   tags?: string[]; // tag words to apply to the new note (find-or-create, idempotent)
 };
 
-/** The intake: a note (or a pasted link) → a LOOSE text bit, carrying the sticky
- * source if one is set (D-102, plan §5 Stage 2). Quote vs. thought is *formatting*
- * (a blockquote), not a new kind. The source is set via setSource (pick-or-create,
- * idempotent) so piling several notes under one sticky source just re-finds it. */
+/** The intake. WORDS (with or without a URL inside) → a LOOSE text bit — your thought,
+ * carrying the sticky source if set (D-102). A BARE URL → a LINK BIT (link-bit-plan.md,
+ * owner-ruled 2026-08-31): the thing itself, card image + title fetched ONCE; it takes
+ * the sticky source too (the chip you set is always honored) and tags like any bit.
+ * "What you give is what it becomes." Quote-formatting shapes notes only (a link bit
+ * ignores asQuote — ruled). Any failure after the thumb upload cleans the object up —
+ * no orphan in storage. */
 export async function addToInbox(input: IntakeInput): Promise<{ error?: string }> {
   const note = (input.note ?? "").trim();
   if (!note) return { error: "Nothing to add." };
   const supabase = await createClient();
   const bitId = randomUUID();
 
-  let inner: string;
-  if (looksLikeUrl(note)) {
-    // A bare pasted link stays a NOTE whose body is a clickable link — bookmark is
-    // retired (D-102). It can carry the sticky source like any other note.
-    const url = normalizeUrl(note);
-    const meta = await fetchPageMeta(url);
-    const label = meta?.title ?? url;
-    inner = `<p><a href="${escapeHtml(url)}">${escapeHtml(label)}</a></p>`;
-  } else {
-    inner = note.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
-  }
-  const body = input.asQuote ? `<blockquote>${inner}</blockquote>` : inner;
+  const isLink = looksLikeUrl(note);
+  let thumbPath: string | null = null;
 
   let created = false;
   try {
-    await createLooseTextBit(supabase, { bitId, body });
+    if (isLink) {
+      const url = normalizeUrl(note);
+      const meta = await fetchPageMeta(url);
+      if (meta?.image) {
+        const img = await fetchImageBlob(meta.image);
+        if (img) {
+          const path = `thumbs/${bitId}.jpg`;
+          try {
+            await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
+            thumbPath = path;
+          } catch (e) {
+            console.error("link thumb upload failed (plainer card):", e);
+          }
+        }
+      }
+      await createLinkBit(supabase, { bitId, url, capturedTitle: meta?.title ?? null, thumbPath });
+    } else {
+      const inner = note.split(/\n+/).map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+      const body = input.asQuote ? `<blockquote>${inner}</blockquote>` : inner;
+      await createLooseTextBit(supabase, { bitId, body });
+    }
     created = true;
     const rawName = (input.sourceName ?? "").trim();
     if (rawName) {
@@ -73,8 +87,10 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     console.error("addToInbox failed:", e);
     // A late step (source/tag) failed AFTER the bit was born: abort the create so
     // "try again" starts clean — otherwise the retry duplicates the note (the first
-    // copy sitting in the pile missing its source/tags).
+    // copy sitting in the pile missing its source/tags). A link bit's uploaded thumb
+    // must go with it — the row is gone, so destroy-cleanup would never reach it.
     if (created) await abortBitCreate(supabase, bitId);
+    if (thumbPath) await removeObjects(supabase, [thumbPath]).catch(() => {});
     return { error: "Couldn't add that — try again." };
   }
   revalidatePath("/bits");
@@ -129,6 +145,41 @@ export async function placeBitsOnBoard(bitIds: string[], boardId: string): Promi
 /** Single-bit send — a thin wrapper so the existing per-card door keeps its signature. */
 export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
   return placeBitsOnBoard([bitId], boardId);
+}
+
+/** Board-paste door (link-bit-plan): capture a pasted URL as a LOOSE link bit, fully
+ * server-side — read-once meta + a stored copy of the page-card image — and return the
+ * created row so the board can place it via the normal call-in path. Best-effort media:
+ * a failed fetch/upload only means a plainer card; a failed INSERT cleans the thumb up. */
+export async function captureLink(
+  rawUrl: string,
+): Promise<{ bit?: import("@/lib/types").Bit; error?: string }> {
+  const supabase = await createClient();
+  const bitId = randomUUID();
+  const url = normalizeUrl(rawUrl);
+  let thumbPath: string | null = null;
+  try {
+    const meta = await fetchPageMeta(url);
+    if (meta?.image) {
+      const img = await fetchImageBlob(meta.image);
+      if (img) {
+        const path = `thumbs/${bitId}.jpg`;
+        try {
+          await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
+          thumbPath = path;
+        } catch (e) {
+          console.error("captureLink thumb upload failed (plainer card):", e);
+        }
+      }
+    }
+    const bit = await createLinkBit(supabase, { bitId, url, capturedTitle: meta?.title ?? null, thumbPath });
+    revalidatePath("/bits");
+    return { bit };
+  } catch (e) {
+    console.error("captureLink failed:", e);
+    if (thumbPath) await removeObjects(supabase, [thumbPath]).catch(() => {});
+    return { error: "Couldn't capture that link — try again." };
+  }
 }
 
 /** Bulk trash from the loose multi-select (owner-ruled 2026-08-31). Trash is a freeze —
