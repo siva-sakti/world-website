@@ -10,6 +10,28 @@
 
 ---
 
+## 0 · ⚠⚠ READ THIS FIRST — an independent stress-test (2026-09-01) challenges most of what follows
+
+Full findings + sources: **`convergent-surfaces-stress-test.md`**. Headline:
+
+> **Convergence is TEN operations. This app serves two. The trio of surfaces addresses ONE of them.**
+
+| # | operation | today | | # | operation | today |
+|---|---|---|---|---|---|---|
+| 1 | **frame** (commit to a target) | ❌ | | 6 | **group** (cluster *and name*) | ❌ |
+| 2 | **gather** | ✅ | | 7 | **merge** | ½ |
+| 3 | **select / cull** (in-out **per piece**) | ❌ | | 8 | **commit** (a version) | ❌ |
+| 4 | **excerpt / split** | ❌ | | 9 | **revise** | — |
+| 5 | **order** (authored) | ❌ | | 10 | **emit** (a file for a person) | ❌ |
+
+**The claim:** what's missing is **records and acts**, not surfaces — a per-piece in/out flag · an authored order · a named group · an excerpt. Doc·deck·sheet·outline·board are **five renderers of the same facts.**
+**The indictment, from our own §4:** *"the craft goes into the seams… not more board features"* — **and the plan puts all the craft into three destinations.**
+**Verdicts:** "formatted to converge" **WEAK** (the variable is *constraint*, not *format* — and **a more capable doc is a more divergent doc**) · the trio **WEAK** (the real axis is *what carries the structure*; it omits **stored nesting**) · the 2×3 grid **WRONG as claimed** (a live-view block writes no row, so backlinks do **not** fall out of every cell) · **rows-are-bits SOUND but unpriced** (I-N1 ⇒ every tracker row loose forever) · sequencing **WEAK** (the sheet is cheapest, the deck heaviest — our estimates were inverted).
+**Kept:** the **bit-block** and **rows are bits** — Heptabase's own rule is our model verbatim: *"Whiteboards do not own cards. All cards belong to the Card Library."*
+**The unclaimed ground:** Mural/Miro order space but export *pictures*; Longform carries *text* but has no canvas. **Nobody carries text and keeps free space.**
+
+🔵 **This is a reviewer's opinion, not a ruling** — but it is heavily sourced and it corrected itself twice on evidence. **Everything below is now under question.**
+
 ## 1 · The frame — one sentence, and the picture
 
 > **Free to diverge. Formatted to converge.** *(the owner's model, stated consistently across the whole session)*

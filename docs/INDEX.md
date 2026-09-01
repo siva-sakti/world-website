@@ -198,6 +198,10 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `convergent-surfaces-stress-test.md` — 🔵 independent review of the convergence direction (2026-09-01)
+**Contains:** convergence as **ten operations** (we serve two) · six verdicts on our conclusions (what's weak, what's wrong, what to keep) · the excerpt problem with four costed stances · spatial→linear: the only four mechanisms that exist · seven ranked gaps · flagged uncertainty · heavy sourcing.
+**Is:** a reviewer's opinion, **not a ruling** — commissioned to attack, not validate. Read WITH the overview.
+
 ### `convergent-surfaces-overview.md` — ⭐ THE ONE CLEAN READ of the convergence picture (2026-08-31)
 **Contains:** the frame (free to diverge, formatted to converge) · the grown north star · the three surfaces' state · the 2×3 connective grid (Obsidian/Notion nested) · the engine digest · the story for people · **everything unruled, listed** · standing cautions.
 **Is:** the synthesis layer — every section points at its detail doc. Read this FIRST on the convergence topic; the trail lives in `product-concept-promise.md`.
