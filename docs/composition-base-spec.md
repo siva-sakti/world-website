@@ -146,6 +146,13 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 - **Terminology discipline:** "composition" consistently as the placeholder (Claude had drifted to "piece"); the real word = the naming session.
 - **Excerpt + make-this-a-bit + PDF/audio-passages = ONE design, three cases** — a bit born from inside something, remembering its parent. All unbuilt; designed together at enactment.
 
+## ⭐ THE CONTENT LAW + morning rulings (owner, 2026-09-03)
+- **⭐ THE LAW (owner's symmetry idea, refined): CONTENT IS BITS; STRUCTURE IS FORMATTING. The two surfaces share ONE content roster.** Everything placeable on a board is pullable into a composition — same objects (text · image · drawing · recording · PDF · link · candidate table/video). The composition's own extras — headings · lists · checklists · dividers — are formatting, never bits. Notion mapped: their content blocks ≈ our bit types; their structure blocks ≈ our formatting. Every new bit type works both surfaces automatically.
+- **No floating on the composition: ✅ STAMPED** (*"we already have the board for that"*).
+- **Source at minting confirmed:** drop a quote in → make it a bit → add its source then, if you choose; never required.
+- **🆕 The drawer's "IN THIS PIECE" scope** (owner's idea): on a composition's page, a drawer tab listing everything pulled into *this* piece, each expandable to read WHOLE beside the writing. Completes the posture pair: *inline = the flow, cropped · drawer = the material, whole* (the board+floater remains the spread-and-look home). Cheap — the pulled-list exists as data.
+- **Bit-type candidates named, none queued:** video · generic file. Roster grows by demonstrated want only.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
