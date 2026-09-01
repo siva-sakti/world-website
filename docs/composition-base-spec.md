@@ -79,13 +79,26 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
 ## Open (only these)
-Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · **the words (Q9)**.
+Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · **N6's sliver: empty-at-click-out — evaporate or persist?** · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
 ---
 
 ## Checker findings folded (independent audit, 2026-09-02 — full report in the session log)
 **Verdict: comprehensive-with-holes; NOT yet buildable.** Fixed same-day: the ghost §8 pointer · two false Part-2 claims (paste already births bits; the card already previews) · stale board-cell leftovers · the "link" word collision (D-129 shipped a `link` bit type — *link* is now TAKEN; Q9 tightens).
 **Owed before enactment (the author's debt):** the explicit **invariant map + full lifecycle trace** (gates 1–2, run and written — incl. what a chip shows when its target composition is *trashed*, what "loose" means post-migration) · floater mechanics + error states · frame-handoff (unsaved edits across floater→panel→page; the same composition open twice) · board-machinery parity (connectors · marquee · tidy-up on a composition's card) · the real migration plan doc.
+
+## ⭐ THE N-ANSWERS (owner-ruled, 2026-09-02 walk-through)
+
+| # | ruling |
+|---|---|
+| **N1 · visibility** | **Controls exist in the UI at last — on boards and compositions at least; bits get a mark-private control.** Compositions **born private**; existing note-rows **flip private at migration** (every stored value was a default, never a choice). Bits: *follow the board unless marked private; the mark is GLOBAL, never per-board* — ⭐ which re-derives **D-072's AND-rule exactly**; machinery unchanged, only the controls + the composition default are new. |
+| **N2 · auto-title** | **Machine-written, fixed date/time format — but ONLY at click-out/save without a title.** Never minted just because you clicked in; background autosave does NOT mint it. ⚠ Amends **I-R1** (machine-never-writes) with one ruled exception: the exit-stamp title, fixed format, recognisably machine-made. Applies to compositions AND boards. |
+| **N3 · chips of resting things** | **Trash:** chip greys + freezes; tap → *"this is in your trash — bring it out to see it"* (restore door; no entry while trashed). **Archive:** chip greys but **remains enterable** — it takes you there, clearly marked archived (*how* it's marked = a design pass, open). |
+| **N4 · toolkits** | **Floater = basic** (text · marks · `[[`). **Panel ("half screen") and full page = the full toolkit.** |
+| **N5 · phone** | **Full page for now** — the floater "wouldn't be as dynamic"; maybe later; revisit, not a blocker. |
+| **N7 · arrows** | Dissolved into the prior, already-parked question: connectors exist in schema, **no drawing UI was ever built**, and the recorded lean stands (*arrangement is the connection; lines a rare power-move*). Stays parked; if ever built, compositions are uniform cards. |
+
+**⚪ The one sliver left from this round (N6):** you click out of a just-born piece with **zero content** — does it **evaporate** (nothing was ever made) or **persist as a date-titled empty piece**? (Title-minting is ruled; the empty case isn't.)
 
 ## ⚑ NEW owner questions (the checker's — it was barred from answering)
 | # | question |
