@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { createLooseTextBit, updateBitBody, updateBitContent, trashBit } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
@@ -27,6 +28,12 @@ export function QuickWrite() {
   const create = useRef<Promise<unknown> | null>(null); // set before any await — the sync guard
   const latest = useRef("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Same three refs as the note editor (F2, one class not one instance): what the
+  // DB holds, what's on the wire, and a write chain so two bodies can't reorder.
+  const saved = useRef("");
+  const writing = useRef<string | null>(null);
+  const chain = useRef<Promise<void>>(Promise.resolve());
+  const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   // The optional title (plan v1.2): held locally until the note is BORN on first
   // body content (title alone never births — unchanged), then flushed to
   // bit.content (D-087 — the same field the board card and the note's page edit).
@@ -44,7 +51,12 @@ export function QuickWrite() {
       if (!bitId.current) return; // the create failed and reset
       updateBitContent(supabase, id, t)
         .then(() => (titleSaved.current = t))
-        .catch(() => {}); // retried on the next blur/keystroke flush
+        .catch((e) => {
+          // Was swallowed entirely: the body saved, the page looked fine, and the
+          // title simply wasn't there later (flow review, network case 3).
+          console.error("save title failed:", e);
+          setErr("Couldn't save the title — it'll retry as you keep typing.");
+        });
     });
   }
 
@@ -70,32 +82,77 @@ export function QuickWrite() {
         });
     }
     if (timer.current) clearTimeout(timer.current);
+    setStatus("idle");
     timer.current = setTimeout(flush, 600);
   }
 
-  async function flush() {
-    if (!create.current) return;
-    try {
+  function flush(): Promise<void> {
+    if (!create.current) return Promise.resolve();
+    const body = latest.current;
+    writing.current = body;
+    setStatus("saving");
+    const run = chain.current.then(async () => {
       await create.current; // the settled gate — never write before the row exists
       const id = bitId.current;
       if (!id) return; // the create failed and reset; the retry path owns it now
-      await updateBitBody(supabase, id, latest.current);
-      await reconcileReferences(supabase, id, extractRefIds(latest.current));
-      setErr(null);
-    } catch (e) {
-      console.error("save failed:", e);
-      setErr("Couldn't save — check your connection. Your words are still here.");
-    }
+      await updateBitBody(supabase, id, body);
+      saved.current = body; // saved once the BODY lands — before the chip reconcile
+      await reconcileReferences(supabase, id, extractRefIds(body));
+    });
+    chain.current = run.catch(() => {}); // settled-safe tail
+    return run
+      .then(() => {
+        setStatus("saved");
+        setErr(null);
+      })
+      .catch((e) => {
+        console.error("save failed:", e);
+        setStatus("idle");
+        setErr("Couldn't save — check your connection. Your words are still here.");
+      })
+      .finally(() => {
+        if (writing.current === body) writing.current = null;
+      });
+  }
+
+  /** Write now if anything is UNSAVED (the dirty check the note editor gained in
+   *  F2 — a failed save must not disable the escape hatches). */
+  function flushPending(): Promise<void> {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    if (!create.current) return Promise.resolve();
+    if (latest.current === saved.current) return Promise.resolve();
+    if (latest.current === writing.current) return Promise.resolve();
+    return flush();
   }
 
   /** Write everything waiting — leaving /write, or the page going away. Without
    *  this, words typed less than 600ms before navigating away died with the timer,
    *  and a title never blurred was never written at all. */
   function leaveNow() {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
     flushTitle(); // guarded internally (no id / unchanged → no-op)
-    void flush();
+    void flushPending();
+  }
+
+  /** Open the note you just wrote. Flushes FIRST, then navigates — a plain link
+   *  would let /note/[id] server-render a pre-flush body, and its next save would
+   *  overwrite the tail you just typed (the hazard board-surface's openSelected
+   *  documents; /write debounces at 600ms, so the window is wide — review F6). */
+  const router = useRouter();
+  const [opening, setOpening] = useState(false);
+  async function openSelf() {
+    const id = selfId;
+    if (!id || opening) return;
+    setOpening(true);
+    try {
+      flushTitle();
+      await flushPending();
+      router.push(`/note/${id}`);
+    } catch (e) {
+      console.error("open failed:", e);
+      setErr("Couldn't finish saving — try again before leaving.");
+      setOpening(false);
+    }
   }
   const leave = useRef(leaveNow);
   leave.current = leaveNow;
@@ -128,6 +185,10 @@ export function QuickWrite() {
     latest.current = "";
     titleRef.current = "";
     titleSaved.current = "";
+    saved.current = "";
+    writing.current = null;
+    chain.current = Promise.resolve();
+    setStatus("idle");
     setTitle("");
     setSelfId(null);
     setErr(null);
@@ -146,6 +207,15 @@ export function QuickWrite() {
           title="Trash this note (restorable)"
         >
           🗑 trash
+        </button>
+        <button
+          type="button"
+          onClick={() => void openSelf()}
+          disabled={!selfId || opening}
+          className="rounded-md border border-neutral-200 px-2 py-1 hover:bg-neutral-50 disabled:opacity-40"
+          title={selfId ? "Open this note on its own page" : "Starts once you've written something"}
+        >
+          {opening ? "opening…" : "open →"}
         </button>
       </div>
       <input
@@ -167,6 +237,10 @@ export function QuickWrite() {
       <p className="mt-4 text-xs text-neutral-400" role="status">
         {err ? (
           <span className="text-red-700">{err}</span>
+        ) : status !== "idle" ? (
+          // A silent save is indistinguishable from a broken one — /write said
+          // nothing at all until now (review F6).
+          <span>{status === "saving" ? "saving…" : "saved"}</span>
         ) : (
           // The gather hint (O3): the page's superpower shouldn't be a secret.
           <span>

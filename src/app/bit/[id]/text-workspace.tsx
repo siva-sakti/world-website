@@ -33,20 +33,36 @@ export function TextWorkspace({
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef(initialBody);
+  // What the DB is known to hold, and what a write currently in flight is carrying.
+  // `saved` MUST start at initialBody: starting empty would make the first mount
+  // look dirty and write a stale body over the real one (review F2).
+  const saved = useRef(initialBody);
+  const writing = useRef<string | null>(null);
+  // Per-editor write chain — the same ordering fix the board's persistence got
+  // (R1.4): without it, typing "A" then "B" can land B-then-A on a slow link and
+  // the DB keeps "A" while the screen says "saved".
+  const chain = useRef<Promise<void>>(Promise.resolve());
 
   function flush() {
     timer.current = null;
     const body = latest.current;
-    // The write goes FIRST — nothing may precede it. This function also runs from
-    // the unmount cleanup and the save guard, where anything that threw ahead of
-    // the write would silently lose the writing.
-    const write = updateBitBody(supabase, bitId, body).then(() =>
-      // Reconcile the `[[` chips into `reference` rows (the two-write step; a
-      // failed reconcile self-heals on the next save/read — plan risk 1).
-      reconcileReferences(supabase, bitId, extractRefIds(body)),
-    );
+    writing.current = body;
     setStatus("saving");
-    write
+    // Chained: this write waits for the previous one, so two saves can never
+    // reorder on the wire. The write goes FIRST — nothing may precede it.
+    const run = chain.current.then(async () => {
+      await updateBitBody(supabase, bitId, body);
+      // Mark saved HERE — after the body lands, before the chip reconcile. If we
+      // waited for reconcile, a body that saved fine but whose reconcile failed
+      // would stay dirty forever: re-writing an identical body on every flush while
+      // the banner claims "couldn't save" about writing that DID save (F2).
+      saved.current = body;
+      // Reconcile the `[[` chips into `reference` rows (the two-write step; a
+      // failed reconcile is retried by the next save — accepted, plan risk 1).
+      await reconcileReferences(supabase, bitId, extractRefIds(body));
+    });
+    chain.current = run.catch(() => {}); // settled-safe tail: one failure can't block the next write
+    run
       .then(() => {
         setStatus("saved");
         setErr(null);
@@ -55,6 +71,9 @@ export function TextWorkspace({
         console.error("save body failed:", e);
         setErr("Couldn't save — keep typing, we'll retry.");
         setStatus("idle");
+      })
+      .finally(() => {
+        if (writing.current === body) writing.current = null;
       });
     // Then tell the parent what the writing says — the note page reads its `[[`
     // chips from this to mark drawer rows "gathered". Guarded: a listener must
@@ -66,11 +85,16 @@ export function TextWorkspace({
     }
   }
 
-  /** Write now if anything is waiting. Safe to call twice — it writes the current
-   *  body, so a repeat is a no-op write, never damage. */
+  /** Write now if anything is UNSAVED. Keyed on dirtiness, not on a pending timer:
+   *  `flush()` clears the timer at entry, so the old timer check made both escape
+   *  hatches dead after a FAILED save — the editor promised "we'll retry" and then
+   *  couldn't (review F2, a real loss path). Safe to call twice: a body already
+   *  written, or already in flight, is skipped. */
   function flushPending() {
-    if (!timer.current) return;
-    clearTimeout(timer.current);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    if (latest.current === saved.current) return; // nothing new
+    if (latest.current === writing.current) return; // already on the wire
     flush();
   }
 
