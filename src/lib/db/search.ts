@@ -107,6 +107,15 @@ export async function searchItems(
 ): Promise<SearchItem[]> {
   const bitKind = args.kind === "bit" || args.kind === "note" ? args.kind : undefined;
   const bits = await searchBits(supabase, { q: args.q, tagId: args.tagId, kind: bitKind });
+  // Source names, searchable ("ottessa" finds everything from Ottessa) — the queue's
+  // "search misses the source attached to a bit" gap. One round-trip for the distinct
+  // sources on these bits (the attachTags pattern).
+  const srcIds = [...new Set(bits.map((b) => b.source_id).filter((x): x is string => Boolean(x)))];
+  const srcName = new Map<string, string>();
+  if (srcIds.length) {
+    const { data } = await supabase.from("source").select("id, name").in("id", srcIds);
+    for (const s of data ?? []) srcName.set(s.id as string, s.name as string);
+  }
   const items: SearchItem[] = bits.map((b) => {
     // `face` isn't a column on the base `bit` table (it's computed in the views), so
     // b.face is undefined here — derive it the way bit_face does (owner's content,
@@ -126,7 +135,7 @@ export async function searchItems(
       created_at: b.created_at,
       // file_name too (media findable by filename), and a link's title + url words —
       // the DB search_tsv indexes them, but the /search UI filters client-side on this.
-      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""} ${b.captured_title ?? ""} ${urlWords}`.toLowerCase(),
+      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""} ${b.captured_title ?? ""} ${urlWords} ${b.source_id ? (srcName.get(b.source_id) ?? "") : ""}`.toLowerCase(),
     };
   });
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));
