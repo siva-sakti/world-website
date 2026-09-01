@@ -25,6 +25,10 @@ export function usePersistence(
   // (a revive reuses the departed row's own id). Remember the rename so a flush that
   // already captured the old key still writes to the real row — never a lost move.
   const renamed = useRef(new Map<string, string>());
+  // Per-ROW write ordering (review R1.4): the tail of the last write chained for each
+  // REAL row id. Without it, a stalled earlier flush can land after a later one and
+  // silently revert the DB (reload teleports a card / reverts typed text).
+  const chains = useRef(new Map<string, Promise<void>>());
 
   // Remember each card's create so writes can wait for the row to exist. Stored
   // settled-safe (.catch): a REJECTED create must not detonate inside flush or a
@@ -61,24 +65,35 @@ export function usePersistence(
 
   async function flush(placementId: string) {
     const p = pending.current.get(placementId);
-    pending.current.delete(placementId);
+    pending.current.delete(placementId); // capture-at-fire (kept BEFORE any await — deliberate)
     timers.current.delete(placementId);
     if (!p) return;
     // The row must exist before we update it; resolve the id AFTER the wait —
     // a reconcile may have landed meanwhile. (settled never rejects.)
     const realId = await settled(placementId);
-    try {
-      if (Object.keys(p.placement).length)
-        await updatePlacement(supabase, realId, p.placement);
-      if (p.body !== undefined) {
-        await updateBitBody(supabase, p.bitId, p.body);
-        // Reconcile the note's `[[` chips into `reference` rows (self-heals on a
-        // later save/read if this leg fails — plan risk 1).
-        await reconcileReferences(supabase, p.bitId, extractRefIds(p.body));
-      }
-    } catch (e) {
-      onErr(e);
-    }
+    // Chain behind the previous write for the SAME real row — keyed POST-reconcile
+    // (the optimistic id can rename; the real row's never does), so two flushes can
+    // never reorder on the wire. Two flushes awaiting the same `prev` resume in
+    // registration order (microtask FIFO) = capture order. The stored tail is
+    // settled-safe (errors surface once via onErr, and never block the next write).
+    const prev = chains.current.get(realId) ?? Promise.resolve();
+    const tail = prev
+      .then(async () => {
+        if (Object.keys(p.placement).length)
+          await updatePlacement(supabase, realId, p.placement);
+        if (p.body !== undefined) {
+          await updateBitBody(supabase, p.bitId, p.body);
+          // Reconcile the note's `[[` chips into `reference` rows (self-heals on a
+          // later save/read if this leg fails — plan risk 1).
+          await reconcileReferences(supabase, p.bitId, extractRefIds(p.body));
+        }
+      })
+      .catch(onErr);
+    chains.current.set(realId, tail);
+    void tail.finally(() => {
+      if (chains.current.get(realId) === tail) chains.current.delete(realId);
+    });
+    await tail;
   }
 
   // Re-point a card's in-flight persistence from its optimistic id to the real one.
@@ -115,16 +130,29 @@ export function usePersistence(
   }
 
   /** Write EVERY waiting change now — leaving the board, or the page going away.
-   *  Without this, a card you moved or typed in less than 350ms before navigating
-   *  away lost its write with the timer. Safe to call twice: each flush writes the
-   *  current value and clears its own pending entry. */
-  function flushAll() {
+   *  Returns a promise that resolves when the writes have LANDED (duplicate-board
+   *  awaits this so the copy includes the last drag/keystroke); the save-guard's
+   *  pagehide callers ignore the return, unchanged. Covers both the still-timered
+   *  flushes AND a snapshot of in-flight chains — a flush already past its
+   *  pending-delete is invisible to the timers map (the antagonist's catch: without
+   *  the snapshot, the await misses exactly the write it exists to include). */
+  function flushAll(): Promise<void> {
+    const fired: Promise<void>[] = [];
     for (const id of [...timers.current.keys()]) {
       const t = timers.current.get(id);
       if (t) clearTimeout(t);
-      void flush(id);
+      fired.push(flush(id));
     }
+    const inFlight = [...chains.current.values()];
+    return Promise.allSettled([...fired, ...inFlight]).then(() => {});
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush, flushAll };
+  /** Every in-flight CREATE (uploads + inserts). Duplicate-board awaits this so a
+   *  just-dropped card's row exists before the copy reads the board. Entries are
+   *  settled-safe and self-cleaning (trackCreate), so this can never hang. */
+  function pendingCreates(): Promise<void> {
+    return Promise.allSettled([...creates.current.values()]).then(() => {});
+  }
+
+  return { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow: flush, flushAll, pendingCreates };
 }

@@ -74,7 +74,7 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow, flushAll } =
+  const { patchCard, saveContent, trackCreate, reconcileId, settled, flushNow, flushAll, pendingCreates } =
     usePersistence(supabase, setCards, onErr);
 
   // Don't lose a move or a keystroke to the 350ms debounce. One stable door to
@@ -84,13 +84,7 @@ export function BoardSurface({
   // eslint-disable-next-line react-hooks/refs -- latest-callback ref: registered once
   leaveBoard.current = flushAll;
   useEffect(() => registerSave(() => leaveBoard.current()), []);
-  useEffect(() => () => leaveBoard.current(), []);
-
-  // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
-  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
-    supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, setLooseRefresh, onErr,
-  });
+  useEffect(() => () => { void leaveBoard.current(); }, []);
 
   // Duplicate this board (organize-phase-plan §4b): flush in-flight moves/edits FIRST so the
   // copy never misses your last drag, then copy (same bits, second arrangement), then the
@@ -100,6 +94,7 @@ export function BoardSurface({
     setDuplicating(true);
     try {
       await flushAll();
+      await pendingCreates(); // a just-dropped card's row must exist before the copy reads the board
       const copy = await duplicateBoard(supabase, boardId);
       const go = await confirm({
         message: `Duplicated — “${copy.title || "untitled board"}” now sits on your shelf, arranging these same bits.`,
@@ -120,7 +115,7 @@ export function BoardSurface({
   // a stale body and its next save overwrites them — plan review finding 4).
   function openSelected(placementId: string, bitId: string) {
     settled(placementId)
-      .then(() => flushNow(placementId))
+      .then((id) => flushNow(id)) // the pending entry lives under the POST-reconcile key
       .then(() => router.push(`/bit/${bitId}`))
       .catch(onErr);
   }
@@ -148,15 +143,27 @@ export function BoardSurface({
   }
 
   // Create doors — every way a card is born onto the surface, plus the board-born
-  // bit's evaporate-if-empty lifecycle and the editor's markContentIfReal.
-  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal } =
+  // bit's evaporate-if-empty lifecycle and the editor's markContentIfReal. Constructed
+  // BEFORE the remove acts (R1.3a): the acts consult isFreshEmpty/clearFresh so a
+  // remove on a never-had-content bit ABORTS it instead of minting blank litter.
+  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal, isFreshEmpty, clearFresh } =
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
       trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor, onErr,
     });
 
+  // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
+  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
+    supabase, cards, selectedIds, setCards, clearSelection,
+    setEditingId, settled, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+  });
+
   function select(placementId: string, bitId: string, additive: boolean) {
+    // Selection moving off the editing card must also END the edit — otherwise editingId
+    // strands (keyboard dead, two cards in contradictory states — review R1.2). Guarded:
+    // re-clicking the editing card itself keeps the edit.
+    if (editingId && editingId !== placementId) setEditingId(null);
     patchCard(placementId, bitId, { z: nextZ() }); // the clicked card comes to front
     setSelectedIds((prev) => {
       if (!additive) return new Set([placementId]);
@@ -175,8 +182,10 @@ export function BoardSurface({
   function onCardDragStart(placementId: string) {
     if (selectedIds.size > 1 && selectedIds.has(placementId)) {
       const m = new Map<string, { x: number; y: number }>();
-      // locked cards never join a group drag (the one skip point — move/end gate on starts.has())
-      for (const c of cards) if (selectedIds.has(c.placementId) && !c.locked) m.set(c.placementId, { x: c.x, y: c.y });
+      // locked cards never join a group drag (the one skip point — move/end gate on starts.has()).
+      // Keyed by bitId: a call-in reconcile can rename a placementId mid-drag; bitIds never rename
+      // (and are unique per board — placement_bit_once).
+      for (const c of cards) if (selectedIds.has(c.placementId) && !c.locked) m.set(c.bitId, { x: c.x, y: c.y });
       dragStart.current = m;
     } else {
       dragStart.current = null;
@@ -267,11 +276,12 @@ export function BoardSurface({
   // Lock / unlock the selected card's POSITION (B+): optimistic, rolled back on failure.
   function toggleLock(c: CardVM) {
     const on = !c.locked;
-    setCards((cs) => cs.map((x) => (x.placementId === c.placementId ? { ...x, locked: on } : x)));
+    setCards((cs) => cs.map((x) => (x.bitId === c.bitId ? { ...x, locked: on } : x)));
     settled(c.placementId)
       .then((id) => setPlacementLock(supabase, id, on))
       .catch((e) => {
-        setCards((cs) => cs.map((x) => (x.placementId === c.placementId ? { ...x, locked: !on } : x)));
+        // keyed by bitId — a call-in reconcile can rename the placementId mid-flight
+        setCards((cs) => cs.map((x) => (x.bitId === c.bitId ? { ...x, locked: !on } : x)));
         onErr(e);
       });
   }

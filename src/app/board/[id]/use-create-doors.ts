@@ -65,6 +65,9 @@ export function useCreateDoors(deps: {
   const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
   const freshEmpty = useRef(new Set<string>()); // board-born bits that never held content (evaporate on edit-end)
   const prevEditing = useRef<string | null>(null);
+  const cardsRef = useRef(cards);
+  // eslint-disable-next-line react-hooks/refs -- latest-value ref: the unmount sweep must see live cards, not the []-closure
+  cardsRef.current = cards;
 
   // The /write test, board-side: real content = visible text or a gather chip.
   function hasRealContent(html: string): boolean {
@@ -122,9 +125,14 @@ export function useCreateDoors(deps: {
     if (!hasRealContent(body)) freshEmpty.current.add(placementId); // evaporates if it stays empty
     const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch((e) => {
       // A failed create must not leave a zombie card (the image/audio/pdf doors already do this;
-      // a leftover here also poisons later removes — the "no longer exists" class).
+      // a leftover here also poisons later removes — the "no longer exists" class). Also: end the
+      // ghost edit (a stranded editingId deadlocks the keyboard — R1.2) and abort the bit row —
+      // createTextBit inserts bit THEN placement, so a placement-side failure would otherwise
+      // leave an invisible blank loose bit (0-row delete when the bit insert itself failed: harmless).
       setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+      setEditingId((cur) => (cur === placementId ? null : cur));
       freshEmpty.current.delete(placementId);
+      abortBitCreate(supabase, bitId).catch(console.error); // must not clobber the original error
       onErr(e);
     });
     trackCreate(placementId, p);
@@ -161,6 +169,33 @@ export function useCreateDoors(deps: {
     if (body !== undefined && freshEmpty.current.has(placementId) && hasRealContent(body))
       freshEmpty.current.delete(placementId);
   }
+
+  // The remove acts consult these (R1.3a): a remove/trash on a NEVER-had-content
+  // board-born bit must ABORT it (evaporate's contract), not mint a blank loose/
+  // trashed bit. Membership in freshEmpty ≈ never had content (markContentIfReal
+  // removes on the first real keystroke).
+  const isFreshEmpty = (placementId: string) => freshEmpty.current.has(placementId);
+  const clearFresh = (placementId: string) => freshEmpty.current.delete(placementId);
+
+  // Leaving the BOARD (unmount only — deliberately NOT the save-guard: tab-hide fires
+  // that while the cards are still on screen, and aborting a live card would eat work
+  // the owner is about to type — the antagonist's rejection). Sweep any still-empty
+  // fresh bits so navigating away mid-double-tap leaves no blank-bit litter. A hard
+  // tab-close never runs unmount — that residue is accepted, not accidental.
+  useEffect(
+    () => () => {
+      for (const pid of [...freshEmpty.current]) {
+        freshEmpty.current.delete(pid);
+        const c = cardsRef.current.find((x) => x.placementId === pid);
+        if (!c || hasRealContent(c.body ?? "")) continue;
+        settled(pid)
+          .then(() => abortBitCreate(supabase, c.bitId))
+          .catch(console.error);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount only
+    [],
+  );
 
   // Pen "Done": convert the session's strokes (screen space) into world space,
   // bundle into ONE drawing bit at their bounding box (widths kept). Empty → nothing.
@@ -516,5 +551,5 @@ export function useCreateDoors(deps: {
     return p;
   }
 
-  return { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal };
+  return { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal, isFreshEmpty, clearFresh };
 }

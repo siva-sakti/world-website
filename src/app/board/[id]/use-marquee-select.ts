@@ -16,6 +16,10 @@ export function useMarqueeSelect(
 ) {
   const marquee = useRef<{ sx: number; sy: number; moved: boolean } | null>(null);
   const [marqueeBox, setMarqueeBox] = useState<MarqueeBox | null>(null);
+  // Real rendered sizes, measured ONCE at the tap→drag transition (text/audio stored
+  // heights are stale by design — the fitView lesson). Per-move DOM reads at 60fps
+  // would force layout each frame; nothing can resize a card mid-marquee.
+  const sizes = useRef(new Map<string, { w: number; h: number }>());
 
   function start(e: React.PointerEvent) {
     marquee.current = { sx: e.clientX, sy: e.clientY, moved: false };
@@ -36,6 +40,13 @@ export function useMarqueeSelect(
     const dx = e.clientX - mq.sx;
     const dy = e.clientY - mq.sy;
     if (!mq.moved && Math.hypot(dx, dy) < 4) return true; // a tap, not yet a drag
+    if (!mq.moved) {
+      sizes.current.clear();
+      for (const c of cards) {
+        const el = document.querySelector(`[data-pid="${c.placementId}"]`);
+        if (el instanceof HTMLElement) sizes.current.set(c.placementId, { w: el.offsetWidth, h: el.offsetHeight });
+      }
+    }
     mq.moved = true;
     const r = boardRef.current!.getBoundingClientRect();
     setMarqueeBox({
@@ -51,7 +62,10 @@ export function useMarqueeSelect(
     const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y);
     const inside = new Set<string>();
     for (const c of cards) {
-      if (c.x < x1 && c.x + c.w > x0 && c.y < y1 && c.y + c.h > y0) inside.add(c.placementId);
+      const m = sizes.current.get(c.placementId);
+      const w = m?.w ?? c.w;
+      const h = m?.h ?? c.h;
+      if (c.x < x1 && c.x + w > x0 && c.y < y1 && c.y + h > y0) inside.add(c.placementId);
     }
     setSelectedIds(inside);
     return true;
