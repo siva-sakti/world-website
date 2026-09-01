@@ -1477,6 +1477,7 @@ body {
 }
 .picker-row.is-hi { background: #f3efe7; }
 .picker-row--special { color: #365a8c; }
+.picker-empty { padding: 7px 9px; font-size: 13px; color: #b3a998; }
 /* The folder menu's search line (lives INSIDE the menu — the display never becomes a text box). */
 .picker-search { padding: 2px 4px 6px; border-bottom: 1px solid #ece7de; margin-bottom: 4px; }
 .picker-search input {

@@ -6,8 +6,9 @@ import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
-import { placeBitsOnBoard } from "./actions";
+import { placeBitsOnBoard, trashBits } from "./actions";
 import { SearchablePicker } from "@/components/searchable-picker";
+import { confirm } from "@/components/confirm";
 import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
@@ -83,6 +84,31 @@ export function NotesBrowser({
       setBulkPending(false);
     }
   }
+  async function bulkTrash() {
+    if (bulkPending || selectedIds.size === 0) return;
+    const n = selectedIds.size;
+    const ok = await confirm({
+      message: n === 1 ? "Trash this bit? You can restore it from the trash." : `Trash these ${n} bits? You can restore them from the trash.`,
+      confirmLabel: "Trash",
+      danger: true,
+    });
+    if (!ok) return;
+    setBulkPending(true);
+    setBulkErr(null);
+    try {
+      const res = await trashBits([...selectedIds]);
+      if (res.error) {
+        setBulkErr(res.error);
+        return;
+      }
+      exitSelect(); // the trashed bits drop from the list (revalidate)
+    } catch {
+      setBulkErr("Couldn't trash those — try again.");
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
   // Escape leaves select mode.
   useEffect(() => {
     if (!selectMode) return;
@@ -248,6 +274,14 @@ export function NotesBrowser({
             disabled={bulkPending || selectedIds.size === 0}
             title="send the selected bits to a board"
           />
+          <button
+            onClick={() => void bulkTrash()}
+            disabled={bulkPending || selectedIds.size === 0}
+            className="text-neutral-500 underline underline-offset-2 hover:text-red-700 disabled:text-neutral-300 disabled:no-underline"
+            title="Trash the selected bits — restorable from the trash"
+          >
+            trash
+          </button>
           {bulkErr && <span className="text-red-700">{bulkErr}</span>}
           <button onClick={exitSelect} className="ml-auto text-neutral-500 underline underline-offset-2">
             clear

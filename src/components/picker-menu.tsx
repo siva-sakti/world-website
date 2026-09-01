@@ -23,6 +23,7 @@ export function PickerMenu({
   setHi,
   onClose,
   children,
+  empty,
 }: {
   anchorRef: RefObject<HTMLElement | null>; // the ref itself — read in the effect, never during render
   rows: MenuRow[];
@@ -30,6 +31,7 @@ export function PickerMenu({
   setHi: (i: number) => void;
   onClose: () => void;
   children?: React.ReactNode;
+  empty?: string; // shown as a quiet line when there are no rows (never silently vanish)
 }) {
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
@@ -63,6 +65,7 @@ export function PickerMenu({
       style={{ position: "fixed", top: pos.top, left: pos.left, width: pos.width }}
     >
       {children}
+      {rows.length === 0 && empty && <li className="picker-empty">{empty}</li>}
       {rows.map((r, i) => (
         <li
           key={r.key}

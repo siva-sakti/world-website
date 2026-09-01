@@ -7,6 +7,7 @@ import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { boardLabel } from "@/lib/labels";
 import { OutlineRow } from "./outline-row";
+import { SearchablePicker } from "@/components/searchable-picker";
 
 // The outline lens (read-only): boards as collapsible headers with their placed
 // bits & notes, plus loose/unplaced. In-memory search + kind/type + tag filters
@@ -109,14 +110,13 @@ export function OutlineView({ outline }: { outline: Outline }) {
           </div>
         )}
         {tags.length > 0 && (
-          <select value={tag} onChange={(e) => setTag(e.target.value)} className="shelf-picker" aria-label="filter by tag">
-            <option value="">all tags</option>
-            {tags.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+          <SearchablePicker
+            options={tags.map((t) => ({ id: t, label: t }))}
+            onPick={setTag}
+            placeholder={tag || "all tags"}
+            noneLabel="all tags"
+            title="filter by tag"
+          />
         )}
       </div>
 

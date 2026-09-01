@@ -130,3 +130,24 @@ export async function placeBitsOnBoard(bitIds: string[], boardId: string): Promi
 export async function placeOnBoard(bitId: string, boardId: string): Promise<{ error?: string }> {
   return placeBitsOnBoard([bitId], boardId);
 }
+
+/** Bulk trash from the loose multi-select (owner-ruled 2026-08-31). Trash is a freeze —
+ * everything lands in /trash, restorable — so best-effort like the bulk send: a failure is
+ * reported, the rest still land. */
+export async function trashBits(ids: string[]): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  let failed = 0;
+  for (const id of ids) {
+    try {
+      await trashBit(supabase, id);
+    } catch (e) {
+      failed++;
+      console.error("trashBits: a bit failed:", e);
+    }
+  }
+  revalidatePath("/bits");
+  if (failed) {
+    return { error: failed === ids.length ? "Couldn't trash those — try again." : "Couldn't trash some of those." };
+  }
+  return {};
+}

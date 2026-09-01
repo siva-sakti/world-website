@@ -49,7 +49,8 @@ export function SearchablePicker({
   }
 
   // Show only once the user has typed (start typing → the dropdown forms), or via ArrowDown.
-  const showMenu = open && rows.length > 0 && (query.length > 0 || Boolean(noneLabel));
+  // A query with NO rows still shows the menu — with a quiet "no match" line, never a silent vanish.
+  const showMenu = open && (query.length > 0 || (rows.length > 0 && Boolean(noneLabel)));
 
   function choose(id: string) { onPick(id); after(); }
   function after() { if (resetOnPick) setQ(""); setOpen(false); setHi(0); }
@@ -71,13 +72,16 @@ export function SearchablePicker({
         disabled={disabled}
         placeholder={placeholder}
         onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(0); }}
+        // A picker WITH a none-row (a bound value / a filter) opens on click — you'd expect to see
+        // the choices; the pure action pickers stay type-first.
+        onFocus={() => { if (noneLabel) setOpen(true); }}
         onKeyDown={onKey}
         aria-label={placeholder}
         title={title}
         autoComplete="off"
       />
       {showMenu && (
-        <PickerMenu anchorRef={inputRef} rows={rows} hi={hi} setHi={setHi} onClose={closeMenu} />
+        <PickerMenu anchorRef={inputRef} rows={rows} hi={hi} setHi={setHi} onClose={closeMenu} empty="no match" />
       )}
     </div>
   );

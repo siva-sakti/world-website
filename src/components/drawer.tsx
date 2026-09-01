@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
+import { SearchablePicker } from "@/components/searchable-picker";
 
 // THE DRAWER — a browser of all your bits, split by kind (bits · notes · all) and
 // filterable by type/tag/source, reachable from a tab. It has TWO HOMES and the
@@ -270,20 +271,22 @@ export function Drawer(props: BoardMode | NoteMode) {
               <option value="pdf">PDFs</option>
             </select>
             {allTags.length > 0 && (
-              <select value={tagId} onChange={(e) => setTagId(e.target.value)} aria-label="Filter by tag">
-                <option value="">any tag</option>
-                {allTags.map((t) => (
-                  <option key={t.id} value={t.id}>{t.word}</option>
-                ))}
-              </select>
+              <SearchablePicker
+                options={allTags.map((t) => ({ id: t.id, label: t.word }))}
+                onPick={setTagId}
+                placeholder={allTags.find((t) => t.id === tagId)?.word ?? "any tag"}
+                noneLabel="any tag"
+                title="Filter by tag"
+              />
             )}
             {allSources.length > 0 && (
-              <select value={sourceId} onChange={(e) => setSourceId(e.target.value)} aria-label="Filter by source">
-                <option value="">any source</option>
-                {allSources.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+              <SearchablePicker
+                options={allSources.map((s) => ({ id: s.id, label: s.name }))}
+                onPick={setSourceId}
+                placeholder={allSources.find((s) => s.id === sourceId)?.name ?? "any source"}
+                noneLabel="any source"
+                title="Filter by source"
+              />
             )}
           </div>
         </div>
