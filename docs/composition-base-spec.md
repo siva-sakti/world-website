@@ -6,7 +6,11 @@
 
 ---
 
-# PART 1 · THE IDEAL STATE — the feature as it should be
+# PART 1 · THE IDEAL STATE — the COMPLETE feature (owner: "the total end state, all the ways we want to see it")
+
+> ⭐ **THE NORTH STAR, the owner verbatim (2026-09-02):** *"**Notion, with Obsidian-like knowledge connection and graph capabilities** — is the ideal."* Notion's editing; Obsidian's fabric. Part 1 now holds the WHOLE ideal — base + capabilities — one picture. *(The capability detail worked out in `composition-surface-spec.md` is folded in as §1.10; that doc remains the working-out.)*
+
+**Word pins (be exact, always):** **composition** = the writing surface only (formerly "note") — never a board. **board** = board. **link** = a `[[` reference in writing. **tag** = a word-label — a different mechanism entirely.
 
 ## 1.1 What a composition is
 A **surface where you weave material into writing** — one made whole with a throughline. A peer of the board: the board arranges material in space; the composition weaves it into words. **Never material itself** — never loose, never in the inbox, never gatherable *as* a scrap. Born a composition, always a composition (no conversion, ever).
@@ -35,7 +39,12 @@ The same editor lives in three frames, because *the entire point is looking at t
 ## 1.6 On a board
 A placed composition appears as a card. ⚪ **its look: a door (title only) or a window (title + opening lines, resizable)** — decide by mock, not argument. Tap-behavior: §1.4's chain.
 
-## 1.7 The fabric — what links to what ⚪ (the sit-down; agenda in §1.7a)
+## 1.7 The fabric — what links to what (the sit-down, in progress 2026-09-02)
+- bit → composition: ✅ the chip (and the full bit-block, §1.10)
+- **composition → composition: 🟡 leaning YES** (the owner: `[[` "could tag another note" — read as link; pin 2 pending confirm). A chip **visually distinct** from a bit-chip.
+- **board → composition: ⚪ genuinely open** — the owner: *"I don't know if it should link a board… should a board be inside a composition surface? We're still thinking."* Drill questions posed; not pushed.
+- `[[` behavior: ✅ **opens by search — type, results come up — in two sections** (material · surfaces).
+- **backlinks: ✅ the FULL treatment** — a clickable backlink panel + **a graph view, the way Obsidian does it**. ⚪ what the graph's dots and lines are — drill question D. ⚪ where a board's backlinks live (it has no page).
 Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (placed) · a composition onto a board (the card) · a board onto a board (doorway). ⚪ Open cells: composition→composition · board→composition · what the `[[` picker offers · where backlinks show per target · whether the pull mixes all three kinds.
 
 ### 1.7a The sit-down agenda (nine cells, three questions each: makes sense? looks like? exists?)
@@ -45,6 +54,9 @@ Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (p
 | a composition | ⚪ a link-chip? its backlink? | ✅ the card (look ⚪) |
 | a board | ⚪ a door in the sentence? | ✅ doorway (UI dormant) |
 Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink surfaces (a bit has "gathered into"; a board needs a "linked from"?) · ⚪ the pull with three kinds.
+
+## 1.10 The capabilities (the Notion half — summarized from `composition-surface-spec.md`)
+Blocks: ~10 text-first (paragraph · headings · lists · **checklist** · quote · divider · code · **a table in the writing** · image) — **zero database blocks** (the unanimous informed cut) · drag-handle reorder · `/` insert menu · turn-into · structure-preserving paste · never-empty · **the bit-block**: a gathered bit shown in full (quote/image itself, source attached — the provenance dividend) as the grown form of the chip. Word count. *(The 8-behavior feel checklist + jank traps live in the spec; the owner's Notion feel-session still feeds the fine cut.)*
 
 ## 1.8 In its room and in the world
 Listed beside boards (home, its room) · starred/alive · found by full text · pulled by tag · exported always (I-G1) · *(later: published; handed over as a file — tracked, not here)*.
