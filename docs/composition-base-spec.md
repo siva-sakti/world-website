@@ -153,6 +153,15 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 - **🆕 The drawer's "IN THIS PIECE" scope** (owner's idea): on a composition's page, a drawer tab listing everything pulled into *this* piece, each expandable to read WHOLE beside the writing. Completes the posture pair: *inline = the flow, cropped · drawer = the material, whole* (the board+floater remains the spread-and-look home). Cheap — the pulled-list exists as data.
 - **Bit-type candidates named, none queued:** video · generic file. Roster grows by demonstrated want only.
 
+## ⭐ THE FOUR DIMENSIONS + the formatting corollary (owner + Claude, 2026-09-03 morning)
+**The vocabulary, complete:** **CONTENT** (bits — one roster) · **STRUCTURE** (surface-native grouping: the board groups by POSITION, the composition by SEQUENCE — headings are the text version of spatial clustering, the owner's analogy confirmed) · **RELATION** (pulling-in · placement · the tie) · **ORGANIZATION** (tags · folders · sorting).
+**The formatting corollary (dissolves "checklist bit" and "table bit"):** formatting belongs to the EDITOR, and every surface hosting written text inherits it — so a text bit can BE a checklist or contain a table with zero new types. The typed-fields tracker stays the separate engine question.
+**"A linear non-spatial board"** = the outline lens (built) / parked document-mode. Covered.
+
+## ⭐ HANDOFF TO THE CODE WINDOW (owner-directed, 2026-09-03): three builds, safe now
+1. **Checklist formatting** (task-list extension, shared editor) — no schema · 2. **Table formatting** (table extension, same) — no schema · 3. **Generic FILE bit type** — schema CHECK + upload (generalize the pdf/audio machinery) + a card; migration-independent (bits stay bits).
+**⛔ Explicitly NOT yet:** anything touching note/composition behavior (floater · note-page block UX) — lands AFTER the storage migration, per sequencing.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
