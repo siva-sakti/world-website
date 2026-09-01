@@ -75,14 +75,14 @@ the last demolition.*
 
 ## 1 · Stage map (each gate: `pnpm test` + tsc + lint + build green)
 
-| stage | ships | visible change |
+| stage | ships | status |
 |---|---|---|
-| 0 ✅ | `pnpm test` runs every suite (done, committed) · group-drag fix (done, `a447a95`) | none |
-| 1 | `undo-stack.ts` (pure) + `undo-stack.test.mjs` + `use-undo.ts` (seam) + `chain()` export | none |
-| 2 | `board-arrange.ts` (pure geometry, tested) + `use-arrange-acts.ts` — arranging acts RECORD, **dark** (dev readout only) · the `onChange` intent tag · group-drag single-entry fix | none on screen |
-| 3 | keeping acts record: un-place / trash / bulk (wrapping `use-board-acts` internals) · `movePlacementForced` | none on screen |
-| 4 | meaning acts record: tag add/remove · source set/clear (+ `setBitSourceId`) · per-bit refresh signal | none on screen |
-| 5 | ↶ ↷ toolbar buttons + ⌘Z/⌘⇧Z + the transient "undid: …" note | **undo/redo exists** |
+| 0 ✅ | `pnpm test` runs every suite · group-drag fix `a447a95` | done |
+| 1 ✅ | the pure stack (9 tests) + seam + `chain()` — `27837f6` | done |
+| 2 ✅ | arranging acts record, dark — `e4681d3`+`5d27d0d`; **antagonist round `8c72573`** (4 defects incl. the REPRODUCED buried-burst corruption; D1 class-fixed via `onBeforeRecord`); truth-checked live (nudge · coalescing · burst-split · send-to-back · lock) | done |
+| 3 ✅ | keeping acts record — `8739d81`; truth-checked live (remove · trash-through-confirm · evaporate stays silent) | done |
+| 4 ✅ | meaning acts record — `073d131`; truth-checked live (tag add via the bar's input · untag via the chip ×, honest global labels); `setBitSourceId` added | done — **floors 3–4 antagonist read in flight** |
+| 5 | ↶ ↷ toolbar buttons + ⌘Z/⌘⇧Z + the transient "undid: …" note + **the owner's label-wording pass** | after the antagonist verdict + the soak |
 
 The antagonist reads THIS PLAN before stage 1 and the **stage-2 diff** (the review's retarget:
 stage 2 owns the group-drag ground and the lock bypass — the real risk).
