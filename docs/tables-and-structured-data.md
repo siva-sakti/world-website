@@ -23,6 +23,29 @@ And the reason it belongs *here* rather than in Notion is **adjacency** (`produc
 
 ---
 
+## 1b · ⭐⭐ THE CONCEPTUAL CHECK — the engine's four jobs vs our model (2026-08-31; owner: cost is not a veto — spec what serves the product)
+
+**The owner's correction, standing:** *"I'm not worried about technical time. I want a good product. We just need to be clear on exactly what we're trying to achieve and if it makes sense for our product."* Effort informs sequencing; it never decides scope. *(Claude had twice used "Notion spent a decade" as an argument — retracted as a category error: their decade includes collab, multi-tenant, scale, and a business. None of that is our problem.)*
+
+**"The database engine" decomposed into its four jobs, mapped:**
+
+| job | in Notion | in OUR model, today |
+|---|---|---|
+| **typed properties** | a database's schema | ⚠️ partly — tags · source · dates exist; **user-defined typed fields (deadline · status · number) are the real gap** |
+| **views** (filter/sort one set, many ways) | saved views | ✅ **architecturally native** — stored-vs-computed is the house principle; **the pull IS a live filtered view**; Anytype's celebrated "Sets are queries, not containers" is how this app has worked since July |
+| **relations** | linked databases | ✅ `reference` + `placement` ARE relations — with backlinks and a graph already |
+| **computation** (formulas · rollups) | the deep end | ❌ genuinely new machinery — defer until a real want |
+
+> **The punchline: this app is ALREADY a database with computed views.** Bits are rows · tags are properties · the pull is a view · references are relations. Notion's documented weakness is databases **bolted on** as a second product; **ours would be one model, deepened.** A structured-data engine is not foreign here — a *separate database container* would be.
+
+**What we're exactly trying to achieve (the owner's ask, answered):** *your material, with typed fields and saved views — never a database product living inside a notes product.*
+
+**The one conceptual gate everything hangs on — §2's fork, now with a strong lean 🔵:** **rows are bits.** Typed fields land ON the bit; a "table" is a saved view over your world; nothing is ever a trapped row in a container. Get this call right and the engine is *more* coherent here than in Notion. Get it wrong (Option B, a separate container) and we rebuild Notion's own bolt-on mistake inside the one app whose model didn't have to.
+
+**Build shape that falls out (prelim, unruled):** ① a typed-field system on `bit` (the schema question — JSONB vs EAV vs columns; **research running**) → ② saved views (a stored query definition rendering as a table — the pull's pattern, persisted) → ③ relations: already exist → ④ computation: parked until wanted.
+
+**⚪ Research dispatched (2026-08-31), landing in `research-structured-data.md`:** R1 Notion's actual data model (API docs) · R2 the common property/view architecture across Airtable/Anytype/Capacities · R3 Postgres JSONB-vs-EAV-vs-hybrid at personal scale, recommendation-shaped.
+
 ## 2 · The central fork — decide this FIRST, everything follows
 
 ### Is a row a **bit**, or a new kind of record?

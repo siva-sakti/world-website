@@ -241,6 +241,7 @@ INDEX.md ................ this file — where everything is
 
 ## 8 · RESEARCH — findings don't expire with plans
 
+- **`research-structured-data.md`** — ⚪ landing doc for the engine research (Notion's data model · the common property/view architecture · Postgres field patterns). Folds into `tables-and-structured-data.md` §1b.
 - **`research-block-editors.md`** — ⚪ the landing doc for the composition-surface research (Claude's 3-question mechanics agent + the owner's Notion feel-protocol). Folds into `composition-surface-spec.md` when both halves land.
 
 - **`research-knowledge-layer.md`** — tags, backlinks, forward-links, graph; the connector's binding model came from here. Reference at build time.
