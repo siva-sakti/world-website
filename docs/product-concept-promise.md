@@ -259,7 +259,32 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 **The gallery tracker resolves INSIDE this** — no separate Sheets product: a **table is a block in a document** (covers the 20-row creative-practice case, which is exactly how people use Notion), and a table block that grows up can **open full-page**. Same object, two views. *(Consistent with the stored-vs-computed instinct, and with `tables-and-structured-data.md` — this is that doc's "where does a table live" question, answered.)*
 
-**⚠ The honest hard part, named:** **flow + freeform on one page is an UNSOLVED interaction problem**, not merely an unbuilt feature. Word has had floating images for thirty years and they are still its jankiest thing — what happens to the pinned doodle when the paragraph above it grows? Real answers exist (anchor-to-paragraph · margin zones · layers) but this is where actual design invention is needed, and exactly where "the same freedom as the divergent layout" gets hard. **If solved, it is the moat — because it is hard, and because it is the founding sentence made real.**
+### ⭐ RULING-GRADE STEER (the owner, 2026-08-31, later): TAKE THE NOTION FORM FACTOR STRAIGHT — layer 3 demoted
+
+> *"I think it's actually OK to just take the Notion form factor in general, because we're not using it for the whole app. The invention of this board surface, still including the graphs of Obsidian, is already a huge change — and then we're adding convergence. I don't think it's too rigid for a compositional surface. My idea is it just doesn't work for a divergent surface."*
+
+**The argument, and it holds:** the founding complaint (*"the page is theirs, not mine"*) was aimed at **Notion-as-the-whole-app** — a rigid page as your ONLY surface. It was written before the board existed; **the board IS the answer to that complaint.** The doodle-beside-text life already exists on the board today. In an app where the board carries the freedom, the convergent surface may be structured — **converging is accepting structure.**
+
+**Consequences:**
+- **Layer 3 (freeform on the page) demotes from "the moat" to a maybe-later** — and the unsolved flow+float interaction problem drops out of scope with it. Nothing needs inventing.
+- **The build = layers 1+2 exactly:** a Notion-form-factor block document (known tech — tiptap, already in the stack, does block editors) + **blocks-that-can-be-bits** (gather matured, on rails we own). The bits-as-blocks layer remains the differentiator over Notion.
+- **The novelty budget, stated:** board-invention + Obsidian-graph + Notion-convergence is already the huge combination; the page itself needn't also be novel.
+- ⚑ **Layer-3 re-entry condition:** philosophy.md's *"handwriting and typing on the same page"* is, under this steer, served by the board rather than the page. If that ever feels like a loss in real use, layer 3 reopens.
+
+### ⭐ THE STORY FOR PEOPLE — where things go, in two sentences (worked out same session)
+
+The owner's question: with a composing surface added, *"how do we say it to people — what is a bit?"*
+
+> **A bit is something you're KEEPING** — it has a life: tagged, findable, on any board, in any piece.
+> **Writing is something you're SAYING** — it lives in the piece you're saying it in, and that's all it needs.
+
+The user-words test: ***will you want this again, somewhere else?*** The quote you'll reuse → a bit. "Email the framer by Friday" → just writing.
+
+**The checklist, fully resolved, zero new objects:** it lives **in a composition** (part of a document, as in Docs/Notion) · the composition **can sit on a board** (N3 doorway — already built: a packing list *in* a piece, *on* the trip board) · and sticky-note thinkers keep the board (index cards already work). **We encourage neither** — capability without prescription (§2c-ter).
+
+**Net: the convergent surface changes nothing about what a bit is.** The whole story: *bits are the material · the board spreads it · the piece shapes it · the words in between are just words.* ⚑ Owner-voiced version owed (this phrasing is Claude's 🔵).
+
+**⚠ The honest hard part, named (NOW MOSTLY MOOT under the steer above — kept for the layer-3 re-entry):** **flow + freeform on one page is an UNSOLVED interaction problem**, not merely an unbuilt feature. Word has had floating images for thirty years and they are still its jankiest thing — what happens to the pinned doodle when the paragraph above it grows? Real answers exist (anchor-to-paragraph · margin zones · layers) but this is where actual design invention is needed, and exactly where "the same freedom as the divergent layout" gets hard. **If solved, it is the moat — because it is hard, and because it is the founding sentence made real.**
 
 ⚑ Nothing here is ruled. The three-layer shape is Claude's synthesis 🔵; layers' *contents* trace to the owner (the conditional · the founding text · the Notion observation). Naming (step 2b): "page" · "block" · "document" all unruled.
 
