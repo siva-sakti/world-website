@@ -1,5 +1,9 @@
 # The flow review's bugs — fix plan (owner-authorized 2026-09-02)
 
+**Status: ✅ ALL BUILT (D-132)** — A `c507e2d` · B `c159853` · C `ff33830` · D `defb408`, plus the
+safe batch `75eaa5e`. Antagonist-corrected before building (its three catches are in the commits).
+Not deployed — awaiting the owner's word. F5/F8 were already shipped when the antagonist read them.
+
 **Source:** the cross-surface flow review (capture · the four doors · returning · finding · the
 board on a phone · note↔bit). Owner: *"absolutely please do plan and fix the bugs."* The phone
 tap-swallowing finding is NOT here — it awaits the owner's 2-minute device check.
