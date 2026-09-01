@@ -34,6 +34,12 @@ export function BoardSurface({
   initialCards: CardVM[];
 }) {
   const [cards, setCards] = useState<CardVM[]>(initialCards);
+  // The LIVE truth for undo's reverses (undo plan §3 / review amendment 3): closures
+  // captured at gesture time must resolve placementId + lock state from the CURRENT
+  // cards at reverse time — a call-in reconcile renames placement ids in state.
+  const cardsRef = useRef<CardVM[]>(initialCards);
+  // eslint-disable-next-line react-hooks/refs -- latest-value ref, same pattern as leaveBoard below
+  cardsRef.current = cards;
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [selectMode, setSelectMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

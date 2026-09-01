@@ -274,6 +274,30 @@ export async function setPlacementLock(
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
+/** Undo's ONE bypass of the lock filter (undo plan §3; owner-ruled: undo may move a
+ *  locked card, the lock stays on). x/y only. Guarded `.is("left_at", null)` — a
+ *  departed row must not eat a forced write — and WITH a 0-row assert: unlike the
+ *  unforced door (whose silent no-op is load-bearing for late debounced flushes), a
+ *  forced 0-row means the card is genuinely gone and the undo must say so, or the
+ *  screen moves while the DB doesn't — the silent divergence the senior review named
+ *  as risk #1. Callers decide forced-vs-normal against the CURRENT card at reverse
+ *  time (never a snapshot — no position act can even capture a locked card), and
+ *  route through chain() so this never reorders against an in-flight flush. */
+export async function movePlacementForced(
+  supabase: SupabaseClient,
+  id: string,
+  pos: { x: number; y: number },
+): Promise<void> {
+  const { data, error } = await supabase
+    .from("placement")
+    .update({ x: pos.x, y: pos.y })
+    .eq("id", id)
+    .is("left_at", null)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("that card no longer exists — reload the board");
+}
+
 export async function updatePlacement(
   supabase: SupabaseClient,
   id: string,

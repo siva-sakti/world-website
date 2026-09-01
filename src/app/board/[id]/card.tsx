@@ -103,7 +103,10 @@ export function Card({
   onSelect: (additive: boolean) => void;
   onEdit: () => void;
   onOpen?: () => void; // a note doorway → open the note's page (N3)
-  onChange: (patch: Partial<CardVM>) => void;
+  /** The one shared write wire, now carrying INTENT (undo plan §4): "move"/"resize"
+   *  are the owner's hand (recorded as acts); "grow" (auto-widen) and "write" (body
+   *  keystrokes — the text editor's own flow-undo owns those) are never recorded. */
+  onChange: (patch: Partial<CardVM>, how?: "move" | "resize" | "grow" | "write") => void;
   onContentSave: (value: string) => void;
   // The card's editable source picker changed the bit's source — patch the resting
   // "from …" stamp into this card's VM so it appears without a reload (SourcePicker
@@ -149,7 +152,7 @@ export function Card({
     const el = innerRef.current;
     if (!el) return;
     if (el.offsetHeight > card.w * 1.5 && card.w < 560) {
-      onChange({ w: Math.min(560, card.w + 80) });
+      onChange({ w: Math.min(560, card.w + 80) }, "grow"); // the board's reflex, not a hand
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- re-measure per keystroke/width only
   }, [card.body, card.w, editing, isText]);
@@ -175,7 +178,7 @@ export function Card({
       onDragStart={() => onDragStart?.()}
       onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
       onDragStop={(_e, d) => {
-        onChange({ x: d.x, y: d.y });
+        onChange({ x: d.x, y: d.y }, "move");
         onDragEnd?.(d.x, d.y);
       }}
       onResizeStop={(_e, _dir, ref, _delta, pos) => {
@@ -184,6 +187,7 @@ export function Card({
           flexSized
             ? { x: pos.x, y: pos.y, w: ref.offsetWidth }
             : { x: pos.x, y: pos.y, w: ref.offsetWidth, h: ref.offsetHeight },
+          "resize",
         );
       }}
     >
@@ -234,7 +238,7 @@ export function Card({
           <TextBit
             html={card.body || ""}
             editing={editing}
-            onChange={(body) => onChange({ body })}
+            onChange={(body) => onChange({ body }, "write")}
           />
         )}
         {/* "from …" — the bit's source travels with it (P8). RESTING: a quiet
