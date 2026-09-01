@@ -40,6 +40,7 @@ type BoardMode = {
   variant: "board";
   boardId: string;
   onBringIn: (bit: PanelBit) => Promise<void>;
+  onJumpTo?: (bitId: string) => void; // an already-here row GLIDES the camera to its card (no more dead-end click)
   refreshSignal: number;
 };
 /** On a note: gather what you pick into the writing. */
@@ -184,7 +185,11 @@ export function Drawer(props: BoardMode | NoteMode) {
   async function pick(bit: PanelBit) {
     if (props.variant === "note") return props.onGather(bit);
     const { boardId: bid, onBringIn } = props;
-    if (onThis(bit)) return; // F13: already on this board → no-op (client-side)
+    if (onThis(bit)) {
+      // Already on this board → jump the camera to its card (was a dead-end no-op).
+      props.onJumpTo?.(bit.id);
+      return;
+    }
     loadId.current++; // invalidate any in-flight load
     // Optimistic: this board joins the bit's memberships (it re-groups + "on N" bumps).
     setBits((ns) =>
@@ -316,7 +321,7 @@ export function Drawer(props: BoardMode | NoteMode) {
                   title={
                     onBoard
                       ? isMarked
-                        ? "already on this board"
+                        ? "already on this board — click to jump to it"
                         : "place on this board"
                       : isMarked
                         ? "already gathered into this writing"

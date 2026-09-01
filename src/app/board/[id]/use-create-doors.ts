@@ -51,7 +51,7 @@ export function useCreateDoors(deps: {
   trackCreate: (placementId: string, p: Promise<unknown>) => void;
   settled: (placementId: string) => Promise<string>;
   reconcileId: (oldId: string, newId: string) => void;
-  setConverting: Dispatch<SetStateAction<boolean>>;
+  setConverting: Dispatch<SetStateAction<number>>; // COUNT of HEICs mid-decode (a counter — multi-file drops overlap)
   setCapturing: Dispatch<SetStateAction<boolean>>; // the board-paste link capture is slow (~seconds) — show a notice
   setWordsFor: Dispatch<SetStateAction<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>>;
   onErr: (e: unknown) => void;
@@ -120,7 +120,13 @@ export function useCreateDoors(deps: {
     selectOne(placementId);
     if (edit) setEditingId(placementId);
     if (!hasRealContent(body)) freshEmpty.current.add(placementId); // evaporates if it stays empty
-    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch(onErr);
+    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch((e) => {
+      // A failed create must not leave a zombie card (the image/audio/pdf doors already do this;
+      // a leftover here also poisons later removes — the "no longer exists" class).
+      setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+      freshEmpty.current.delete(placementId);
+      onErr(e);
+    });
     trackCreate(placementId, p);
   }
 
@@ -187,18 +193,18 @@ export function useCreateDoors(deps: {
     trackCreate(placementId, p);
   }
 
-  function importImageFile(file: File, wx: number, wy: number) {
+  function importImageFile(file: File, wx: number, wy: number, zOverride?: number) {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     // HEIC decoding takes a few seconds; only then does it show a notice.
     const heic = isHeic(file);
-    if (heic) setConverting(true);
+    if (heic) setConverting((n) => n + 1);
     const chain = importImage(file)
       .then(async (img) => {
         const dispScale = Math.min(1, MAX_DISP / img.width);
         const w = Math.max(1, Math.round(img.width * dispScale));
         const h = Math.max(1, Math.round(img.height * dispScale));
-        const z = nextZ();
+        const z = zOverride ?? nextZ();
         const localUrl = URL.createObjectURL(img.blob);
         setCards((cs) => [
           ...cs,
@@ -225,7 +231,7 @@ export function useCreateDoors(deps: {
         onErr(e);
       })
       .finally(() => {
-        if (heic) setConverting(false);
+        if (heic) setConverting((n) => n - 1);
       });
     trackCreate(placementId, chain);
   }
@@ -237,10 +243,10 @@ export function useCreateDoors(deps: {
 
   // Voice memo → an audio card. The original bytes are stored as-is (no transform,
   // no thumbnail); the optimistic card plays immediately from a local object URL.
-  function importAudioFile(file: File, wx: number, wy: number) {
+  function importAudioFile(file: File, wx: number, wy: number, zOverride?: number) {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
-    const z = nextZ();
+    const z = zOverride ?? nextZ();
     const localUrl = URL.createObjectURL(file);
     setCards((cs) => [
       ...cs,
@@ -275,10 +281,10 @@ export function useCreateDoors(deps: {
   // viewer); a 600px page-1 JPEG stores as the thumbnail (like an image's). The card
   // is added AFTER page 1 renders (so it can size to the page aspect), like the image
   // door. An unrenderable PDF still uploads — a document sheet, no thumbnail.
-  function importPdfFile(file: File, wx: number, wy: number) {
+  function importPdfFile(file: File, wx: number, wy: number, zOverride?: number) {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
-    const z = nextZ();
+    const z = zOverride ?? nextZ();
     const chain = importPdf(file)
       .then(async (pdf) => {
         let w = PDF_W;
@@ -322,44 +328,55 @@ export function useCreateDoors(deps: {
 
   // Route a dropped/pasted file to the right door (audio → recording, pdf → PDF,
   // else image).
-  function placeDroppedFile(file: File, wx: number, wy: number) {
-    if (isAudioFile(file)) importAudioFile(file, wx, wy);
-    else if (isPdfFile(file)) importPdfFile(file, wx, wy);
-    else importImageFile(file, wx, wy);
+  function placeDroppedFile(file: File, wx: number, wy: number, zOverride?: number) {
+    if (isAudioFile(file)) importAudioFile(file, wx, wy, zOverride);
+    else if (isPdfFile(file)) importPdfFile(file, wx, wy, zOverride);
+    else importImageFile(file, wx, wy, zOverride);
+  }
+
+  // Every file in a batch lands (the single-file `files[0]` silently discarded the
+  // rest — the review's confirmed gap): caller-computed cascade offsets so they don't
+  // stack, and one z base + i so a same-tick batch never z-ties (nextZ reads the same
+  // stale render array for every file in a sync loop).
+  function placeFiles(files: File[], atX: number, atY: number) {
+    const z0 = nextZ();
+    files.forEach((f, i) => placeDroppedFile(f, atX + i * 36, atY + i * 28, z0 + i));
   }
 
   function onBoardDrop(e: React.DragEvent) {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      const w = screenToWorld(e.clientX, e.clientY);
-      placeDroppedFile(file, w.x, w.y);
-    }
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (!files.length) return;
+    const w = screenToWorld(e.clientX, e.clientY);
+    placeFiles(files, w.x, w.y);
   }
 
   function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length) {
       const p = findClearSpot(320, 260); // dims unknown until decode — a sensible estimate
-      importImageFile(file, p.x, p.y);
+      const z0 = nextZ();
+      files.forEach((f, i) => importImageFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
     }
     e.target.value = "";
   }
 
   function onPickAudio(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length) {
       const p = findClearSpot(AUDIO_W, 90);
-      importAudioFile(file, p.x, p.y);
+      const z0 = nextZ();
+      files.forEach((f, i) => importAudioFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
     }
     e.target.value = "";
   }
 
   function onPickPdf(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length) {
       const p = findClearSpot(PDF_W, PDF_H); // real dims arrive after page-1 render
-      importPdfFile(file, p.x, p.y);
+      const z0 = nextZ();
+      files.forEach((f, i) => importPdfFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
     }
     e.target.value = "";
   }
@@ -371,12 +388,14 @@ export function useCreateDoors(deps: {
     function onPaste(e: ClipboardEvent) {
       const t = e.target as HTMLElement | null;
       if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
-      const file = Array.from(e.clipboardData?.files ?? []).find(
-        (f) => f.type.startsWith("image/") || isAudioFile(f) || isPdfFile(f),
-      );
-      if (file) {
+      const all = Array.from(e.clipboardData?.files ?? []);
+      const media = all.filter((f) => f.type.startsWith("image/") || isAudioFile(f) || isPdfFile(f));
+      if (media.length) {
         const p = findClearSpot(320, 260);
-        placeDroppedFile(file, p.x, p.y);
+        placeFiles(media, p.x, p.y);
+        if (media.length < all.length) {
+          onErr(new Error(`${all.length - media.length} pasted file(s) weren't images, recordings, or PDFs — skipped.`));
+        }
         return;
       }
       const text = e.clipboardData?.getData("text/plain") ?? "";

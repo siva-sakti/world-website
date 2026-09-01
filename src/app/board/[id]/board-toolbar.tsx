@@ -11,9 +11,12 @@ export function BoardToolbar({
   selectedCount,
   onBulkUnplace,
   onBulkTrash,
+  onTidy,
   onDuplicate,
   duplicating,
   onFit,
+  onZoomIn,
+  onZoomOut,
   zoomPct,
   fileRef,
   onPickImage,
@@ -31,9 +34,12 @@ export function BoardToolbar({
   selectedCount: number;
   onBulkUnplace: () => void;
   onBulkTrash: () => void;
+  onTidy: () => void; // arrange the selection in a neat grid (owner-approved tidy-up)
   onDuplicate: () => void; // a copy arranging the same bits; the dialog offers open-or-stay
   duplicating: boolean;
   onFit: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
   zoomPct: number;
   fileRef: RefObject<HTMLInputElement | null>;
   onPickImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -69,6 +75,9 @@ export function BoardToolbar({
       {selectedCount > 1 && (
         <span className="compose-bulk">
           <span className="compose-selected">{selectedCount} selected</span>
+          <button className="compose-btn subtle" onClick={onTidy} title="Arrange the selected cards in a neat grid">
+            tidy up
+          </button>
           <button className="compose-btn subtle" onClick={onBulkUnplace} title="Remove all selected cards from this board">
             remove from board
           </button>
@@ -78,6 +87,12 @@ export function BoardToolbar({
         </span>
       )}
       <span className="compose-zoom">
+        <button className="compose-btn" onClick={onZoomOut} title="Zoom out (⌘−)">
+          −
+        </button>
+        <button className="compose-btn" onClick={onZoomIn} title="Zoom in (⌘=)">
+          +
+        </button>
         <button className="compose-btn" onClick={onFit} title="Bring all your cards into view — press again to go back">
           ⊹ fit
         </button>
@@ -85,9 +100,9 @@ export function BoardToolbar({
           {Math.round(zoomPct * 100)}%
         </span>
       </span>
-      <input ref={fileRef} type="file" accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
-      <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onPickAudio} />
-      <input ref={pdfRef} type="file" accept="application/pdf,.pdf" hidden onChange={onPickPdf} />
+      <input ref={fileRef} type="file" multiple accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
+      <input ref={audioRef} type="file" multiple accept="audio/*" hidden onChange={onPickAudio} />
+      <input ref={pdfRef} type="file" multiple accept="application/pdf,.pdf" hidden onChange={onPickPdf} />
       {error && (
         <span className="text-sm text-red-700">
           {error} <button className="underline" onClick={onDismissError}>ok</button>

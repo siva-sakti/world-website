@@ -15,6 +15,7 @@ import { duplicateBoard } from "@/lib/db/boards";
 import { confirm } from "@/components/confirm";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
+import { useBoardKeys } from "./use-board-keys";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
 import { useBoardActs } from "./use-board-acts";
@@ -41,7 +42,7 @@ export function BoardSurface({
   const clearSelection = () => setSelectedIds(new Set());
   const [drawMode, setDrawMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [converting, setConverting] = useState(false); // HEIC decode is slow — tell the user
+  const [converting, setConverting] = useState(0); // COUNT of HEICs mid-decode (a counter — the first of three finishing must not hide the notice)
   const [capturing, setCapturing] = useState(false); // a pasted link's server capture is slow — tell the user
   const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>(null);
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
@@ -58,7 +59,7 @@ export function BoardSurface({
   const router = useRouter();
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
-  const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
+  const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, zoomBy, zoomTo, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
     useCamera(boardRef, boardId);
   const marquee = useMarqueeSelect(boardRef, screenToWorld, setSelectedIds, clearSelection);
 
@@ -208,14 +209,84 @@ export function BoardSurface({
     }
   }
 
-  // Escape clears the selection (and exits edit).
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") { clearSelection(); setEditingId(null); }
+  // The board's keyboard (use-board-keys — ordered guards, check-corrected): Escape is
+  // TWO-step (edit → selected → clear), Delete = remove-from-this-board (the ruled
+  // meaning), arrows nudge, Cmd+A selects all, Cmd+=/−/0 zoom.
+  function nudgeSelected(dx: number, dy: number) {
+    for (const c of cards) {
+      if (!selectedIds.has(c.placementId)) continue;
+      patchCard(c.placementId, c.bitId, { x: c.x + dx, y: c.y + dy });
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }
+  function removeSelectedByKey() {
+    if (selectedIds.size > 1) {
+      bulkUnplace();
+    } else {
+      const pid = [...selectedIds][0];
+      if (pid) unplaceSelected(pid);
+    }
+  }
+  // Tidy up (owner-approved): arrange the selection in a neat grid at its own top-left.
+  // Reading order = banded rows (raw (y,x) flips visually-level cards — the check's rule):
+  // sort by y, a new row opens past a 40-world-px band, x within a row. Real rendered
+  // sizes via data-pid (text heights are stale by design). One patchCard per card — the
+  // normal save path.
+  function tidySelected() {
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
+    if (chosen.length < 2) return;
+    const meas = chosen.map((c) => {
+      const el = document.querySelector(`[data-pid="${c.placementId}"]`);
+      return {
+        c,
+        w: el instanceof HTMLElement ? el.offsetWidth : c.w,
+        h: el instanceof HTMLElement ? el.offsetHeight : c.h,
+      };
+    });
+    const BAND = 40;
+    const GAP = 16;
+    const sorted = [...meas].sort((a, b) => a.c.y - b.c.y);
+    const bands: (typeof meas)[] = [];
+    for (const m of sorted) {
+      const last = bands[bands.length - 1];
+      if (last && m.c.y <= last[0].c.y + BAND) last.push(m);
+      else bands.push([m]);
+    }
+    const reading = bands.flatMap((b) => [...b].sort((p, q) => p.c.x - q.c.x));
+    const cols = Math.ceil(Math.sqrt(reading.length));
+    const cellW = Math.max(...meas.map((m) => m.w)) + GAP;
+    const cellH = Math.max(...meas.map((m) => m.h)) + GAP;
+    const x0 = Math.min(...chosen.map((c) => c.x));
+    const y0 = Math.min(...chosen.map((c) => c.y));
+    reading.forEach((m, i) => {
+      const nx = x0 + (i % cols) * cellW;
+      const ny = y0 + Math.floor(i / cols) * cellH;
+      if (nx !== m.c.x || ny !== m.c.y) patchCard(m.c.placementId, m.c.bitId, { x: nx, y: ny });
+    });
+  }
+  // Send the selected card behind everything (the demote valve — click-to-front stays, ruled).
+  function sendToBack(placementId: string, bitId: string) {
+    const minZ = cards.reduce((m, c) => Math.min(m, c.z), 0);
+    patchCard(placementId, bitId, { z: minZ - 1 });
+  }
+  // Jump-to (the drawer's this-board rows stop being dead ends): glide to the card, readable.
+  function jumpToCard(bitId: string) {
+    const c = cards.find((x) => x.bitId === bitId);
+    if (!c) return;
+    centerOn(c, Math.min(1, Math.max(camRef.current.scale, 0.75)));
+    selectOne(c.placementId);
+  }
+  useBoardKeys({
+    enabled: !drawMode,
+    editingId,
+    selectedCount: selectedIds.size,
+    setEditingIdNull: () => setEditingId(null),
+    clearSelection,
+    selectAll: () => setSelectedIds(new Set(cards.map((c) => c.placementId))),
+    removeSelected: removeSelectedByKey,
+    nudgeSelected,
+    zoomBy,
+    zoomTo,
+  });
 
   // ---- pan + pinch + tap on empty space ----
   function onBoardPointerDown(e: React.PointerEvent) {
@@ -289,8 +360,11 @@ export function BoardSurface({
         selectedCount={selectedIds.size}
         onBulkUnplace={bulkUnplace}
         onBulkTrash={bulkTrash}
+        onTidy={tidySelected}
         onDuplicate={() => void duplicateThis()}
         duplicating={duplicating}
+        onZoomIn={() => zoomBy(1.2)}
+        onZoomOut={() => zoomBy(1 / 1.2)}
         onFit={() => fitOrToggleBack(cards)}
         zoomPct={cam.scale}
         fileRef={fileRef}
@@ -312,6 +386,13 @@ export function BoardSurface({
               title="Open this card full-page — comfortable writing"
             >
               open
+            </button>
+            <button
+              className="compose-btn subtle"
+              onClick={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
+              title="Send this card behind everything else"
+            >
+              send to back
             </button>
             <button
               className="compose-btn subtle"
@@ -340,12 +421,12 @@ export function BoardSurface({
         onDragOver={(e) => e.preventDefault()}
         onDrop={onBoardDrop}
       >
-        {cards.length === 0 && !converting && (
+        {cards.length === 0 && converting === 0 && (
           <p className="compose-empty">Tap &ldquo;+ text&rdquo;, or double-tap anywhere, to start.</p>
         )}
-        {converting && (
+        {converting > 0 && (
           <div className="compose-converting" role="status">
-            Converting your photo…
+            Converting your photo{converting > 1 ? "s" : ""}…
             <span>HEICs take a few seconds</span>
           </div>
         )}
@@ -406,7 +487,7 @@ export function BoardSurface({
             style={{ left: marquee.marqueeBox.left, top: marquee.marqueeBox.top, width: marquee.marqueeBox.w, height: marquee.marqueeBox.h }}
           />
         )}
-        <Drawer variant="board" boardId={boardId} onBringIn={bringIn} refreshSignal={looseRefresh} />
+        <Drawer variant="board" boardId={boardId} onBringIn={bringIn} onJumpTo={jumpToCard} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
         {wordsFor && (
           <WordsOffer

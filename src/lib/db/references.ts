@@ -96,7 +96,7 @@ export type BitHit = {
 /** The `[[` picker's candidates — recent LIVE bits (newest first), each with its
  *  face for the label + type for the section, plus a thumb path / strokes so a
  *  picture identifies a doodle or screenshot by sight (the organized picker). The
- *  picker filters this list client-side through lib/search — the one match rule
+ *  picker filters this list client-side through lib/search-query — the one match rule
  *  (full text, partial words), the house pattern (source-picker/tag-bar) and the
  *  best as-you-type feel at one writer's scale; a server-side search is the later
  *  add when the pile grows past this cap. Excludes

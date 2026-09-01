@@ -81,6 +81,51 @@ colors/paper (aesthetics phase) · board-doorways (S3) · bulk move-to-board (A1
   state); duplicate-board copies geometry — **copy locked_at too?** (a faithful copy: yes — flag
   for the check); destroy cascades fine.
 
+## CORRECTIONS FROM THE INDEPENDENT CHECK — fold ALL in
+
+**Critical:**
+1. **The keyboard guard must be ORDERED, not flat** (the flat spec contradicted the Escape
+   two-step): ① target is an INPUT/TEXTAREA (drawer search, ContentLine, TagBar, pickers,
+   WordsOffer, BoardTitle) → ignore everything, Escape included (they run their own Esc-revert) ·
+   ② inside the confirm dialog (`.confirm-scrim`, incl. its autofocused button) → ignore everything
+   · ③ `editingId` set / target contenteditable → handle **Escape only** (exit edit, KEEP
+   selection); ignore the rest · ④ drawMode on → bail · ⑤ else the full key set. Tiptap binds no
+   Escape (verified), so the window listener still receives it — today's exit-edit works only
+   because the current listener is unguarded.
+2. **The view replace must repeat `with (security_invoker = true)`** — CREATE OR REPLACE resets
+   unspecified reloptions; omitting it flips board_cards to definer rights, a SILENT RLS
+   REGRESSION with the guest door live. Full verbatim select (resting_state:58-83) + `p.locked_at`
+   appended after `source_url`. The throwaway proof must assert the view still has security_invoker.
+3. **Stale closures:** the handler reads cards/selectedIds/editingId and calls bulkUnplace —
+   registered `[]` it acts on a stale board. Re-bind on deps (the paste handler's precedent) or the
+   house latest-callback-ref. New code lives in its own `use-board-keys.ts` (board-surface is at
+   427 lines already).
+4. **Rollback must NOT restore on the "no longer exists" error class** (unplaceBit/trashBit throw
+   on 0 rows) — else a failed-create's leftover card becomes an un-removable zombie. AND fix the
+   root: `createTextCard`'s failed create must remove its optimistic card (the image/audio/pdf
+   doors already do; text doesn't). Bulk rollback is per-failure, not all-or-nothing.
+
+**Medium:** confirm-scrim guard (above) · multi-file loop needs CALLER-computed offsets AND an
+explicit per-file z (`z0 + i` — the import fns' internal nextZ ties in a same-tick loop) ·
+`setConverting` becomes a COUNTER (first-of-3 HEICs finishing must not hide the notice) · tidy-up
+needs a Y-BAND row rule (sort y; new row when y > rowStart + band ≈ 40 world px; x within) — raw
+(y,x) flips visually-same-row cards · `looseRefresh` bumps only after the write lands (or re-bumps
+on rollback) · the lock needs a real write path (`setPlacementLock` db fn through settled; CardVM +
+BoardCard + page mapping carry `locked_at`) · **duplicateBoard copies locked_at — ruled yes** (lock
+is arrangement state like x/y/z) · move-together skips locked cards at ONE point (the starts map in
+onCardDragStart; move/end gate on starts.has() free) · Rnd: `disableDragging = editing || locked`,
+resizing off when locked.
+
+**Confirmed + adopted details:** window-level listener (board div has no focus) · nudge rides the
+per-placement-keyed debounce (proven by move-together) · zoom keys accept `=`/`+` in, `-`/`_` out,
+`0` reset (meta||ctrl), preventDefault; button/key zoom calls scheduleSave explicitly (also clears
+the fit snap-back — correct) · send-to-back: z int, no constraint, negatives legal, no renumbering
+(skip the cleverness) · jump-to maps bitId→card (unique per board), `centerOn(min(1,…))` + select;
+drawer stays open v1 · description UI clones **BitTitle's debounced+save-guard** pattern (BoardTitle's
+blur-only save lost text once) · `home` view won't expose description (frozen b.*) — harmless,
+title-only jump · lock-toggle floats the board on home via the updated_at trigger — expected, noted ·
+one more stale comment: `references.ts:99` "through lib/search" → search-query (fold into B's commit).
+
 ## Model-safety gates
 Nothing touches bit substance. The migration adds two nullable columns (no constraint semantics);
 locked is placement-state like x/y (per-board, not per-bit ✓ derive-don't-duplicate). All state

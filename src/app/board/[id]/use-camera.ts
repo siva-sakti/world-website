@@ -158,6 +158,25 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>, boardId: s
     });
   }
 
+  // Deliberate zoom (the + / − buttons and Cmd+=/−/0): the wheel's zoom-toward-point
+  // math anchored at the VIEWPORT CENTER, clamped, and saved (a button zoom is a
+  // deliberate move — scheduleSave also correctly clears the fit snap-back).
+  function zoomAtCenter(next: (s: number) => number) {
+    const el = boardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = r.width / 2;
+    const py = r.height / 2;
+    setCam((c) => {
+      const scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next(c.scale)));
+      const k = scale / c.scale;
+      return { scale, x: px - (px - c.x) * k, y: py - (py - c.y) * k };
+    });
+    scheduleSave();
+  }
+  const zoomBy = (factor: number) => zoomAtCenter((s) => s * factor);
+  const zoomTo = (target: number) => zoomAtCenter(() => target);
+
   // The fit button. First press frames all cards, remembering where you were; press again
   // (without moving) to snap back to that pre-fit view. scheduleSave clears justFitted on any
   // deliberate move, so after you pan/zoom, fit is a fresh fit again. Session-only (in memory).
@@ -226,5 +245,5 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>, boardId: s
     return wasPinching;
   }
 
-  return { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView };
+  return { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, zoomBy, zoomTo, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView };
 }
