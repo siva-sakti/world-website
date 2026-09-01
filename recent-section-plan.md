@@ -1,6 +1,6 @@
 # "where you were" — the recent section · plan
 
-**Status:** ✅ **BUILT + proven locally; the migration is OWED TO THE OWNER** (paste, then deploy).
+**Status:** ✅ **BUILT · migration APPLIED to cloud · proven live end-to-end. Awaiting the owner's word to deploy.**
 Concept ruled → plan → **antagonist: "NOT build as written"** → corrected → built → proven.
 Owner-authorized 2026-09-01. Queue item
 **THE GAPS ROUND #4** (`organize-phase-plan.md`).
@@ -256,13 +256,23 @@ the surfaces are the page. A missing migration or an RLS slip must not brick the
 it must not vanish silently either, so it is logged server-side. The other three reads have **no**
 such catch: if those fail, home genuinely has nothing to show and should say so.
 
-### ⛔ Still unproven until the migration is applied
+### ✅ The real-PostgREST run — all five behaviors proven live (2026-09-01)
 
-The **PostgREST layer itself** — whether it accepts an `on_conflict` column (`owner_id`) that isn't
-in the request body. The SQL shape is proven; this repo has no local PostgREST (every runner is
-`*-native.sh`, raw Postgres), so it is provable only against the real thing. **The order is
-therefore: owner pastes the migration → Claude runs the browser test on localhost (real PostgREST,
-real RLS) → deploy.** If it does balk, the fix is one line: send `owner_id` explicitly.
+The owner applied `20260903000001_opening.sql` to cloud; this was then run on localhost against the
+real PostgREST and real RLS — the one layer the throwaway couldn't reach:
+
+| | proven live |
+|---|---|
+| **the upsert** | **PostgREST accepts `on_conflict` naming `owner_id`, which is not in the request body** — the last open question in this plan. Openings land. |
+| **order** | opened board → note → board → home: the trail read back in exact reverse-open order, boards and notes together |
+| **reorder + dedupe** | re-opened the OLDEST entry → it jumped to the front, **count stayed 4, no duplicate**. Fatal-defect 2 closed in the real system. |
+| **the 5-cap** | six surfaces opened → five shown, the oldest fell off |
+| **the drop-out** | trashed a board that was in the trail → it vanished, **and the slot refilled** with the entry that had fallen off the cap (the cap counts survivors, as designed) |
+
+*Two side-findings from the run, both benign:* home's surfaces list renders below the fold (28 links,
+1334px page vs a 634px viewport) — checked because a screenshot made it look truncated, and it was
+not. And a click that appeared to open the wrong board was a browser-tooling coordinate-scaling
+slip, not a title-resolution bug: the trail had correctly named the board actually opened.
 
 ### Named, not fixed: the 1000-row cap
 
