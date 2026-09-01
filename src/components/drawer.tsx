@@ -125,8 +125,8 @@ export function Drawer(props: BoardMode | NoteMode) {
     return [...m].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [bits]);
 
-  // Same search language as the global search (search-query.ts): whole word by
-  // default · word* starts-with · "phrase" · -exclude — never a partial word.
+  // Same search language as the global search (search-query.ts): starts-with by
+  // default · *word contains · "phrase" · -exclude.
   const parsed = useMemo(() => parseQuery(query), [query]);
   const matcher = useMemo(() => compileMatcher(parsed), [parsed]);
   const hasWords = !isEmptyQuery(parsed);

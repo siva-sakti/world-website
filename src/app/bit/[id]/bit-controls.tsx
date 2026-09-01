@@ -112,6 +112,7 @@ export function BitTrash({
   const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function onTrash() {
     let n = 1;
@@ -126,35 +127,42 @@ export function BitTrash({
         : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
     if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setBusy(true);
+    setFailed(false);
     try {
       await trashBit(supabase, bitId);
       router.push(returnTo);
       router.refresh();
-    } catch {
+    } catch (e) {
+      console.error("trash failed:", e);
+      setFailed(true); // visible — a silent busy-release is not feedback (the house standard)
       setBusy(false);
     }
   }
 
   return (
-    <button
-      className={
-        compact
-          ? "text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-50"
-          : "text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      }
-      onClick={onTrash}
-      disabled={busy}
-      title="Move this note to the trash — hidden everywhere, restorable"
-    >
-      {busy ? "trashing…" : "trash"}
-    </button>
+    <span>
+      <button
+        className={
+          compact
+            ? "text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-50"
+            : "text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+        }
+        onClick={onTrash}
+        disabled={busy}
+        title={failed ? "that didn't save — try again" : "Move this note to the trash — hidden everywhere, restorable"}
+      >
+        {busy ? "trashing…" : "trash"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }
 
 // PUT AWAY (N5) — the thin slice. Archive is a resting state, not trash: the note
-// leaves the rooms you work in and stays findable in find. Starring and archiving
-// are opposite claims about a thing, so putting away also un-stars it (the db
-// refuses any other combination) — the label says so rather than surprising you.
+// leaves the rooms you work in AND find (I-L8 — the archive page is its surface).
+// Starring and archiving are opposite claims about a thing, so putting away also
+// un-stars it (setResting's one door; the DB CHECK is queued, 20260902000002) —
+// the label says so rather than surprising you.
 export function BitArchive({
   bitId,
   archived,
@@ -167,34 +175,40 @@ export function BitArchive({
   const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function go() {
     if (busy) return;
     setBusy(true);
+    setFailed(false);
     try {
       await archiveBit(supabase, bitId, !archived);
       router.refresh();
     } catch (e) {
       console.error("archive failed:", e);
+      setFailed(true); // visible — a silent busy-release is not feedback
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <button
-      className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      disabled={busy}
-      onClick={() => void go()}
-      title={
-        archived
-          ? "take this back out — it returns to your notes"
-          : starred
-            ? "put this away — it leaves your notes (and loses its star), stays findable in find"
-            : "put this away — it leaves your notes but stays findable in find"
-      }
-    >
-      {archived ? "take back out" : "put away"}
-    </button>
+    <span>
+      <button
+        className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+        disabled={busy}
+        onClick={() => void go()}
+        title={
+          archived
+            ? "take this back out — it returns to your notes"
+            : starred
+              ? "put this away — it leaves your notes (and loses its star); the archive page holds it"
+              : "put this away — it leaves your notes; the archive page holds it"
+        }
+      >
+        {archived ? "take back out" : "put away"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
 import { listSources, type Source } from "@/lib/db/sources";
@@ -30,12 +30,16 @@ export function Intake() {
   const [err, setErr] = useState<string | null>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    let alive = true;
-    listSources(supabase).then((l) => alive && setSources(l)).catch(() => {});
-    listTags(supabase).then((l) => alive && setTagMenu(l)).catch(() => {});
-    return () => { alive = false; };
+  // Reloadable (review R3.17): a source/tag created by one add must autosuggest on
+  // the NEXT note without a remount — and the server may have retitled a URL-source,
+  // which the client can't know locally. Fire-and-forget after each successful add.
+  const reloadSuggestions = useCallback(() => {
+    listSources(supabase).then(setSources).catch(() => {});
+    listTags(supabase).then(setTagMenu).catch(() => {});
   }, [supabase]);
+  useEffect(() => {
+    reloadSuggestions();
+  }, [reloadSuggestions]);
 
   // Auto-grow the note box to fit its text. Because this runs on every `note` change
   // (including the reset to "" after add), it deterministically SHRINKS back too —
@@ -76,6 +80,7 @@ export function Intake() {
     try {
       const res = await addToInbox({ note: body, asQuote, sourceName, sourceUrl, tags });
       if (res.error) { setErr(res.error); return; }
+      reloadSuggestions(); // a source/tag born in THIS add must autosuggest on the next (fire-and-forget)
       // Full reset — a fresh box for the next note (the "better reset").
       setNote("");
       setAsQuote(false);

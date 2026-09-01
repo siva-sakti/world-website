@@ -20,6 +20,7 @@ export function DestroyButton({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function onClick() {
     const name = label.trim() || (thing === "board" ? "this board" : "this note");
@@ -44,30 +45,36 @@ export function DestroyButton({
     )
       return;
     setBusy(true);
+    setFailed(false);
     try {
       await destroyItemAction(thing, id);
       router.refresh();
     } catch (e) {
       console.error(e);
+      setFailed(true); // visible — a silent busy-release is not feedback
       setBusy(false);
     }
   }
 
   return (
-    <button
-      className="text-sm text-red-700 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      onClick={onClick}
-      disabled={busy}
-      title="Delete permanently — cannot be undone"
-    >
-      {busy ? "destroying…" : "destroy"}
-    </button>
+    <span>
+      <button
+        className="text-sm text-red-700 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+        onClick={onClick}
+        disabled={busy}
+        title="Delete permanently — cannot be undone"
+      >
+        {busy ? "destroying…" : "destroy"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }
 
 export function EmptyTrashButton({ count }: { count: number }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function onClick() {
     if (
@@ -87,23 +94,28 @@ export function EmptyTrashButton({ count }: { count: number }) {
     )
       return;
     setBusy(true);
+    setFailed(false);
     try {
       await emptyTrashAction();
       router.refresh();
     } catch (e) {
       console.error(e);
+      setFailed(true); // visible — a silent busy-release is not feedback
       setBusy(false);
     }
   }
 
   return (
-    <button
-      className="text-sm text-red-700 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      onClick={onClick}
-      disabled={busy}
-      title="Permanently delete everything in the trash"
-    >
-      {busy ? "emptying…" : "empty trash"}
-    </button>
+    <span>
+      <button
+        className="text-sm text-red-700 underline underline-offset-4 hover:no-underline disabled:opacity-50"
+        onClick={onClick}
+        disabled={busy}
+        title="Permanently delete everything in the trash"
+      >
+        {busy ? "emptying…" : "empty trash"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }

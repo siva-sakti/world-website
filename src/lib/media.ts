@@ -39,7 +39,7 @@ function loadHeicDecoder(): Promise<HeicTo> {
   const w = window as unknown as { HeicTo?: HeicTo };
   if (w.HeicTo) return Promise.resolve(w.HeicTo);
   if (heicLoad) return heicLoad;
-  heicLoad = new Promise((resolve, reject) => {
+  heicLoad = new Promise<HeicTo>((resolve, reject) => {
     const s = document.createElement("script");
     s.src = "/vendor/heic-to.js";
     s.async = true;
@@ -47,6 +47,11 @@ function loadHeicDecoder(): Promise<HeicTo> {
       w.HeicTo ? resolve(w.HeicTo) : reject(new Error("HeicTo not present after load"));
     s.onerror = () => reject(new Error("could not load the HEIC decoder script"));
     document.head.appendChild(s);
+  }).catch((e) => {
+    // Reset the latch (review R3.15): a cached REJECTED promise would brick every
+    // later HEIC import until a full reload — one transient network blip must not.
+    heicLoad = null;
+    throw e;
   });
   return heicLoad;
 }

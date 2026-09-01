@@ -25,7 +25,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Apply the remembered choice after mount (localStorage is client-only —
   // the same one-time capability-read pattern as card.tsx's coarse-pointer check).
   useEffect(() => {
-    const stored = window.localStorage.getItem("railCollapsed");
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem("railCollapsed");
+    } catch {
+      /* storage blocked (Safari block-all) — fall back to the route default */
+    }
     if (stored !== null) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
       setCollapsed(stored === "1");
@@ -43,7 +48,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const next = !collapsed;
     setCollapsed(next);
     setChosen(true);
-    window.localStorage.setItem("railCollapsed", next ? "1" : "0");
+    try {
+      window.localStorage.setItem("railCollapsed", next ? "1" : "0");
+    } catch {
+      /* storage blocked — the choice just won't persist */
+    }
   }
 
   if (pathname === "/login") return <>{children}</>;

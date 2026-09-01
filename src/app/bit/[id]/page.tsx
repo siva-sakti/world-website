@@ -125,9 +125,12 @@ export default async function BitPage({
             <TextWorkspace bitId={b.id} initialBody={b.body ?? "<p></p>"} />
           </div>
         )}
-        {b.type === "image" && imageUrl && (
-          <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
-        )}
+        {b.type === "image" &&
+          (imageUrl ? (
+            <img src={imageUrl} alt={b.content ?? ""} className="max-h-[60vh] rounded-md border border-neutral-200" />
+          ) : (
+            <p className="text-sm text-neutral-500">Couldn&rsquo;t load this image — reload the page.</p>
+          ))}
         {b.type === "link" && (
           <div>
             {imageUrl && (

@@ -133,8 +133,8 @@ export function NotesBrowser({
   const shown = useMemo(() => {
     let xs = view === "loose" ? items.filter((b) => b.boards.length === 0) : items;
     if (kind) xs = xs.filter((b) => b.type === kind);
-    // Same search language as the global search (search-query.ts): whole word by
-    // default · word* starts-with · "phrase" · -exclude — never a partial word.
+    // Same search language as the global search (search-query.ts): starts-with by
+    // default · *word contains · "phrase" · -exclude.
     const parsed = parseQuery(q);
     if (!isEmptyQuery(parsed)) {
       const matcher = compileMatcher(parsed);

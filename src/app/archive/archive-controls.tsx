@@ -25,6 +25,7 @@ export function ArchiveButton({
   const router = useRouter();
   const [supabase] = useState(() => createClient());
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function onClick() {
     let n = 0;
@@ -43,12 +44,14 @@ export function ArchiveButton({
         : `Archive this ${thing === "board" ? "board" : "note"}? It's set aside in your archive — un-archive anytime.`;
     if (!(await confirm({ message: msg, confirmLabel: "Archive" }))) return;
     setBusy(true);
+    setFailed(false);
     try {
       await archiveItemAction(thing, id);
       if (returnTo) router.push(returnTo);
       router.refresh();
     } catch (e) {
       console.error(e);
+      setFailed(true); // visible — a silent busy-release is not feedback
       setBusy(false);
     }
   }
@@ -57,40 +60,49 @@ export function ArchiveButton({
     ? "text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-50"
     : "text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50";
   return (
-    <button
-      className={cls}
-      onClick={onClick}
-      disabled={busy}
-      title="Set aside in your archive — hidden but kept, un-archive anytime"
-    >
-      {busy ? "archiving…" : "archive"}
-    </button>
+    <span>
+      <button
+        className={cls}
+        onClick={onClick}
+        disabled={busy}
+        title="Set aside in your archive — hidden but kept, un-archive anytime"
+      >
+        {busy ? "archiving…" : "archive"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }
 
 export function UnarchiveButton({ thing, id }: { thing: "bit" | "board"; id: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function onClick() {
     setBusy(true);
+    setFailed(false);
     try {
       await unarchiveItemAction(thing, id);
       router.refresh();
     } catch (e) {
       console.error(e);
+      setFailed(true); // visible — a silent busy-release is not feedback
       setBusy(false);
     }
   }
 
   return (
-    <button
-      className="text-sm underline underline-offset-4 hover:no-underline disabled:opacity-50"
-      onClick={onClick}
-      disabled={busy}
-      title="Bring it back to the world, exactly where it was"
-    >
-      {busy ? "…" : "un-archive"}
-    </button>
+    <span>
+      <button
+        className="text-sm underline underline-offset-4 hover:no-underline disabled:opacity-50"
+        onClick={onClick}
+        disabled={busy}
+        title="Bring it back to the world, exactly where it was"
+      >
+        {busy ? "…" : "un-archive"}
+      </button>
+      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+    </span>
   );
 }

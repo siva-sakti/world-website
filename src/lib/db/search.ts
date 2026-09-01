@@ -117,12 +117,12 @@ export async function searchItems(
     for (const s of data ?? []) srcName.set(s.id as string, s.name as string);
   }
   const items: SearchItem[] = bits.map((b) => {
-    // `face` isn't a column on the base `bit` table (it's computed in the views), so
-    // b.face is undefined here — derive it the way bit_face does (owner's content,
-    // else the body's first words) so a result shows its ACTUAL text, not the generic
-    // "a note" fallback. Media with no caption still falls back per-type in bitLabel.
+    // `face` IS a stored generated column on bit (init.sql:190 — the old comment here
+    // claimed otherwise, and the JS re-derivation had already drifted: an uncaptioned
+    // link labeled generically where the DB face shows its URL — review B1/L7).
+    // Use the DB's face; derive-don't-duplicate.
     const bodyText = (b.body ?? "").replace(/<[^>]+>/g, " ").trim();
-    const face = b.content?.trim() || (bodyText ? bodyText.slice(0, 80) : null) || b.captured_title?.trim() || null;
+    const face = b.face;
     // A link's url, split into WORDS — the DB tsvector only tokenizes hosts whole
     // ("barewall.example.net"), so word-level url search lives here (link-bit-plan §9).
     const urlWords = (b.url ?? "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();

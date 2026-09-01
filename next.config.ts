@@ -1,6 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    // Modest hardening (security review #6): nosniff + a tight referrer policy.
+    // CSP is deliberately deferred to the guest-page pass (it needs real design
+    // against the app's actual inline styles/workers, not a midnight guess).
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     // The geography moved twice (D-113, then D-118's re-ruling): the browse
     // surface is now /bits; /notes is the notes ROOM (written pieces). Old

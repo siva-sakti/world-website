@@ -63,13 +63,21 @@ export function HomeSurfaces({
   // When the desk is empty we keep it open, so home is never a blank screen.
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
-    if (window.localStorage.getItem("homeListCollapsed") === "1") setCollapsed(true);
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
+      if (window.localStorage.getItem("homeListCollapsed") === "1") setCollapsed(true);
+    } catch {
+      /* storage blocked (Safari block-all) — a throw here would error-boundary HOME */
+    }
   }, []);
   function toggleCollapsed() {
     const next = !collapsed;
     setCollapsed(next);
-    window.localStorage.setItem("homeListCollapsed", next ? "1" : "0");
+    try {
+      window.localStorage.setItem("homeListCollapsed", next ? "1" : "0");
+    } catch {
+      /* storage blocked — the collapse just won't persist */
+    }
   }
   const showBody = deskEmpty || !collapsed;
 

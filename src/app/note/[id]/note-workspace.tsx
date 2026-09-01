@@ -37,7 +37,8 @@ export function NoteWorkspace({
   }, []);
 
   const onGather = useCallback((bit: PanelBit) => {
-    gather.current?.({ id: bit.id, face: bit.face, type: bit.type });
+    if (!gather.current) return; // editor not ready yet — no chip inserted, so no false "gathered" mark
+    gather.current({ id: bit.id, face: bit.face, type: bit.type });
     // Optimistic: the row reads "gathered" immediately; the next save re-derives
     // the true set from the body (which also catches a chip you delete by hand).
     setGatheredIds((s) => new Set(s).add(bit.id));

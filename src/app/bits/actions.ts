@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-user";
 import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
 import { uploadObject, removeObjects } from "@/lib/storage";
 import { getBoardCards } from "@/lib/db/boards";
@@ -56,6 +57,7 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
   const note = (input.note ?? "").trim();
   if (!note) return { error: "Nothing to add." };
   const supabase = await createClient();
+  await requireUser(supabase);
   const bitId = randomUUID();
 
   const isLink = looksLikeUrl(note);
@@ -118,6 +120,7 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
 export async function trashFromInbox(formData: FormData) {
   const id = String(formData.get("id"));
   const supabase = await createClient();
+  await requireUser(supabase);
   await trashBit(supabase, id);
   revalidatePath("/bits");
 }
@@ -130,6 +133,7 @@ export async function trashFromInbox(formData: FormData) {
  * (a reused one collides on the PK and would throw for every bit after the first). */
 export async function placeBitsOnBoard(bitIds: string[], boardId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
+  await requireUser(supabase);
   const anchor = anchorNearContent(await getBoardCards(supabase, boardId));
   let failed = 0;
   let firstMsg = "";
@@ -171,6 +175,7 @@ export async function captureLink(
   rawUrl: string,
 ): Promise<{ bit?: import("@/lib/types").Bit; error?: string }> {
   const supabase = await createClient();
+  await requireUser(supabase);
   const bitId = randomUUID();
   const url = normalizeUrl(rawUrl);
   let thumbPath: string | null = null;
@@ -192,6 +197,7 @@ export async function captureLink(
  * reported, the rest still land. */
 export async function trashBits(ids: string[]): Promise<{ error?: string }> {
   const supabase = await createClient();
+  await requireUser(supabase);
   let failed = 0;
   for (const id of ids) {
     try {

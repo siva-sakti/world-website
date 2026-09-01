@@ -72,8 +72,8 @@ export function OutlineView({ outline }: { outline: Outline }) {
     return { cats: CAT_ORDER.filter((c) => cs.has(c)), tags: [...ts].sort() };
   }, [outline]);
 
-  // Same search language as the global + drawer search (search-query.ts): whole word
-  // by default · word* starts-with · "phrase" · -exclude — never a partial word.
+  // Same search language as the global + drawer search (search-query.ts): starts-with
+  // by default · *word contains · "phrase" · -exclude.
   const parsed = useMemo(() => parseQuery(q), [q]);
   const matcher = useMemo(() => compileMatcher(parsed), [parsed]);
   const hasWords = !isEmptyQuery(parsed);

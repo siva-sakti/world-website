@@ -198,7 +198,9 @@ export async function fetchImageBlob(
     try { if (isPrivateHost(new URL(res.url).hostname)) return null; } catch { return null; }
     if (!res.ok) return null;
     const ct = (res.headers.get("content-type") ?? "").split(";")[0].trim();
-    if (!ct.startsWith("image/")) return null;
+    // Raster types only (security review #5): a scripted SVG stored and re-served
+    // under a signed URL is an avoidable oddity — no og:image needs SVG.
+    if (!/^image\/(jpeg|png|webp|gif|avif)$/.test(ct)) return null;
     const len = Number(res.headers.get("content-length") ?? 0);
     if (len > MAX_IMAGE) return null;
     if (!res.body) return null;
