@@ -1026,6 +1026,24 @@ body {
 .tag-chip:hover {
   border-color: #b7aea0;
 }
+/* The chip's two halves (F1): the WORD pulls, the × removes. The × carries negative
+   margins so its hit area reaches ~24px without changing the chip's look — a bare ×
+   inside the board card's 11px chip is an ~8px target sitting next to a link that
+   navigates away, which would trade one bad gesture for another. */
+.tag-chip-word { color: inherit; text-decoration: none; }
+.tag-chip-word:hover { text-decoration: underline; }
+.tag-chip-x {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: 1;
+  opacity: 0.55;
+  padding: 4px 6px;
+  margin: -4px -6px -4px 0;
+}
+.tag-chip-x:hover { opacity: 1; }
 .tag-chip.is-on {
   background: #3e4c86;
   border-color: #3e4c86;

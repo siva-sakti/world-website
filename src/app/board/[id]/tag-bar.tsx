@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
@@ -14,8 +15,9 @@ import {
 } from "@/lib/db/tags";
 
 // The tag editor for a selected note OR the board itself (§3a — anything is
-// taggable; §3c — guided, never gating: tap an existing chip or type a new word;
-// tap a chip to remove it).
+// taggable; §3c — guided, never gating: tap an existing chip or type a new word).
+// A chip has TWO halves: the word is THE PULL (→ everything carrying it) and the ×
+// removes — it used to be one button that removed on any tap (flow review F1).
 export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: string }) {
   const [supabase] = useState(() => createClient());
   const [tags, setTags] = useState<Tag[]>([]);
@@ -98,10 +100,30 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   return (
     <div className="tag-bar" onPointerDown={(e) => e.stopPropagation()}>
       <span className="tag-bar-label">{label}</span>
+      {/* THE PULL vs REMOVE (flow review F1). The whole chip used to be one button
+          that DELETED the tag — no confirm, no undo — while the pull (tap a word,
+          see everything carrying it) was wired in two places app-wide. Now the WORD
+          is the pull and a separate × removes. Siblings, not nested: a <button>
+          inside an <a> is invalid and swallows the click. */}
       {tags.map((t) => (
-        <button key={t.id} className="tag-chip is-on" onClick={() => remove(t)} title="remove tag">
-          {t.word} <span aria-hidden>×</span>
-        </button>
+        <span key={t.id} className="tag-chip is-on">
+          <Link
+            href={`/search?tag=${t.id}`}
+            className="tag-chip-word"
+            title={`everything tagged “${t.word}”`}
+          >
+            {t.word}
+          </Link>
+          <button
+            type="button"
+            className="tag-chip-x"
+            onClick={() => remove(t)}
+            aria-label={`remove the tag ${t.word}`}
+            title="remove this tag"
+          >
+            ×
+          </button>
+        </span>
       ))}
       <span className="tag-bar-field">
         <input
