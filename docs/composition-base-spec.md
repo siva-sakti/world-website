@@ -76,7 +76,30 @@ public-default → **private** · loose/inbox membership → **never** · gather
 ## 8 · Migration sketch (enactment — the code window's lane, house method: backup → throwaway-proven → owner's go → cloud)
 1. `surface` table (or extend `board`) + form + body · 2. copy `kind='note'` rows over · 3. repoint placements / references / tags / travel · 4. delete note-rows from `bit`; drop `kind` · 5. sweep the ~30 app files (mostly deletions) · 6. views + export + search regenerated · 7. proofs re-run (`verification/`).
 
-## 9 · ⚑ THE QUESTIONS — the owner answers these, then the base is settled
+## 9b · ⭐ SETTLED BY THE OWNER (2026-09-01, the talk-through) — plus two ruled features
+
+| q | ruling |
+|---|---|
+| **Q2 source** | ✅ **dropped** — the owner's reasoning, better than the lean: *"think of it like a board — there's multiple things happening there."* |
+| **Q3 titles** | ✅ **auto-fill with date/time when blank — for BOTH compositions and boards** (replaceable stand-in, never locked). Supersedes "untitled board." |
+| **Q7 what a board births** | ✅ ⭐ **THE PRINCIPLE: the board catches MATERIAL; surfaces are made ON PURPOSE.** Everything placed on a board is a bit by default (paste · drop · type-a-card); a composition is always an intentional step. **Cascades:** the "+ note" door → a text-bit door · paste → a bit · **Q6 dissolves** (evaporate now concerns empty bits — keep, uncontroversial) · the board needs its own deliberate "compose" door. |
+| **Q8 placed-on-composition** | ✅ **no** — *"composition is more text-forward, it's like Notion."* |
+| **Q4b opening** | ✅ **ruled, and extended into the feature's heart:** tap a placed composition → a **side compose panel** (full page one click away) **+ a draggable mini compose window** over the canvas — *"that's part of our entire thing: you're looking at the board to compose something."* Same editor, three frames: page · panel · floater. |
+
+### 🆕 The sibling gesture (Claude's, owner-invited): **compose-from-selection**
+Multi-select cards on a board → **"compose from these"** → the panel opens with a fresh composition, those bits pre-gathered in selection order. The category's most common convergent gesture (Figma/FigJam/Freeform/Notion all have "selection becomes a thing"), aimed at our exact seam. 🔵 awaiting the owner's yes.
+
+### Still open, and only these
+| # | question |
+|---|---|
+| **Q1** | shared drawer or own drawer (the storage shape — re-asked in plain words, unanswered) |
+| **Q4a** | the card on the board: a **door** (title) or a **window** (title + opening lines, resizable) |
+| **Q5 + the fabric** | what `[[` offers · what links to what, appearing how — ⚑ **the owner wants this thought through together; the next sit-down** |
+| new | is a board-born composition **auto-placed** on that board? (lean: yes) |
+| new | **panel vs drawer real estate** — both want the right side (lean: the drawer docks inside the compose context) |
+| **Q9** | the words — unavoidable before UI |
+
+## 9 · ⚑ THE QUESTIONS — original set (answers folded above)
 *(each with options + Claude's lean 🔵 — leans are inputs, not defaults)*
 
 | # | question | options | lean |
