@@ -63,11 +63,18 @@ export function usePersistence(
     timers.current.set(placementId, setTimeout(() => flush(placementId), 350));
   }
 
-  async function flush(placementId: string) {
+  /** Returns TRUE when the owner's words/positions are safely in the DB — the
+   *  boundary hunt's #3: every "flush before you leave/remove" gate used to resolve
+   *  indistinguishably on failure, so removes forgot restored patches and opens
+   *  navigated onto stale pages. Gates now refuse their destructive step on false.
+   *  (A failed reference-reconcile does NOT count as failure — hunt #7: the body IS
+   *  saved; the index self-heals on the next save, and the old behavior restored the
+   *  whole patch and showed a banner about words that had landed.) */
+  async function flush(placementId: string): Promise<boolean> {
     const p = pending.current.get(placementId);
     pending.current.delete(placementId); // capture-at-fire (kept BEFORE any await — deliberate)
     timers.current.delete(placementId);
-    if (!p) return;
+    if (!p) return true;
     // The row must exist before we update it; resolve the id AFTER the wait —
     // a reconcile may have landed meanwhile. (settled never rejects.)
     const realId = await settled(placementId);
@@ -76,6 +83,8 @@ export function usePersistence(
     // never reorder on the wire. Two flushes awaiting the same `prev` resume in
     // registration order (microtask FIFO) = capture order. The stored tail is
     // settled-safe (errors surface once via onErr, and never block the next write).
+    let ok = true;
+    let bodyLanded = false;
     const prev = chains.current.get(realId) ?? Promise.resolve();
     const tail = prev
       .then(async () => {
@@ -83,12 +92,20 @@ export function usePersistence(
           await updatePlacement(supabase, realId, p.placement);
         if (p.body !== undefined) {
           await updateBitBody(supabase, p.bitId, p.body);
+          bodyLanded = true; // the WORDS are safe from here (hunt #7 carve)
           // Reconcile the note's `[[` chips into `reference` rows (self-heals on a
           // later save/read if this leg fails — plan risk 1).
           await reconcileReferences(supabase, p.bitId, extractRefIds(p.body));
         }
       })
       .catch((e) => {
+        if (bodyLanded) {
+          // Only the reconcile leg failed: the body saved. No restore (it would
+          // re-write identical words), no banner (it would lie). Self-heals.
+          console.error("reference reconcile failed (self-heals on next save):", e);
+          return;
+        }
+        ok = false;
         // The patch was captured-at-fire and deleted, so a failure used to strand
         // the change in React state forever while the banner said "your work is
         // still here" (review F3). Put it BACK so the next edit — or the flushAll
@@ -102,6 +119,7 @@ export function usePersistence(
       if (chains.current.get(realId) === tail) chains.current.delete(realId);
     });
     await tail;
+    return ok;
   }
 
   /** Put a FAILED patch back into `pending` so a later flush retries it. Field-level
@@ -176,7 +194,7 @@ export function usePersistence(
    *  pending-delete is invisible to the timers map (the antagonist's catch: without
    *  the snapshot, the await misses exactly the write it exists to include). */
   function flushAll(): Promise<void> {
-    const fired: Promise<void>[] = [];
+    const fired: Promise<boolean>[] = [];
     // timers ∪ pending: a RESTORED patch (review F3) has no timer by design, so a
     // timers-only sweep would never retry the very writes this exists to rescue.
     for (const id of new Set([...timers.current.keys(), ...pending.current.keys()])) {

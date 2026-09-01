@@ -86,8 +86,11 @@ export function QuickWrite() {
     timer.current = setTimeout(flush, 600);
   }
 
-  function flush(): Promise<void> {
-    if (!create.current) return Promise.resolve();
+  /** Returns TRUE when the body landed (hunt #3: openSelf used to navigate on a
+   *  FAILED save — /note/[id] then rendered the stale body and its next save
+   *  overwrote the tail). The catch below already shows the honest banner. */
+  function flush(): Promise<boolean> {
+    if (!create.current) return Promise.resolve(true);
     const body = latest.current;
     writing.current = body;
     setStatus("saving");
@@ -104,11 +107,13 @@ export function QuickWrite() {
       .then(() => {
         setStatus("saved");
         setErr(null);
+        return true;
       })
       .catch((e) => {
         console.error("save failed:", e);
         setStatus("idle");
         setErr("Couldn't save — check your connection. Your words are still here.");
+        return false;
       })
       .finally(() => {
         if (writing.current === body) writing.current = null;
@@ -117,12 +122,12 @@ export function QuickWrite() {
 
   /** Write now if anything is UNSAVED (the dirty check the note editor gained in
    *  F2 — a failed save must not disable the escape hatches). */
-  function flushPending(): Promise<void> {
+  function flushPending(): Promise<boolean> {
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
-    if (!create.current) return Promise.resolve();
-    if (latest.current === saved.current) return Promise.resolve();
-    if (latest.current === writing.current) return Promise.resolve();
+    if (!create.current) return Promise.resolve(true);
+    if (latest.current === saved.current) return Promise.resolve(true);
+    if (latest.current === writing.current) return Promise.resolve(true);
     return flush();
   }
 
@@ -146,7 +151,12 @@ export function QuickWrite() {
     setOpening(true);
     try {
       flushTitle();
-      await flushPending();
+      if (!(await flushPending())) {
+        // Hunt #3: the save failed — navigating would render the stale body and its
+        // next save would clobber the tail. The banner is already up; stay and retry.
+        setOpening(false);
+        return;
+      }
       router.push(`/note/${id}`);
     } catch (e) {
       console.error("open failed:", e);

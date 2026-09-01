@@ -550,6 +550,10 @@ export function useCreateDoors(deps: {
               : cs.map((c) => (c.placementId === placementId ? { ...c, placementId: placement.id } : c)),
           );
           setSelectedIds((prev) => { if (!prev.has(placementId)) return prev; const nx = new Set(prev); nx.delete(placementId); nx.add(placement.id); return nx; });
+          // The keyboard's owner must follow the rename too (hunt #10): a stranded
+          // editingId points at a dead id — the keyed Card remounts un-editing while
+          // useBoardKeys still thinks an editor owns the keys → Delete/arrows dead.
+          setEditingId((cur) => (cur === placementId ? placement.id : cur));
         }
       })
       .catch((e) => {

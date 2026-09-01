@@ -116,7 +116,12 @@ export function BoardSurface({
   function openSelected(placementId: string, bitId: string) {
     settled(placementId)
       .then((id) => flushNow(id)) // the pending entry lives under the POST-reconcile key
-      .then(() => router.push(`/bit/${bitId}`))
+      .then((ok) => {
+        // Hunt #3: a failed save must not navigate — the destination would render the
+        // STALE body and its next save would overwrite the words the flush re-queued.
+        // The banner is already up (flush's onErr); staying here keeps the words safe.
+        if (ok) router.push(`/bit/${bitId}`);
+      })
       .catch(onErr);
   }
 

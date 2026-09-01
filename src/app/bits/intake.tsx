@@ -120,9 +120,20 @@ export function Intake() {
     const sourceName = sticky?.name ?? (draft.trim() || null);
     const sourceUrl = sticky?.url ?? null;
     const tags = tagDraft.trim() ? [...tagWords, tagDraft.trim()] : tagWords;
+    // The boundary hunt's #5: navigate away between the server accepting this add and
+    // resetBox() rendering, and the device-local draft would still hold the note — a
+    // returning visit restores it and a second add captures it TWICE. So the draft is
+    // cleared BEFORE the await (the box is locked while pending, so no state change
+    // can re-mirror it), and explicitly restored on every failure path.
+    const snapshot = { note, asQuote, sticky, draft, tagWords, tagDraft };
+    saveDraft({ note: "", asQuote: false, sticky: null, draft: "", tagWords: [], tagDraft: "" });
     try {
       const res = await addToInbox({ note: body, asQuote, sourceName, sourceUrl, tags });
-      if (res.error) { setErr(res.error); return; }
+      if (res.error) {
+        setErr(res.error);
+        saveDraft(snapshot); // the add failed — the crash-guard must hold the words again
+        return;
+      }
       reloadSuggestions(); // a source/tag born in THIS add must autosuggest on the next (fire-and-forget)
       resetBox(); // a fresh box for the next note — and the mirror drops the saved draft
       noteRef.current?.focus();
@@ -130,6 +141,7 @@ export function Intake() {
       // The action call itself rejected (offline / flaky network — the phone case).
       // Without this catch, `pending` would stick true and lock the box forever.
       setErr("Couldn't reach the server — check your connection and try again.");
+      saveDraft(snapshot);
     } finally {
       setPending(false);
     }
@@ -168,6 +180,7 @@ export function Intake() {
             <input
               className="tag-bar-input"
               value={draft}
+          disabled={pending}
               placeholder="a book, a site, an author, or paste a link…"
               autoComplete="off"
               onChange={(e) => setDraft(e.target.value)}
@@ -211,6 +224,7 @@ export function Intake() {
           <input
             className="tag-bar-input"
             value={tagDraft}
+          disabled={pending}
             placeholder="add a tag…"
             autoComplete="off"
             onChange={(e) => setTagDraft(e.target.value)}
@@ -241,6 +255,9 @@ export function Intake() {
         className="intake-note"
         value={note}
         rows={2}
+        disabled={pending} /* the hunt's #1: words typed DURING the add were wiped by the
+          success-reset with no recovery (the mirror then dropped the draft too). A locked
+          box for the sub-second of "adding…" is honest; typing resumes on focus after. */
         placeholder="Jot a note, or paste a link…"
         aria-label="Add to inbox"
         onChange={(e) => setNote(e.target.value)}
