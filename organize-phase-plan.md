@@ -62,6 +62,39 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
 - **N4c · The last save gap — a hard tab-close.** *(Opened 2026-08-28, after the save-guard work; LOW urgency, listed so it isn't forgotten.)* **What's already fixed:** every debounced writer (a note's body · titles · board cards · `/write`) now flushes on unmount and on `visibilitychange:hidden` + `pagehide` (`lib/save-guard.ts`), and the note says "saving… / saved". **What remains:** on a genuine tab-close the browser may kill the in-flight request — exposure is now *milliseconds*, not the old 350–600ms, and only on that one path. **The fix if we take it:** give the browser Supabase client a custom `fetch` (`createBrowserClient(url, key, { global: { fetch } })`) that adds `keepalive: true` **only while the save guard is firing** — a module flag the guard raises and lowers. It must stay conditional: `keepalive` caps the body at **64KB**, so a long note would fail outright if it were always on; the wrapper falls back to a normal fetch above that. *(Rejected: `navigator.sendBeacon` — it can't carry the auth headers cleanly and would mean hitting the REST endpoint raw, around the one db door.)* **Recommendation: don't build this yet.** The residual risk is small, the fix adds a fetch wrapper with a size gotcha to every request in the app, and the cheaper mitigations (a shorter debounce, a flush on editor blur) are available if it ever actually bites. Re-enter if the owner loses writing to a tab-close.
 - **N5 · Archive — CONCEPT RULED (owner, 2026-08-29).** Archive = **hide-but-keep**: it clears clutter but **never deletes**; it goes to its **own archive area** you can pull things back out of. **Distinct from trash** (trash = weeding, its own place, *can* be emptied → D-125). Build (its own): `archived_at` on bit/board · hide archived things from the live surfaces (home · search · the pull) · an **archive** area (like `/trash`) · archive/unarchive controls. Small schema, throwaway-proven, owner-gated.
 - **Functional-gaps queue (owner: functional first, then the spatial desk — 2026-08-29):** ✅ **empty-trash / destroy (D-125)** → ✅ **`/write` trash (D-126)** → **archive** (N5, above) → **gather a board / source into a note** (N6; owner leaning yes) → *search covers source names/URLs* (small; today search misses the `source` attached to a bit) → **publishing/sharing** (its own design-heavy session — the public/private plumbing exists at the DB, no publish act built). Then the **spatial desk** (H4).
+- **THE GAPS ROUND (owner-ruled 2026-09-02, from Claude's inside-the-code observations — all owner-accepted):**
+  1. **PHONE CAPTURE** — *"something we need to have for sure."* The app exists to catch what you
+     consume, and consuming happens on a phone; today the likely only path is open-site → log in →
+     find the box. Wants: a real capture door (share-sheet / installable / shortcut — the flow
+     review is naming what exists). **The highest-value gap in the app.**
+  2. **LOST SIGNAL** — *"we need to think about"*: nothing survives a dropped connection today; for
+     a capture tool, losing a thought in a tunnel is the worst failure. Offline/draft-safety.
+  3. **UNDO** — owner: *"smart."* Re-raised from Phase 4: the one basic every canvas tool has and
+     this doesn't. Needs its own plan (it crosses the debounced-save + optimistic-create machinery).
+  4. **A RECENT SECTION** — owner-ruled: solves "what was I doing?" (home shows starred + sorts but
+     no trail of where you actually were). Note: needs a visit-tracking decision (A7 forecloses
+     placement-level visit history — check its scope before building).
+  5. **THE FOUR-DOORS TAX** — four capture doors (`/write` · `/bits` intake · board paste · file
+     door) force a "which door?" decision. Owner: *"you're right about the tax and I think the UI
+     can help solve that"* — a UI answer, not a model change.
+  6. **SEARCH's ceiling** — client-side over everything, instant now, a known cliff. Owner asked for
+     the approach; Claude's answer: cheap step (load less per bit) → real fix (use the `search_tsv`
+     GIN index already built and maintained; the query grammar translates to tsquery). Trigger:
+     ~1000 bits or a slow /search load. Not now.
+  *(Note→bit division: the owner is working it in the OTHER window — not this track.)*
+
+- **ACCOUNTS + PRIVACY + STORAGE — the owner's shape (2026-09-02), input to the other window's
+  privacy/publishing session (its ④, the great unblocker) — NOT built here until that session rules:**
+  the owner sees accounts as *part of* the convergent-surfaces thread — *"if we have accounts, people
+  can be editors on each other's convergent surfaces and share stuff with each other simply and
+  easily and send stuff to each other."* So the sharing model is **collaborative-adjacent** (editors
+  on a surface + person-to-person sending), not just publish-to-web. **Business shape ruled:** self
+  first · accounts · **freemium — free until a limit, then premium** (candidate limits: total
+  storage, and/or a per-file cap); the actual numbers are open and want real usage data
+  (`positioning.md` §8 holds the storage-cost thinking). **Claude's standing note:** the DB is
+  already structurally multi-user (per-row ownership + a proven guest door), so accounts is a signup
+  door + product decisions, not a rebuild.
+
 - **Basic-acts queue (owner idea-dump, 2026-09-01 → settled + built same day):** **duplicate a board** ✅.
   The model fork RULED: the copy's cards point at the **same bits** — a second arrangement of the
   same material (bits are the atoms; placements are cheap; deep-copying would double material and
