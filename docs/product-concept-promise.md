@@ -243,6 +243,26 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 | an ordered sequence | **a deck** |
 | a file you hand someone | how a doc/sheet/deck **leaves** — print/export |
 
+### ⭐⭐ WHAT THE CONVERGENT SURFACE HAS TO HOLD (worked out 2026-08-31 — owner's conditional + founding text, Claude's synthesis on top)
+
+**The owner's ask:** *"I want for convergence the same freedom and creativity as we made the divergent layout… do we make something more like a Notion surface that people are familiar with — tables you can drag, checklists, part of a document format — or something like Google Sheets and Google Docs?"* Earlier conditional, same thread: *"if it also gets text boxes and freeform dropping in, then I would agree."*
+
+**⭐ The spec already exists — in `philosophy.md`, since the founding:** *"Obsidian / Notion give me search, links, and structure, but not MY layout — I can't drag a doodle into the corner, wrap a paragraph around a sketch, and pin a photo where it belongs. **The page is theirs, not mine.**"* That sentence does not describe the board (which exists and does this). **It describes the missing convergent surface: a page with flow AND freedom.**
+
+**The verdict on Notion-like vs Google-like: neither suite. One surface, three layers** 🔵:
+
+| layer | what it is | who has it |
+|---|---|---|
+| **1 · FLOW, done properly** | real text — headings · checklists · **tables** — as draggable blocks in a document | Notion's good part; our text box's missing part |
+| **2 · BLOCKS THAT CAN BE BITS** | the quote in your document IS the bit on your board — one thing, two surfaces. **This is GATHER, matured**: today's `[[` chip renders as a reference; the grown-up version renders the bit's full content as a block in the flow | **nobody — structurally impossible for Notion** (its content is trapped in its page). The seam made literal |
+| **3 · FREEFORM ON THE PAGE** | the doodle in the corner · the photo pinned where it belongs · text wrapping a sketch · *handwriting and typing on the same page* | **nobody.** Notion can't (all blocks, one column) · Docs can't (floating images are jank) · Canva can but has no real flow and no memory |
+
+**The gallery tracker resolves INSIDE this** — no separate Sheets product: a **table is a block in a document** (covers the 20-row creative-practice case, which is exactly how people use Notion), and a table block that grows up can **open full-page**. Same object, two views. *(Consistent with the stored-vs-computed instinct, and with `tables-and-structured-data.md` — this is that doc's "where does a table live" question, answered.)*
+
+**⚠ The honest hard part, named:** **flow + freeform on one page is an UNSOLVED interaction problem**, not merely an unbuilt feature. Word has had floating images for thirty years and they are still its jankiest thing — what happens to the pinned doodle when the paragraph above it grows? Real answers exist (anchor-to-paragraph · margin zones · layers) but this is where actual design invention is needed, and exactly where "the same freedom as the divergent layout" gets hard. **If solved, it is the moat — because it is hard, and because it is the founding sentence made real.**
+
+⚑ Nothing here is ruled. The three-layer shape is Claude's synthesis 🔵; layers' *contents* trace to the owner (the conditional · the founding text · the Notion observation). Naming (step 2b): "page" · "block" · "document" all unruled.
+
 ### The discipline (the owner's own rule, §6, applied hard)
 
 **We do not beat Google Docs, Excel, or Canva.** *Good enough that you never have to leave.* The entire justification for building any of this here is the seam: **a deck in Canva cannot reach your board; a deck here can.** If a convergent surface isn't connected to your material, it has no reason to exist in this app — go use the real one.
