@@ -198,6 +198,10 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `app-things-inventory.md` — ⭐ THE CONCRETE LIST (2026-09-01)
+**Contains:** every finding from the convergence work translated into **things you'd see or click** — writing a piece · linking (what can point at what) · getting things out · ordering · tables/fields · about a piece · and which lines have real evidence.
+**Is:** the plain-language output layer. Written after the owner named the translation loss: *"what are the actual things I need to see in an app."* Read this instead of the frameworks; the frameworks are the working-out.
+
 ### `convergent-surfaces-stress-test.md` — 🔵 independent review of the convergence direction (2026-09-01)
 **Contains:** convergence as **ten operations** (we serve two) · six verdicts on our conclusions (what's weak, what's wrong, what to keep) · the excerpt problem with four costed stances · spatial→linear: the only four mechanisms that exist · seven ranked gaps · flagged uncertainty · heavy sourcing.
 **Is:** a reviewer's opinion, **not a ruling** — commissioned to attack, not validate. Read WITH the overview.
