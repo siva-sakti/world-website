@@ -118,6 +118,14 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 
 **Evidence banked for S5/S12 (the bit-web):** the owner confirmed she IS the knowledge worker, and her **founding mental model of connection** was *"a note where I'm typing, but I'm bringing bits in"* — the writing-tie is her native gesture, not Claude's lean. The live question narrows to **STEERING**: a faster on-ramp into that motion from deep-in-text, not a different mechanism.
 
+## ⭐ THE TABLE WALK (owner, 2026-09-02, late) — the fabric closed cell by cell
+- **piece↔piece: ✅ FORMALLY CONFIRMED** — `[[` referencing between pieces, *"the basic Obsidian."*
+- **piece-on-board as a card: ✅ affirmed** (*"I like that quite a lot"*).
+- **The bit-block REOPENED and re-shaped by the owner:** not "shown in full" — **preview-sized by default, full only when full is small.** By type and size: an image in full ✅ · short text in full ✅ · long text = first lines + tap-to-expand (the peek, inline). ⚑ awaiting her stamp on this formalization.
+- **bit↔bit: the close look, concluded (⚑ awaiting stamp): NO fourth mechanism — deliberately.** The owner's own observation decides it: bits are reused across boards, so bit-relations are *contextual* — and a bare global tie is context-free, the wrong shape ("related how? for which thinking?"). The existing three each carry context: a board (*here*) · a tag (*under this word*) · co-pulled into writing (*for this stated reason* — her founding gesture). What improves instead: **steering** — a fast on-ramp to the connective note (e.g., "write about this" from a bit's page, pre-pulled).
+- **board↔board, honest state:** the doorway is a *placement*, not a writing-link (boards don't write). The reverse ("which boards hold a door to me") is **stored but invisible** — no screen shows it; parked with the dormant doorway UI.
+- **board→piece: DELIBERATELY single-channel** — a board relates to a piece only by *holding it as a card*; no second mechanism exists or should (every board-relation is a holding; every writing-relation needs a writer). Owner asked for this to be chosen, not accidental — ⚑ her stamp closes it.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
