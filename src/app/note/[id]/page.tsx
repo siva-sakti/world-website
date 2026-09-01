@@ -15,6 +15,7 @@ import { ArchiveButton } from "@/app/archive/archive-controls";
 import { PinToggle, GroupPicker } from "@/components/shelf-controls";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { listGroups } from "@/lib/db/shelf";
+import { RecordOpening } from "@/components/record-opening";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,9 @@ export default async function NotePage({
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
+      {/* renders null — stamps "you opened this" for home's "where you were".
+          Safe by position: a non-note has already redirected to /bit/[id] above. */}
+      <RecordOpening kind="note" id={b.id} />
       {/* Action bar — everything that ISN'T writing (owner: never in the writing). */}
       <div className="note-actions">
         <PinToggle bitId={b.id} pinned={Boolean(b.pinned_at)} greetsHome />

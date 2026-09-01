@@ -8,6 +8,7 @@ import { BoardSurface } from "./board-surface";
 import { BoardTitle } from "./board-title";
 import { BoardDescription } from "./board-description";
 import { TagBar } from "./tag-bar";
+import { RecordOpening } from "@/components/record-opening";
 import type { CardVM } from "./card";
 
 export const dynamic = "force-dynamic";
@@ -102,6 +103,8 @@ export default async function BoardPage({
 
   return (
     <main className="board-page">
+      {/* renders null — stamps "you opened this" for home's "where you were" */}
+      <RecordOpening kind="board" id={board.id} />
       <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-4">
         <span className="w-8 shrink-0" aria-hidden="true"></span>
         <BoardTitle boardId={board.id} title={board.title} />

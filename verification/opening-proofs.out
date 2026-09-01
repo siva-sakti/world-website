@@ -1,0 +1,40 @@
+=== OPENING PROOFS ===
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:63: NOTICE:  PASS 1 — exactly one target: both-set and neither-set are refused
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:77: NOTICE:  PASS 2 — one row per (owner, board): the second insert is refused
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:94: NOTICE:  PASS 3 — PostgREST's predicate-free ON CONFLICT infers the constraint
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:108: NOTICE:  PASS 3b — the note conflict target infers too
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:135: NOTICE:  PASS 4 — re-opening UPDATES the one row and moves opened_at forward
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:153: NOTICE:  PASS 5 — omitting opened_at leaves it frozen (the defect, documented)
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:168: NOTICE:  PASS 6 — 2 note openings coexist (NULLS DISTINCT)
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:194: NOTICE:  PASS 7 — an opening leaves updated_at untouched on BOTH targets
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:207: NOTICE:  PASS 8 — opening has no triggers
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:222: NOTICE:  PASS 9 — destroying a target cascades its openings away
+DO
+INSERT 0 1
+SET
+SET
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:240: NOTICE:  PASS 10a — a stranger sees zero of the owner's openings
+DO
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:250: NOTICE:  PASS 10b — a stranger cannot forge an opening onto the owner
+DO
+RESET
+SET
+SET
+psql:/Users/gargoodevi/Documents/world-website/verification/opening-proofs.sql:261: NOTICE:  PASS 10c — the owner sees their own openings (1)
+DO
+RESET
+ALL OPENING PROOFS PASSED
+ROLLBACK

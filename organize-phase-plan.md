@@ -71,9 +71,12 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
      a capture tool, losing a thought in a tunnel is the worst failure. Offline/draft-safety.
   3. **UNDO** — owner: *"smart."* Re-raised from Phase 4: the one basic every canvas tool has and
      this doesn't. Needs its own plan (it crosses the debounced-save + optimistic-create machinery).
-  4. **A RECENT SECTION** — owner-ruled: solves "what was I doing?" (home shows starred + sorts but
-     no trail of where you actually were). Note: needs a visit-tracking decision (A7 forecloses
-     placement-level visit history — check its scope before building).
+  4. ✅ **A RECENT SECTION — BUILT (D-134), migration owed to the owner.** "where you were": the
+     last 5 surfaces you OPENED, on home, across devices. New `opening` table (its own — the
+     `updated_at` trigger on bit/board would have made opening look like editing). **The A7 check
+     came back CLEAR:** A7 is a *bit's* travel between boards; this is where the *owner* has been —
+     no overlap, nothing spent. Words in `lexicon.md` (an opening · where you were).
+     **Owner: paste `20260903000001_opening.sql`, then deploy.**
   5. **THE FOUR-DOORS TAX** — four capture doors (`/write` · `/bits` intake · board paste · file
      door) force a "which door?" decision. Owner: *"you're right about the tax and I think the UI
      can help solve that"* — a UI answer, not a model change.
