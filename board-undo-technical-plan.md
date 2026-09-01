@@ -191,6 +191,14 @@ acts and carry their label. No prop explosion.
 
 ## 5 · Stage 3 — keeping acts
 
+**First, the owner-found seam (2026-09-01, verified):** the remove acts never flush a card's
+pending typing — type two words and trash within the 350ms debounce and `forget()` drops the
+queued body write; restore returns the pre-tail body. Pre-existing loss edge, made visible by
+undo (a snapshot would show text the DB never got). **Stage 3 fixes it at the source: every
+remove act runs `flushNow(placementId)` BEFORE the removal** (then forget stays exactly as is —
+its teleport-guard job is untouched). One line per act; a regression note goes in the act's
+comment.
+
 Each remove act snapshots the full `CardVM`(s) before the optimistic removal, then records:
 
 - **un-place** → undo = **re-add the snapshot card to `setCards` FIRST (optimistic — the
