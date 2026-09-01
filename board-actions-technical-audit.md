@@ -305,3 +305,30 @@ is never half-rewired across a session boundary.
   assert), which stays within the layering doctrine. Danger the review exposed: the unforced
   door's silent 0-row no-op means an unguarded undo write to a locked card would move the screen
   and not the DB — silent divergence. The forced door's assert closes it.
+
+## Part 5 · THE COMMITTED TARGET (2026-09-01 — the owner delegated the call; Claude ruled)
+
+The owner's spec, verbatim in spirit: *"it doesn't need to be cheap … what's important is that
+this all goes together right … really good architecture and code to help this vision."* The
+ruling, made and owned by Claude under that delegation:
+
+**The board becomes six layers, and we commit to owning the one we rent.**
+
+| layer | the commitment |
+|---|---|
+| 1 · input | **ours** — one gesture engine (tap · double-tap · drag · resize · pan · pinch · marquee), phone-first, replacing react-rnd. Rationale: three futures converge on it (phone taps · live-tracked drags for arrows · the two workarounds already paid). Pan/pinch/marquee/taps/group-drag are already our code — only single-drag + resize handles are genuinely new. |
+| 2 · meaning | the act layer (the amended undo design): every deliberate gesture a named, reversible act |
+| 3 · geometry | the registry — every card continuously reports its real world-box; arrows/tidy/fit/snapping read one truth |
+| 4 · state | the cards array, as is |
+| 5 · persistence | **untouched** — the hardened machinery stays (plus the reviewed `chain()` export) |
+| 6 · seeing | DOM world stays; world/screen split formalized; the drawer generalizes into the PANEL hosting a note's workspace (docked/floating) — notes-in-board is a view, not a model change |
+
+**Sequence (each step stands on the last):** undo → geometry registry → own the input layer →
+the note panel → links. Editor-on-demand + culling stay evidence-gated (performance, not
+architecture).
+
+**The held risk:** input-feel regression. Mitigation: the new engine ships behind a switch,
+side-by-side with react-rnd for one sitting; the owner feel-tests desktop + Daylight + phone;
+only the owner's hands retire the library. The pending phone tap test informs urgency, not the
+decision.
+
