@@ -18,6 +18,7 @@ export function SurfaceRow({
   onPick,
   onNew,
   onPin,
+  onDuplicate,
 }: {
   surface: Surface;
   groups: ShelfGroup[];
@@ -25,6 +26,7 @@ export function SurfaceRow({
   onPick: (groupId: string | null) => void;
   onNew: (name: string) => void;
   onPin: () => void;
+  onDuplicate?: () => void; // boards only — a second arrangement of the same bits
 }) {
   const s = surface;
   return (
@@ -53,6 +55,16 @@ export function SurfaceRow({
         >
           {s.pinned_at ? "★" : "☆"}
         </button>
+        {s.kind === "board" && onDuplicate && (
+          <button
+            className="shelf-move"
+            disabled={busy}
+            title="Duplicate this board — a copy arranging the same bits"
+            onClick={onDuplicate}
+          >
+            ⧉
+          </button>
+        )}
         <ArchiveButton thing={s.kind === "board" ? "board" : "bit"} id={s.id} compact />
         {s.kind === "board" ? (
           <form action={trashBoardAction}>

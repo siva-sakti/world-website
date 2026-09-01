@@ -30,6 +30,48 @@ export async function getBoard(
   return data as Board | null;
 }
 
+/** Duplicate a board (basic act, ruled 2026-09-01 — organize-phase-plan §4b): a SECOND
+ * ARRANGEMENT of the same material — the copy's placements point at the SAME bits (bits are
+ * the atoms; deep-copying would double material and pollute search/tags). Copies title+" copy",
+ * visibility, folder, and every LIVE placement's geometry with a FRESH arrived_at (travel
+ * history is the original's story, not the copy's). Not copied: the ★ (a copy isn't alive
+ * until you say so) · departed legs · connectors (no create-UI exists yet — when arrows
+ * arrive, duplicate must learn placement-id remapping). If the placements fail after the
+ * board row lands, the half-copy is deleted (cascade takes its placements) — no litter. */
+export async function duplicateBoard(supabase: SupabaseClient, boardId: string): Promise<Board> {
+  const { data: src, error: e1 } = await supabase
+    .from("board")
+    .select("title, visibility, group_id")
+    .eq("id", boardId)
+    .eq("state", "live")
+    .single();
+  if (e1) throw e1;
+  const { data: board, error: e2 } = await supabase
+    .from("board")
+    .insert({ title: `${src.title || "untitled board"} copy`, visibility: src.visibility, group_id: src.group_id })
+    .select("*")
+    .single();
+  if (e2) throw e2;
+  try {
+    const { data: rows, error: e3 } = await supabase
+      .from("placement")
+      .select("target_bit_id, target_board_id, x, y, width, height, z, display_size")
+      .eq("board_id", boardId)
+      .is("left_at", null);
+    if (e3) throw e3;
+    if (rows && rows.length) {
+      const { error: e4 } = await supabase
+        .from("placement")
+        .insert(rows.map((r) => ({ ...r, board_id: board.id })));
+      if (e4) throw e4;
+    }
+  } catch (e) {
+    await supabase.from("board").delete().eq("id", board.id); // deliberate half-copy cleanup
+    throw e;
+  }
+  return board as Board;
+}
+
 export async function createBoard(
   supabase: SupabaseClient,
   title: string | null,

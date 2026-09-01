@@ -11,6 +11,8 @@ import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
 import { Drawer } from "@/components/drawer";
 import { registerSave } from "@/lib/save-guard";
+import { duplicateBoard } from "@/lib/db/boards";
+import { confirm } from "@/components/confirm";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useMarqueeSelect } from "./use-marquee-select";
@@ -44,6 +46,7 @@ export function BoardSurface({
   const [wordsFor, setWordsFor] = useState<{ bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" } | null>(null);
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
+  const [duplicating, setDuplicating] = useState(false); // the ⧉ act is in flight
 
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -87,6 +90,28 @@ export function BoardSurface({
     supabase, cards, selectedIds, setCards, clearSelection,
     setEditingId, settled, setLooseRefresh, onErr,
   });
+
+  // Duplicate this board (organize-phase-plan §4b): flush in-flight moves/edits FIRST so the
+  // copy never misses your last drag, then copy (same bits, second arrangement), then the
+  // dialog offers open-the-copy or stay-here — the owner's ruled flow.
+  async function duplicateThis() {
+    if (duplicating) return;
+    setDuplicating(true);
+    try {
+      await flushAll();
+      const copy = await duplicateBoard(supabase, boardId);
+      const go = await confirm({
+        message: `Duplicated — “${copy.title || "untitled board"}” now sits on your shelf, arranging these same bits.`,
+        confirmLabel: "open the copy",
+        cancelLabel: "stay here",
+      });
+      if (go) router.push(`/board/${copy.id}`);
+    } catch (e) {
+      onErr(e);
+    } finally {
+      setDuplicating(false);
+    }
+  }
 
   // "open" — the focused writing view (writing-experience-plan v1): the bit's own
   // page. Gated: the row must exist (a fresh card's insert may be in flight → the
@@ -264,6 +289,8 @@ export function BoardSurface({
         selectedCount={selectedIds.size}
         onBulkUnplace={bulkUnplace}
         onBulkTrash={bulkTrash}
+        onDuplicate={() => void duplicateThis()}
+        duplicating={duplicating}
         onFit={() => fitOrToggleBack(cards)}
         zoomPct={cam.scale}
         fileRef={fileRef}

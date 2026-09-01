@@ -16,6 +16,7 @@ import {
   moveGroup,
   deleteGroup,
 } from "@/lib/db/shelf";
+import { duplicateBoard } from "@/lib/db/boards";
 import { SurfaceRow } from "./surface-row";
 import { confirm } from "@/components/confirm";
 import { jumpWords, titleMatches } from "@/lib/jump-match";
@@ -141,6 +142,7 @@ export function HomeSurfaces({
       onPick={(gid) => pick(s, gid)}
       onNew={(name) => pickNew(s, name)}
       onPin={() => pin(s)}
+      onDuplicate={s.kind === "board" ? () => act(() => duplicateBoard(supabase, s.id)) : undefined}
     />
   );
 

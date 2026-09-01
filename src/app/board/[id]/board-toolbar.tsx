@@ -11,6 +11,8 @@ export function BoardToolbar({
   selectedCount,
   onBulkUnplace,
   onBulkTrash,
+  onDuplicate,
+  duplicating,
   onFit,
   zoomPct,
   fileRef,
@@ -29,6 +31,8 @@ export function BoardToolbar({
   selectedCount: number;
   onBulkUnplace: () => void;
   onBulkTrash: () => void;
+  onDuplicate: () => void; // a copy arranging the same bits; the dialog offers open-or-stay
+  duplicating: boolean;
   onFit: () => void;
   zoomPct: number;
   fileRef: RefObject<HTMLInputElement | null>;
@@ -53,6 +57,14 @@ export function BoardToolbar({
         title="Select several cards to move or remove them together"
       >
         ⛶ select
+      </button>
+      <button
+        className="compose-btn"
+        disabled={duplicating}
+        onClick={onDuplicate}
+        title="Duplicate this board — a copy arranging the same bits"
+      >
+        ⧉ {duplicating ? "duplicating…" : "duplicate"}
       </button>
       {selectedCount > 1 && (
         <span className="compose-bulk">
