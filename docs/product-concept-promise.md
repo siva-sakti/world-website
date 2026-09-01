@@ -259,7 +259,26 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 **The gallery tracker resolves INSIDE this** — no separate Sheets product: a **table is a block in a document** (covers the 20-row creative-practice case, which is exactly how people use Notion), and a table block that grows up can **open full-page**. Same object, two views. *(Consistent with the stored-vs-computed instinct, and with `tables-and-structured-data.md` — this is that doc's "where does a table live" question, answered.)*
 
-### 🟡 EXPLORING — is the straight Notion form factor enough? **NOT CONCLUDED**
+### ⭐⭐ THE OWNER'S MODEL OF CONVERGENCE — stated consistently four times, finally heard (2026-08-31)
+
+> **Diverging is free; converging is FORMATTED.** The board is the free surface — built, good. The convergent surfaces are the **familiar structured trio: DOCUMENT · SHEET · DECK** (Docs / Sheets / "Slides if it wasn't ancient news"). Their structure is not a limitation to design around — **the format is what makes them convergent.**
+
+**The owner's redundancy catch that clarified it:** *"the free page is already the divergent surface, right?"* — Claude's "page with flow + freeform placement" (old layer 3 / option B) **is the board again**, proposed twice in a page costume. Killed. *(Hearing note, recorded because the pattern matters: the owner said "Docs, Sheets, Slides" in nearly every message on this topic; Claude tried three times to reduce the trio to one surface — treating it as scope to shrink rather than the model to hear.)*
+
+**Why the model is strong (Claude's critical read, in support):**
+1. **Structure is cognitively correct for convergence** — a format *forces* the convergent decisions (what order · what fits · what's cut); a free canvas defers them. The trio matches what converging IS, not just what people know.
+2. **The differentiator stays clean:** Docs/Sheets/Slides are **empty apps**; ours are **fed** — bits flow in from your world. Familiar surfaces, novel supply line. *(The seam, again.)*
+3. **The artifact map is complete:** statement/essay/script → doc · tracker/list-of-work → sheet · deck/lookbook/portfolio → deck. No orphans found (a one-pager = a one-slide deck).
+4. **Fits D-121 without surgery:** three kinds of composition, fixed at birth, never converted — Google's model too.
+
+**Where Claude pushes (critical, held open):**
+1. **The deck is where pure structure fails — by the owner's own observation** (creatives present from Canva/Photoshop *because those are surfaces you arrange*). The candidate answer, using machinery we own: **each slide's interior is a small bounded board** — the *sequence* is the format; freedom lives only inside a frame. The Canva pattern, on our board tech. 🔵 unruled.
+2. **The sheet is the scope trap:** sort/filter yes · typed columns probably · formulas/pivots = the cliff where it becomes Excel. The fork lives in `tables-and-structured-data.md`, now live.
+3. **Build order ≠ the model:** they won't arrive together; doc-first is hard to argue with (the owner is a writer; the note is half of one). Sequencing only.
+
+⚑ **Status: the owner's stated model, engaged — NOT ruled.** ("I don't feel ready to conclude" stands; Notion remains a helpful reference, not the spec.) Naming (step 2b): "document · sheet · deck" are Google's words; unruled.
+
+### 🟡 SUPERSEDED EXPLORATION — the straight-Notion-form-factor line (kept as history)
 
 > ⚠ **Status corrected (same day):** Claude recorded this as "ruling-grade" off a thinking-out-loud turn, and the owner pushed back directly: *"I don't feel ready to conclude that it's going to be just kind of copying Notion — although that's a really good example of what people use, and that's helpful to have."* **So: Notion = a helpful known reference point. The shape of the convergent surface = OPEN.** The argument below stands as one live line of thinking, not a decision.
 
