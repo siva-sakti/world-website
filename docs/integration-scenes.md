@@ -43,4 +43,24 @@ Your album board holds forty bits — and, by now, three placed pieces. You come
 
 ---
 
+## BEYOND THE OWNER — cases other makers bring *(owner-asked: "the cases people might need or want, not just me")*
+*Drawn from the persona work (`product-concept-people.md`) and the required-artifacts map — each tests whether the composition's ideal covers a real outside need:*
+
+## S9 · The artist statement, written next to the work
+A painter's board holds studies and reference images. A gallery wants a statement. She opens a composition *beside the board* — the floater — and writes while looking at the work it describes.
+✅ **This is S3 wearing another maker's life** — the ideal covers it as designed. *(And it's the demo scene for the switching pitch: no other tool puts the statement next to the work.)*
+
+## S10 · The list the gallerist asked for
+"Send me a list of your work." Rows: title, year, medium. That's **a table inside a composition** (ruled in) — and eventually **a file that leaves the app** (later phase, tracked).
+⚑ Covered by rulings; the test is whether the *later phase* stays honest — the case is only served when the file can actually be sent.
+
+## S11 · The songwriter's lyric sheet against the demo
+Lyrics drafted in a composition; the voice-memo demo is a bit, pulled in with `[[` — the recording sits inside the writing, playable.
+⚑ **Feel-check:** does a pulled-in audio bit belong *inside* writing, or beside it on the board? (The bit-block question, non-text edition.)
+
+---
+
+## THE EXTERNAL LAYER — telling and teaching this feature *(owner-asked, same day)*
+The internal spec is level 1. **Level 2 — how a person meets this feature — is a distinct, owed piece:** the story told as flows, never definitions (*"definitions describe; flows invite"* — the ruled teaching principle) · **templates as the teacher** (*"You're an artist — here's your statement,"* opening ready-shaped) · the demo moment (the floater over the board — the seam no one else has, shown not explained). Machinery already ruled in `product-concept-people.md` (identity door · flows · granular roles) and `product-concept-promise.md` (the switching pitch); **what's owed is this feature's own telling** — ⚑ written by the owner, after naming, with S3/S9 as the likely hero scenes.
+
 **How the sitting works:** walk S1→S8 in order. For each: first correct the scene itself ("that's not how I'd move"), then answer its ⚑. By S8, the joints are ruled from use — and the answers flow into `composition-definition.md` §4 and the base spec.
