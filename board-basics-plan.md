@@ -1,7 +1,8 @@
 # Board basics + cleanup — plan (the two review prongs, owner-approved)
 
-**Status:** planned → independent check → build in three batches, each verified + committed
-separately. Sources: the 2026-09-01 feature review (25 verdicts + noticed gaps) and code-health
+**Status:** ✅ BUILT + DEPLOYED (2026-09-01, D-130) — all three batches (A `ae0d1f7` · B `c5c1024` ·
+B+ `2ae8736`), migration proven then owner-applied to cloud, owner feel-testing live. Bonus catch in
+B+: emptyTrash leaked non-image trashed files' storage objects — fixed. Sources: the 2026-09-01 feature review (25 verdicts + noticed gaps) and code-health
 survey (B+ · 5 ranked cleanups). Owner rulings (via questions): **Delete = remove-from-board** ·
 **click-to-front stays** (send-to-back is the relief) · **card lock AND board description both
 build** (one gated migration). Tidy-up approved. Excluded (ruled elsewhere): undo (Phase 4) ·
