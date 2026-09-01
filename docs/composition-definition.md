@@ -34,9 +34,10 @@ The app serves one motion: **diverge, then converge.** You catch scattered mater
 ## 4 · What is deliberately still open
 
 1. **The connection design** (one sitting, four questions): compositions referencing each other · bits connecting beyond a shared board or tag · the pulling gesture itself · **and where connections *show* afterward** — the seeing-side designed with the making-side.
-2. **The card** — how much of a composition its board-card shows.
-3. **The words** — "composition" is this doc's term; the app's buttons and pages transition after the naming session.
-4. **Storage** — decided last, after behavior; invisible either way.
+2. **Four convergence operations, restored after an audit found them slipped:** **frame** (what a piece is *for* — audience, length, deadline; the owner's top-flagged open idea) · **cull** (in-or-out for this piece) · **excerpt** (quoting part of a bit — already a real gap for PDFs/audio) · **group-naming** (naming a cluster on a board). Each gets decided — in, later, or out — but *chosen*, never lost.
+3. **The card** — how much of a composition its board-card shows.
+4. **The words** — "composition" is this doc's term; the app's buttons and pages transition after the naming session.
+5. **Storage** — decided last, after behavior; invisible either way.
 
 ## 5 · Where the depth lives
 `composition-base-spec.md` — every ruling with its trail, the lifecycle, the open cells · `composition-surface-spec.md` — the document-capability research and cut · `note-storage-audit.md` — why the separation from bits is happening · `convergent-surfaces-overview.md` — the wider diverge/converge picture this sits in.

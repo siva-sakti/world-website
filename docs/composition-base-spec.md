@@ -116,6 +116,14 @@ Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (m
 
 ---
 
+## ⭐ THE RECONCILIATION (2026-09-02) — the convergence thinking, audited against this spec
+Owner-asked: *"what had we thought about before — how do we bring it all together?"* Result: **nine-tenths carried; four items had slipped, now restored to the open list:**
+1. **FRAME** — what a piece is FOR (audience · length · deadline). **The owner's own top flag** (*"the most important one, where we're still ideating"*) — had vanished entirely. ⚪ restored, ideation open.
+2. **CULL** — in-or-out *for this piece* (the cut pile; include-in-compile; the thing no spatial tool has). ⚪ restored, unruled.
+3. **EXCERPT** — quoting *part* of a bit; concretely broken for shipped PDF/audio (filename-only search). ⚪ restored; the stress-test's costed options stand (first-class excerpt-bit with a quote-hint was the reviewer's revised lean).
+4. **GROUP-NAMING** — name a cluster on a board. Went down with the (rightly) rejected compose-from-selection; the naming half was never itself rejected. ⚪ restored, unruled.
+Also surfaced: ⚑ **the owner's Notion feel-session is still owed** and the final toolkit cut waits on it. Everything else: carried, parked-on-purpose, or deliberately excluded — verified line by line against `convergent-surfaces-stress-test.md`, `convergent-surfaces-overview.md`, `product-concept-promise.md`, `composition-surface-spec.md`.
+
 ## Checker findings folded (independent audit, 2026-09-02 — full report in the session log)
 **Verdict: comprehensive-with-holes; NOT yet buildable.** Fixed same-day: the ghost §8 pointer · two false Part-2 claims (paste already births bits; the card already previews) · stale board-cell leftovers · the "link" word collision (D-129 shipped a `link` bit type — *link* is now TAKEN; Q9 tightens).
 **Owed before enactment (the author's debt):** the explicit **invariant map + full lifecycle trace** (gates 1–2, run and written — incl. what a chip shows when its target composition is *trashed*, what "loose" means post-migration) · floater mechanics + error states · frame-handoff (unsaved edits across floater→panel→page; the same composition open twice) · board-machinery parity (connectors · marquee · tidy-up on a composition's card) · the real migration plan doc.
