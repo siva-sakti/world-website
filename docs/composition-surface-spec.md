@@ -79,6 +79,21 @@ One idea carries it: **a deck = a SEQUENCE of frames; each frame's interior is a
 2. **Notion's synced blocks are their retrofit of transclusion** (Ted Nelson's term — content living in multiple places, bi-directionally). It's their newest-ish, most bolted-on primitive, and access-permission-bound. **Our model has transclusion natively** — a bit is independent by birth; `reference`/`placement` ARE the transclusion records. Validation that §4.2 is architecturally downhill for us and uphill for them.
 3. Block taxonomy baseline (Notion's block set) informed §4.1's in/out cut.
 
+## 6b · ⚑ THE OWNER'S FEEL-RESEARCH PROTOCOL (offered 2026-08-31 — she volunteered; each task feeds a named spec section)
+
+Hands-on in Notion, ~45 min total. **Write real content, never lorem** — feel-data is only real when the stakes are.
+
+| task | do | answer while doing it | feeds |
+|---|---|---|---|
+| **A · Draft (20 min)** | write a real piece — something you actually want to write | what do you *reach for*? what *interrupts* you? what does Enter do that you like/hate? what happens when you paste? | §4.1 in/out cut |
+| **B · Blocks (5 min)** | make a checklist; drag blocks around; turn one thing into another | does grabbing blocks feel like *arranging* or like *fighting*? | §4.1 interactions |
+| **C · Tracker (10 min)** | build a 5-row table — galleries or publications, real ones | at what moment does the simple table stop being enough — sorting? a date? a status? | the sheet fork (`tables-and-structured-data.md`) |
+| **D · Reuse (5 min)** | put the same content in two pages (synced block: select → ⋮⋮ → Turn into → Synced block) | does content-in-two-places feel natural or like a trick? | §4.2 the bit-block |
+| **E · The A/B (5 min)** | make the same small page in Google Docs | what do you miss in each direction? | the form-factor question itself |
+| **throughout** | — | **3 delights · 3 frictions · the blocks you never touched** | the v1 cut |
+
+Findings land here in §6c when she reports. **Her never-touched list is the strongest v1-out evidence we can get.**
+
 ## 7 · What this spec deliberately does NOT do
 Rule anything · name anything (step 2b owed on: doc · deck · sheet · block · flow · frame · bit-block) · sequence the build (the doc-first lean is the owner's, unruled) · touch schema · decide composition→composition · decide the sheet's fate.
 
