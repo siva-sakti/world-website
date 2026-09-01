@@ -97,6 +97,39 @@ Only actions enter undo. This is the ruled deliberate-vs-reflex carve (owner, 20
 scattered across six files, with intent and names missing.** Undo is merely the first feature
 that needs what the shape doesn't have.
 
+## Part 2b · The whole body: how a person's doing travels through the code
+
+*(Added at the owner's ask, 2026-09-01: not the organs — the body. A person walks into a board
+and does things. Where does their doing enter, how is it understood, and is the listening one
+coherent system?)*
+
+A person's action passes through six stages. Verified door by door:
+
+| stage | what it is | where it lives today | health |
+|---|---|---|---|
+| **1 · entry** — the touch reaches the code | **seven separate doors:** the board's empty space (pointer handlers: pan·pinch·marquee·tap·double-tap) · each card via **react-rnd, a third-party library** (drag/resize) plus the card's own click handlers (select·edit·open) and ~8 stopPropagation shields where inner controls must not become drags · one window keyboard listener · a native wheel listener (zoom) · a window paste listener (`use-create-doors:460`) · drop on the board div · the toolbar's buttons (+ the pen overlay, which captures everything while on) | grown door-by-door | works; never reviewed as a system |
+| **2 · recognition** — *what gesture was that?* | hand-rolled, distributed state machines: `pan.current` + a 4px moved-threshold, `lastTap` timing for double-tap, pinch state in the camera, the marquee hook — and **react-rnd's internal thresholds, a black box** we have already fought twice (the controlled-position stutter workaround; the suspected phone tap-swallowing) | distributed | the app's weakest examined layer |
+| **3 · meaning** — view or world? act or reflex? | **view vs world is the code's cleanest boundary**: pan/zoom/fit touch only the camera, per-device, never the world — zooming is *looking*, and the code fully honors it. **act vs reflex is its most implicit** — nowhere written until the undo work names it | half clean, half implicit | being fixed by this track |
+| **4 · state** | one `cards` array + selection + editing + camera, in the orchestrator | sound shape, oversized file | B |
+| **5 · persistence** | the hardened door: debounce · per-row chains · settled-create gate · two failure policies | four review rounds | A− |
+| **6 · the database** | the proven schema: RLS, invariants, travel, the regression suite | proof record | A |
+
+**The body-level verdict.** Every review round to date hardened stages 4–6 — *remembering*.
+Stages 1–3 — *listening* — have never been reviewed as a system; each gesture was added where it
+was needed, one door at a time. And the open phone problems (the tap-swallowing suspicion, the
+board-on-phone breakage batch) live exactly in stages 1–2, the unreviewed half. The weight of
+rigor has all gone to the bottom of the pipeline; the person touches the top.
+
+**Honesty about the shape:** distributed, hand-rolled gesture handling is how most canvas apps
+are actually built — the shape is not wrong, it is *unexamined*. The one genuine structural
+oddity: the app's single most important gesture — the drag — is outsourced to react-rnd, whose
+internals we cannot see and have twice had to work around. Mature canvas apps almost all end up
+owning their drag. **Named fork, evidence-gated:** if the owner's phone check confirms taps are
+being swallowed by the library, the right restructuring is our own pointer-based drag/resize
+(stages 1–2 become ours, one recognizer, phone-first) — a real project, entered on evidence,
+never speculatively. Until then, the undo track fixes stage 3, and stages 1–2 stay as they are,
+now at least *mapped*.
+
 ## Review outcome (2026-09-01) — the AMENDED design
 
 The review's verdict: **the diagnosis is sound, the direction right, and the formal act-object
