@@ -71,6 +71,30 @@ Today `[[` drops a **chip** (a word-sized reference). The grown-up version: the 
 ### 4.3 What "functional" means here (the owner's bar)
 A working document you'd actually draft in: structure you can rearrange, lists that check off, a table that holds a tracker, the material of your world droppable into the text. **Not**: a Notion replacement, a database, or a collaboration surface.
 
+## 4.4 · ⭐ THE SPEC AGAINST OUR BASE — what v1 actually is, in our code (read, not assumed; 2026-08-31)
+
+**The base, verified:** one shared tiptap **v3.28** editor (`text-bit.tsx`: StarterKit + Link + the custom `BitRef` atom node), used by board cards AND the note page (`TextWorkspace` → `/note/[id]`). Body = HTML in `bit.body`; `[[` chips carry `data-ref`; references reconciled on save; 350ms debounce + the 3-way save-guard flush. `BitRefView` already fetches the target's content to render thumbnails + the tap-peek.
+
+**The headline: v1 needs ZERO schema changes.** Everything below serializes into `bit.body` HTML — so `search_tsv` indexes tables and checklists for free, export carries them untouched, and `extractRefIds`/reconcile are unaffected. **The doc surface is the note page, upgraded — not a new thing.**
+
+**Second headline: half the "blocks" already exist.** StarterKit v3 already ships headings · bullet/numbered lists · blockquote · code block · divider · undo/redo. They're in the editor today with no UI exposing them. Much of v1 is **surfacing what's installed**, not adding.
+
+| v1 feature | how, concretely | size |
+|---|---|---|
+| headings · lists · quote · divider · code | **already in StarterKit** — expose in UI | UI only |
+| **checklist** | `@tiptap/extension-task-list` + `task-item` (official, MIT) | S |
+| **slash menu** (`/`) | the `@tiptap/suggestion` utility — **the same pattern as our `[[` watcher**; explicit-trigger rule from §6a applies | M |
+| **turn-into** | the commands exist (`setNode`/`toggleList`); needs the block-menu UI | S–M |
+| **table block** | `@tiptap/extension-table` (+row/cell/header, official) — serializes as HTML into body | M |
+| **image-in-doc** | a small atom block reusing the `signedUrl`/thumb machinery `bit-ref-view.tsx` already has | M |
+| **⭐ the bit-block** (§4.2) | a `display: 'chip'│'block'` attribute on the existing `BitRef` node — **`BitRefView`'s peek already fetches and renders the target's content; block mode ≈ "the peek, made permanent."** Serializes as one more data-attr on the same span; `extractRefIds` untouched | **S–M — the peek code is most of it** |
+| **drag handles** | tiptap's drag-handle extension — ⚠ **VERIFY free-vs-Pro tier before planning**; community fallback exists (§6a jank rule: hover-revealed, never `draggable` on the text node) | M + verify |
+| Enter-split · paste-structure · never-empty | largely ProseMirror defaults — **verify each against §6a's 8-point checklist**, don't assume | S |
+
+**Scoping note:** the block UX (handles · slash menu · turn-into) belongs to the **page context** (`/note/[id]`, `/write`) — not inside little board cards. `TextBit` likely grows a `variant: 'card' │ 'page'` prop; the card keeps today's light editor.
+
+**What her feel-test settles in this table:** toggle in/out (§6a) · how much table is enough (the sheet fork) · whether chip-vs-block wants a per-instance switch or a default.
+
 ## 5 · The frame surface (deck) — second, lighter (the owner: "less intense" for now)
 One idea carries it: **a deck = a SEQUENCE of frames; each frame's interior is a small bounded board** — placement mechanics we already own, inside edges. Ordered (the format) · free inside (the Canva pattern) · printable/exportable because bounded. Everything else about it waits. 🔵 unruled.
 
