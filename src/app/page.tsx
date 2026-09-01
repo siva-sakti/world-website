@@ -16,17 +16,15 @@ export const dynamic = "force-dynamic";
 // their own room. The spatial desk is a later phase; this is the linear home.
 export default async function Home() {
   const supabase = await createClient();
-  // Independent reads in parallel (R4.20) — three sequential round-trips were pure TTFB cost.
+  // Independent reads in parallel (R4.20) — sequential round-trips were pure TTFB cost.
   const [boards, groups, notes, openings] = await Promise.all([
     listBoards(supabase),
     listGroups(supabase),
     listNotes(supabase),
-    // The trail is DECORATION; the surfaces are the page. So a failed read here —
-    // a migration not yet applied, an RLS slip — degrades to "no trail" instead of
-    // taking down the landing page. Logged, never swallowed: the db module still
-    // throws (that's its job), and this is the one place that knows the read is
-    // inessential. The other three reads have no such catch — if those fail, home
-    // genuinely has nothing to show and should say so.
+    // "where you were" is DECORATION; the surfaces are the page — so a failed read
+    // here degrades to no row rather than killing the landing page. Logged, never
+    // swallowed. The other three have no catch: if THEY fail, home has nothing to
+    // show and should say so. (Reasoning: recent-section-plan.md §10.)
     listRecentOpenings(supabase).catch((e) => {
       console.error("where you were: could not read openings —", e);
       return [];

@@ -14,10 +14,10 @@ import { recordOpening } from "@/lib/db/openings";
 // revalidate and no router involvement: stamping a visit must never re-render
 // the page the owner just arrived on.
 //
-// SILENT ON FAILURE, ALWAYS. A dropped connection costs one trail entry and
-// nothing else; surfacing it would be noise on a page the owner came here to
-// read. `recordOpening` is idempotent (one row per thing, timestamp moved), so
-// StrictMode's double mount is harmless.
+// SILENT ON FAILURE, ALWAYS. A dropped connection costs one row of "where you
+// were" and nothing else; surfacing it would be noise on a page the owner came
+// here to read. `recordOpening` is idempotent (one row per thing, its timestamp
+// moved), so StrictMode's double mount is harmless.
 export function RecordOpening({ kind, id }: { kind: "board" | "note"; id: string }) {
   const [supabase] = useState(() => createClient());
   useEffect(() => {

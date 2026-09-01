@@ -16,12 +16,12 @@ export function WhereYouWere({ recent }: { recent: Surface[] }) {
   return (
     <section className="mb-10">
       <h2 className="desk-h">where you were</h2>
-      <ul className="trail">
+      <ul className="openings">
         {recent.map((s) => (
           <li key={`${s.kind}-${s.id}`}>
-            <Link href={s.href} className="trail-link">
-              <span className="trail-name">{s.title}</span>
-              <span className="trail-kind">{s.kind}</span>
+            <Link href={s.href} className="opening-link">
+              <span className="opening-name">{s.title}</span>
+              <span className="opening-kind">{s.kind}</span>
             </Link>
           </li>
         ))}

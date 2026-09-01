@@ -12,7 +12,7 @@ export type Opening = {
 };
 
 /** Record that the owner opened a surface. Idempotent: one row per thing, its
- *  timestamp moved forward — so a re-open reorders the trail instead of piling up.
+ *  timestamp moved forward — so a re-open reorders "where you were" instead of piling up.
  *
  *  TWO THINGS HERE ARE LOAD-BEARING, both proven in `verification/opening-proofs.sql`
  *  after an antagonist caught them as fatal, silent defects in the plan:
@@ -23,7 +23,7 @@ export type Opening = {
  *     caller's catch, forever (proof 3).
  *  2. `opened_at` is SENT, never left to the column default. A default fires on
  *     INSERT only, so omitting it freezes the row at its first-ever visit and the
- *     trail can never reorder — the whole feature (proofs 4 and 5). */
+ *     row can never reorder — the whole feature (proofs 4 and 5). */
 export async function recordOpening(
   supabase: SupabaseClient,
   target: { kind: "board" | "note"; id: string },
