@@ -195,5 +195,23 @@ export function usePersistence(
     return Promise.allSettled([...creates.current.values()]).then(() => {});
   }
 
-  return { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow: flush, flushAll, pendingCreates };
+  /** Run a DISCRETE row write behind the same per-row chain the debounced flushes
+   *  use (undo plan §3 / senior review §2c): a revive, a lock re-apply, or a
+   *  forced move on a row must never reorder against an in-flight flush for that
+   *  SAME row — two writes ~100ms apart would otherwise co-fire on the wire.
+   *  `realId` must be the POST-reconcile id (resolve via settled() first). The
+   *  caller sees the write's own success/failure and classifies it; the STORED
+   *  tail is settled-safe so a failure never blocks the row's next write. */
+  function chain(realId: string, fn: () => Promise<void>): Promise<void> {
+    const prev = chains.current.get(realId) ?? Promise.resolve();
+    const run = prev.then(fn);
+    const stored = run.catch(() => {});
+    chains.current.set(realId, stored);
+    void stored.finally(() => {
+      if (chains.current.get(realId) === stored) chains.current.delete(realId);
+    });
+    return run;
+  }
+
+  return { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow: flush, flushAll, pendingCreates, chain };
 }
