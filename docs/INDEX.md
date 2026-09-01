@@ -198,6 +198,10 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `convergent-surfaces-overview.md` — ⭐ THE ONE CLEAN READ of the convergence picture (2026-08-31)
+**Contains:** the frame (free to diverge, formatted to converge) · the grown north star · the three surfaces' state · the 2×3 connective grid (Obsidian/Notion nested) · the engine digest · the story for people · **everything unruled, listed** · standing cautions.
+**Is:** the synthesis layer — every section points at its detail doc. Read this FIRST on the convergence topic; the trail lives in `product-concept-promise.md`.
+
 ### `composition-surface-spec.md` — 🟡 preliminary thinking-spec (2026-08-31)
 **Contains:** the diverge/converge picture drawn · the full entry/link **matrix** (what can enter what, incl. the one new model question: composition→composition) · the existing tiptap base · the doc-surface capability cut (blocks · the **bit-block** = gather matured) · the deck sketched lightly · quick research (tiptap ships a Notion-like template; Notion's synced blocks vs our native transclusion) · the owner's check-in list.
 **Does NOT:** rule, name, sequence, or touch schema. Gated on the owner's check-in → naming session → the item loop.

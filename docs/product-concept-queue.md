@@ -72,6 +72,7 @@ The owner framed level 1 not as *gap-finding* but as **"what makes a complete se
 | 3b | **The gaps it's surfacing** — audio bits · ordered lists · a date you set | ⚪ each appears in 2+ situations, which is the test | ⚑ owner sees whether they're real |
 | 3c | **Are.na is social; we are not.** If we take their market, do we take it without the thing that makes it sticky? | ⚪ **sharpest open question in the workstream** | ⚑ owner — feeds `product-concept-privacy.md` |
 | 4 | **The frameworks research round** | ⚪ 6 draft questions written, not run | ⚑ sharpen the questions together, then run |
+| 4 · read | **`convergent-surfaces-overview.md`** — ⭐ the morning read: the whole convergence picture, one clean pass | 🟢 written | ⚑ the owner reads this FIRST |
 | 4a | **The composition-surface prelim spec** — ✅ drafted (`composition-surface-spec.md`); the check-in list is §8 | 🔴 **live** | ⚑ owner reacts to §8's five questions |
 | 4b | **Pieces** — finished-work as a status + a presentation-forward room; the zero-build `finished`-tag test available today | 🟡 owner's idea + Claude's sketch on the table | ⚑ owner reacts to the sketch; the tag test needs only their hands |
 | 5 | **The six-area cut** — ✅ **checked 2026-08-30, three findings** (`promise.md` §2): a missing **seventh area — learning/thinking for its own sake** (the founding use!) · outreach+opportunities should merge · the archive needs an include/exclude call | 🟡 findings on the table | ⚑ owner rules the three |
