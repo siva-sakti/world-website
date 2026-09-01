@@ -163,6 +163,10 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 **The handoff is written for the code window: `editor-formatting-and-file-bit-plan.md` (repo root)** — full context, three builds, verification, the don't list. **Owner nuance folded in:** the checklist capability is formatting in the ONE shared editor, and the *choosing* is a **"+ checklist" door** on the board (births a pre-shaped text bit; subtype stamping deferred to the owner's vocabulary call).
 **⛔ Explicitly NOT yet:** anything touching note/composition behavior (floater · note-page block UX) — lands AFTER the storage migration, per sequencing.
 
+## ⭐ THE WALK (started 2026-09-03) — itinerary + station stamps
+Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavior) · 3b screens/controls/states (empty·error·loading·phone) · 4 the scenes S1–S12 · 5 the edges (deliberate absences) · 5b data & invariants · 6 what remains + acceptance criteria on everything.
+**Station 1 ✅ (owner):** the motion is a **RHYTHM** (diverge↔converge, repeatedly, never one-way) · **both surfaces are FORMATS** — board = spatial format, composition = linear format, two powers · creation is **absolutely deliberate** ("it could never just happen") · **privacy pulled OUT of the concept** — visibility (everything togglable) is its own later session; the migration's safe-default flip stays as a data matter only. ⚑ one re-confirm pending: the legibility half (a board speaks mostly to its maker; a composition is legible to any reader).
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 

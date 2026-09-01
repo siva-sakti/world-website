@@ -8,15 +8,15 @@
 
 ## 1 · Why it exists — the concept over everything
 
-The app serves one motion: **diverge, then converge.** You catch scattered material (bits). You spread it out and think with it in space (the board). And then — when you want to make something *of* it — you **synthesize**: you converge the scattered into one made thing.
+The app serves a **rhythm: diverge → converge → diverge → converge** — never a one-way arrow (owner-stamped, station 1). You catch scattered material (bits). You spread it and think with it in space (the board). When you want to make something *of* it, you **synthesize** — and then you diverge again.
 
-**The board converges, but privately.** Its arrangement holds your thinking — and it is legible mostly to *you*. **The composition is convergence made legible**: synthesis in words, with a throughline, readable by anyone — including future-you — and eventually offerable to the world.
+**Both surfaces are formats with different powers** (owner-stamped): the board is the **spatial format**; the composition is the **linear format**. A board's arrangement speaks mostly to its maker; **the composition is convergence made legible** — synthesis in words, with a throughline, readable by any reader, including future-you, and eventually offerable. *(Visibility — public/private and its toggles, for everything — is deliberately NOT part of this definition; it is its own later session.)*
 
 > **A composition is the surface geared toward convergence: the place you synthesize.** It will have Notion-like functionality — a real document, with structure — because a format is what carries synthesis. That is its goal, at the highest level, and everything below serves it.
 
 ## 2 · The definition
 
-**A composition is a document you write.** It is made of your words, and captured things can be pulled into the writing and sit inside it. It is *made*, never captured — born only by your deliberate act. It always appears in your compositions list. It can also sit on boards as a card, on as many as you like. It is private unless you say otherwise. It is not a bit and never becomes one: **a bit is material you caught; a composition is a thing you made.**
+**A composition is a document you write.** It is made of your words, and captured things can be pulled into the writing and sit inside it. It is *made*, never captured — **it can never just happen; nothing creates one automatically** (owner-stamped). It always appears in your compositions list. It can also sit on boards as a card, on as many as you like. It is not a bit and never becomes one: **a bit is material you caught; a composition is a thing you made.**
 
 ## 3 · What you can do with one — the shipped ideal
 
