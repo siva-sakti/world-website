@@ -238,6 +238,9 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `future-features.md` — 🟠 the shelf: owner-loved ideas that wait for the base (2026-09-02)
+**Contains:** resurfacing (V2, pointer) · the thought's-journey strip · the board timeline view — each spec'd one paragraph, all explicitly behind *"settle the basics of bit, piece, board first."*
+
 ### `resurfacing-ideation.md` — 🟠 V2 ideation, owner-loved: your past self as a collaborator (2026-09-02)
 **Contains:** the idea (a drawer section keeping pace with your writing) · the hard design constraints (pull not push · ignorable · no curation · the never-list check) · three implementation tiers (tier 1 buildable today from the pull's own machinery; tier 3 = the AI gate, parked).
 
