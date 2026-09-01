@@ -58,6 +58,13 @@ A painter's board holds studies and reference images. A gallery wants a statemen
 Lyrics drafted in a composition; the voice-memo demo is a bit, pulled in with `[[` — the recording sits inside the writing, playable.
 ⚑ **Feel-check:** does a pulled-in audio bit belong *inside* writing, or beside it on the board? (The bit-block question, non-text edition.)
 
+## S12 · The knowledge worker, deep in the text *(owner-asked: the connector's moment)*
+A scholar three months into a topic. Dozens of bits: quotes, screenshots of papers, jotted objections. Today she's writing — and mid-paragraph realizes a quote she's pulling in *contradicts* a claim she saved in April.
+**What does she want to do, right there, without leaving the paragraph?**
+Her real need has three parts: **mark the relation now** (before the thought escapes) · **keep writing** (the paragraph is the priority) · **find it again from either side** (in June, landing on either bit, she wants to see the other).
+Today's honest paths: pull *both* into this piece and write the contradiction into her prose (the relation lives in the writing — findable via both bits' "pulled into" lists) · or a shared tag.
+⚑ **The choice this scene sharpens** (S5's sibling, from inside the text): is *the relation lives in writing* enough for the connector — or does deep-in-text work need a faster gesture, made without breaking the sentence? **This is the scene that decides whether the bit-web needs anything new.**
+
 ---
 
 ## THE EXTERNAL LAYER — telling and teaching this feature *(owner-asked, same day)*
