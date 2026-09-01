@@ -44,7 +44,14 @@ And the reason it belongs *here* rather than in Notion is **adjacency** (`produc
 
 **Build shape that falls out (prelim, unruled):** ① a typed-field system on `bit` (the schema question — JSONB vs EAV vs columns; **research running**) → ② saved views (a stored query definition rendering as a table — the pull's pattern, persisted) → ③ relations: already exist → ④ computation: **parked — owner-confirmed 2026-08-31** (*"if it's the machinery we could just park it"*); re-enters on a real want, not a checklist.
 
-**⚪ Research dispatched (2026-08-31), landing in `research-structured-data.md`:** R1 Notion's actual data model (API docs) · R2 the common property/view architecture across Airtable/Anytype/Capacities · R3 Postgres JSONB-vs-EAV-vs-hybrid at personal scale, recommendation-shaped.
+**🟢 RESEARCH LANDED (2026-08-31 — full report + sources: `research-structured-data.md`). The technical shape, recommendation-grade:**
+- **The universal pattern** (all four tools, no exceptions): a **property registry** (`{id, name, type, options}`) + **values as an id-keyed bag on the row** + **view = saved config with zero data gravity** (Notion/Airtable don't even expose views in their APIs — a view is pure presentation).
+- **For us, concretely: TWO small tables + ONE column.** `property_defs` · `saved_views` (JSONB config: filters · sorts · layout · visible props) · `bit.props jsonb`. **No new container anywhere — rows stay bits**, which the research independently endorses: with one atom table, Anytype's *global* property registry is the natural scope (a "deadline" field works on anything, like a tag does).
+- **EAV is dominated** (3× storage, orders slower even indexed); **JSONB's documented failure modes are million-row diseases** — at our scale even the GIN index is optional at first.
+- **Three residual costs, all owned by the one db door:** validation on write (the type lives in the registry) · deletion sweeps (`props - 'prop_id'`) · **id-keyed values, never name-keyed** — ⭐ which is already house **P9** (tags rename free by id-reference). The engine's one hard rule is a rule this project already obeys.
+- **A naming gift:** Anytype's Query-vs-Collection split (live filter vs hand-curation) is *the pull vs the board*, named by someone else — external confirmation the model's bones are the right ones.
+
+**⚪ Original dispatch note:** R1 Notion's actual data model (API docs) · R2 the common property/view architecture across Airtable/Anytype/Capacities · R3 Postgres JSONB-vs-EAV-vs-hybrid at personal scale, recommendation-shaped.
 
 ## 2 · The central fork — decide this FIRST, everything follows
 
