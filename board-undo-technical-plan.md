@@ -44,6 +44,35 @@ built that the six-layer target later throws away:
   lines. Building the engine first would delay undo behind the riskiest work for no
   correctness gain.
 
+## 0c · The scaffolding ledger (the ten-toes contract, 2026-09-01)
+
+The owner asked whether the current machinery is "genuinely well built for these undo/redo
+scenarios." The honest answer, on the record: **no — the ~15 compensating mechanisms this plan
+needed are the signature of a substrate not shaped for undo.** The staged path is still right
+(same destination as a rewrite, without the dark weeks or feel regressions), but every
+compensation gets a DEMOLITION DATE. Scaffolding with demolition dates is architecture;
+without them it's debt. The full stand — "this is the best way, and this is what we've done" —
+is owed to the owner when the input engine ships and this table reads empty.
+
+| compensation | retired by |
+|---|---|
+| record-only suppression in group drag | the input engine (gestures become entries natively) |
+| the `onChange` intent tag | the input engine (intent born in the recognizer) |
+| react-rnd's uncontrolled mid-drag hole | the input engine (scheduled, D-135) |
+| DOM-measured geometry (tidy, arrows-to-be) | the geometry registry (scheduled, D-135) |
+| `cardsRef` + resolve-at-reverse | the store step: state becomes single truth |
+| `settled`/`trackCreate` choreography on reverses | the store step: landing states native |
+| refresh signals into tag/source bars | the store step (bars read the store) |
+| the unmount `record:false` carve | the store step (no orphaned commits) |
+| snapshot signed-URL expiry | refresh-on-error (audit F5 class, evidence-gated) |
+| **`chain()` per-row ordering** | **survives** — absorbed into the persistence adapter |
+| **`movePlacementForced`** | **survives** — a real policy (undo may move locked) |
+| **two write policies (streamed/discrete)** | **survives** — a truth about acts, centralized |
+
+*The store step = the small named follow-up AFTER the input engine: persistence becomes a
+SUBSCRIBER to the board's state instead of an interleaved partner. It completes the core; it is
+the last demolition.*
+
 ## 1 · Stage map (each gate: `pnpm test` + tsc + lint + build green)
 
 | stage | ships | visible change |
