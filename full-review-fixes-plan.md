@@ -1,5 +1,9 @@
 # The full code review → the fix plan (overnight, owner-authorized 2026-09-01)
 
+**Status: ✅ ALL FOUR BATCHES BUILT + COMMITTED (D-131)** — R1 machinery `5d2515c` · R2 integrity
+`df916b2` · R3 client+security `dfe7d2d` · R4 structural `6a6c411`. The archive-invariant migration
+`20260902000002` is throwaway-proven; its cloud paste + the deploy await the owner's morning word.
+
 **Source:** four adversarial reviews (machinery · data integrity · security · client/architecture),
 every finding evidence-cited. **Owner authorization:** "any and all fixes — arrange, plan, check
 with an antagonist, enact, verify." **Standing limits tonight:** NO deploy · NO cloud schema
