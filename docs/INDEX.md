@@ -10,27 +10,45 @@
 
 ---
 
-## ⭐ HOW WE WORK WITH THESE DOCS (the rules — owner-prompted 2026-09-01)
+## ⭐ HOW WE WORK WITH THESE DOCS (owner-ruled 2026-09-01)
 
-**The owner's position:** *"I'm OK to have many documents, as long as we're tracking what is where and we are not redoing content — or creating new things just to spawn new things because I asked."* Many docs = fine. **Redundancy and reflex-spawning = not fine.**
+**The owner's rule, and it is the app's own model applied to us:**
 
-**The failure that actually happened** (audited 2026-09-01): not spawning-to-please — **13 of 16 docs here were explicitly requested.** The real fault: **Claude ADDS instead of REPLACING.** Three times the owner said a doc wasn't landing; three times Claude wrote a *new* doc at a *different altitude* rather than fixing the one that failed. Result: `convergent-surfaces-overview` (synthesis) → `composition-surface-spec` (spec) → `app-things-inventory` (concrete) — one picture, three files.
+> *"You don't have to delete documents — they just have to be referenced, or you have to know what you're doing with them. It's OK to take notes and have them in a document, or have temporary documents, or list things out. **I encourage this.** I want to keep track of where you go — but there should be points, after we do the divergence and the research and all that, to actually **converge** and say: OK, this is the outcome."*
+
+**Diverge freely in docs. Then converge deliberately. Never delete the material.** *(Exactly as a board's cards survive the piece made from them.)*
 
 ### The five rules
 
-1. **REPLACE, DON'T ADD.** If the owner says a doc isn't landing, **fix or rewrite that doc.** A different altitude is not a new document — it is that document, written better. Adding a layer is the failure mode, not the fix.
-2. **A request for CONTENT is not a request for a FILE.** *"What are the actual things I need to see"* asks for an answer, not a new `.md`. Default: write into the doc that owns the question.
-3. **Name the home before writing.** Before any new doc, state in one line: *what does this hold that no existing doc does?* If that line is hard to write, it isn't a new doc.
-4. **Two docs per topic, maximum: the ANSWER and the REASONING.** One doc says what we're doing; one holds why, including the trail. **Three altitudes on one subject is always a merge waiting to happen.**
-5. **Every new doc gets its INDEX row in the same commit** — and any doc it supersedes gets marked here in that same commit, never later.
+1. **DIVERGE FREELY.** Notes, working lists, temporary docs, half-thoughts, parallel attempts — **encouraged**, not tolerated. The scratch *is* the thinking; suppressing it hides where we went.
+2. **NEVER DELETE. Always reference.** Superseded work is marked and pointed at, never removed. Every doc must be reachable from this index — *knowing what a doc is for* is the requirement, not tidiness.
+3. **NAME THE CONVERGENCE POINT.** After a stretch of divergence/research there is an **explicit step**: *this is the outcome.* It is a decision to hold, not something that happens by drift.
+4. **AT CONVERGENCE:** write or update **the outcome doc**, and mark every upstream doc as *"working-out that led to X"* with a pointer. The material stays; its role changes.
+5. **EVERY DOC DECLARES WHICH IT IS** — 🟠 **WORKING** (diverging; may be redundant, half-right, superseded) or 🟢 **OUTCOME** (converged; the current answer). ⚠ A reader must never have to guess.
 
-### Where a thing goes — the routing test
-- *what are we building?* → **`app-things-inventory.md`** (the concrete list, kept current)
+*(⛔ Superseded, same day: an earlier draft of these rules said "replace, don't add" and "two docs per topic, maximum." **Both were anti-divergence** and the owner corrected them. The real fault they were aiming at — three docs at three altitudes with no marked outcome — is fixed by rules 3–5, not by writing fewer docs.)*
+
+### Where a thing goes
+- *what are we building?* → **`app-things-inventory.md`** (🟢 the current answer)
 - *why / what's still open?* → the topic doc that owns it (`product-concept-*`)
 - *what's next?* → **`product-concept-queue.md`**
 - *where is anything?* → **this file**
-- *a finding with sources* → a `research-*.md` (findings don't expire with plans)
-- **anything else → an existing doc, until rule 3's line is easy to write**
+- *a finding with sources* → a `research-*.md` — 🟢 findings don't expire with plans
+- *scratch, a list, a parallel attempt* → **a new doc is fine** — mark it 🟠 and index it
+
+### Doc status right now — convergence OWED on the convergent-surfaces thread
+
+| doc | status |
+|---|---|
+| `app-things-inventory.md` | 🟢 the current answer to *what are we building* |
+| `research-block-editors.md` · `research-structured-data.md` | 🟢 findings, sourced, settled |
+| `convergent-surfaces-overview.md` | 🟠 working — its §0 is now under challenge |
+| `convergent-surfaces-stress-test.md` | 🟠 working — a reviewer's opinion, not ruled |
+| `composition-surface-spec.md` | 🟠 working — the doc-surface detail |
+| `tables-and-structured-data.md` | 🟠 working — an open question |
+| all `product-concept-*.md` | 🟠 working — thinking in progress, status-banners inside |
+
+> ⚑ **The convergent-surfaces thread has diverged for two days and has NO convergence point yet.** Research (×2) landed, the stress-test reopened the picture, nothing is ruled. **The owed step: an owner sitting that produces the outcome** — what survives, what's cut, what's next. Until then everything on it stays 🟠.
 
 ## 🔎 "I'm looking for…" — straight to the answer
 
