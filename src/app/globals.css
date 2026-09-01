@@ -1402,7 +1402,7 @@ body {
   gap: 6px;
 }
 .inbox-card-tags .tag-chip {
-  cursor: default; /* collapsed chips are a glance, not a control */
+  cursor: default; /* the chip WRAPPER isn't the control — its word (a pull link) and its × are */
 }
 .inbox-tag-add {
   font-size: 12px;

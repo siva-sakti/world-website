@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, BitType } from "@/lib/types";
 import { bitLabel } from "@/lib/labels";
+import { pagedRows, chunk } from "@/lib/db/paged";
 
 // Search (§7) — all computed, stored nowhere. The empty query is THE LEDGER: every
 // live bit, newest first, the reachability floor (I-T1). Add a text query, a tag,
@@ -17,33 +18,46 @@ export async function searchBits(
   args: SearchArgs,
 ): Promise<SearchResult[]> {
   // A tag filter is a join, so resolve the matching bit ids first (the pull).
+  // Paged: an unbounded read silently stops at PostgREST's 1000-row cap, which for
+  // a popular tag would quietly drop bits OUT of the pull's result.
   let onlyIds: string[] | null = null;
   if (args.tagId) {
-    const { data, error } = await supabase
-      .from("tag_application")
-      .select("target_bit_id")
-      .eq("tag_id", args.tagId)
-      .not("target_bit_id", "is", null);
-    if (error) throw error;
-    onlyIds = (data ?? []).map((r) => r.target_bit_id as string);
+    const rows = await pagedRows<{ target_bit_id: string }>((from, to) =>
+      supabase
+        .from("tag_application")
+        .select("target_bit_id")
+        .eq("tag_id", args.tagId!)
+        .not("target_bit_id", "is", null)
+        .order("target_bit_id")
+        .range(from, to),
+    );
+    onlyIds = rows.map((r) => r.target_bit_id);
     if (onlyIds.length === 0) return [];
   }
 
-  let query = supabase
-    .from("bit")
-    .select("*")
-    .eq("state", "live")
-    .order("created_at", { ascending: false })
-    .limit(1000); // load-most: search filters client-side (instant); ~1000+ = server-search trigger
-  if (args.type) query = query.eq("type", args.type);
-  if (args.kind) query = query.eq("kind", args.kind); // bit vs note
-  if (args.q && args.q.trim())
-    query = query.textSearch("search_tsv", args.q.trim(), { type: "websearch" });
-  if (onlyIds) query = query.in("id", onlyIds);
-
-  const { data: bits, error } = await query;
-  if (error) throw error;
-  return attachTags(supabase, (bits ?? []) as Bit[]);
+  // PAGED, not capped (review F4): the old `.limit(1000)` was exactly PostgREST's
+  // max_rows, so /search silently truncated while its UI said "everything". The
+  // second `.order("id")` is the stable tiebreak — created_at ties without it can
+  // repeat or drop rows across page boundaries.
+  const bits = await pagedRows<Bit>((from, to) => {
+    let q = supabase
+      .from("bit")
+      .select("*")
+      .eq("state", "live")
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, to);
+    if (args.type) q = q.eq("type", args.type);
+    if (args.kind) q = q.eq("kind", args.kind); // bit vs note
+    if (args.q && args.q.trim())
+      q = q.textSearch("search_tsv", args.q.trim(), { type: "websearch" });
+    // A huge id list would blow the URL; chunking here would break paging, so the
+    // tag filter narrows client-side below when it's large.
+    if (onlyIds && onlyIds.length <= 200) q = q.in("id", onlyIds);
+    return q;
+  });
+  const only = onlyIds && onlyIds.length > 200 ? new Set(onlyIds) : null;
+  return attachTags(supabase, only ? bits.filter((b) => only.has(b.id)) : bits);
 }
 
 /** Everything from one source (§5b) — the source view's list. Live bits carrying
@@ -70,13 +84,24 @@ async function attachTags(
   rows: Bit[],
 ): Promise<SearchResult[]> {
   if (rows.length === 0) return [];
-  const { data: apps, error } = await supabase
-    .from("tag_application")
-    .select("target_bit_id, tag:tag(id, word)")
-    .in("target_bit_id", rows.map((b) => b.id));
-  if (error) throw error;
+  // CHUNKED (URL length) *and* PAGED (the 1000-row cap): 200 bits carrying >5 tags
+  // each overflows a single page inside one chunk, which would make the tag facet
+  // WRONG rather than merely short. Chunking alone moves that bug; it doesn't close it.
+  const apps: { target_bit_id: unknown; tag: unknown }[] = [];
+  for (const ids of chunk(rows.map((b) => b.id))) {
+    const page = await pagedRows<{ target_bit_id: unknown; tag: unknown }>((from, to) =>
+      supabase
+        .from("tag_application")
+        .select("target_bit_id, tag:tag(id, word)")
+        .in("target_bit_id", ids)
+        .order("target_bit_id")
+        .order("tag_id")
+        .range(from, to),
+    );
+    apps.push(...page);
+  }
   const byBit = new Map<string, { id: string; word: string }[]>();
-  for (const a of apps ?? []) {
+  for (const a of apps) {
     const t = a.tag as unknown as { id: string; word: string };
     const arr = byBit.get(a.target_bit_id as string) ?? [];
     if (t) arr.push(t);
@@ -135,7 +160,7 @@ export async function searchItems(
       created_at: b.created_at,
       // file_name too (media findable by filename), and a link's title + url words —
       // the DB search_tsv indexes them, but the /search UI filters client-side on this.
-      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""} ${b.captured_title ?? ""} ${urlWords} ${b.source_id ? (srcName.get(b.source_id) ?? "") : ""}`.toLowerCase(),
+      searchText: `${b.content ?? ""} ${bodyText} ${b.file_name ?? ""} ${b.captured_title ?? ""} ${urlWords} ${b.source_id ? (srcName.get(b.source_id) ?? "") : ""} ${b.tags.map((t) => t.word).join(" ")}`.toLowerCase(),
     };
   });
   items.sort((a, z) => z.created_at.localeCompare(a.created_at));

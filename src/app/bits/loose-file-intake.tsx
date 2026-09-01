@@ -4,13 +4,13 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { uploadObject, removeObjects } from "@/lib/storage";
-import { createAudioBit, createPdfBit, updateBitContent } from "@/lib/db/bits";
+import { createAudioBit, createPdfBit, createFileBit, updateBitContent } from "@/lib/db/bits";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
-import { MediaError } from "@/lib/media";
+import { importImage, MediaError } from "@/lib/media";
 
-// The LOOSE file-upload doors (voice-memo-plan.md / pdf-plan.md): drop a voice memo
-// OR a PDF straight into the pile — no board needed ("loose OR on a board, the
+// The LOOSE file-upload doors (voice-memo-plan.md / pdf-plan.md + the flow review's
+// F7): drop a PHOTO, a voice memo, or a PDF straight into the pile — no board needed ("loose OR on a board, the
 // same"). Client-side, exactly like the board's doors: import → upload → create the
 // file bit with NO placement (a loose bit → the inbox). A fresh upload then offers
 // an inline caption (consistent with the board's WordsOffer), editable later on the
@@ -18,13 +18,49 @@ import { MediaError } from "@/lib/media";
 export function LooseFileIntake() {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
+  const imageRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState<null | "recording" | "PDF">(null);
+  const [busy, setBusy] = useState<null | "image" | "recording" | "PDF">(null);
   const [err, setErr] = useState<string | null>(null);
   const [captionFor, setCaptionFor] = useState<string | null>(null); // the just-added bit's id
-  const [captionNoun, setCaptionNoun] = useState<"recording" | "PDF">("recording");
+  const [captionNoun, setCaptionNoun] = useState<"image" | "recording" | "PDF">("recording");
   const [caption, setCaption] = useState("");
+
+  // A PHOTO, loose (F7): the most phone-native capture, and until now the only one
+  // you could NOT do outside a board. Same shape as the two doors below — import
+  // (HEIC decoded inside importImage) → the two uploads → createFileBit with NO
+  // placement (loose) → offer a caption. Orphan-swept on a failed insert.
+  async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || busy) return;
+    setBusy("image");
+    setErr(null);
+    const bitId = crypto.randomUUID();
+    const uploaded: string[] = [];
+    try {
+      const img = await importImage(file);
+      const storagePath = `images/${bitId}.jpg`;
+      const thumbPath = `thumbs/${bitId}.jpg`;
+      await Promise.all([
+        uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" }),
+        uploadObject(supabase, { path: thumbPath, body: img.thumb, contentType: "image/jpeg" }),
+      ]);
+      uploaded.push(storagePath, thumbPath);
+      await createFileBit(supabase, "image", {
+        bitId, storagePath, thumbPath, // no placementId/boardId → a LOOSE bit (the inbox)
+        mediaWidth: img.width, mediaHeight: img.height,
+        mime: "image/jpeg", byteSize: img.blob.size, fileName: file.name,
+      });
+      offerCaption(bitId, "image");
+    } catch (e2) {
+      removeObjects(supabase, uploaded.length ? uploaded : [`images/${bitId}.jpg`, `thumbs/${bitId}.jpg`]).catch(() => {});
+      setErr(e2 instanceof MediaError ? e2.message : "Couldn't add that photo — check your connection.");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function onPickAudio(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -92,7 +128,7 @@ export function LooseFileIntake() {
     }
   }
 
-  function offerCaption(bitId: string, noun: "recording" | "PDF") {
+  function offerCaption(bitId: string, noun: "image" | "recording" | "PDF") {
     setCaptionFor(bitId);
     setCaptionNoun(noun);
     setCaption("");
@@ -120,6 +156,15 @@ export function LooseFileIntake() {
         type="button"
         className="compose-btn"
         disabled={busy !== null}
+        onClick={() => imageRef.current?.click()}
+        title="Add a photo — it lands loose in your bits"
+      >
+        {busy === "image" ? "adding…" : "+ image"}
+      </button>
+      <button
+        type="button"
+        className="compose-btn"
+        disabled={busy !== null}
         onClick={() => audioRef.current?.click()}
         title="Upload a voice memo — it lands loose in your bits"
       >
@@ -134,6 +179,7 @@ export function LooseFileIntake() {
       >
         {busy === "PDF" ? "adding…" : "+ PDF"}
       </button>
+      <input ref={imageRef} type="file" accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
       <input ref={audioRef} type="file" accept="audio/*" hidden onChange={onPickAudio} />
       <input ref={pdfRef} type="file" accept="application/pdf,.pdf" hidden onChange={onPickPdf} />
       {err && <span className="intake-err">{err}</span>}

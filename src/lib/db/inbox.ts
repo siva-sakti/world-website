@@ -67,14 +67,20 @@ export async function listAllBits(supabase: SupabaseClient): Promise<PanelBit[]>
   }
 
   // Tags: chunked lookups over the whole set.
+  // Chunked (URL length) AND paged (the 1000-row cap): a chunk of 200 bits with
+  // several tags each overflows one page, which makes the tag lists WRONG, not short.
   const apps: { target_bit_id: unknown; tag: unknown }[] = [];
   for (const idChunk of chunk(ids)) {
-    const { data: someApps, error: tErr } = await supabase
-      .from("tag_application")
-      .select("target_bit_id, tag:tag(id, word)")
-      .in("target_bit_id", idChunk);
-    if (tErr) throw tErr;
-    apps.push(...(someApps ?? []));
+    const page = await pagedRows<{ target_bit_id: unknown; tag: unknown }>((from, to) =>
+      supabase
+        .from("tag_application")
+        .select("target_bit_id, tag:tag(id, word)")
+        .in("target_bit_id", idChunk)
+        .order("target_bit_id")
+        .order("tag_id")
+        .range(from, to),
+    );
+    apps.push(...page);
   }
   const tagsByBit = new Map<string, Tag[]>();
   for (const a of apps) {
