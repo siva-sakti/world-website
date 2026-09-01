@@ -47,6 +47,22 @@
 | **a composition** | ⚪ **composition→composition — the pitching case** (reuse chunks of an old pitch). Currently UNDECIDED in the model (notes-in-notes, parked at D-121). This spec forces the question | 🔲 a page-shaped doorway (N3 pattern) | ✅ exists — N3 doorway card |
 | **a sheet/table** | 🟡 a table **block** (the working assumption; full-page view later) | 🔲 placed table | 🔲 doorway |
 
+### ⭐⭐ THE NESTING (owner-directed, 2026-08-31): Obsidian's capabilities, nested under the grown model
+
+**The owner:** *"I was really thinking in terms of Obsidian — links, backlinks. But if we're migrating from just-Obsidian into Obsidian-plus-more, I want to nest the Obsidian capabilities under the bigger picture."*
+
+**The collapse: everything is TWO MECHANICS × THREE DISPLAY LEVELS.** The mechanics exist (`reference` = tied into flow · `placement` = set in space); the new axis is only *how much of the thing shows*:
+
+| how much shows | in a composition (flow) | on a board / frame (space) |
+|---|---|---|
+| **POINTER** — a name you tap | the `[[` chip ✅ *(= Obsidian wikilink · Notion mention)* | the doorway card ✅ |
+| **SHOWN IN FULL** — content, in place | **the bit-block** (§4.2, planned) *(= Notion embed · transclusion)* | the placed bit ✅ — the board always worked at this level |
+| **LIVE VIEW** — a query rendered in place | **a saved-view block** — *the pull, embedded in writing* (engine territory, later — `tables-and-structured-data.md` §1b) | a board is nearly this, hand-arranged |
+
+**The nesting itself:** **Obsidian = the pointer column + backlinks.** Notion adds the embed and view rows — bolted onto trapped content. **Ours: every cell writes a `reference` or `placement` row, so backlinks and the graph fall out of ALL cells automatically** — "gathered into" and the graph thread are the *reverse read of the whole grid*, not a feature beside it. Links/backlinks are thereby **promoted**: from the product's organizing idea to the connective tissue of a bigger organism (the north-star growth, D-053 → 2026-08-31).
+
+**Still open, unchanged:** composition-in-composition (the pitch-reuse case) — every display level of it is unruled because notes-in-notes is unruled.
+
 **Backlinks ride along free:** "gathered into" already reads `reference` backwards for bits. Every new arrow above is a `reference` or `placement` row, so **every one is backlink-able and graph-visible by construction** — the Obsidian fabric extends to the new surfaces without new machinery. *(The reference-threaded graph stays parked/evidence-gated; the data accrues either way.)*
 
 ⚑ **The one genuinely new model question this opens: composition→composition.** Everything else reuses ruled mechanics. This cell needs its own small ruling (the owner's own pitching flow needs it).

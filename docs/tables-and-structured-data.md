@@ -42,7 +42,7 @@ And the reason it belongs *here* rather than in Notion is **adjacency** (`produc
 
 **The one conceptual gate everything hangs on — §2's fork, now with a strong lean 🔵:** **rows are bits.** Typed fields land ON the bit; a "table" is a saved view over your world; nothing is ever a trapped row in a container. Get this call right and the engine is *more* coherent here than in Notion. Get it wrong (Option B, a separate container) and we rebuild Notion's own bolt-on mistake inside the one app whose model didn't have to.
 
-**Build shape that falls out (prelim, unruled):** ① a typed-field system on `bit` (the schema question — JSONB vs EAV vs columns; **research running**) → ② saved views (a stored query definition rendering as a table — the pull's pattern, persisted) → ③ relations: already exist → ④ computation: parked until wanted.
+**Build shape that falls out (prelim, unruled):** ① a typed-field system on `bit` (the schema question — JSONB vs EAV vs columns; **research running**) → ② saved views (a stored query definition rendering as a table — the pull's pattern, persisted) → ③ relations: already exist → ④ computation: **parked — owner-confirmed 2026-08-31** (*"if it's the machinery we could just park it"*); re-enters on a real want, not a checklist.
 
 **⚪ Research dispatched (2026-08-31), landing in `research-structured-data.md`:** R1 Notion's actual data model (API docs) · R2 the common property/view architecture across Airtable/Anytype/Capacities · R3 Postgres JSONB-vs-EAV-vs-hybrid at personal scale, recommendation-shaped.
 
