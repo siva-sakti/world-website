@@ -111,8 +111,15 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
+## ⭐ RULED 2026-09-02 (evening) — three more, plus banked evidence
+1. **Auto-place: YES.** A piece started or opened from within a board **appears as a card on that board** — *"wherever it's clicked, it's got to appear somewhere there."* The "connected = placed" pin is closed.
+2. **The piece-card must look visibly DIFFERENT from a bit-card** — a design requirement for the mock, not an open question.
+3. **🆕 A per-board toggle to HIDE the piece-cards** — *"if you just want to compose but don't want to see them on your surface, and you want them to be linked and related."* Presentation-only: placements untouched, the board shows material only while toggled.
+
+**Evidence banked for S5/S12 (the bit-web):** the owner confirmed she IS the knowledge worker, and her **founding mental model of connection** was *"a note where I'm typing, but I'm bringing bits in"* — the writing-tie is her native gesture, not Claude's lean. The live question narrows to **STEERING**: a faster on-ramp into that motion from deep-in-text, not a different mechanism.
+
 ## Open (only these)
-Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
+Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
 ---
 

@@ -63,6 +63,7 @@ A scholar three months into a topic. Dozens of bits: quotes, screenshots of pape
 **What does she want to do, right there, without leaving the paragraph?**
 Her real need has three parts: **mark the relation now** (before the thought escapes) · **keep writing** (the paragraph is the priority) · **find it again from either side** (in June, landing on either bit, she wants to see the other).
 Today's honest paths: pull *both* into this piece and write the contradiction into her prose (the relation lives in the writing — findable via both bits' "pulled into" lists) · or a shared tag.
+**⭐ Owner evidence (2026-09-02):** she IS this person — and her *founding* model of connection was exactly *"a note where I'm typing, but I'm bringing bits in."* The writing-tie is her native gesture. The live question narrows to **steering** — a faster on-ramp to the connective note from deep-in-text — not the mechanism.
 ⚑ **The choice this scene sharpens** (S5's sibling, from inside the text): is *the relation lives in writing* enough for the connector — or does deep-in-text work need a faster gesture, made without breaking the sentence? **This is the scene that decides whether the bit-web needs anything new.**
 
 ---
