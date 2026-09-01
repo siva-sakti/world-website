@@ -344,3 +344,5 @@ verification/     the proof record + regression suite
 design-studies/   aesthetic specimens
 backups/          local db dumps (gitignored)
 ```
+
+- **`../board-actions-technical-audit.md`** — the board's technical audit + committed six-layer target (D-135): listening/seeing pipelines, the amended undo design, the ruled build sequence. Read before board-machinery work.
