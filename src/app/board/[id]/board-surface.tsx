@@ -156,7 +156,7 @@ export function BoardSurface({
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {

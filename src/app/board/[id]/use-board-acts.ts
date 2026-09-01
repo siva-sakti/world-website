@@ -25,6 +25,11 @@ export function useBoardActs(deps: {
   clearSelection: () => void;
   setEditingId: Dispatch<SetStateAction<string | null>>;
   settled: (placementId: string) => Promise<string>;
+  // Flush a card's PENDING writes (typed tail, last nudge) before removing it —
+  // the owner-found seam (2026-09-01): forget() after removal drops queued writes,
+  // so type-then-remove within the 350ms debounce lost the typed words. Flush
+  // first, and the tail lands; forget keeps its teleport-guard job untouched.
+  flushNow: (placementId: string) => Promise<void>;
   // Drop a removed card's queued writes once the removal LANDS — a restored patch
   // (F3) must not outlive its card and teleport it after a later call-in (F3e).
   forget: (placementId: string) => void;
@@ -37,7 +42,7 @@ export function useBoardActs(deps: {
 }) {
   const {
     supabase, cards, selectedIds, setCards, clearSelection,
-    setEditingId, settled, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
   } = deps;
 
   // The evaporate-instead-of-remove path: drop the card from state and abort the bit
@@ -78,7 +83,7 @@ export function useBoardActs(deps: {
     clearSelection();
     setEditingId(null);
     settled(placementId)
-      .then((id) => unplaceBit(supabase, id))
+      .then((id) => flushNow(placementId).then(() => unplaceBit(supabase, id)))
       .then(() => {
         forget(placementId); // the card is gone — drop any queued/restored writes for it
         setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
@@ -105,6 +110,7 @@ export function useBoardActs(deps: {
     clearSelection();
     setEditingId(null);
     settled(placementId)
+      .then(() => flushNow(placementId)) // the typed tail lands before the freeze
       .then(() => trashBit(supabase, bitId))
       .then(() => forget(placementId))
       .catch((e) => snap && handleRemoveFailure(snap, e));
@@ -134,7 +140,7 @@ export function useBoardActs(deps: {
     };
     for (const c of chosen) {
       settled(c.placementId)
-        .then((id) => unplaceBit(supabase, id))
+        .then((id) => flushNow(c.placementId).then(() => unplaceBit(supabase, id)))
         .then(() => {
           forget(c.placementId);
           landed++;
@@ -175,6 +181,7 @@ export function useBoardActs(deps: {
     setEditingId(null);
     for (const c of chosen) {
       settled(c.placementId)
+        .then(() => flushNow(c.placementId)) // the typed tail lands before the freeze
         .then(() => trashBit(supabase, c.bitId))
         .then(() => forget(c.placementId))
         .catch((e) => handleRemoveFailure(c, e));
