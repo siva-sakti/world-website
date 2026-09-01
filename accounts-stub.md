@@ -18,6 +18,21 @@ freemium promise) · multi-device identity.
 - **A guest door exists** (anon read of public content, `20260728000002`) — the read-only half of
   sharing is plumbed, unshipped as product.
 
+## ⚠ THE ONE REAL BLOCKER FOUND (2026-09-02, storage-policy capture)
+**Files are not owner-scoped.** Table rows are (per-row `owner_id` + RLS, `20260728000001`), but
+the single storage policy — `owner_all_objects`, now captured in `20260902000003` — scopes by
+BUCKET only: **every authenticated user can read, overwrite and delete every other user's files.**
+Sound today (one account; `anon` has no storage policy at all, and the private bucket is
+non-public), and a genuine hole the moment a second account exists. Two things follow:
+- **The fix at accounts:** an owner-scoped policy, standardly by path prefix
+  (`(storage.foldername(name))[1] = auth.uid()::text`).
+- **The cheap-now/expensive-later part:** that implies a **path-convention change** — today's keys
+  are `images|thumbs|audio|pdfs/{bitId}.ext`, and owner-scoping wants `{owner_id}/…`. Changing the
+  convention is trivial while there are few files and means moving every object later. **Worth an
+  owner call before the file count grows**, independent of when accounts actually ship.
+- Probe: `verification/storage-boundary-check.sql` (read-only; its ST-4 is the tripwire that must
+  be rewritten the day accounts land).
+
 ## The known dependencies (why this waits)
 1. **The privacy/publishing ruling** (other window ④): default visibility · the publishable unit ·
    key-link vs open web · what kind of social. Accounts before this ruling would harden guesses.
