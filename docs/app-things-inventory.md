@@ -33,7 +33,19 @@
 | ❌ | **show a bit IN FULL in the writing** | the quote/image itself, not just its name. *The differentiator; the tap-peek already does the hard part* |
 | ❌ | **quote PART of a bit** | you can't take one sentence of a long note, or a passage from a PDF |
 
-## 2 · Linking — what can point at what *(the owner's "what should you be able to link, and where?")*
+## 2 · Connecting — the actions, by pair (owner's question answered 2026-09-02; supersedes the older matrix below)
+
+| between | today | ruled, coming | open |
+|---|---|---|---|
+| **bit ↔ piece** | pull in (`[[`/drawer) · "pulled into" on the bit | the bit-block (shown in full) · pull from the floater | excerpt (part of a bit) |
+| **bit ↔ board** | place · move · remove · call back | — complete | — |
+| **bit ↔ bit** | same board · shared tag · co-pulled into one writing | — | the steering on-ramp to the connective note |
+| **piece ↔ piece** | — | `[[` one into the other · the seeing-side list | how the seeing-side looks |
+| **piece ↔ board** | place as card | auto-place at birth · distinct card · hide-pieces toggle | the card's look (mock) |
+| **board ↔ board** | doorway (schema-ready, UI dormant) | — | when to surface |
+| **anything** | shared tag · folder · find | "make this a board" from a tag | the graph (own round) · resurfacing (V2 doc) |
+
+## 2-old · Linking — what can point at what *(the owner's "what should you be able to link, and where?")*
 
 | from → into | a piece | a board |
 |---|---|---|
