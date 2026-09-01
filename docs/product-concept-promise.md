@@ -259,14 +259,16 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 **The gallery tracker resolves INSIDE this** — no separate Sheets product: a **table is a block in a document** (covers the 20-row creative-practice case, which is exactly how people use Notion), and a table block that grows up can **open full-page**. Same object, two views. *(Consistent with the stored-vs-computed instinct, and with `tables-and-structured-data.md` — this is that doc's "where does a table live" question, answered.)*
 
-### ⭐ RULING-GRADE STEER (the owner, 2026-08-31, later): TAKE THE NOTION FORM FACTOR STRAIGHT — layer 3 demoted
+### 🟡 EXPLORING — is the straight Notion form factor enough? **NOT CONCLUDED**
+
+> ⚠ **Status corrected (same day):** Claude recorded this as "ruling-grade" off a thinking-out-loud turn, and the owner pushed back directly: *"I don't feel ready to conclude that it's going to be just kind of copying Notion — although that's a really good example of what people use, and that's helpful to have."* **So: Notion = a helpful known reference point. The shape of the convergent surface = OPEN.** The argument below stands as one live line of thinking, not a decision.
 
 > *"I think it's actually OK to just take the Notion form factor in general, because we're not using it for the whole app. The invention of this board surface, still including the graphs of Obsidian, is already a huge change — and then we're adding convergence. I don't think it's too rigid for a compositional surface. My idea is it just doesn't work for a divergent surface."*
 
 **The argument, and it holds:** the founding complaint (*"the page is theirs, not mine"*) was aimed at **Notion-as-the-whole-app** — a rigid page as your ONLY surface. It was written before the board existed; **the board IS the answer to that complaint.** The doodle-beside-text life already exists on the board today. In an app where the board carries the freedom, the convergent surface may be structured — **converging is accepting structure.**
 
-**Consequences:**
-- **Layer 3 (freeform on the page) demotes from "the moat" to a maybe-later** — and the unsolved flow+float interaction problem drops out of scope with it. Nothing needs inventing.
+**IF this line were taken (not decided):**
+- Layer 3 (freeform on the page) would become a maybe-later rather than the moat. **⚠ NOT demoted — the owner explicitly re-opened flexible convergent surfaces the same day.** Layer 3 and its alternatives are live.
 - **The build = layers 1+2 exactly:** a Notion-form-factor block document (known tech — tiptap, already in the stack, does block editors) + **blocks-that-can-be-bits** (gather matured, on rails we own). The bits-as-blocks layer remains the differentiator over Notion.
 - **The novelty budget, stated:** board-invention + Obsidian-graph + Notion-convergence is already the huge combination; the page itself needn't also be novel.
 - ⚑ **Layer-3 re-entry condition:** philosophy.md's *"handwriting and typing on the same page"* is, under this steer, served by the board rather than the page. If that ever feels like a loss in real use, layer 3 reopens.
@@ -280,7 +282,7 @@ The owner's question: with a composing surface added, *"how do we say it to peop
 
 The user-words test: ***will you want this again, somewhere else?*** The quote you'll reuse → a bit. "Email the framer by Friday" → just writing.
 
-**The checklist, fully resolved, zero new objects:** it lives **in a composition** (part of a document, as in Docs/Notion) · the composition **can sit on a board** (N3 doorway — already built: a packing list *in* a piece, *on* the trip board) · and sticky-note thinkers keep the board (index cards already work). **We encourage neither** — capability without prescription (§2c-ter).
+**The checklist — one candidate resolution (🔵 Claude's, offered for reaction, not settled):** it lives **in a composition** (part of a document, as in Docs/Notion) · the composition **can sit on a board** (N3 doorway — already built: a packing list *in* a piece, *on* the trip board) · and sticky-note thinkers keep the board (index cards already work). **We encourage neither** — capability without prescription (§2c-ter).
 
 **Net: the convergent surface changes nothing about what a bit is.** The whole story: *bits are the material · the board spreads it · the piece shapes it · the words in between are just words.* ⚑ Owner-voiced version owed (this phrasing is Claude's 🔵).
 
