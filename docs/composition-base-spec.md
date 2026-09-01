@@ -79,7 +79,7 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
 ## Open (only these)
-Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · **N6's sliver: empty-at-click-out — evaporate or persist?** · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
+Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
 ---
 
@@ -98,7 +98,7 @@ Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (m
 | **N5 · phone** | **Full page for now** — the floater "wouldn't be as dynamic"; maybe later; revisit, not a blocker. |
 | **N7 · arrows** | Dissolved into the prior, already-parked question: connectors exist in schema, **no drawing UI was ever built**, and the recorded lean stands (*arrangement is the connection; lines a rare power-move*). Stays parked; if ever built, compositions are uniform cards. |
 
-**⚪ The one sliver left from this round (N6):** you click out of a just-born piece with **zero content** — does it **evaporate** (nothing was ever made) or **persist as a date-titled empty piece**? (Title-minting is ruled; the empty case isn't.)
+**N6 · ✅ RULED (2026-09-02): EVAPORATE.** Clicking out with zero content is the *typical* gesture (a misclick, a changed mind) — nothing persists, no date-titled ghosts. Born-on-first-content everywhere; the born-then-emptied edge evaporates (D-111's rule carried forward).
 
 ## ⚑ NEW owner questions (the checker's — it was barred from answering)
 | # | question |
