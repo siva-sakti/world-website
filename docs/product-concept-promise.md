@@ -437,7 +437,19 @@ The core differentiator is **the integrated arc itself**. Return is what turns t
 - **We're late to a crowded space.** People stay in Notion and Obsidian out of habit, not love.
 - **"Single-player, no AI" is a real positioning risk** in an AI-hyped market. We'd be choosing to be the calm anti-tool — and we'd have to mean it.
 
-## 6 · Cut-across, with discipline
+## 6 · Cut-across, with discipline 🔵 — ⚠ CLAUDE'S FRAMING, NOT THE OWNER'S POSITION
+
+> ### ⚠ PROVENANCE CORRECTION (2026-08-31) — read before using anything in this section
+>
+> **The "junk drawer / Notion-slop / known graveyard" argument below is Claude's, and the owner has never endorsed it.** It was recorded unmarked, which made it read as a settled constraint. It is not.
+>
+> **What the owner actually said:** *"I'm actually cutting across all of these ideally… I would love to do the best of what each of these apps do in one, and even say that's what I'm doing."* · *"Notion is probably what I'm competing with more than Google Docs, for sure."* · *"I do think we win coverage, right?"* — i.e. **Notion is the thing to beat on coverage, not a fate to avoid.** The owner, when Claude later cited this section against a proposal of theirs: *"I never said that. Where are you getting this from?"*
+>
+> **The failure pattern, third instance today:** Claude generates a framing → records it → later cites its own record as established evidence. (Also: the writer pass's "critical mass" step, and the "four independent asks" for sequence.) **Claude's own drafts are hypotheses, never data.** Anything Claude originates gets 🔵 at the moment it is written.
+>
+> **What survives:** feature bloat degrading a calm surface is a real risk worth naming. **What does not survive:** treating it as the owner's ruling, or using it to argue against expanding the convergent surfaces. The three rules below are **a proposal awaiting the owner's judgement**, not a governing constraint.
+
+
 
 The owner's play is to **cut across** all these areas, not beat a specialist head-on. That's a real position — you won't out-link Obsidian or out-collect Pinterest, and shouldn't try.
 
