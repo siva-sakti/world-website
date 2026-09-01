@@ -34,7 +34,8 @@ export async function getBoard(
  * ARRANGEMENT of the same material — the copy's placements point at the SAME bits (bits are
  * the atoms; deep-copying would double material and pollute search/tags). Copies title+" copy",
  * visibility, folder, and every LIVE placement's geometry with a FRESH arrived_at (travel
- * history is the original's story, not the copy's). Not copied: the ★ (a copy isn't alive
+ * history is the original's story, not the copy's) — and locked_at (a lock is arrangement
+ * state like x/y/z, so a faithful copy keeps it — check-ruled). Not copied: the ★ (a copy isn't alive
  * until you say so) · departed legs · connectors (no create-UI exists yet — when arrows
  * arrive, duplicate must learn placement-id remapping). If the placements fail after the
  * board row lands, the half-copy is deleted (cascade takes its placements) — no litter. */
@@ -55,7 +56,7 @@ export async function duplicateBoard(supabase: SupabaseClient, boardId: string):
   try {
     const { data: rows, error: e3 } = await supabase
       .from("placement")
-      .select("target_bit_id, target_board_id, x, y, width, height, z, display_size")
+      .select("target_bit_id, target_board_id, x, y, width, height, z, display_size, locked_at")
       .eq("board_id", boardId)
       .is("left_at", null);
     if (e3) throw e3;
@@ -99,6 +100,17 @@ export async function getBoardCards(
   return (data ?? []) as BoardCard[];
 }
 
+/** The board's optional description/subtitle (B+); empty saves as none. */
+export async function updateBoardDescription(
+  supabase: SupabaseClient,
+  id: string,
+  description: string | null,
+): Promise<void> {
+  const value = description && description.trim() ? description.trim() : null;
+  const { error } = await supabase.from("board").update({ description: value }).eq("id", id);
+  if (error) throw error;
+}
+
 /** Rename a board — free, forever; titles never touch anything placed (P9). */
 export async function renameBoard(
   supabase: SupabaseClient,
@@ -139,18 +151,20 @@ export async function destroyBoard(supabase: SupabaseClient, id: string): Promis
 }
 
 /** Empty the trash — destroy every trashed bit + board (I-L2 · I-L10 · I-L6). Removes
- *  the trashed image bits' files first, then deletes all trashed rows (the schema
+ *  the trashed FILE-carrying bits' stored objects first — image, audio, pdf, AND a
+ *  link's card image (the old `type=image` filter silently leaked every other type's
+ *  files — caught in the B+ pass) — then deletes all trashed rows (the schema
  *  cascades the rest). Trashed-only by the `deleted_at IS NOT NULL` guard. */
 export async function emptyTrash(supabase: SupabaseClient): Promise<void> {
-  const { data: imgs } = await supabase
+  const { data: files } = await supabase
     .from("bit")
     .select("storage_path, thumb_path")
-    .eq("type", "image")
-    .not("deleted_at", "is", null);
-  if (imgs && imgs.length) {
+    .not("deleted_at", "is", null)
+    .or("storage_path.not.is.null,thumb_path.not.is.null");
+  if (files && files.length) {
     await removeObjects(
       supabase,
-      imgs.flatMap((b) => [b.storage_path as string | null, b.thumb_path as string | null]),
+      files.flatMap((b) => [b.storage_path as string | null, b.thumb_path as string | null]),
     );
   }
   const bitDel = await supabase.from("bit").delete().not("deleted_at", "is", null);

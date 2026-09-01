@@ -1462,6 +1462,15 @@ body {
 .picker-row--special { color: #365a8c; }
 .picker-empty { padding: 7px 9px; font-size: 13px; color: #b3a998; }
 
+/* The board's optional description — a quiet subtitle line under the title (B+). */
+.board-desc-input {
+  width: 100%; font: inherit; font-size: 13.5px; color: #57503f;
+  background: transparent; border: none; outline: none; padding: 0;
+  text-align: center;
+}
+.board-desc-input::placeholder { color: #d6cfc2; }
+.board-desc-input:focus::placeholder { color: #b3a998; }
+
 /* ── The link card (link-bit-plan): the page-card image, cover-fit, with a quiet
    title strip; the ladder degrades to a title card (site + title on plain ground).
    The ↗ opens the real page. Fills the card like an image (is-image treatment). ── */

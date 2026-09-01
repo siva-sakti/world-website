@@ -52,6 +52,7 @@ export type Board = {
   visibility: Visibility;
   group_id: string | null; // the shelf (O1): which home section this board sits in
   pinned_at: string | null; // pinned floats to the top of the shelf; null = unpinned
+  description: string | null; // an optional subtitle under the title (B+, 2026-09-01); null = none
   deleted_at: string | null;
   archived_at: string | null; // archive = hide-but-keep, its own resting state
   state: "live" | "archived" | "trashed"; // generated: the single source of truth
@@ -74,6 +75,7 @@ export type Placement = {
   height: number | null;
   z: number | null;
   display_size: DisplaySize;
+  locked_at: string | null; // locked = position frozen (drag/resize/nudge/tidy skip it); null = unlocked
   arrived_at: string;
   left_at: string | null;
   updated_at: string;
@@ -103,6 +105,7 @@ export type BoardCard = {
   thumb_path: string | null;
   target_visibility: Visibility | null;
   source_id: string | null; // the source row's id (the view exposes it beside the name)
+  locked_at: string | null; // locked = position frozen (B+)
   source_name: string | null; // "from …" — the bit's source travels with it (P8)
   source_url: string | null; // the source's optional clickable link
 };

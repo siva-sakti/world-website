@@ -256,6 +256,23 @@ export async function callInBit(
   return cur.data as Placement;
 }
 
+/** Lock / unlock a card's POSITION (B+): locked = drag/resize/nudge/tidy skip it;
+ *  select/open/tags still work, unplace/trash still allowed. The 0-row assert is the
+ *  house guard (a stale surface must not silently lose the act). */
+export async function setPlacementLock(
+  supabase: SupabaseClient,
+  placementId: string,
+  on: boolean,
+): Promise<void> {
+  const { data, error } = await supabase
+    .from("placement")
+    .update({ locked_at: on ? new Date().toISOString() : null })
+    .eq("id", placementId)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("that card no longer exists — reload the board");
+}
+
 export async function updatePlacement(
   supabase: SupabaseClient,
   id: string,

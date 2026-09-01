@@ -6,6 +6,7 @@ import { normalizeDrawing } from "@/lib/stroke";
 import { signedUrl } from "@/lib/storage";
 import { BoardSurface } from "./board-surface";
 import { BoardTitle } from "./board-title";
+import { BoardDescription } from "./board-description";
 import { TagBar } from "./tag-bar";
 import type { CardVM } from "./card";
 
@@ -89,6 +90,7 @@ export default async function BoardPage({
           imageUrl,
           fileUrl,
           content: meta.get(r.target_bit_id!)?.content ?? undefined,
+          locked: Boolean(r.locked_at),
           url: type === "link" ? (r.url ?? undefined) : undefined,
           label: type === "link" ? (r.label ?? undefined) : undefined,
           sourceName: r.source_name ?? undefined,
@@ -104,6 +106,9 @@ export default async function BoardPage({
         <span className="w-8 shrink-0" aria-hidden="true"></span>
         <BoardTitle boardId={board.id} title={board.title} />
       </header>
+      <div className="shrink-0">
+        <BoardDescription boardId={board.id} initial={board.description ?? ""} />
+      </div>
       <div className="shrink-0">
         <TagBar target={{ boardId: board.id }} label="board tags" />
       </div>

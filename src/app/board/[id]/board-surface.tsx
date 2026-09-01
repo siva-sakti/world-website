@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateBitContent } from "@/lib/db/bits";
+import { updateBitContent, setPlacementLock } from "@/lib/db/bits";
 import { MediaError } from "@/lib/media";
 import { Card, type CardVM } from "./card";
 import { DrawOverlay } from "./draw-overlay";
@@ -175,7 +175,8 @@ export function BoardSurface({
   function onCardDragStart(placementId: string) {
     if (selectedIds.size > 1 && selectedIds.has(placementId)) {
       const m = new Map<string, { x: number; y: number }>();
-      for (const c of cards) if (selectedIds.has(c.placementId)) m.set(c.placementId, { x: c.x, y: c.y });
+      // locked cards never join a group drag (the one skip point — move/end gate on starts.has())
+      for (const c of cards) if (selectedIds.has(c.placementId) && !c.locked) m.set(c.placementId, { x: c.x, y: c.y });
       dragStart.current = m;
     } else {
       dragStart.current = null;
@@ -214,7 +215,7 @@ export function BoardSurface({
   // meaning), arrows nudge, Cmd+A selects all, Cmd+=/−/0 zoom.
   function nudgeSelected(dx: number, dy: number) {
     for (const c of cards) {
-      if (!selectedIds.has(c.placementId)) continue;
+      if (!selectedIds.has(c.placementId) || c.locked) continue; // locked = position frozen
       patchCard(c.placementId, c.bitId, { x: c.x + dx, y: c.y + dy });
     }
   }
@@ -232,7 +233,7 @@ export function BoardSurface({
   // sizes via data-pid (text heights are stale by design). One patchCard per card — the
   // normal save path.
   function tidySelected() {
-    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked); // locked cards stay put
     if (chosen.length < 2) return;
     const meas = chosen.map((c) => {
       const el = document.querySelector(`[data-pid="${c.placementId}"]`);
@@ -263,6 +264,18 @@ export function BoardSurface({
       if (nx !== m.c.x || ny !== m.c.y) patchCard(m.c.placementId, m.c.bitId, { x: nx, y: ny });
     });
   }
+  // Lock / unlock the selected card's POSITION (B+): optimistic, rolled back on failure.
+  function toggleLock(c: CardVM) {
+    const on = !c.locked;
+    setCards((cs) => cs.map((x) => (x.placementId === c.placementId ? { ...x, locked: on } : x)));
+    settled(c.placementId)
+      .then((id) => setPlacementLock(supabase, id, on))
+      .catch((e) => {
+        setCards((cs) => cs.map((x) => (x.placementId === c.placementId ? { ...x, locked: !on } : x)));
+        onErr(e);
+      });
+  }
+
   // Send the selected card behind everything (the demote valve — click-to-front stays, ruled).
   function sendToBack(placementId: string, bitId: string) {
     const minZ = cards.reduce((m, c) => Math.min(m, c.z), 0);
@@ -386,6 +399,13 @@ export function BoardSurface({
               title="Open this card full-page — comfortable writing"
             >
               open
+            </button>
+            <button
+              className="compose-btn subtle"
+              onClick={() => toggleLock(selectedBit)}
+              title={selectedBit.locked ? "Unlock — this card can move again" : "Lock this card in place — a stray drag can't move it (removing it still works)"}
+            >
+              {selectedBit.locked ? "🔓 unlock" : "🔒 lock"}
             </button>
             <button
               className="compose-btn subtle"

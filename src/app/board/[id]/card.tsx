@@ -28,6 +28,7 @@ export type CardVM = {
   imageUrl?: string; // image thumbnail/full URL — also a PDF's first-page thumbnail (signed thumb_path)
   fileUrl?: string; // audio (resolved storage URL for the <audio> player)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
+  locked?: boolean; // position frozen (B+): drag/resize/nudge/tidy skip it
   url?: string; // a LINK bit's substance — the card's open-↗ target
   label?: string; // a link bit's computed face (caption → read-once title → url) for the title strip
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)
@@ -159,9 +160,9 @@ export function Card({
     <Rnd
       position={{ x: card.x, y: card.y }}
       size={size as { width: number | string; height: number | string }}
-      disableDragging={editing}
+      disableDragging={editing || Boolean(card.locked)}
       enableResizing={
-        selected && !editing ? (flexSized ? RESIZE_TEXT : RESIZE_SCALE) : false
+        selected && !editing && !card.locked ? (flexSized ? RESIZE_TEXT : RESIZE_SCALE) : false
       }
       resizeHandleStyles={coarse ? HANDLE_STYLES_COARSE : HANDLE_STYLES}
       lockAspectRatio={!flexSized}
