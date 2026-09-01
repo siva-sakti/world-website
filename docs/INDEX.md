@@ -198,6 +198,10 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `composition-surface-spec.md` — 🟡 preliminary thinking-spec (2026-08-31)
+**Contains:** the diverge/converge picture drawn · the full entry/link **matrix** (what can enter what, incl. the one new model question: composition→composition) · the existing tiptap base · the doc-surface capability cut (blocks · the **bit-block** = gather matured) · the deck sketched lightly · quick research (tiptap ships a Notion-like template; Notion's synced blocks vs our native transclusion) · the owner's check-in list.
+**Does NOT:** rule, name, sequence, or touch schema. Gated on the owner's check-in → naming session → the item loop.
+
 ### `tables-and-structured-data.md` — ⚪ parked handoff, not a plan
 **Contains:** why structured data serves the surround claim (adjacency) · **the central fork** (is a row a *bit* or a new record?) · what a bit already provides vs the one real gap (**a user-set date**) · the honest 21-item feature inventory across three tiers · the model-safety flags · six open questions · a read-in order.
 **Does NOT cover:** any decision. Nothing planned, nothing built, nothing ruled.
