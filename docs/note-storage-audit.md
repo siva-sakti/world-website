@@ -1,4 +1,13 @@
-# Audit — does "a note is a bit underneath" still hold? (2026-09-01)
+# Audit — the composition is architecturally MATERIAL. Does that hold? (2026-09-01)
+
+> ⭐ **REFRAMED by the owner, same day:** this is **not a storage question — it is a DATA-MODEL ARCHITECTURE question.** "Storage" (D-121's own *"invisible plumbing"*) was the minimizing word. In a relational system the table a thing lives in IS its architecture. The true statement: **the data model has ONE entity where the concept has TWO — a composition IS material, not filed beside it.**
+>
+> **Three verified proofs the architecture assigns material-behavior to the convergent surface:**
+> 1. **Compositions default `visibility='public'`** (the atom's default, D-072) **while boards default `'private'`** — a composition is a whole room inheriting a scrap's exposure rule. Latent, not live (no publish act) — but the defaults encode the wrong identity, and publishing would make them real.
+> 2. **A composition is gatherable AS material** — `reference.to_bit_id` is kind-unchecked; the ruled hard line "gather material, never a surface" is architecturally unenforceable.
+> 3. **A composition is "loose"** — an unplaced essay satisfies the inbox's loose-material definition (I-N1), a scrap awaiting filing.
+>
+> **The ruling, restated in its true terms:** *does the data model get a second entity — **SURFACE**, architecturally distinct from **MATERIAL** — or does one entity keep playing both parts?* The table choice, the migration, the sweep are **enactment** of that ruling, not the ruling.
 
 > ## STATUS · 🟠 WORKING — an evidence audit, verdict marked 🔵; the ruling is the owner's
 > Commissioned by the owner: *"we were looking at notes as underground the same as bits — does that hold? Actually look at this."* Run against the merged codebase (post-media-merge).

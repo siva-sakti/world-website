@@ -238,8 +238,8 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
-### `note-storage-audit.md` — 🟠 the evidence audit: does note-as-bit still hold? (2026-09-01)
-**Contains:** the real seam count (~30 files; corrects Claude's earlier false "5 in 3") · the reframe (app code is AHEAD of storage) · 🔵 the convergence finding (one surface table unifies the whole link fabric — comp→comp and comp→board become one row type; A15 dissolves) · the ONE ruling that gates the migration · Claude's updated recommendation.
+### `note-storage-audit.md` — 🟠 the ARCHITECTURE audit: the composition is architecturally material (2026-09-01)
+**Contains:** ⭐ the owner's reframe (a DATA-MODEL question, not storage: one entity playing two parts) · three verified proofs (public-by-default compositions · gatherable-as-material · architecturally "loose") · the real seam count (~30 files; corrects Claude's false "5 in 3") · the app-code-is-AHEAD finding · 🔵 the convergence finding (one surface table unifies the whole link fabric — comp→comp and comp→board become one row type; A15 dissolves) · the ONE ruling that gates the migration · Claude's updated recommendation.
 
 ### `app-things-inventory.md` — ⭐ THE CONCRETE LIST (2026-09-01)
 **Contains:** every finding from the convergence work translated into **things you'd see or click** — writing a piece · linking (what can point at what) · getting things out · ordering · tables/fields · about a piece · and which lines have real evidence.
