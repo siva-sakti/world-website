@@ -90,6 +90,8 @@ export function Card({
   onChange,
   onContentSave,
   onSourceChange,
+  onSourceAct,
+  metaRefresh,
   onDragStart,
   onResizeStart,
   onDragMove,
@@ -113,6 +115,10 @@ export function Card({
   // "from …" stamp into this card's VM so it appears without a reload (SourcePicker
   // already persisted bit.source_id; this only refreshes the local view).
   onSourceChange?: (source: Source | null) => void;
+  /** undo §6: forwarded to the SourcePicker — the board records landed source acts. */
+  onSourceAct?: (prev: Source | null, next: Source | null) => void;
+  /** Bumped by an undo/redo reverse — the pickers refetch so the reverse repaints. */
+  metaRefresh?: number;
   // Drag reporting for move-together: the board moves the OTHER selected cards; this
   // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
   onDragStart?: () => void;
@@ -271,6 +277,8 @@ export function Card({
             initial={null}
             label="source"
             onChange={onSourceChange}
+            onSourceAct={onSourceAct}
+            refreshSignal={metaRefresh}
           />
         )}
         {card.type === "image" && card.imageUrl && (
@@ -360,6 +368,8 @@ export function Card({
                     initial={null}
                     label="source"
                     onChange={onSourceChange}
+                    onSourceAct={onSourceAct}
+                    refreshSignal={metaRefresh}
                   />
                 </>
               ) : (

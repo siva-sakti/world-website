@@ -19,7 +19,13 @@ import {
 // taggable; §3c — guided, never gating: tap an existing chip or type a new word).
 // A chip has TWO halves: the word is THE PULL (→ everything carrying it) and the ×
 // removes — it used to be one button that removed on any tap (flow review F1).
-export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: string }) {
+export function TagBar({ target, label = "tags", onTagAct, refreshSignal = 0 }: { target: TagTarget; label?: string;
+  /** Board-only (undo §6): reports a landed tag act so the stack can record it.
+   *  Unwired everywhere else — bit/note pages have no stack. */
+  onTagAct?: (kind: "add" | "remove", tag: { id: string; word: string }) => void;
+  /** Bumped by an undo/redo reverse — refetch so the reverse can repaint us. */
+  refreshSignal?: number;
+}) {
   const [supabase] = useState(() => createClient());
   const [tags, setTags] = useState<Tag[]>([]);
   const [all, setAll] = useState<TagChoice[]>([]);
@@ -45,15 +51,16 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetId, supabase]);
+  }, [targetId, supabase, refreshSignal]);
 
-  async function add(word: string) {
+  async function add(word: string, report = true) {
     const w = word.trim();
     setDraft("");
     setErr(null);
     if (!w || tags.some((t) => t.word.toLowerCase() === w.toLowerCase())) return;
     try {
       const tag = await applyTag(supabase, { ...target, word: w });
+      if (report) onTagAct?.("add", tag); // AFTER the write lands — a failed add records nothing
       setTags((ts) => (ts.some((t) => t.id === tag.id) ? ts : [...ts, tag]));
       setAll((a) =>
         a.some((x) => x.id === tag.id)
@@ -74,7 +81,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
   // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the unmount effect below commits the current draft
   commitRef.current = () => {
     const w = draft.trim();
-    if (w) void add(w);
+    if (w) void add(w, false); // the unmount-commit carve (undo §6): never recorded
   };
   useEffect(() => {
     // Page-hide too (hunt #8): a phone backgrounding fires visibilitychange, not
@@ -91,6 +98,7 @@ export function TagBar({ target, label = "tags" }: { target: TagTarget; label?: 
     setTags((ts) => ts.filter((t) => t.id !== tag.id));
     try {
       await removeTag(supabase, { ...target, tagId: tag.id });
+      onTagAct?.("remove", tag); // AFTER the write lands
     } catch (e) {
       console.error("untag failed:", e);
       setTags((ts) => (ts.some((t) => t.id === tag.id) ? ts : [...ts, tag])); // put it back

@@ -21,6 +21,7 @@ import { BoardToolbar } from "./board-toolbar";
 import { useBoardActs } from "./use-board-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
+import { useMeaningActs } from "./use-meaning-acts";
 import { UndoDevReadout } from "./undo-dev-readout";
 import { tidyPatches, backZ, groupDragPatches, nextZ as zAbove } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
@@ -99,6 +100,12 @@ export function BoardSurface({
   const { record, onBeforeRecord, fail, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
   void undo; void redo; void undoLabel; void redoLabel; // stage 5 wires the buttons
   const arrange = useArrangeActs({ supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain });
+  // The meaning acts (undo §6 — tags + source, GLOBAL reach, honest labels) + the
+  // per-bit refresh signal their reverses bump so mounted bars repaint themselves.
+  const [metaRefresh, setMetaRefresh] = useState(0);
+  const meaning = useMeaningActs({
+    supabase, cardsRef, record, setCards, bumpMeta: () => setMetaRefresh((n) => n + 1),
+  });
   // Before-captures for the two gestures whose acts finish elsewhere:
   const dragBefore = useRef<{ bitId: string; x: number; y: number } | null>(null);   // single drag
   const resizeBefore = useRef<{ bitId: string; x: number; y: number; w: number; h?: number } | null>(null);
@@ -462,7 +469,16 @@ export function BoardSurface({
       />
       {selectedBit && (
         <div className="selected-bar">
-          <TagBar key={selectedBit.bitId} target={{ bitId: selectedBit.bitId }} />
+          <TagBar
+            key={selectedBit.bitId}
+            target={{ bitId: selectedBit.bitId }}
+            refreshSignal={metaRefresh}
+            onTagAct={(kind, tag) =>
+              kind === "add"
+                ? meaning.recordTagAdd(selectedBit.bitId, tag)
+                : meaning.recordTagRemove(selectedBit.bitId, tag)
+            }
+          />
           <div className="selected-actions">
             <button
               className="compose-btn subtle"
@@ -577,6 +593,8 @@ export function BoardSurface({
                 patchCard(c.placementId, c.bitId, patch);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
+              onSourceAct={(prev, next) => meaning.recordSourceChange(c.bitId, prev, next)}
+              metaRefresh={metaRefresh}
               onSourceChange={(src) =>
                 // The source was already persisted (bit.source_id) by the picker;
                 // patch ONLY this card's VM so its resting "from …" stamp updates

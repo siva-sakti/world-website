@@ -22,6 +22,8 @@ export function SourcePicker({
   initial = null,
   label = "source",
   onChange,
+  onSourceAct,
+  refreshSignal = 0,
 }: {
   bitId: string;
   initial?: Source | null;
@@ -30,6 +32,11 @@ export function SourcePicker({
   // Optional — the note/bit pages don't pass it; the board card uses it to refresh
   // its resting "from …" stamp without a reload.
   onChange?: (source: Source | null) => void;
+  /** Board-only (undo §6): reports a LANDED set/clear with the full prev+next
+   *  Source objects (an id alone can't repaint the card's "from …" stamp). */
+  onSourceAct?: (prev: Source | null, next: Source | null) => void;
+  /** Bumped by an undo/redo reverse — refetch so the reverse can repaint us. */
+  refreshSignal?: number;
 }) {
   const [supabase] = useState(() => createClient());
   const [current, setCurrent] = useState<Source | null>(initial);
@@ -58,15 +65,20 @@ export function SourcePicker({
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bitId, supabase]);
+  }, [bitId, supabase, refreshSignal]);
 
-  async function pick(name: string) {
+  async function pick(name: string, report = true) {
     const nm = name.trim();
     setDraft("");
     setErr(null);
     if (!nm) return;
+    // Capture the PRIOR before the await (undo §6). While the initial fetch is
+    // still loading the prior is UNKNOWN — recording then would capture null and
+    // an undo would CLEAR a source that existed (the hunt's D10): don't report.
+    const prior = loading ? undefined : current;
     try {
       const src = await setSource(supabase, bitId, nm);
+      if (report && prior !== undefined) onSourceAct?.(prior, src);
       setCurrent(src);
       onChange?.(src);
       setAll((a) => (a.some((s) => s.id === src.id) ? a : [src, ...a]));
@@ -82,7 +94,7 @@ export function SourcePicker({
   // eslint-disable-next-line react-hooks/refs -- latest-callback ref: the unmount effect below commits the current draft
   commitRef.current = () => {
     const nm = draft.trim();
-    if (nm) void pick(nm);
+    if (nm) void pick(nm, false); // the unmount-commit carve (undo §6): never recorded
   };
   useEffect(() => {
     // Page-hide too (hunt #8): a phone backgrounding fires visibilitychange, not
@@ -96,11 +108,13 @@ export function SourcePicker({
 
   async function clear() {
     setErr(null);
+    if (loading) return; // prior unknown — a recorded clear would lie (D10)
     const prev = current;
     setCurrent(null);
     onChange?.(null);
     try {
       await clearSource(supabase, bitId);
+      onSourceAct?.(prev, null); // AFTER the write lands
     } catch (e) {
       console.error("clear source failed:", e);
       setCurrent(prev); // put it back
