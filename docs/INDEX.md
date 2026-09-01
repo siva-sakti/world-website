@@ -238,6 +238,10 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `composition-base-spec.md` — 🟠 THE BASE SPEC: the composition re-derived, bottom-up (2026-09-01)
+**Contains:** the post-split model · the entity defined conceptually + technically (the surface-table shape) · relations reshaped (placement · reference · tags — one link mechanism) · **every act traced, no blank cells** · doors in/out · what it sheds from bit-hood, each chosen · invariants touched · the migration sketch · **§9: the nine questions the owner answers to settle the base.**
+**Gate:** owner answers §9 → 🟢 → enactment in the code window's lane. The capability layer (`composition-surface-spec.md`) builds on this after.
+
 ### `note-storage-audit.md` — 🟠 the ARCHITECTURE audit: the composition is architecturally material (2026-09-01)
 **Contains:** ⭐ the owner's reframe (a DATA-MODEL question, not storage: one entity playing two parts) · three verified proofs (public-by-default compositions · gatherable-as-material · architecturally "loose") · the real seam count (~30 files; corrects Claude's false "5 in 3") · the app-code-is-AHEAD finding · 🔵 the convergence finding (one surface table unifies the whole link fabric — comp→comp and comp→board become one row type; A15 dissolves) · the ONE ruling that gates the migration · Claude's updated recommendation.
 
