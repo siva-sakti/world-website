@@ -91,6 +91,7 @@ export function Card({
   onContentSave,
   onSourceChange,
   onDragStart,
+  onResizeStart,
   onDragMove,
   onDragEnd,
 }: {
@@ -115,6 +116,7 @@ export function Card({
   // Drag reporting for move-together: the board moves the OTHER selected cards; this
   // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
   onDragStart?: () => void;
+  onResizeStart?: () => void; // the board captures before-geometry from STATE here (rnd's callback carries none)
   onDragMove?: (x: number, y: number) => void;
   onDragEnd?: (x: number, y: number) => void;
 }) {
@@ -181,6 +183,7 @@ export function Card({
         onChange({ x: d.x, y: d.y }, "move");
         onDragEnd?.(d.x, d.y);
       }}
+      onResizeStart={() => onResizeStart?.()}
       onResizeStop={(_e, _dir, ref, _delta, pos) => {
         userSized.current = true; // the owner set this width — auto-widen backs off
         onChange(

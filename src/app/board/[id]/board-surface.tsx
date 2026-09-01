@@ -19,6 +19,10 @@ import { useBoardKeys } from "./use-board-keys";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
 import { useBoardActs } from "./use-board-acts";
+import { useUndo } from "./use-undo";
+import { useArrangeActs } from "./use-arrange-acts";
+import { UndoDevReadout } from "./undo-dev-readout";
+import { tidyPatches, backZ } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
 
 // The board's compose surface, on real data, on an infinite canvas. Local state
@@ -86,8 +90,18 @@ export function BoardSurface({
 
   // Debounced persistence through the one door (moves/edits coalesced; a move
   // waits for its card's create to land before writing).
-  const { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow, flushAll, pendingCreates } =
+  const { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow, flushAll, pendingCreates, chain } =
     usePersistence(supabase, setCards, onErr);
+
+  // THE UNDO SEAM (dark — stage 2b): arranging acts RECORD; nothing on screen can
+  // act on an entry until stage 5's buttons. The dev readout below is the soak's
+  // evidence surface. onErr here takes the seam's owner-facing copy directly.
+  const { record, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
+  void undo; void redo; void undoLabel; void redoLabel; // stage 5 wires the buttons
+  const arrange = useArrangeActs({ supabase, cardsRef, record, patchCard, setCards, settled, chain });
+  // Before-captures for the two gestures whose acts finish elsewhere:
+  const dragBefore = useRef<{ bitId: string; x: number; y: number } | null>(null);   // single drag
+  const resizeBefore = useRef<{ bitId: string; x: number; y: number; w: number; h?: number } | null>(null);
 
   // Don't lose a move or a keystroke to the 350ms debounce. One stable door to
   // flushAll, fired when you leave the board and when the page goes away (a hidden
@@ -214,6 +228,11 @@ export function BoardSurface({
       dragStart.current = m;
     } else {
       dragStart.current = null;
+      // Single drag: the act finishes in onChange("move") — capture its BEFORE from
+      // state now (state at drag-start IS the pre-drag truth: the dragged card is
+      // uncontrolled until stop, and auto-widen requires editing, which disables drags).
+      const c = cards.find((x) => x.placementId === placementId);
+      dragBefore.current = c ? { bitId: c.bitId, x: c.x, y: c.y } : null;
     }
   }
   // The map above is keyed by BIT id (see the comment there) — so every reader must
@@ -243,21 +262,30 @@ export function BoardSurface({
     const s = starts.get(dragged.bitId)!;
     const dx = x - s.x;
     const dy = y - s.y;
+    const moves: { bitId: string; before: { x: number; y: number }; after: { x: number; y: number } }[] = [];
     for (const c of cards) {
       if (c.placementId === placementId || !starts.has(c.bitId)) continue;
       const p0 = starts.get(c.bitId)!;
       patchCard(c.placementId, c.bitId, { x: p0.x + dx, y: p0.y + dy }); // per-card independent save
+      moves.push({ bitId: c.bitId, before: p0, after: { x: p0.x + dx, y: p0.y + dy } });
     }
+    // ONE entry for the whole gesture — the dragged card's own onChange("move") was
+    // record-suppressed (starts still populated when it fired; see onChange below).
+    moves.push({ bitId: dragged.bitId, before: s, after: { x, y } });
+    arrange.recordGroupMove(moves);
   }
 
   // The board's keyboard (use-board-keys — ordered guards, check-corrected): Escape is
   // TWO-step (edit → selected → clear), Delete = remove-from-this-board (the ruled
   // meaning), arrows nudge, Cmd+A selects all, Cmd+=/−/0 zoom.
   function nudgeSelected(dx: number, dy: number) {
+    const moves: { bitId: string; before: { x: number; y: number }; after: { x: number; y: number } }[] = [];
     for (const c of cards) {
       if (!selectedIds.has(c.placementId) || c.locked) continue; // locked = position frozen
       patchCard(c.placementId, c.bitId, { x: c.x + dx, y: c.y + dy });
+      moves.push({ bitId: c.bitId, before: { x: c.x, y: c.y }, after: { x: c.x + dx, y: c.y + dy } });
     }
+    arrange.noteNudge(moves); // one entry per BURST (800ms window keyed on the selection)
   }
   function removeSelectedByKey() {
     if (selectedIds.size > 1) {
@@ -275,52 +303,47 @@ export function BoardSurface({
   function tidySelected() {
     const chosen = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked); // locked cards stay put
     if (chosen.length < 2) return;
-    const meas = chosen.map((c) => {
+    // Real rendered sizes via data-pid (text heights are stale in state by design);
+    // the MATH lives in board-arrange.ts, pure and unit-tested (undo floor 2a).
+    const measured = chosen.map((c) => {
       const el = document.querySelector(`[data-pid="${c.placementId}"]`);
       return {
-        c,
+        card: c,
         w: el instanceof HTMLElement ? el.offsetWidth : c.w,
         h: el instanceof HTMLElement ? el.offsetHeight : c.h,
       };
     });
-    const BAND = 40;
-    const GAP = 16;
-    const sorted = [...meas].sort((a, b) => a.c.y - b.c.y);
-    const bands: (typeof meas)[] = [];
-    for (const m of sorted) {
-      const last = bands[bands.length - 1];
-      if (last && m.c.y <= last[0].c.y + BAND) last.push(m);
-      else bands.push([m]);
-    }
-    const reading = bands.flatMap((b) => [...b].sort((p, q) => p.c.x - q.c.x));
-    const cols = Math.ceil(Math.sqrt(reading.length));
-    const cellW = Math.max(...meas.map((m) => m.w)) + GAP;
-    const cellH = Math.max(...meas.map((m) => m.h)) + GAP;
-    const x0 = Math.min(...chosen.map((c) => c.x));
-    const y0 = Math.min(...chosen.map((c) => c.y));
-    reading.forEach((m, i) => {
-      const nx = x0 + (i % cols) * cellW;
-      const ny = y0 + Math.floor(i / cols) * cellH;
-      if (nx !== m.c.x || ny !== m.c.y) patchCard(m.c.placementId, m.c.bitId, { x: nx, y: ny });
-    });
+    const patches = tidyPatches(measured);
+    const befores = new Map(chosen.map((c) => [c.bitId, { x: c.x, y: c.y }]));
+    for (const p of patches) patchCard(p.placementId, p.bitId, { x: p.x, y: p.y });
+    arrange.recordTidy(patches, befores); // redo replays THESE patches, never re-runs tidy
   }
   // Lock / unlock the selected card's POSITION (B+): optimistic, rolled back on failure.
-  function toggleLock(c: CardVM) {
-    const on = !c.locked;
-    setCards((cs) => cs.map((x) => (x.bitId === c.bitId ? { ...x, locked: on } : x)));
-    settled(c.placementId)
+  // `applyLock` is the reversible core — undo replays it with the opposite state.
+  function applyLock(bitId: string, on: boolean) {
+    const cur = cardsRef.current.find((x) => x.bitId === bitId);
+    if (!cur) return;
+    setCards((cs) => cs.map((x) => (x.bitId === bitId ? { ...x, locked: on } : x)));
+    settled(cur.placementId)
       .then((id) => setPlacementLock(supabase, id, on))
       .catch((e) => {
         // keyed by bitId — a call-in reconcile can rename the placementId mid-flight
-        setCards((cs) => cs.map((x) => (x.bitId === c.bitId ? { ...x, locked: !on } : x)));
+        setCards((cs) => cs.map((x) => (x.bitId === bitId ? { ...x, locked: !on } : x)));
         onErr(e);
       });
+  }
+  function toggleLock(c: CardVM) {
+    const on = !c.locked;
+    applyLock(c.bitId, on);
+    arrange.recordLock(c.bitId, on, applyLock);
   }
 
   // Send the selected card behind everything (the demote valve — click-to-front stays, ruled).
   function sendToBack(placementId: string, bitId: string) {
-    const minZ = cards.reduce((m, c) => Math.min(m, c.z), 0);
-    patchCard(placementId, bitId, { z: minZ - 1 });
+    const c = cards.find((x) => x.placementId === placementId);
+    const toZ = backZ(cards);
+    patchCard(placementId, bitId, { z: toZ });
+    if (c) arrange.recordSendToBack(bitId, c.z, toZ);
   }
   // Jump-to (the drawer's this-board rows stop being dead ends): glide to the card, readable.
   function jumpToCard(bitId: string) {
@@ -519,8 +542,31 @@ export function BoardSurface({
                 setEditingId(c.placementId);
               }}
               onOpen={() => openSelected(c.placementId, c.bitId)}
-              onChange={(patch) => {
+              onChange={(patch, how) => {
                 markContentIfReal(c.placementId, patch.body); // first real content → no longer evaporates
+                // RECORD-ONLY suppression for a group drag (antagonist D3): the card's
+                // own onChange still persists it (onCardDragEnd deliberately skips the
+                // dragged card), but the group entry in onCardDragEnd covers the record —
+                // dragStart.current is still populated here (nulled only in onCardDragEnd).
+                if (how === "move" && !dragStart.current?.has(c.bitId)) {
+                  const b = dragBefore.current;
+                  if (b && b.bitId === c.bitId && patch.x !== undefined && patch.y !== undefined) {
+                    arrange.recordMove({ bitId: c.bitId, before: { x: b.x, y: b.y }, after: { x: patch.x, y: patch.y } });
+                  }
+                  dragBefore.current = null;
+                }
+                if (how === "resize") {
+                  const b = resizeBefore.current;
+                  if (b && b.bitId === c.bitId && patch.x !== undefined && patch.y !== undefined && patch.w !== undefined) {
+                    arrange.recordResize(
+                      c.bitId,
+                      { x: b.x, y: b.y, w: b.w, h: b.h },
+                      { x: patch.x, y: patch.y, w: patch.w, h: patch.h },
+                    );
+                  }
+                  resizeBefore.current = null;
+                }
+                // "grow" (auto-widen) and "write" (body) route RAW — reflexes and flow.
                 patchCard(c.placementId, c.bitId, patch);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
@@ -537,6 +583,9 @@ export function BoardSurface({
                 )
               }
               onDragStart={() => onCardDragStart(c.placementId)}
+              onResizeStart={() =>
+                (resizeBefore.current = { bitId: c.bitId, x: c.x, y: c.y, w: c.w, h: c.h })
+              }
               onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
               onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}
             />
@@ -550,6 +599,7 @@ export function BoardSurface({
         )}
         <Drawer variant="board" boardId={boardId} onBringIn={bringIn} onJumpTo={jumpToCard} refreshSignal={looseRefresh} />
         {drawMode && <DrawOverlay onDone={finishDoodle} onCancel={() => setDrawMode(false)} />}
+        {process.env.NODE_ENV === "development" && <UndoDevReadout snapshot={devSnapshot} />}
         {wordsFor && (
           <WordsOffer
             key={wordsFor.bitId}
