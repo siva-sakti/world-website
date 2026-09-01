@@ -73,26 +73,6 @@ export async function moveGroup(
   if (e2) throw e2;
 }
 
-/** How many live bits sit in each folder. Folders cut across kinds (O1b), so a
- *  "what happens if I delete this" count built from boards alone would understate
- *  it — and this app's confirms are honest about what they touch (F16). */
-export async function countBitsPerGroup(
-  supabase: SupabaseClient,
-): Promise<Record<string, number>> {
-  const { data, error } = await supabase
-    .from("bit")
-    .select("group_id")
-    .not("group_id", "is", null)
-    .is("deleted_at", null);
-  if (error) throw error;
-  const out: Record<string, number> = {};
-  for (const r of data ?? []) {
-    const g = r.group_id as string;
-    out[g] = (out[g] ?? 0) + 1;
-  }
-  return out;
-}
-
 /** Delete a section — its boards fall back to ungrouped (set-null physics, proven). */
 export async function deleteGroup(supabase: SupabaseClient, groupId: string): Promise<void> {
   const { error } = await supabase.from("shelf_group").delete().eq("id", groupId);

@@ -10,7 +10,7 @@ import {
   callInBit,
   abortBitCreate,
 } from "@/lib/db/bits";
-import { uploadObject, signedUrl } from "@/lib/storage";
+import { uploadObject, signedUrl, removeObjects } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
@@ -66,8 +66,7 @@ export function useCreateDoors(deps: {
   const freshEmpty = useRef(new Set<string>()); // board-born bits that never held content (evaporate on edit-end)
   const prevEditing = useRef<string | null>(null);
   const cardsRef = useRef(cards);
-  // eslint-disable-next-line react-hooks/refs -- latest-value ref: the unmount sweep must see live cards, not the []-closure
-  cardsRef.current = cards;
+  cardsRef.current = cards; // latest-value ref: the unmount sweep must see live cards, not the []-closure
 
   // The /write test, board-side: real content = visible text or a gather chip.
   function hasRealContent(html: string): boolean {
@@ -263,6 +262,10 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        // The uploads may have landed before the row insert failed — remove them or
+        // they're orphans forever (paths are deterministic from bitId; removing a
+        // never-uploaded path is a no-op; cleanup failure must not mask the error).
+        removeObjects(supabase, [`images/${bitId}.jpg`, `thumbs/${bitId}.jpg`]).catch(() => {});
         onErr(e);
       })
       .finally(() => {
@@ -303,6 +306,13 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        // The upload may have landed before the insert failed — sweep every possible
+        // extension (the real one lives in the .then's closure; removing absent paths
+        // is a no-op).
+        removeObjects(
+          supabase,
+          ["m4a", "mp3", "mp4", "aac", "wav", "ogg", "oga", "opus", "webm", "flac"].map((x) => `audio/${bitId}.${x}`),
+        ).catch(() => {});
         onErr(e);
       });
     trackCreate(placementId, chain);
@@ -356,6 +366,7 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
+        removeObjects(supabase, [`pdfs/${bitId}.pdf`, `thumbs/${bitId}.jpg`]).catch(() => {}); // orphan sweep
         onErr(e);
       });
     trackCreate(placementId, chain);

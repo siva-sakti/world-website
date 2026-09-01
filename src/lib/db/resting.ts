@@ -20,6 +20,12 @@ export async function setResting(
     [column]: on ? new Date().toISOString() : null,
   };
   if (column === "deleted_at" && on) patch.archived_at = null; // mutual exclusion: trash wins
+  // "Nothing is both alive-right-now and put away" — archiving clears the star, for bit
+  // AND board, at the ONE door every archive path uses (review R2.6: the second door used
+  // to keep it). App-enforced tonight; the DB CHECK (bit/board_archived_not_alive) is
+  // written + proven and queued for the owner's cloud paste. Un-archiving does NOT
+  // resurrect the star (the value was nulled here — deliberate).
+  if (column === "archived_at" && on) patch.pinned_at = null;
   const { data, error } = await supabase.from(thing).update(patch).eq("id", id).select("id");
   if (error) throw error;
   return data?.length ?? 0;

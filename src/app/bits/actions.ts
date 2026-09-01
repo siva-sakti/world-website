@@ -98,8 +98,15 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
     // "try again" starts clean — otherwise the retry duplicates the note (the first
     // copy sitting in the pile missing its source/tags). A link bit's uploaded thumb
     // must go with it — the row is gone, so destroy-cleanup would never reach it.
-    if (created) await abortBitCreate(supabase, bitId);
-    if (thumbPath) await removeObjects(supabase, [thumbPath]).catch(() => {});
+    // The thumb is removed only after a CONFIRMED row abort (R2.11): if the abort
+    // itself fails, the bit row survives — stripping its card image then would leave
+    // a permanent link bit pointing at nothing.
+    try {
+      if (created) await abortBitCreate(supabase, bitId);
+      if (thumbPath) await removeObjects(supabase, [thumbPath]);
+    } catch (cleanupErr) {
+      console.error("addToInbox cleanup failed (row or thumb may remain):", cleanupErr);
+    }
     return { error: "Couldn't add that — try again." };
   }
   revalidatePath("/bits");

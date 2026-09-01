@@ -25,6 +25,30 @@ export async function uploadObject(supabase: SupabaseClient, args: UploadArgs) {
   return { bucket: PRIVATE_BUCKET, path: args.path };
 }
 
+/** Sign MANY private objects in a few round-trips (createSignedUrls, chunked ~100 —
+ *  the export's per-file loop was thousands of sequential calls; review R2.7). Returns
+ *  path → url (null where signing failed); order-independent. */
+export async function signedUrls(
+  supabase: SupabaseClient,
+  paths: string[],
+  expiresInSeconds = 3600,
+): Promise<Map<string, string | null>> {
+  const out = new Map<string, string | null>();
+  for (let i = 0; i < paths.length; i += 100) {
+    const slice = paths.slice(i, i + 100);
+    try {
+      const { data, error } = await supabase.storage
+        .from(PRIVATE_BUCKET)
+        .createSignedUrls(slice, expiresInSeconds);
+      if (error) throw error;
+      for (const r of data ?? []) out.set(r.path ?? "", r.signedUrl ?? null);
+    } catch {
+      for (const p of slice) if (!out.has(p)) out.set(p, null); // a failed batch → null urls, never a thrown export
+    }
+  }
+  return out;
+}
+
 /** A time-limited URL for reading a private object. */
 export async function signedUrl(
   supabase: SupabaseClient,

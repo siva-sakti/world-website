@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { uploadObject } from "@/lib/storage";
+import { uploadObject, removeObjects } from "@/lib/storage";
 import { createAudioBit, createPdfBit, updateBitContent } from "@/lib/db/bits";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
@@ -32,11 +32,13 @@ export function LooseFileIntake() {
     if (!file || busy) return;
     setBusy("recording");
     setErr(null);
+    const bitId = crypto.randomUUID();
+    let uploadedPath: string | null = null;
     try {
       const audio = await importAudio(file);
-      const bitId = crypto.randomUUID();
       const storagePath = `audio/${bitId}.${audio.ext}`;
       await uploadObject(supabase, { path: storagePath, body: audio.blob, contentType: audio.mime });
+      uploadedPath = storagePath;
       await createAudioBit(supabase, {
         bitId, storagePath, // no placementId/boardId → a LOOSE bit (the inbox)
         mediaWidth: audio.durationSec != null ? Math.round(audio.durationSec) : undefined,
@@ -44,6 +46,9 @@ export function LooseFileIntake() {
       });
       offerCaption(bitId, "recording");
     } catch (e2) {
+      // The upload may have landed before the insert failed — remove it or it's an
+      // orphan forever (a retry mints a fresh bitId; the server intake sets the precedent).
+      if (uploadedPath) removeObjects(supabase, [uploadedPath]).catch(() => {});
       setErr(e2 instanceof MediaError ? e2.message : "Couldn't add that recording — check your connection.");
     } finally {
       setBusy(null);
@@ -56,9 +61,10 @@ export function LooseFileIntake() {
     if (!file || busy) return;
     setBusy("PDF");
     setErr(null);
+    const bitId = crypto.randomUUID();
+    const uploaded: string[] = [];
     try {
       const pdf = await importPdf(file);
-      const bitId = crypto.randomUUID();
       const storagePath = `pdfs/${bitId}.pdf`;
       const thumbPath = pdf.thumb ? `thumbs/${bitId}.jpg` : undefined;
       // The original PDF, plus (when page 1 rendered) its first-page thumbnail.
@@ -69,6 +75,8 @@ export function LooseFileIntake() {
         uploads.push(uploadObject(supabase, { path: thumbPath, body: pdf.thumb, contentType: "image/jpeg" }));
       }
       await Promise.all(uploads);
+      uploaded.push(storagePath);
+      if (thumbPath) uploaded.push(thumbPath);
       await createPdfBit(supabase, {
         bitId, storagePath, thumbPath, // no placementId/boardId → a LOOSE bit (the inbox)
         mediaWidth: pdf.width ?? undefined, mediaHeight: pdf.height ?? undefined,
@@ -76,6 +84,8 @@ export function LooseFileIntake() {
       });
       offerCaption(bitId, "PDF");
     } catch (e2) {
+      // Orphan sweep (a failed insert after the uploads landed) — deterministic paths from bitId.
+      removeObjects(supabase, uploaded.length ? uploaded : [`pdfs/${bitId}.pdf`, `thumbs/${bitId}.jpg`]).catch(() => {});
       setErr(e2 instanceof MediaError ? e2.message : "Couldn't add that PDF — check your connection.");
     } finally {
       setBusy(null);

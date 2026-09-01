@@ -42,14 +42,19 @@ export async function getBoard(
 export async function duplicateBoard(supabase: SupabaseClient, boardId: string): Promise<Board> {
   const { data: src, error: e1 } = await supabase
     .from("board")
-    .select("title, visibility, group_id")
+    .select("title, visibility, group_id, description")
     .eq("id", boardId)
     .eq("state", "live")
     .single();
   if (e1) throw e1;
   const { data: board, error: e2 } = await supabase
     .from("board")
-    .insert({ title: `${src.title || "untitled board"} copy`, visibility: src.visibility, group_id: src.group_id })
+    .insert({
+      title: `${src.title || "untitled board"} copy`,
+      visibility: src.visibility,
+      group_id: src.group_id,
+      description: src.description, // part of the board's identity — a faithful copy keeps it
+    })
     .select("*")
     .single();
   if (e2) throw e2;
@@ -67,7 +72,10 @@ export async function duplicateBoard(supabase: SupabaseClient, boardId: string):
       if (e4) throw e4;
     }
   } catch (e) {
-    await supabase.from("board").delete().eq("id", board.id); // deliberate half-copy cleanup
+    // Deliberate half-copy cleanup; if the cleanup ITSELF fails, say so (a stray
+    // "X copy" board on home) but still surface the original error.
+    const { error: cleanupErr } = await supabase.from("board").delete().eq("id", board.id);
+    if (cleanupErr) console.error("duplicateBoard: half-copy cleanup failed too:", cleanupErr);
     throw e;
   }
   return board as Board;
@@ -130,12 +138,14 @@ export async function trashBoard(
   await setResting(supabase, "board", id, "deleted_at", true);
 }
 
-/** Restore a trashed board — its arrangement returns exactly (§2g). */
+/** Restore a trashed board — its arrangement returns exactly (§2g). Asserts the row
+ *  count (R2.12): restoring against an emptied trash must say so, not silently no-op. */
 export async function restoreBoard(
   supabase: SupabaseClient,
   id: string,
 ): Promise<void> {
-  await setResting(supabase, "board", id, "deleted_at", false);
+  const n = await setResting(supabase, "board", id, "deleted_at", false);
+  if (!n) throw new Error("that's no longer in the trash — it may have been destroyed");
 }
 
 /** DESTROY a board permanently (I-L6) — only if trashed. Cascade deletes its
@@ -150,25 +160,27 @@ export async function destroyBoard(supabase: SupabaseClient, id: string): Promis
   if (error) throw error;
 }
 
-/** Empty the trash — destroy every trashed bit + board (I-L2 · I-L10 · I-L6). Removes
- *  the trashed FILE-carrying bits' stored objects first — image, audio, pdf, AND a
- *  link's card image (the old `type=image` filter silently leaked every other type's
- *  files — caught in the B+ pass) — then deletes all trashed rows (the schema
- *  cascades the rest). Trashed-only by the `deleted_at IS NOT NULL` guard. */
+/** Empty the trash — destroy every trashed bit + board (I-L2 · I-L10 · I-L6).
+ *  DELETE…RETURNING (R2.8): the file paths come from the rows ACTUALLY deleted, so a
+ *  bit restored mid-act simply isn't in the returning set — its files are never
+ *  touched (the old read-then-delete shape could remove a restored bit's media from a
+ *  stale path list). Rows-first ordering: a failed file-remove leaves orphan objects
+ *  (the accepted lesser evil), never restorable rows whose media is gone. The bulk
+ *  delete is ONE atomic statement — all rows or an error; on error nothing was
+ *  deleted and no file is removed. Files removed right after the bit delete so a
+ *  board-delete failure can't strand them. */
 export async function emptyTrash(supabase: SupabaseClient): Promise<void> {
-  const { data: files } = await supabase
+  const bitDel = await supabase
     .from("bit")
-    .select("storage_path, thumb_path")
+    .delete()
     .not("deleted_at", "is", null)
-    .or("storage_path.not.is.null,thumb_path.not.is.null");
-  if (files && files.length) {
-    await removeObjects(
-      supabase,
-      files.flatMap((b) => [b.storage_path as string | null, b.thumb_path as string | null]),
-    );
-  }
-  const bitDel = await supabase.from("bit").delete().not("deleted_at", "is", null);
+    .select("storage_path, thumb_path");
   if (bitDel.error) throw bitDel.error;
+  const paths = (bitDel.data ?? []).flatMap((b) => [
+    b.storage_path as string | null,
+    b.thumb_path as string | null,
+  ]);
+  if (paths.some(Boolean)) await removeObjects(supabase, paths);
   const boardDel = await supabase.from("board").delete().not("deleted_at", "is", null);
   if (boardDel.error) throw boardDel.error;
 }

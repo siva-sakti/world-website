@@ -268,6 +268,7 @@ export async function setPlacementLock(
     .from("placement")
     .update({ locked_at: on ? new Date().toISOString() : null })
     .eq("id", placementId)
+    .is("left_at", null) // a departed row takes no lock (R2.9 — a stale surface must not arm a revive-frozen trap)
     .select("id");
   if (error) throw error;
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
@@ -278,7 +279,15 @@ export async function updatePlacement(
   id: string,
   patch: Pos,
 ): Promise<void> {
-  const { error } = await supabase.from("placement").update(patch).eq("id", id);
+  // A MOVE (x/y) on a LOCKED card is refused at the DB (R2.9 — a second device that
+  // hasn't seen the lock yet must not drag through it). Scoped to x/y ONLY, per the
+  // antagonist: z (click-to-front, send-to-back) and width (auto-widen while editing)
+  // remain legal on locked cards — a blanket filter would silently break all three.
+  // Deliberately NO 0-row assert: the silent no-op on removed/locked rows is
+  // load-bearing for late debounced flushes (a spurious error banner would lie).
+  let q = supabase.from("placement").update(patch).eq("id", id);
+  if (patch.x !== undefined || patch.y !== undefined) q = q.is("locked_at", null);
+  const { error } = await q;
   if (error) throw error;
 }
 
@@ -313,7 +322,12 @@ export async function unplaceBit(
 ): Promise<void> {
   const { data, error } = await supabase
     .from("placement")
-    .update({ left_at: new Date().toISOString() })
+    // locked_at clears with the departure (R2.9): the revive path rewrites position/size/z
+    // but not the lock — without this, a card unplaced-while-locked would come back FROZEN
+    // at its new drop point, locked by a past life. (Trash→restore keeps the lock — that
+    // row never departs.) NOTE (I-L5, dormant): when connector arrows gain a create-UI,
+    // un-place must also delete this placement's connectors, with a confirm.
+    .update({ left_at: new Date().toISOString(), locked_at: null })
     .eq("id", placementId)
     .select("id");
   if (error) throw error;
@@ -321,29 +335,21 @@ export async function unplaceBit(
 }
 
 /** Put a note away, or take it back out (N5). Archive is a RESTING state, not
- *  trash-lite: the row stays live, so find still reaches it — it just leaves the
- *  rooms you work in.
+ *  trash-lite: it leaves the rooms you work in (and find — I-L8 rules archived OUT
+ *  of search; the archive page is its surface).
  *
- *  Archiving clears the star in the SAME statement. Nothing is both "alive right
- *  now" and put away — they're opposite claims about one thing — and the DB check
- *  `bit_archived_not_alive` refuses any other combination, so this is the only
- *  shape that can succeed. That's deliberate: the invariant lives in the schema,
- *  and this is the one door that satisfies it. */
+ *  Delegates to the ONE resting door (setResting), which clears the star on archive
+ *  — "nothing is both alive-right-now and put away" is app-enforced there tonight;
+ *  the DB CHECK is queued for the owner's cloud paste (review R2.6 — the check this
+ *  comment used to cite fell out of the resting-state rewrite; two doors had
+ *  diverged). Keeps the 0-row assert this page's caller relies on. */
 export async function archiveBit(
   supabase: SupabaseClient,
   bitId: string,
   on: boolean,
 ): Promise<void> {
-  const patch = on
-    ? { archived_at: new Date().toISOString(), pinned_at: null }
-    : { archived_at: null };
-  const { data, error } = await supabase
-    .from("bit")
-    .update(patch)
-    .eq("id", bitId)
-    .select("id");
-  if (error) throw error;
-  if (!data?.length) throw new Error("that note no longer exists — reload");
+  const n = await setResting(supabase, "bit", bitId, "archived_at", on);
+  if (!n) throw new Error("that note no longer exists — reload");
 }
 
 /** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
@@ -358,17 +364,24 @@ export async function trashBit(
 
 /** Compensating erase of a bit created MOMENTS ago by a multi-step intake whose
  * later step failed — an abort of the act, not a destroy of a kept thing (the bit
- * was never seen). Best-effort: cascades take any placements. */
+ * was never seen). Cascades take any placements. THROWS on a failed delete (R2.11):
+ * a caller doing cleanup-in-order (remove the thumb only after the row is truly
+ * gone) must know the abort didn't land. A 0-row delete is NOT an error (the bit
+ * insert itself may have failed — nothing to abort). */
 export async function abortBitCreate(supabase: SupabaseClient, bitId: string): Promise<void> {
-  await supabase.from("bit").delete().eq("id", bitId);
+  const { error } = await supabase.from("bit").delete().eq("id", bitId);
+  if (error) throw error;
 }
 
-/** Restore a trashed bit — back to the world exactly, everywhere it was (§2g). */
+/** Restore a trashed bit — back to the world exactly, everywhere it was (§2g).
+ *  Asserts the row count (R2.12): restoring against an emptied trash must SAY so,
+ *  not silently no-op while the owner believes the thing is back. */
 export async function restoreBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  await setResting(supabase, "bit", bitId, "deleted_at", false);
+  const n = await setResting(supabase, "bit", bitId, "deleted_at", false);
+  if (!n) throw new Error("that's no longer in the trash — it may have been destroyed");
 }
 
 /** DESTROY a bit permanently (I-L10) — only if trashed. Removes its media files,
@@ -376,21 +389,24 @@ export async function restoreBit(
  *  tag applications, gather ties both ways, and travel. Guarded to `deleted_at IS
  *  NOT NULL`: a live bit can never be destroyed, even if this is mis-called. */
 export async function destroyBit(supabase: SupabaseClient, bitId: string): Promise<void> {
-  // Best-effort media cleanup: a failed READ here only skips object removal (an
-  // orphaned file, not lost data) — the row delete below still proceeds.
-  const { data } = await supabase
-    .from("bit")
-    .select("storage_path, thumb_path")
-    .eq("id", bitId)
-    .not("deleted_at", "is", null)
-    .maybeSingle();
-  if (data) await removeObjects(supabase, [data.storage_path, data.thumb_path]);
-  const { error } = await supabase
+  // DELETE…RETURNING (R2.8): the file paths come from the rows ACTUALLY deleted —
+  // no separate read, so no read-delete gap. A restore racing in makes the guarded
+  // delete match 0 rows → we throw and the files are KEPT (the old read-then-remove
+  // shape deleted a now-live bit's media and reported success). Rows-first ordering:
+  // a failed file-remove leaves an orphan object — the accepted lesser evil
+  // (storage.ts) — never a restorable row whose media is gone.
+  const { data, error } = await supabase
     .from("bit")
     .delete()
     .eq("id", bitId)
-    .not("deleted_at", "is", null);
+    .not("deleted_at", "is", null)
+    .select("storage_path, thumb_path");
   if (error) throw error;
+  if (!data?.length) throw new Error("that's no longer in the trash — reload");
+  await removeObjects(
+    supabase,
+    data.flatMap((b) => [b.storage_path as string | null, b.thumb_path as string | null]),
+  );
 }
 
 // ---- reads (the bit page + the board's raw-content need) ----

@@ -20,6 +20,7 @@ export async function trashBoardAction(formData: FormData) {
   const supabase = await createClient();
   await trashBoard(supabase, id);
   revalidatePath("/");
+  revalidatePath("/bits"); // its bits may now read as loose there
 }
 
 /** Restore a trashed bit from the trash listing. */
@@ -28,6 +29,8 @@ export async function restoreBitAction(formData: FormData) {
   const supabase = await createClient();
   await restoreBit(supabase, id);
   revalidatePath("/trash");
+  revalidatePath("/bits"); // the restored bit reappears loose (or on its boards)
+  revalidatePath("/");
 }
 
 /** Restore a trashed board from the trash listing. */
@@ -64,6 +67,7 @@ export async function archiveItemAction(thing: "bit" | "board", id: string) {
   else await archiveBit(supabase, id);
   revalidatePath("/");
   revalidatePath("/archive");
+  revalidatePath("/bits"); // an archived bit leaves the loose pile too
 }
 
 /** Un-archive — return a thing to the world, exactly where it was. */
