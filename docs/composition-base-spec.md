@@ -56,6 +56,21 @@ Settled cells: a bit into a composition (the `[[` chip) · a bit onto a board (p
 | a board | ❌ ruled out (the direction principle; a plain hyperlink stays legal) | ✅ doorway (UI dormant) |
 Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink surfaces (a bit has "gathered into"; a board needs a "linked from"?) · ⚪ the pull with three kinds.
 
+## 1.7b ⭐ THE WEB, STRAIGHT (owner-ruled through 2026-09-02) — the definitive fabric table
+
+| | can WRITE ties (`[[`) | can be TIED into writing | joins a BOARD | tagged/foldered |
+|---|---|---|---|---|
+| **bit** (text) | ✅ already live — the tie machinery never cared who writes | ✅ | ✅ placed | ✅ |
+| **bit** (image·audio·pdf) | — (no body) | ✅ | ✅ placed | ✅ |
+| **composition** | ✅ | ✅ **ruled YES 2026-09-02** — pieces reference each other; chips styled distinctly; "tied into" backlink + graph thread | ✅ as a card | ✅ |
+| **board** | — (no body) | ❌ ruled out (direction principle; plain hyperlink legal) | ✅ board-on-board | ✅ |
+
+**The owner's model insight behind it:** *an Obsidian note = our BIT* — Obsidian has one unit doing every job; this model separates small (bit) · big-made (composition) · spatial (board), and **stitching small into big is the product.** The atom-web partly exists already: a text bit's body can `[[` today.
+
+**⚪ IDEATING (owner, 2026-09-02): a LESS-SPATIAL way to connect bits together.** Three candidate shapes: (1) **writing-ties only** — what exists; Claude's lean: a tie with no words carries no meaning six months later; (2) **the wordless pair-tie** — select two → relate; new record; the everyone-builds-nobody-understands-later risk; (3) **tie-with-a-phrase** — labeled; heavy. **Held at 1, with 2 as the evidence-gated candidate**: the moment the owner catches herself wanting to relate two bits with no words for why, 2 has its evidence. NOT ruled.
+
+**Birth/list ruling (2026-09-02):** every composition auto-appears in the compositions list, always; one opened from within a board is additionally connected to that board (⚑ pin: "connected" = placed as a card — one-word confirm). **Floaters: MANY allowed** — display/management = design pass. Right side: panel + drawer share flexibly; details at design.
+
 ## 1.10 The capabilities (the Notion half — summarized from `composition-surface-spec.md`)
 Blocks: ~10 text-first (paragraph · headings · lists · **checklist** · quote · divider · code · **a table in the writing** · image) — **zero database blocks** (the unanimous informed cut) · drag-handle reorder · `/` insert menu · turn-into · structure-preserving paste · never-empty · **the bit-block**: a gathered bit shown in full (quote/image itself, source attached — the provenance dividend) as the grown form of the chip. Word count. *(The 8-behavior feel checklist + jank traps live in the spec; the owner's Notion feel-session still feeds the fine cut.)*
 
@@ -79,7 +94,7 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
 ## Open (only these)
-Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · comp→comp one-word confirm (pin 2) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
+Q1 storage drawer (shared/own — plain words asked, unanswered) · card look (mock it) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
 ---
 
