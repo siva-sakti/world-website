@@ -238,6 +238,9 @@ INDEX.md ................ this file — where everything is
 
 ## 6 · THE TECHNICAL MANUAL
 
+### `resurfacing-ideation.md` — 🟠 V2 ideation, owner-loved: your past self as a collaborator (2026-09-02)
+**Contains:** the idea (a drawer section keeping pace with your writing) · the hard design constraints (pull not push · ignorable · no curation · the never-list check) · three implementation tiers (tier 1 buildable today from the pull's own machinery; tier 3 = the AI gate, parked).
+
 ### `integration-scenes.md` — 🟠 the joints as scenes (2026-09-02)
 **Contains:** the eight moments of use — the settled baseline, pitch-from-pitch, writing beside the board, the recurring bit, two-bits-no-board, the one-sentence excerpt, the piece-that-knows-its-job (frame), the project seen whole — each with its open choice ⚑ embedded where the owner can *feel* it. **The connection/frame sitting's material.**
 
