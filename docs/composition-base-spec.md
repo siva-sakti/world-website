@@ -126,6 +126,13 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 - **board↔board, honest state:** the doorway is a *placement*, not a writing-link (boards don't write). The reverse ("which boards hold a door to me") is **stored but invisible** — no screen shows it; parked with the dormant doorway UI.
 - **board→piece: DELIBERATELY single-channel** — a board relates to a piece only by *holding it as a card*; no second mechanism exists or should (every board-relation is a holding; every writing-relation needs a writer). Owner asked for this to be chosen, not accidental — ⚑ her stamp closes it.
 
+## ⭐ STAMPS + ANSWERS (owner, 2026-09-02, closing the fabric)
+- **bit↔bit: ✅ STAMPED** — no fourth mechanism, deliberately (*"I guess I agree with you"*).
+- **board→piece: ✅ STAMPED** — single-channel, holding-as-card only (*"that makes sense"*).
+- **The image in writing:** per-instance sizing (thumbnail ↔ full inline, like any doc editor) — **always carrying its bit-hood** (tap → source · tags · life). The owner re-derived the native-transclusion differentiator herself: *"an image on a composed surface is not just an image sitting there — it's actually a bit."* ⚑ shape set, final word hers.
+- **board↔board seeing-side, answered:** shows today only as the doorway card on the holding board; the reverse shows nowhere. Natural spots if wanted: the held board's header ("held by: …") or the outline lens. **Parked WITH the dormant doorway UI** — design the seeing with the doorway, not before.
+- **A piece on multiple boards, answered:** placements, exactly like bits — N boards, each card independent (own position), un-place one leaves the rest, born on the birth-board, more from its page; the hide-pieces toggle is per board.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
