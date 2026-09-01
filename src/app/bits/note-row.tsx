@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
-import { PinToggle, GroupPicker } from "./note-card";
+import { PinToggle, GroupPicker } from "@/components/shelf-controls";
 import type { ShelfGroup } from "@/lib/db/shelf";
 import { fmt } from "@/lib/dates";
 

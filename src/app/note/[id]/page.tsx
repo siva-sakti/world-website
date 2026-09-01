@@ -12,7 +12,7 @@ import { SourcePicker } from "@/app/board/[id]/source-picker";
 import { NoteWorkspace } from "./note-workspace";
 import { BitTitle, BitTrash } from "@/app/bit/[id]/bit-controls";
 import { ArchiveButton } from "@/app/archive/archive-controls";
-import { PinToggle, GroupPicker } from "@/app/bits/note-card";
+import { PinToggle, GroupPicker } from "@/components/shelf-controls";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { listGroups } from "@/lib/db/shelf";
 

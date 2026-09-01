@@ -22,13 +22,16 @@ export default async function GroupPage({
   const supabase = await createClient();
 
   const group = await getGroup(supabase, id);
-  if (!group) notFound();
+  if (!group) notFound(); // existence gate first; the rest load in parallel
 
-  const boardsAll = await listBoards(supabase); // once — the page needs both views of it
+  const [boardsAll, allBitsAll, groups] = await Promise.all([
+    listBoards(supabase),
+    listAllBits(supabase),
+    listGroups(supabase),
+  ]);
   const boards = boardsAll.filter((b) => b.group_id === id);
-  const bits = (await listAllBits(supabase)).filter((b) => b.group_id === id);
+  const bits = allBitsAll.filter((b) => b.group_id === id);
   const allBoards = boardsAll.map((b) => ({ id: b.id, title: b.title }));
-  const groups = await listGroups(supabase);
 
   const imgs = await signThumbs(supabase, bits);
 

@@ -23,9 +23,13 @@ export default async function NotesPage({
   // in /notes, not here. A bit is a fragment that lives loose or on a board; a
   // note is a document. (The board side-panel still lists notes so they stay
   // placeable — that boundary is a separate open ruling.)
-  const bits = (await listAllBits(supabase)).filter((b) => b.kind === "bit");
-  const boards = (await listBoards(supabase)).map((b) => ({ id: b.id, title: b.title }));
-  const groups = await listGroups(supabase);
+  const [allBits, allBoards, groups] = await Promise.all([
+    listAllBits(supabase),
+    listBoards(supabase),
+    listGroups(supabase),
+  ]);
+  const bits = allBits.filter((b) => b.kind === "bit");
+  const boards = allBoards.map((b) => ({ id: b.id, title: b.title }));
 
   // Resolve display images (thumb preferred). Whole-set signing is fine at
   // one-writer scale; revisit with A22 if the collection outgrows it.

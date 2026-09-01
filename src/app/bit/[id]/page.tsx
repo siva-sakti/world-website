@@ -6,7 +6,7 @@ import { listBoards } from "@/lib/db/boards";
 import { PlaceOnBoard } from "@/app/bits/place-on-board";
 import { getBitSource } from "@/lib/db/sources";
 import { listGroups } from "@/lib/db/shelf";
-import { GroupPicker } from "@/app/bits/note-card";
+import { GroupPicker } from "@/components/shelf-controls";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash } from "./bit-controls";
 import { signedUrl } from "@/lib/storage";

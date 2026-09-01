@@ -13,9 +13,12 @@ export const dynamic = "force-dynamic";
 // their own room. The spatial desk is a later phase; this is the linear home.
 export default async function Home() {
   const supabase = await createClient();
-  const boards = await listBoards(supabase);
-  const groups = await listGroups(supabase);
-  const notes = await listNotes(supabase);
+  // Independent reads in parallel (R4.20) — three sequential round-trips were pure TTFB cost.
+  const [boards, groups, notes] = await Promise.all([
+    listBoards(supabase),
+    listGroups(supabase),
+    listNotes(supabase),
+  ]);
 
   const surfaces = toSurfaces(boards, notes);
   const alive = surfaces
