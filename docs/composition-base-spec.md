@@ -182,6 +182,12 @@ Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavi
 
 **Stations 3a–3c (the walk, 2026-09-03):** 3a ✅ (doors 1–2 stamped · **templates = a MODE inside the doors, not a door** — blank-or-preshaped at any entrance, owner's correction · openings ✅ incl. list→page) · 3b ✅ all six · 3c ✅ trash-like-bits · archive-available · card-vanishes-while-trashed · frozen chips · destruction. **Create-on-miss (`[[a-new-name]]` births it): OUT** — owner: *"we wouldn't know what to create it as"*; a shortcut needs a designed pathway; maybe-later only. **The three sizes of presence, pinned for good:** CHIP = the name · PEEK = the glimpse on tap · BLOCK = content in place, preview-sized. ⚑ one stamp left in 3c: the ARCHIVED card = greyed, present, still opens (matching her archived-chip ruling).
 
+## ⭐ THE FLATNESS CALL (2026-09-03 — owner's instinct + recommendation, ⚑ her stamp pending)
+> **Material is flat; only surfaces weave.** After the split, pulling-in (`[[`) is a **composition capability** — text bits lose it (today they technically have it via the shared editor).
+**Why:** the differentiation made real (bits get referenced, never reference) · kills the nesting spiral the owner flagged ("a lot of complication") · **the drafted migration schema already says references come from surfaces only** — instinct and schema converged independently · formatting (checklists/tables) stays shared — capability vs formatting split cleanly, the editor variant carries it.
+**The named cost (accepted-pending-stamp):** the tiny connective thought (S5's answer) becomes a **small composition** — a thought that weaves IS a small piece of writing; the list sorts. **Migration footnote:** existing text-bit-authored ties get grandfathered/converted at enactment, counted then.
+**Link-bit chips:** the face = the captured headline, else the domain — the retired bookmark's own face rule, revived for the link type.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
