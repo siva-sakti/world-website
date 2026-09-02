@@ -209,6 +209,12 @@ Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavi
 **Archive-edit: two shapes for the owner's feel:** (a) **quiet revive** — typing un-archives, a whisper says so · (b) **archive is READ-ONLY** — greyed, readable, one visible "bring back to edit" tap. Claude's slight lean: (b) — matches her greyed-chip instinct; archive means something crisp. ⚑ hers.
 **Picker: ✅ STAMPED — archived excluded.**
 **"Block" the word is overloaded** (Notion's paragraph word) — naming-session item; interim: "shown in place."
+**⭐ STAMPED THIS ROUND (owner, 2026-09-03, the chip/block discussion):**
+- **ARCHIVE IS READ-ONLY** — an archived piece opens greyed, readable, not editable; one visible **"bring back to edit"** tap revives it. Archive means something crisp: resting, lookable, untouched until deliberately woken. *(Supersedes the two-shapes open cell.)*
+- **BORN AS A CHIP; the object is its own switch:** pulling-in never interrupts the sentence — everything arrives as a chip. Tap → the peek → **"show in place"** unfurls it to a block; a block's control tucks it back. Reversible forever; no toolbar needed. **Type exception: images (and drawings) are born as BLOCKS** — you pulled in a picture to see it.
+- **Copy-paste with chips works free:** copying a paragraph carrying a chip into another piece → the chip rides (it carries its id) → the destination mints its own reference on save. Existing machinery; quoting-yourself keeps threads intact automatically.
+- **The words CHIP and BLOCK: owner-loved** (*"really cute words, let's keep that"*) — carried to the naming session as incumbents.
+- **The beauty pointer (for the aesthetics track):** blocks are where the composition's visual life will live — a text bit shown in place as a designed pull-quote; an image block matted like the board's cards. The papers moment, for the writing surface.
 **The pattern: every procedural gap is about TIME** — caches aging, states colliding, ops repeating. Snapshot-invisible, film-obvious.
 
 ## Open (only these)

@@ -84,6 +84,12 @@ Honest inventory (this is an *upgrade*, not a greenfield):
 ### 4.2 The bit-block — gather, matured (the differentiator)
 Today `[[` drops a **chip** (a word-sized reference). The grown-up version: the same gathered bit can render as a **block** — its full content (text · image · doodle) in the flow, with its source and tags one tap away. **Two display modes of ONE mechanic** (chip = inline mention · block = shown in full), owner-switchable per instance. ⚠ Unlike Notion's synced blocks — their content is *trapped in pages* and syncing is a bolt-on (see §6) — **our bits already live independently**; showing one in two places is native, not a hack. The seam, literal.
 
+### 4.2b Text behavior the surface still owes (owner, 2026-09-03)
+*"None of this is there right now — we were just making it as an elaboration of a text bit. For it to really be a TEXT INTERFACE it needs this and all the other Notion-like things."*
+- **Text wrap around images** — ruled conceptually (*wrap yes, float no* — anchored, book-page style); the implementation (wrap positions: left/right of image, size interplay) is real editor work, listed here so it's costed.
+- **Text alignment** (left/center/right at least) — absent today, expected of any real text interface; add to the v1 cut.
+- The standing reminder: today's composition editor is a text *bit's* editor wearing a page — the whole §4.1 cut is what turns it into a text *interface*.
+
 ### 4.3 What "functional" means here (the owner's bar)
 A working document you'd actually draft in: structure you can rearrange, lists that check off, a table that holds a tracker, the material of your world droppable into the text. **Not**: a Notion replacement, a database, or a collaboration surface.
 
