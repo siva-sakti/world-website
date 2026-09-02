@@ -34,8 +34,9 @@ to the largest card, in reading order (rows banded at 40px, left-to-right within
 actually wanted from it, without needing a reading order at all.
 
 ### 2.2 · Alignment guides — maths built + tested, UNWIRED
-While you drag **one** card, thin magenta lines appear wherever an edge or centre of it comes
-within a small distance of an edge or centre of any other card. On release the card lands exactly
+While you drag **one** card, **at most ONE** thin magenta line per axis appears — the nearest
+alignment of an edge or centre of it to an edge or centre of another card, within a small
+distance. (`SnapResult` carries one guide per axis; "wherever" was wrong in the first draft.) On release the card lands exactly
 on that alignment. Lines vanish on release. Each card offers 3 lines per axis: **near edge ·
 centre · far edge**. Axes are decided independently. Nearest candidate wins; ties keep the first.
 
@@ -50,6 +51,11 @@ No dragging, no grid, no reading order. Cards move to match *each other*.
 it comes with the set of this type of work"*). When on, a faint lattice is drawn on the board's
 ground, and a dragged card can settle onto it. **Off by default.** Visible ⇒ it snaps; hidden ⇒
 it does not (a visible grid that ignores you is decoration; an invisible one that pulls is spooky).
+
+⚠ **It cannot be drawn on the world layer.** `.compose-world` (`globals.css:54-59`) is
+`position:absolute` with **no width or height** — every card inside is absolutely positioned — so
+it is a 0×0 box and a background on it paints nothing. The grid goes on `.compose-board` in SCREEN
+space: spacing × `cam.scale`, phase from `cam.x`/`cam.y`.
 
 ### 2.5 · Ruler guides — NOT PROPOSED
 Lines you drag out and place yourself, persisting until removed. Named only so the family is
@@ -74,7 +80,10 @@ feel is §7.
 - G8 A single-card drag still causes **zero React re-renders** (it does today; it must stay so).
 
 **Guides — snapping (step 2)**
-- S1 On release, the card's stored position equals the neighbour's exactly — not within a pixel.
+- S1 On release, the card's RENDERED edge lands exactly on the neighbour's — not within a pixel.
+  Checked by comparing rendered edges, NOT stored numbers: only a near-edge snap stores the
+  neighbour's own value (a centre snap stores `edge - w/2`, a far edge `edge - w`), and a text
+  card's snapped y derives from a measured auto-height that is never stored at all.
 - S2 Holding Alt through the release: no line shown, raw drop position stored.
 - S3 The drag records **one** undo entry; undo returns the card to where it was **before the
   drag** (not to the un-snapped drop).
@@ -121,6 +130,22 @@ So card-aligned left + grid-aligned top is a normal outcome. The grid fills in w
 are silent; it never replaces them.
 
 ---
+
+## 4b · The three rules the review forced (each would have shipped a bug)
+
+- **A CLICK IS NOT A DRAG.** react-draggable has no movement threshold — it fires drag-stop on
+  every mouseup, which is exactly why `use-arrange-acts.ts:79` already carries *"a click, not a
+  move"*. Without a guard, merely SELECTING a card that sits 4px off a neighbour would teleport it
+  and push a real undo entry. **The snap is gated on a moved-flag set in the drag-move handler.**
+  It would have shipped as "cards jump when I click them".
+- **The candidate list excludes the dragged card AND every other selected card.** The dragged card
+  would otherwise align to itself (delta 0, guide always drawn). Worse: in a GROUP drag the
+  followers hold a *constant* offset to the dragged card for the whole gesture, so if one sits
+  within threshold it snaps on every frame and the group acquires a permanent 1–6px shift —
+  breaking P1's "relative positions preserved exactly".
+- **The candidate list is built ONCE at drag start, and culled to what is on screen.** Nothing else
+  moves during a single-card drag, so rebuilding it per frame is wasted work — and an unculled
+  neighbour 8000px away can win and draw a guide to nothing.
 
 ## 5 · The cases
 
@@ -194,3 +219,59 @@ that `recordMove`'s `after` is the snapped value (so undo is honest).
 **8.5 · Risks.** Guides are additive and off the persistence path — low. The snap writes a
 position, so it touches the same door every move already uses — medium, covered by S1–S5. The
 grid is a new stored preference — low. **Nothing here changes the schema.**
+
+---
+
+## 9 · The plan review (independent, 2026-09-02)
+
+The plan went to an adversarial reviewer BEFORE any code, per the owner's sequence. **The maths
+and the drag-ordering claim in §8.2 came back sound.** Everything below was wrong or missing.
+The three that would have produced wrong stored data are folded into §2.4 and §4b; two of them
+were verified by hand before being accepted.
+
+**Verified, and would have shipped as bugs:**
+1. **A click would move a card** ✓ verified against `use-arrange-acts.ts:79`.
+2. **Group drags would acquire a permanent drift** — followers hold a constant offset.
+3. **The grid step was a no-op** ✓ verified against `globals.css:54-59` — a 0×0 box.
+
+**Corrections folded in without ceremony:** `snapDrop` must receive the event to read Alt — and a
+touch release carries no Alt at all, so **S2 is mouse-only** · `EXTEND` is a hardcoded WORLD
+constant, so the guide's overshoot shrinks to ~5 screen px at 0.2× zoom, exactly where it is most
+needed → parameterise it, default preserved so the committed test still passes · use `camRef`, not
+`cam`, on the per-frame path (board-surface deliberately does not re-render during a drag — that
+is G8 — so the state value is stale) · `touchcancel` fires no drag-stop, so the overlay must be
+hidden explicitly rather than trusted (G4's "always" had a hole) · the overlay must be permanently
+mounted and toggled via `el.style`/`el.hidden`, because deriving its visibility from React state
+kills G8 · the align controls belong in `board-toolbar.tsx`'s `selectedCount > 1` cluster, not
+`SelectedBar`, which only renders for a SINGLE selection · resize does not snap — now stated in §6
+rather than left unsaid.
+
+**THE SEQUENCING WAS WRONG, and is changed.** Align & distribute moves to **FIRST**: pure
+functions, ledger-only, reusing `recordTidy`'s proven shape, touching nothing in the drag path —
+and §2.1 records the owner saying it is what she actually wanted from tidy. The two guide steps
+**merge**: "draw only" is a fine commit boundary but a bad release boundary, because a line that
+promises an alignment and then drops the card somewhere else is worse than no line at all.
+
+**Revised order:** ① align & distribute → ② guides (draw + snap together) → ③ group drags → ④ the grid.
+
+## 10 · Open questions the review surfaced
+
+**10.1–10.3 are the owner's. 10.4 is a design problem needing her eye.**
+
+- **10.1 Locked cards and align.** If a locked card is in the selection, is it the ANCHOR the
+  others align to, or excluded from the calculation? Same for distribute when an outermost card is
+  locked. Both defensible; it changes what the button does.
+- **10.2 The grid toggle's scope.** Per board, or one setting everywhere? Per-board is more useful
+  (a grid on a moodboard, not on a reading list) and more work.
+- **10.3 The grid's first paint.** Storage can only be read after the page mounts, so a board with
+  the grid ON paints grid-off for one frame and flips. Accept the flicker, or hold the board back?
+- **10.4 THE SELECTION-CHROME PROBLEM.** A selected card renders a title field and a source picker
+  that an unselected one does not, and the ledger measures the whole thing. **The dragged card is
+  always selected; its neighbours usually are not.** So a centre- or bottom-edge snap aligns an
+  inflated box against a bare one — **and the alignment visibly breaks the moment you deselect.**
+  Left and top edges are unaffected (they are the anchor). This also inverts §5's captioned-image
+  row: the measured box *includes* the caption, so it aligns the card, not the picture.
+  Options: align the RESTING box (needs a second measurement) · restrict the dragged card to
+  top/left candidates while chrome is showing · accept it and let the feel-tune judge.
+  **Claude's recommendation: the resting box** — the composition's resting state is what is
+  actually being composed.
