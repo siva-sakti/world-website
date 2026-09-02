@@ -19,6 +19,9 @@
 - ⚪ — **genuinely open.** Do not build past a ⚪ without the owner.
 - ⛔ — deliberately excluded. Not an oversight; do not "fix" it.
 
+**Provenance discipline — how this document guards against invention:**
+Every claim here traces to one of four sources: **an owner ruling** (quoted or dated) · **shipped code** (verified in the repo) · **a Claude proposal, marked 🔵** · or **⚪ open**. A claim with no source is a defect. *(This discipline exists because an audit on 2026-09-02 found three Claude inventions written as settled: the recursion guard, the silent-bit-hood forbidden-list, and the drawer's focus requirement — all now marked 🔵.)*
+
 **The three rules for anyone extending this document:**
 1. **Amend in place.** Never add a contradicting layer below. *(This rule exists because it was broken — see `aerial-review-findings.md`.)*
 2. **Every ruling names its owner.** If you cannot say who decided something, it is ⚪ or 🔵, never RULED.
@@ -81,7 +84,7 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 | **direction** | **Boards hold; compositions are held.** A composition never contains or references a board. **Mention is not containment** — a plain hyperlink to a board remains possible: it is an **ordinary editor link** (the link mark that already exists), **not a feature to build**, and it creates **no stored tie, no backlink, no graph line.** | owner |
 | **deliberateness** | A composition is **never** auto-created. The board catches material by default; making a composition is always an act. Pasting into writing stays mere content — never auto-minted as a bit. | owner |
 | **fixed kind** | A thing's kind is set at birth and never converts: bit ↮ composition ↮ board. | D-121 |
-| **silent bit-hood** | In the writing, a pulled-in thing **renders as normal document content** — an image looks like an image, a quote reads as a quote. **Forbidden: badges, borders, icons, or any persistent marker distinguishing pulled-in content from typed content.** Its bit-life (source · tags · where else it lives) appears **only** on tap or hover. | owner |
+| **silent bit-hood** | In the writing, a pulled-in thing **renders as normal document content** — an image looks like an image, a quote reads as a quote. 🔵 **Forbidden: badges, borders, icons, or any persistent marker distinguishing pulled-in content from typed content.** *(The rule is the owner's — "it could be annoying for everything to be in this bit shape"; this specific forbidden-list is Claude's operationalisation of it.)* Its bit-life (source · tags · where else it lives) appears **only** on tap or hover. | owner |
 
 **3.5 · What a composition IS — the definition**
 > A **document you write.** Made of your words, with captured things pulled into the writing. It is **made, never captured** — it can never just happen. It always appears in your compositions list. It can sit on many boards as cards. It is not a bit and never becomes one.
@@ -210,7 +213,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
    - **short text bit:** its content, whole
    - **long text bit:** its first lines, with an expand control
    - **PDF / audio:** ⚪ undesigned — a titled row, a thumbnail, or a player
-3. **Renders one level deep only.** Chips inside a block's content stay chips and never expand. *(Prevents infinite recursion.)*
+3. 🔵 **Renders one level deep only.** Chips inside a block's content stay chips and never expand. *(Prevents infinite recursion when A blocks B and B chips A.)* **Claude's rule, found in the procedural pass — never owner-stamped.** Mandatory on technical grounds; flagged so it is not mistaken for a ruling.
 4. Carries a control to **tuck back to a chip**. Reversible forever, per instance.
 5. **Silent bit-hood applies:** no badge, border, or icon marks it as pulled-in content. Its bit-life appears on tap/hover only.
 
@@ -218,7 +221,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 1. Available on the composition's **page and side panel**. ⚪ *whether it fits in the floater at all.*
 2. Tabs: **bits · compositions · all**, plus **"in this piece"**.
 3. **"In this piece"** lists everything this composition currently references, each **readable in full** in the drawer — so long material stays cropped in the flow but whole at your side.
-4. **Clicking any row inserts it at the caret**, exactly as picker selection does (§9.2.7). The row must not steal focus from the editor — the caret survives the click.
+4. **Clicking any row inserts it at the caret**, exactly as picker selection does (§9.2.7). 🔵 The row must not steal focus from the editor — the caret survives the click. *(Claude's implementation requirement, from the N4b build's known risk; not an owner ruling.)*
 5. Same exclusions as the picker (§9.2.4).
 
 ### 9.8 Pulling in — the edge cases
@@ -226,7 +229,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 |---|---|
 | the target is trashed after being pulled in | the chip **greys and freezes**; tapping says *"this is in your trash — bring it out to see it"* with a restore door. The writing is unchanged. |
 | the target is archived after being pulled in | the chip **greys but stays enterable**; tapping opens it, clearly marked archived |
-| the target is destroyed (empty-trash) | the chip **degrades to plain text** of its stored face; the reference row is gone; the sentence still reads |
+| the target is destroyed (empty-trash) | the chip **degrades to plain text** of its stored face; the reference row is gone; the sentence still reads. *(Not a design decision — a consequence of the chip's stored text BEING its label, by construction since the Aug 2026 gather build.)* |
 | the composition itself is trashed | its chips elsewhere freeze (as above); its own content is untouched |
 | a chip is deleted from the body | the reference row is removed at the next save |
 | the save fails mid-reconcile | the body is the truth; references re-derive on the next successful save *(self-healing)* |
