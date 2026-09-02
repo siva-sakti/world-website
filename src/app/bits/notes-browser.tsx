@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { emptyMessage } from "@/lib/empty-message";
 import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
@@ -321,10 +322,10 @@ export function NotesBrowser({
       {shown.length === 0 ? (
         <p className="mt-8 text-neutral-500">
           {q || kind
-            ? "Nothing matches — clear the search or filters."
+            ? emptyMessage({ filtered: true })
             : view === "loose"
               ? "Nothing loose right now. Paste a link or jot a note above, and it lands here."
-              : "Nothing here yet — jot a note above, or catch things on a board."}
+              : emptyMessage({ filtered: false, hint: "jot a note above, or catch things on a board" })}
         </p>
       ) : (
         <>

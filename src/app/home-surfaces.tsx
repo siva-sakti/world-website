@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { emptyMessage } from "@/lib/empty-message";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useAct } from "@/components/use-act";
@@ -212,7 +213,7 @@ export function HomeSurfaces({
     const matches = kinded.filter((s) => titleMatches(s.title, words)).sort(cmp);
     body =
       matches.length === 0 ? (
-        <p className="text-neutral-500">Nothing matches.</p>
+        <p className="text-neutral-500">{emptyMessage({ filtered: true, hint: null })}</p>
       ) : (
         <ul className="divide-y divide-neutral-100">
           {matches.map((s) => (

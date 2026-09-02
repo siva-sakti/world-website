@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { emptyMessage } from "@/lib/empty-message";
 import { useMemo, useState } from "react";
 import type { SearchItem, SearchKind } from "@/lib/db/search";
 import type { TagChoice } from "@/lib/db/tags";
@@ -92,7 +93,9 @@ export function SearchLive({
 
       {results.length === 0 ? (
         <p className="text-neutral-500">
-          {filtered ? "Nothing matches — try a different word, tag, or date." : "Nothing yet."}
+          {filtered
+            ? emptyMessage({ filtered: true, hint: "try a different word, tag, or date" })
+            : emptyMessage({ filtered: false })}
         </p>
       ) : (
         <ul className="divide-y divide-neutral-100">

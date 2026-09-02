@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { emptyMessage } from "@/lib/empty-message";
 import Link from "next/link";
 import type { Outline } from "@/lib/outline";
 import type { PanelBit } from "@/lib/db/inbox";
@@ -130,7 +131,7 @@ export function OutlineView({ outline }: { outline: Outline }) {
       </div>
 
       {filterActive && sections.length === 0 ? (
-        <p className="mt-8 text-neutral-500">Nothing matches — clear the search or filters.</p>
+        <p className="mt-8 text-neutral-500">{emptyMessage({ filtered: true })}</p>
       ) : (
         <div className="mt-6 space-y-6">
           {sections.map((s) => {

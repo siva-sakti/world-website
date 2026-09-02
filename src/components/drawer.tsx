@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { emptyMessage } from "@/lib/empty-message";
 import { createClient } from "@/lib/supabase/client";
 import { listAllBits, type PanelBit } from "@/lib/db/inbox";
 import { signedUrl } from "@/lib/storage";
@@ -313,8 +314,8 @@ export function Drawer(props: BoardMode | NoteMode) {
           {error} <button className="underline" onClick={load}>retry</button>
         </p>
       )}
-      {bits && bits.length === 0 && <p className="loose-col-msg">Nothing here yet.</p>}
-      {bits && bits.length > 0 && filtered.length === 0 && <p className="loose-col-msg">Nothing matches.</p>}
+      {bits && bits.length === 0 && <p className="loose-col-msg">{emptyMessage({ filtered: false })}</p>}
+      {bits && bits.length > 0 && filtered.length === 0 && <p className="loose-col-msg">{emptyMessage({ filtered: true, hint: null })}</p>}
       {filtered.length > 0 && (
         <ul className="loose-list">
           {filtered.map((it) => {
