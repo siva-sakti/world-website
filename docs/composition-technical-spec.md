@@ -64,6 +64,16 @@ Dropped from the old note-rows: `source_id` (ruled out) · face machinery (title
 **Claude:** the card mock · frame-handoff design · floater mechanics detail (size/z/persistence) · drawer-docking detail · the enactment plan doc (from §1.3, for the code window).
 **Deferred by design:** privacy/visibility session · the graph round · T3 shelf · deck · sheet/engine.
 
+## 6b · ⭐ STATION 5 — THE DELIBERATE ABSENCES, READ BACK AND STAMPED (owner, 2026-09-02)
+
+**Stand as absent, confirmed:** a board referenced inside writing (visited, not read) · **floating things on a composition** (*"we do not want that"* — the board is for that) · **pasted content auto-becoming bits** — confirmed with the owner's better reasoning: *we can't reliably tell someone pasting their own paragraphs around from someone pasting something new*; the highlight-to-make-a-bit button stays, nothing automatic · formulas/linked-tables/database-views (parked) · **a piece converting to a bit, or back** (*"they just stay as pieces"*) · anything auto-creating a composition · the never-list (collaboration · AI · analytics · audience).
+
+**⚠ CHANGED BY THE OWNER AT STATION 5 — two:**
+1. **VERSION HISTORY IS WANTED** (reversing "duplicate covers it" — Claude's position, overruled): *"I don't think duplicating a piece covers version history; I think it actually makes sense to have a good version history system."* Duplicating gives forks, not history — it can't say what this piece looked like Tuesday. → filed **F-8**.
+2. **CREATE-ON-MISS: REOPENED as a candidate.** Claude had ruled it out for lacking a designed pathway; **the owner supplied the pathway** — *"provide people more options to know if they want to create a bit or a board"* → typing a name that doesn't exist offers **"create as: a bit · a composition."** Not ruled in; no longer ruled out.
+
+**⚑ THE BIT↔BIT WORRY, resolved as a STEERING problem (owner-raised, Claude-answered, owner to confirm):** her worry — the Obsidian-minded person whose unit is the bit finds they can't link bits. **The resolution:** in Obsidian a note is both captured-thing and writing; this model split them, so "linking my bits" is really linking *small written units* — which here **are compositions**. Literal bit-linking (a screenshot to a screenshot) carries no *why*; the sentence explaining the relation is the link. And structurally: **anything that can point at other things IS a weaving surface** — a bit referencing three bits is a small composition wearing the wrong label, the exact confusion this redesign undid. **The real risk is steering, and the fix is a DOOR not a mechanism:** from any bit, *"write about this"* → a small composition opens with that bit already pulled in. One tap from impulse to the right surface; no rule to learn. → filed **F-9**.
+
 ## 7 · CAUGHT BY WRITING THIS (new, previously unasked)
 1. **Search must learn surfaces** — post-migration, `/search` reads the bit table; document bodies need indexing in or **pieces vanish from search**. Real work item, now §4.
 2. **Board-trash cascade for piece-cards:** a trashed *board* makes bits loose — but **pieces are never loose**; their cards simply vanish with the board (placement rows survive frozen), the piece unaffected in its list. Needs one explicit line in the migration tests. ⚪ confirm this reading.

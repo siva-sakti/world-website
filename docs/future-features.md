@@ -33,8 +33,14 @@ Select anything in your writing → the deliberate catch act, performable mid-fl
 ## F-7 · Duplicate a piece *(owner-loved 2026-09-03: "I would love that")*
 "Duplicate" on the piece's page + card menu → a new composition: **body verbatim — chips come along free** (they carry target ids; first save mints the copy's own reference rows to the same bits — existing machinery, zero new code) · tags copied · same folder · fresh dates · no star · **no placements** (unless duplicated from a board card → lands beside the original) · no backlinks (correct automatically). **Quietly answers VERSIONS:** duplicate-before-rewrite is manual versioning — the shape people actually reach for. Post-migration (composition behavior).
 
+## F-8 · Version history *(owner-wanted 2026-09-02 — she overruled "duplicate covers it")*
+Real history for a composition's body: what did this look like Tuesday, and restore it. Distinct from F-7 duplicate (forks, not history). Sketch: snapshots on a cadence (or on meaningful change), a versions list on the piece's page, preview + restore; restore writes a new current version rather than destroying the chain. ⚠ Storage cost is the real design question (bodies are HTML; snapshot everything vs deltas vs time-window). Post-migration.
+
+## F-9 · "Write about this" — the steering door *(from the bit↔bit worry, 2026-09-02)*
+From any bit (its page, its card menu): one tap opens a small composition with that bit already pulled in. **The answer to "I want to connect my bits" without breaking flatness** — the impulse gets the right surface instead of a rule. Cheap: an existing create path + one pre-gather. Near-term candidate once compositions land.
+
 ## The full cool-ideas list (owner-requested tracker — keep current)
-resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piece (F-7) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
+resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piece (F-7) · version history (F-8) · write-about-this (F-9) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
 
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
