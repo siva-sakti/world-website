@@ -1,5 +1,5 @@
 import { useRef, useState, type RefObject } from "react";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 
 type MarqueeBox = { left: number; top: number; w: number; h: number };
 

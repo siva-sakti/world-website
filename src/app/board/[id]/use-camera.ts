@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 import { boundsOf } from "./geometry";
 import { anchorToCamera, cameraToAnchor, loadAnchor, saveAnchor, type Anchor, type Size } from "./camera-storage";
 

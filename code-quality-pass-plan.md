@@ -169,9 +169,65 @@ version catches.
 
 ---
 
-## 5. Owner decisions
+## 5. Owner rulings (2026-09-02)
 
-1. **T1 widths** — unify to the creating values (`400`/`300`), or keep the legacy fallback? Only
-   affects rows whose width was never set. *(Proceeding heights-only meanwhile — safe either way.)*
-2. **§2e.3 `archiveBit`** — make the silent no-op throw like its twin? House standard says yes.
-3. **Confirm Tier 3 is deferred, not dropped.**
+1. **Card widths — RULED: standardize to one table**, using the values the app actually creates
+   (`400` text, `300` audio). *"I think we have a design and UI pass coming later where I'll be a
+   lot more specific about card size and auto size and different options for backgrounds."* So this
+   is a consolidation, not a design choice — the real sizing decision is a later pass.
+2. **The silent resting acts — RULED: fix, pulled forward.** ✅ Done (stage B1). See §6.
+3. **Search consistency — RULED: DEFERRED, with a reason.** *"I think we need to realign on search
+   after we've decided what composition surfaces are — the fact that they're not bits, they're their
+   own thing. Maybe we do that after building the composition surface."* Fixing search before that
+   ruling would mean doing it twice. **Re-entry: after composition surfaces are built.**
+4. **The type words — RULED: SPLIT IN TWO.** The owner's correction, which changes the finding:
+   *"a drawing can be a doodle — I'm doing something cute. It can be a drawing like I'm sketching the
+   way a cell looks. It can be a drawing like I'm drawing out the form of a fashion piece. These are
+   all valid."*
+   - **(a) The file kind** (audio vs recording, pdf vs PDF) — meaningless inconsistency. **Fix.**
+   - **(b) What the owner CALLS it** (doodle · sketch · drawing) — a real vocabulary, not drift.
+     **Do not flatten. Do not touch.** The schema already has the mechanism: `bit.subtype_word_id`,
+     unused so far — and one of the two things this pass REFUSED to delete when an audit called it
+     dead code. The feature the owner just described already has its field waiting.
+5. **Structural duplication — RULED: in scope.** *"I don't want to have duplicates of things."*
+   Sequenced last (it touches the save paths, where the comments record real past data-loss bugs).
+6. **Bit/note links — RULED: just fix it.** Verified the owner's intuition is correct: a note IS a
+   bit row with `kind = 'note'` (one column, `20260825000002_kind_and_folder_stars.sql:11`). Same
+   table, same row. So this is not a design question — the links simply forgot to check the column.
+   Three of the five sites already have `kind` in hand; the other two need it added to one query
+   (`references.ts:146` selects `id, face, type, state` — no `kind`).
+
+7. **Put-away should reach EVERY bit — RULED (2026-09-02), queued as a feature, not this pass.**
+   *"Every bit should be able to be put away — and by put away we mean archiving and/or trash. They
+   should all be treated the same way. It should be simple, moving throughout the whole app, for it
+   to be the same way."* Today only boards and notes carry the control; a photo, recording or PDF
+   has no put-away door at all. **This is a feature ask** (new UI in several rooms), so it does not
+   ride inside a no-behaviour-change refactor. Queued behind the composition-surface work per §5.8.
+8. **Sequence — RULED:** *"I want a sequence — the cleanup you're doing now, and then all of this
+   composition surface stuff."* Cleanup finishes first. Composition surfaces follow. Search
+   consistency (§5.3) sits after those, as ruled.
+
+## 5b. The wording checklist (owed — one copy pass, in the owner's voice, later)
+
+Approved to proceed with placeholders now and sweep them together later: *"as long as you write down
+the wording and you have a checklist and we can move through it later, I'm happy with that."* Every
+user-facing sentence this pass wrote or changed, so none is lost:
+
+| Where | Sentence now | Note |
+|---|---|---|
+| put away / trash a vanished thing | "that no longer exists — reload" | **Changed.** Was "that *note* no longer exists — reload"; the noun was dropped because one sentence now serves bits AND boards, and "note" was wrong for a board. |
+| restore from trash | "that's no longer in the trash — it may have been destroyed" | Unchanged, kept verbatim. |
+| take back out of the archive | "that's no longer in the archive — it may have been taken back out" | **New.** No sentence existed — this path failed silently before. |
+
+Not in scope for that sweep but noted by the audit: **five different spellings of "nothing matches"**
+across home, the drawer, `/bits`, `/outline` and `/search`.
+
+## 6. Done so far
+
+- **Stage A** (`6d561f1`) — 96 lines of verified dead code deleted, incl. the two-functions-one-name
+  `archiveBit` trap. Kept deliberately: `snapTo` (staged for geometry stage 4) and the row-mirror
+  type fields.
+- **Stage B1** (`862d0f3`) — no resting act can fail silently. `setResting` now throws on a 0-row
+  update, so all 9 paths carry the assert instead of 3 of them. RLS verified permissive first, so
+  the new throw cannot misfire on a live thing. **Owner hand-test still owed:** put a note away from
+  the home screen, take it back out from `/archive`.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 
 // THE GEOMETRY REGISTRY (geometry-registry-plan.md; D-135 phase 2) — one ledger
 // of every mounted card's TRUE rendered size, replacing four ad-hoc DOM measurers

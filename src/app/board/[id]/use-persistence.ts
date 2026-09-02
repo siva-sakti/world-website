@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { updatePlacement, updateBitBody, updateBitContent } from "@/lib/db/bits";
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 
 type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number };
 

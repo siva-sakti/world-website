@@ -10,7 +10,7 @@ import {
   callInBit,
   abortBitCreate,
 } from "@/lib/db/bits";
-import { uploadObject, signedUrl, removeObjects } from "@/lib/storage";
+import { uploadObject, removeObjects } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
@@ -20,7 +20,9 @@ import { captureLink } from "@/app/bits/actions";
 import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
 import type { PanelBit } from "@/lib/db/inbox";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
+import { isCardType } from "./card-vm";
+import { defaultCardSize, resolveCardMedia } from "./card-defaults";
 import type { Camera } from "./use-camera";
 
 const MAX_DISP = 320; // an image card's initial on-board width
@@ -115,13 +117,14 @@ export function useCreateDoors(deps: {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     const z = nextZ();
+    const size = defaultCardSize("text", "bit"); // one table — see card-defaults
     setCards((cs) => [
       ...cs,
-      { placementId, bitId, type: "text", kind: "bit", x, y, w: 400, h: 60, z, body },
+      { placementId, bitId, type: "text", kind: "bit", x, y, w: size.w, h: size.h, z, body },
     ]);
     selectOne(placementId);
     if (edit) setEditingId(placementId);
-    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: 400, z }).catch((e) => {
+    const p = createTextBit(supabase, { bitId, placementId, boardId, body, x, y, width: size.w, z }).catch((e) => {
       // A failed create must not leave a zombie card (the image/audio/pdf doors already do this;
       // a leftover here also poisons later removes — the "no longer exists" class). Also: end the
       // ghost edit (a stranded editingId deadlocks the keyboard — R1.2) and abort the bit row —
@@ -215,8 +218,9 @@ export function useCreateDoors(deps: {
     trackCreate(placementId, chain);
   }
 
-  const AUDIO_W = 300; // an audio card's initial on-board width
-  const AUDIO_H = 56; //  the native player's height (flex-sized: h follows the player)
+  // Straight from the one size table — declaring 300/56 here again is exactly how the
+  // server's copy and this one drifted apart in the first place.
+  const { w: AUDIO_W, h: AUDIO_H } = defaultCardSize("audio", "bit");
   const AUDIO_FILE = /\.(m4a|mp3|mp4|aac|wav|ogg|oga|opus|webm|flac)$/i;
   const isAudioFile = (f: File) => f.type.startsWith("audio/") || AUDIO_FILE.test(f.name);
 
@@ -432,40 +436,28 @@ export function useCreateDoors(deps: {
   // reconcile the card's id when the server revived a departed row (plan §5.4, finding 1).
   async function bringIn(bit: PanelBit) {
     const type = bit.type;
-    if (type !== "text" && type !== "drawing" && type !== "image" && type !== "audio" && type !== "pdf" && type !== "link") return;
+    if (!isCardType(type)) return;
     const isNote = bit.kind === "note"; // a note lands page-shaped (a doorway), not receipt-shaped
-    const width = isNote ? 200 : type === "text" ? 400 : type === "audio" ? AUDIO_W : 220;
-    const height = isNote ? 260 : type === "text" ? 60 : type === "audio" ? AUDIO_H : type === "pdf" ? 280 : type === "link" ? 180 : 220;
+    // Size and signed media BOTH come from the shared tables (card-defaults) — the
+    // server's board load uses the same two. They used to be written out here and in
+    // page.tsx, and had already drifted apart.
+    const { w: width, h: height } = defaultCardSize(type, bit.kind);
     // Look-then-place, like every non-deliberate spawn (the old 6-step cascade
     // cycled — the 7th landed exactly on the 1st). Text rendered-height estimate;
     // a note has a real fixed height, so use it directly.
-    const w = findClearSpot(width, isNote ? height : type === "text" ? 120 : height);
+    const spot = findClearSpot(width, isNote ? height : type === "text" ? 120 : height);
     const placementId = crypto.randomUUID();
     const z = nextZ();
-    // File types resolve a signed URL: image → thumb/full (imageUrl), audio → its
-    // stored object (fileUrl, for the player). Without this the placed card is blank.
-    let imageUrl: string | undefined;
-    let fileUrl: string | undefined;
-    if (type === "image") {
-      const path = bit.thumb_path ?? bit.storage_path;
-      if (path) {
-        try { imageUrl = await signedUrl(supabase, path); } catch {}
-      }
-    } else if (type === "audio" && bit.storage_path) {
-      try { fileUrl = await signedUrl(supabase, bit.storage_path); } catch {}
-    } else if (type === "pdf" && bit.thumb_path) {
-      // A PDF shows its first-page thumbnail (thumb_path only — the storage_path is
-      // the PDF binary, not an image). No thumb → the card's document-sheet fallback.
-      try { imageUrl = await signedUrl(supabase, bit.thumb_path); } catch {}
-    } else if (type === "link" && bit.thumb_path) {
-      // A link shows its stored page-card image; no thumb → the title/URL card.
-      try { imageUrl = await signedUrl(supabase, bit.thumb_path); } catch {}
-    }
+    const { imageUrl, fileUrl } = await resolveCardMedia(supabase, {
+      type,
+      thumb_path: bit.thumb_path,
+      storage_path: bit.storage_path,
+    });
     setCards((cs) => [
       ...cs,
       {
         placementId, bitId: bit.id, type, kind: bit.kind,
-        x: w.x, y: w.y, w: width, h: height, z,
+        x: spot.x, y: spot.y, w: width, h: height, z,
         body: bit.body ?? undefined,
         drawing: type === "drawing" ? normalizeDrawing(bit.strokes) : undefined,
         imageUrl,
@@ -478,7 +470,7 @@ export function useCreateDoors(deps: {
       },
     ]);
     selectOne(placementId);
-    const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: w.x, y: w.y, width, height, z })
+    const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: spot.x, y: spot.y, width, height, z })
       .then((placement) => {
         if (placement.id !== placementId) {
           reconcileId(placementId, placement.id);

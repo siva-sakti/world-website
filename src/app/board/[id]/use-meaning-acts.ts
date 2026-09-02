@@ -3,7 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { applyTag, removeTag } from "@/lib/db/tags";
 import { setBitSourceId, type Source } from "@/lib/db/sources";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 import type { useUndo } from "./use-undo";
 
 // The MEANING acts' recording layer (undo plan §6) — dark until stage 5. Tags and

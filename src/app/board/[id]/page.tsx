@@ -3,13 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getBoard, getBoardCards } from "@/lib/db/boards";
 import { getBitMeta } from "@/lib/db/bits";
 import { normalizeDrawing } from "@/lib/stroke";
-import { signedUrl } from "@/lib/storage";
+import { defaultCardSize, resolveCardMedia } from "./card-defaults";
+import { isCardType } from "./card-vm";
 import { BoardSurface } from "./board-surface";
 import { BoardTitle } from "./board-title";
 import { BoardDescription } from "./board-description";
 import { TagBar } from "./tag-bar";
 import { RecordOpening } from "@/components/record-opening";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 
 export const dynamic = "force-dynamic";
 
@@ -36,46 +37,17 @@ export default async function BoardPage({
   const cards = (
     await Promise.all(
       rows.map(async (r): Promise<CardVM | null> => {
-        if (r.thing !== "bit" || !r.type) return null;
-        if (r.type !== "text" && r.type !== "drawing" && r.type !== "image" && r.type !== "audio" && r.type !== "pdf" && r.type !== "link") return null;
         const type = r.type;
+        if (r.thing !== "bit" || !isCardType(type)) return null;
         const kind = meta.get(r.target_bit_id!)?.kind ?? "bit";
-        const isNoteCard = kind === "note"; // a note lands as a page-shaped doorway
-        // File types resolve a signed URL: image → its thumb/full (into imageUrl);
-        // pdf → its first-page thumb only (into imageUrl); audio → its stored object
-        // (into fileUrl, for the <audio> player).
-        let imageUrl: string | undefined;
-        let fileUrl: string | undefined;
-        if (type === "image") {
-          const path = r.thumb_path ?? r.storage_path;
-          if (path) {
-            try {
-              imageUrl = await signedUrl(supabase, path);
-            } catch {
-              imageUrl = undefined;
-            }
-          }
-        } else if (type === "pdf" && r.thumb_path) {
-          // thumb_path only — storage_path is the PDF binary, never an <img> src.
-          try {
-            imageUrl = await signedUrl(supabase, r.thumb_path);
-          } catch {
-            imageUrl = undefined;
-          }
-        } else if (type === "audio" && r.storage_path) {
-          try {
-            fileUrl = await signedUrl(supabase, r.storage_path);
-          } catch {
-            fileUrl = undefined;
-          }
-        } else if (type === "link" && r.thumb_path) {
-          // the stored page-card image (thumb_path only — a link has no storage_path)
-          try {
-            imageUrl = await signedUrl(supabase, r.thumb_path);
-          } catch {
-            imageUrl = undefined;
-          }
-        }
+        // The signed URLs and the fallback size are BOTH shared with bringIn (the
+        // client's call-in door) — one table each, in card-defaults.
+        const { imageUrl, fileUrl } = await resolveCardMedia(supabase, {
+          type,
+          thumb_path: r.thumb_path,
+          storage_path: r.storage_path,
+        });
+        const size = defaultCardSize(type, kind);
         return {
           placementId: r.placement_id,
           bitId: r.target_bit_id!,
@@ -83,8 +55,8 @@ export default async function BoardPage({
           kind,
           x: r.x ?? 40,
           y: r.y ?? 40,
-          w: r.width ?? (isNoteCard ? 200 : type === "text" ? 240 : type === "audio" ? 260 : 220),
-          h: r.height ?? (isNoteCard ? 260 : type === "text" ? 60 : type === "audio" ? 56 : type === "pdf" ? 280 : type === "link" ? 180 : 220),
+          w: r.width ?? size.w,
+          h: r.height ?? size.h,
           z: r.z ?? 0,
           body: r.body ?? undefined,
           drawing: type === "drawing" ? normalizeDrawing(r.strokes) : undefined,

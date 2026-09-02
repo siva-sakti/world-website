@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { movePlacementForced } from "@/lib/db/bits";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 import type { Patch } from "./board-arrange";
 import type { useUndo } from "./use-undo";
 

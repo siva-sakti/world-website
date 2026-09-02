@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards } from "@/lib/db/bits";
 import type { useUndo } from "./use-undo";
 import { confirm } from "@/components/confirm";
-import type { CardVM } from "./card";
+import type { CardVM } from "./card-vm";
 
 // The board's REMOVE acts (I-W1: two distinct, labeled acts), singular and in bulk:
 //  · un-place — take the card off THIS board only; the bit lives on (travel keeps
