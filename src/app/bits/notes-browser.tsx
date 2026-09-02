@@ -7,6 +7,7 @@ import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
 import { placeBitsOnBoard, trashBits, archiveBits } from "./actions";
+import { confirmArchive } from "@/app/archive/archive-confirm";
 import { SearchablePicker } from "@/components/searchable-picker";
 import { confirm } from "@/components/confirm";
 import type { ShelfGroup } from "@/lib/db/shelf";
@@ -85,10 +86,12 @@ export function NotesBrowser({
     }
   }
   /** Archive the selection — set aside, hidden but kept, reversible from /archive.
-   *  No confirm, by owner ruling (2026-09-02): archive is reversible, so it does not
-   *  earn the interruption that trash does. */
+   *  Asks first, through THE one archive confirm (archive-confirm.ts) that the single
+   *  ArchiveButton also uses — owner ruling (2026-09-02): the two doors must not be able
+   *  to disagree, so "does archiving ask?" is answered in exactly one file. */
   async function bulkArchive() {
     if (bulkPending || selectedIds.size === 0) return;
+    if (!(await confirmArchive({ count: selectedIds.size, noun: "bit" }))) return;
     setBulkPending(true);
     setBulkErr(null);
     try {

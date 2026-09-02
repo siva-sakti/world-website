@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { confirm } from "@/components/confirm";
+import { confirmArchive } from "./archive-confirm";
 import { archiveItemAction, unarchiveItemAction } from "@/app/actions";
 import { getBitBoards } from "@/lib/db/bits";
 
@@ -43,13 +43,9 @@ export function ArchiveButton({
         /* fall back to the plain message */
       }
     }
-    const msg =
-      n > 0
-        ? `This is on ${n} board${n === 1 ? "" : "s"} — archiving hides it from ${
-            n === 1 ? "it" : "them"
-          } until you un-archive.`
-        : `Archive this ${noun ?? (thing === "board" ? "board" : "note")}? It's set aside in your archive — un-archive anytime.`;
-    if (!(await confirm({ message: msg, confirmLabel: "Archive" }))) return;
+    // THE one archive confirm (archive-confirm.ts) — shared with the bulk act on /bits,
+    // so changing what archiving asks (or whether it asks) is a single-file edit.
+    if (!(await confirmArchive({ noun: noun ?? (thing === "board" ? "board" : "note"), onBoards: n }))) return;
     setBusy(true);
     setFailed(false);
     try {
