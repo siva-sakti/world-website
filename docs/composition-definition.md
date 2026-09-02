@@ -31,6 +31,14 @@ The app serves a **rhythm: diverge → converge → diverge → converge** — n
 **End it** — trash and restore · left empty at birth, it evaporates · permanent delete only by emptying the trash
 **Later phases** — save out as a file · publish
 
+## 3b · The little glossary — five words, all grounded in the shipped app
+
+- **the FACE** — a bit's stand-in headline, computed since day one: your caption if any → else its first words (the Roam answer — no titles required) → else nothing, and visual things stand in with a thumbnail.
+- **a CHIP** — the small inline pill that lands in your sentence when you pull something in (`[[` or the drawer). Shows the face (or a tiny thumbnail). *Shipped August; the gather pill you already use.*
+- **the PEEK** — tap a chip → a floating glimpse of the real thing beside it, with "open →". Tap away, keep writing. *Also shipped August.*
+- **a BLOCK** — the one new rung: the pulled thing's preview sitting IN the flow permanently (the image visible in the text), preview-sized, expandable. *Ruled, unbuilt.*
+- **EVAPORATION** — start a composition, type nothing, click away → it never existed. *Your own ruling, dramatic name.*
+
 ## 4 · What is deliberately still open
 
 1. **The connection design** (one sitting, four questions): compositions referencing each other · bits connecting beyond a shared board or tag · the pulling gesture itself · **and where connections *show* afterward** — the seeing-side designed with the making-side.
