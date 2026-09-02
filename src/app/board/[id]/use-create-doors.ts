@@ -48,7 +48,6 @@ export function useCreateDoors(deps: {
   setDrawMode: Dispatch<SetStateAction<boolean>>;
   nextZ: () => number;
   trackCreate: (placementId: string, p: Promise<unknown>) => void;
-  settled: (placementId: string) => Promise<string>;
   reconcileId: (oldId: string, newId: string) => void;
   setConverting: Dispatch<SetStateAction<number>>; // COUNT of HEICs mid-decode (a counter — multi-file drops overlap)
   setCapturing: Dispatch<SetStateAction<boolean>>; // the board-paste link capture is slow (~seconds) — show a notice
@@ -72,8 +71,6 @@ export function useCreateDoors(deps: {
   // made while they panned or resized. Blank-litter from a stray double-tap is the
   // accepted cost, chosen eyes-open. abortBitCreate remains ONLY as failed-create
   // cleanup — never as content judgment.
-  const cardsRef = useRef(cards);
-  cardsRef.current = cards; // latest-value ref: the unmount sweep must see live cards, not the []-closure
 
 
   // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate

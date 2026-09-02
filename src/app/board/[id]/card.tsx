@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { registerSave } from "@/lib/save-guard";
 import { TextBit } from "./text-bit";
@@ -161,6 +161,20 @@ export function Card({
   // each keystroke commits; the same onChange({w}) path as a hand-resize persists it.
   const userSized = useRef(false);
   const innerRef = useRef<HTMLDivElement | null>(null);
+  // MEMOIZED composed ref (health check S1): an inline arrow re-attaches on every
+  // render — Card re-renders on every pan/drag frame, so that was ~1800 forced
+  // reflows/sec on a 30-card board. measureRef is stable per placementId; so is this.
+  const setInner = useCallback(
+    (el: HTMLDivElement | null) => {
+      innerRef.current = el;
+      const cleanup = measureRef?.(el);
+      return () => {
+        innerRef.current = null;
+        cleanup?.();
+      };
+    },
+    [measureRef],
+  );
   useEffect(() => {
     if (!editing || !isText || userSized.current) return;
     const el = innerRef.current;
@@ -207,14 +221,7 @@ export function Card({
       }}
     >
       <div
-        ref={(el) => {
-          innerRef.current = el;
-          const cleanup = measureRef?.(el);
-          return () => {
-            innerRef.current = null;
-            cleanup?.();
-          };
-        }}
+        ref={setInner}
         data-pid={card.placementId}
         className={`compose-card-inner${
           isNote

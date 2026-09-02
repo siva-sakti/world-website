@@ -120,7 +120,6 @@ export async function setSource(
   return source;
 }
 
-/** Clear a bit's source — the bit survives, it just loses the stamp (§6). */
 /** Undo's narrow source door (undo plan §6): ONE update by id — no find-or-create,
  *  no url back-fill — so a reverse is exactly what it claims. `setSource` (by name)
  *  is not a clean inverse: it can re-create a deleted source and back-fill its url.
@@ -141,6 +140,7 @@ export async function setBitSourceId(
   if (!data?.length) throw new Error("that bit no longer exists");
 }
 
+/** Clear a bit's source — the bit survives, it just loses the stamp (§6). */
 export async function clearSource(supabase: SupabaseClient, bitId: string): Promise<void> {
   const { error } = await supabase.from("bit").update({ source_id: null }).eq("id", bitId);
   if (error) throw error;

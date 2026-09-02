@@ -182,7 +182,9 @@ export function usePersistence(
     // Through the door: a title typed on a fresh optimistic card must wait for the
     // bit row to exist, or the update matches 0 rows and the title vanishes.
     settled(placementId)
-      .then(() => updateBitContent(supabase, bitId, value))
+      .then((id) => chain(id, () => updateBitContent(supabase, bitId, value))) // ordered (health check S4):
+      // four doors now hit saveContent (blur · unmount-commit · page-hide · the offer) —
+      // unchained, two writes could reorder on the wire and an older caption win.
       .catch(onErr);
   }
 

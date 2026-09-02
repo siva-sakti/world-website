@@ -111,6 +111,7 @@ export function BoardSurface({
     setUndoNote(msg);
     noteTimer.current = setTimeout(() => setUndoNote(null), 2500);
   };
+  useEffect(() => () => { if (noteTimer.current) clearTimeout(noteTimer.current); }, []); // S5
   const arrange = useArrangeActs({ supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain });
   async function doUndo() {
     arrange.closeNudgeWindow(); // never pop an entry a burst is still extending (D12)
@@ -213,7 +214,7 @@ export function BoardSurface({
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, setDrawMode, nextZ,
-      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr, sizeOf,
+      trackCreate, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr, sizeOf,
     });
 
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.

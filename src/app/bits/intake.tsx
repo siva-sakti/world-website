@@ -78,9 +78,11 @@ export function Intake() {
   // reset re-runs this with an empty box, which REMOVES the key. Gated on `hydrated`
   // so the first paint's empty box can't wipe the draft before it's read back.
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || pending) return; // pending too (health check R2): the un-disabled
+    // controls (sticky ×, tag ×, the checkbox) could re-mirror the snapshot mid-add
+    // and reopen the double-capture window the pre-await clear closed.
     saveDraft({ note, asQuote, sticky, draft, tagWords, tagDraft });
-  }, [hydrated, note, asQuote, sticky, draft, tagWords, tagDraft]);
+  }, [hydrated, pending, note, asQuote, sticky, draft, tagWords, tagDraft]);
 
   // One reset, used by BOTH a successful add and "clear" — so the two can't drift apart
   // and leave a field behind. The mirror effect above turns this into a key removal.

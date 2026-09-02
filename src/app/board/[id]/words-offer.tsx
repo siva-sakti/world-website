@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // The one-line, one-tap-to-skip words offer (S5 — the highest-leverage
 // findability surface for a screenshot-heavy owner). Enter saves; skip is a tap.
@@ -16,6 +16,12 @@ export function WordsOffer({
   onSkip: () => void;
 }) {
   const [value, setValue] = useState(initial ?? "");
+  const touched = useRef(false);
+  // The unmount-committed caption lands AFTER this mounts (same commit's passive
+  // phase) — accept it unless the owner already typed here (health check S3).
+  useEffect(() => {
+    if (!touched.current) setValue(initial ?? "");
+  }, [initial]);
   return (
     <div className="compose-words-offer">
       <input
@@ -32,7 +38,10 @@ export function WordsOffer({
                   ? "add a few words so you can find this link later?"
                   : "add a few words to make this drawing findable?"
         }
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          touched.current = true;
+          setValue(e.target.value);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (value.trim()) onSave(value);

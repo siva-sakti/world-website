@@ -62,6 +62,7 @@ export function TextBit({
   onReady?: (api: { gather: (t: GatherTarget) => void }) => void;
 }) {
   const [supabase] = useState(() => createClient());
+  const wasSelected = useRef(false); // pre-click selection (S2 — see onPointerDownCapture)
   const [picker, setPicker] = useState<Picker | null>(null);
   const [candidates, setCandidates] = useState<BitHit[] | null>(null);
 
@@ -200,6 +201,12 @@ export function TextBit({
       <EditorContent
         editor={editor}
         className="tiptap"
+        onPointerDownCapture={() => {
+          // Snapshot the PRE-click selection (health check S2): the card selects on
+          // pointerdown and React flushes before the click event — reading the live
+          // prop made the "second click opens" grammar collapse to one click.
+          wasSelected.current = selected;
+        }}
         onClickCapture={(e) => {
           // The resting-link click grammar (soak finding, 2026-09-01): a plain
           // click on an in-text anchor used to navigate the WHOLE TAB away mid-
@@ -210,7 +217,7 @@ export function TextBit({
           const href = a?.getAttribute("href");
           if (!a || !href) return;
           e.preventDefault();
-          if (selected) {
+          if (wasSelected.current) {
             e.stopPropagation(); // the open click must not ALSO enter edit mode
             window.open(href, "_blank", "noopener,noreferrer");
           }
