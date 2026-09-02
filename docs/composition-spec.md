@@ -574,3 +574,66 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 ### 20.7 Two compositions side by side *(owner: "sounds nice — I wonder what we'd need, or do people just open two windows")*
 **Today it already works: two browser windows.** Zero cost, zero build.
 🔵 **Recommendation: don't build it.** A built version means real window management inside the app for a need that the browser already serves. Revisit only if two windows proves genuinely bad in use.
+
+---
+
+## 21 · Storage — the ruled shape *(owner session, 2026-09-02)*
+
+### 21.1 The ruling: a composition is NOT a bit
+✅ **RULED (owner, 2026-09-02):** *"I don't want the composition to be a bit at all… it's gonna have all the functionality of a bit, but it's gotta be a different thing."* It gets **its own table**, a peer of `board`.
+
+**The evidence that supported it** (measured, not asserted, 2026-09-02):
+- **30 files / 47 lines** of code must currently ask *"is this a bit or a note?"* — forget one and a composition renders as a fragment.
+- **The counter-argument, stated honestly:** as a `bit` row a composition inherits every new feature free — `opening` shipped 2026-09-03 pointing at `bit_id` and covered notes without anyone thinking about it; likewise archive · trash · folders · alive · tags · search.
+- **What settled it:** the whole composition feature is about to be built. Built on `bit` and moved later = the work done twice. **This is the cheapest moment the split will ever have.**
+
+### 21.2 What it carries
+✅ Everything a bit has — title · the writing · folder · alive · archive · trash · visibility · search — **except `source`** *(owner: "doesn't have to have a source. I agree with you")*. A bit records where it came from; a composition came from the owner. **The first place the two genuinely differ, which is itself evidence they are different things.**
+
+### 21.3 The four pointers *(owner asked: "what is that second column?")*
+Four tables name a bit and would each gain a second, exclusive slot — *this tag is on bit `abc` **or** composition `xyz`, exactly one*:
+
+| table | today | after |
+|---|---|---|
+| `tag_application` | `target_bit_id` | + `target_composition_id` |
+| `placement` (on a board) | `target_bit_id` | + `target_composition_id` |
+| `reference` (gather) | `from_bit_id` · `to_bit_id` | both sides gain one |
+| `opening` | `bit_id` | + `composition_id` |
+
+**Not an invention — the house pattern.** `placement` and `opening` already do exactly this (bit-or-board, exactly one, enforced by CHECK).
+
+### 21.4 Composition-into-composition ✅ ALLOWED
+✅ **RULED (owner, 2026-09-02).** ⚠ **And it already works by accident** *(verified in code 2026-09-02: `gather-picker.tsx` applies no kind filter, and `reference.to_bit_id` accepts any bit — a note IS a bit today)*. **Nobody decided this; the ruling makes it deliberate**, and the new tie table must keep permitting it on purpose.
+
+### 21.5 How the writing is stored — 🔵 recommendation, not yet ruled
+**The three options, and what Notion actually does** *(owner asked)*:
+- **Notion:** every paragraph, heading and bullet is **its own database row** with a parent pointer and a position. A page is a tree of hundreds of records assembled at load. That is how it links to one paragraph, comments on one line, syncs a block across pages. **The cost is enormous** — page load assembles hundreds of rows; reordering rewrites position keys.
+- ⭐ **Why we do not need it — the owner's own ruling bought us out.** Block-rows exist so anything can point at *any block from anywhere*. §20.5c ruled links point at **whole compositions, not headings inside them**. **That single ruling is the exact requirement that forces Notion's architecture, and it was declined.**
+- ⚠ **And note what does NOT need blocks:** folding a section · dragging a heading with its section · the table of contents. All are **editor behaviour**, not filing.
+
+**What the feature list actually demands** — only three lines have teeth:
+
+| feature | demand on storage |
+|---|---|
+| rich text · fold/drag a heading · table of contents · images · undo | **nothing** |
+| read/write lock | one column |
+| **links to headings** | **headings need permanent ids surviving rename + move** |
+| **chips and blocks** | **every reference must be findable in the writing, reliably** |
+| **search the body** | **Postgres must read the words out** |
+
+🔵 **Claude's recommendation: ONE STRUCTURED DOCUMENT per composition (the editor's own format), not the HTML string used today.**
+1. **The chips.** Today they are found by pattern-matching HTML text (`extractRefIds`). It works, but a formatting change can break it *silently* — discovered only when a chip stops counting. Walking a structured document finds them exactly.
+2. **The heading ids.** In HTML they are attributes a paste or sanitizer can strip; one missing id breaks every link to that heading. Structured, they are real fields that cannot be dropped by accident.
+- ⚠ **The honest cost, NOT yet proven:** Postgres searches the body today by regex-stripping tags (`bit_search_text`). Structured storage needs text pulled out of the structure instead. Believed doable in the same style as the existing `bit_face` / `bit_search_text` functions — **to be RUN and shown before it is committed to.**
+
+### 21.6 Naming *(owner, 2026-09-02)*
+- ✅ **"note" is retired** — *"we're gonna get rid of note, that's old words."* Supersedes the D-118→D-121 note vocabulary in `lexicon.md`.
+- ✅ **"composition" stands** — *"I think composition is nice"* (open to a better word; no rival proposed).
+- ✅ **Route: `/composition`.**
+- ✅ **"chip" and "block" are user-facing words** — *"we can say chips and blocks to users, I think that's good."* They stop being Claude's shorthand.
+- ⚪ **"gather" — soft.** *"You really anchored on the word gather; I wasn't the biggest fan, although I don't dislike it."* Stays live, not settled.
+- ⛔ **"link" is unavailable** — taken 2026-09-01 as the `link` bit type (D-129).
+- ⚪ **No words yet for the two directions** (forward / backward). Owner: *"forward link, back link — some of these things don't have words… we were using words to be straight with what we were accomplishing."* Today's backward surface reads **"gathered into."**
+
+### 21.7 Deferred
+⏸ **The migration** — moving existing notes across and rewriting pointers. *(Owner: "it's OK for the migration, I think about that a little bit later.")* Includes converting existing HTML bodies if §21.5 is adopted.
