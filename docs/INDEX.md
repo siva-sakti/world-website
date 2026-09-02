@@ -253,12 +253,31 @@ INDEX.md ................ this file — where everything is
 ### `aerial-review-findings.md` — 🔵 the independent audit of the whole composition stack (2026-09-03)
 **Contains:** the verdict (close, not consolidation-ready) · the worst findings (three answers to one question · the definition lagging the stamps · evaporate's three readings · the evaporate×I-L2 lifecycle hole) · Claude's own caught errors · the drift strike-list · the KEEP-verbatim five · **the consolidation recipe.** Drives the clean-document pass.
 
-### 🧵 THREADS — follow a topic across files
-- **TEACHING / ONBOARDING:** `teaching-the-user.md` (literal: what + when) → `product-concept-people.md` (personas & flows) → `integration-scenes.md` (the moments) → `../user-flows.md` Arc 0 (the mechanism) → `product-concept-promise.md` (the pitch) → `../vision-and-language.md` (the voice).
-- **THE COMPOSITION FEATURE:** `composition-definition.md` (concept) → `composition-technical-spec.md` (build-grade) → `composition-surface-spec.md` (capabilities) → `composition-base-spec.md` (⚠ trail/palimpsest) → `aerial-review-findings.md` (the audit) → `future-features.md` (the shelf).
-- **CONNECTION / THE FABRIC:** `composition-technical-spec.md` §1.2 → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2/S5/S12/S13.
-- **STRUCTURED DATA:** `tables-and-structured-data.md` → `research-structured-data.md`.
-- **THE BIG PICTURE:** `convergent-surfaces-overview.md` → `convergent-surfaces-stress-test.md` → `product-concept-*`.
+### 🧵 THREADS — **READ THIS BEFORE WORKING ON ANY OF THESE TOPICS**
+*Directive, not descriptive. If your task touches a topic below, open the named files in the named order **before** proposing anything. Skipping a step here is how this project has previously re-derived work it had already done.*
+
+**IF the task is TEACHING, ONBOARDING, HINTS, or ANY USER-FACING COPY →**
+1. **START:** `teaching-the-user.md` — what a person must learn, at which moment, in what form. **The three must-understands are there; do not invent a fourth.**
+2. THEN `product-concept-people.md` — who they are; ⚑ **the persona stories are the OWNER's to write, never Claude's.**
+3. THEN `integration-scenes.md` — the real moments (S3/S9 are the hero candidates).
+4. THEN `../user-flows.md` Arc 0 — the first-run mechanism only.
+5. For the pitch: `product-concept-promise.md`. For voice: `../vision-and-language.md` (⚑ owner re-voices).
+**⛔ Do not write user-facing words before the naming session lands (`product-concept-language.md`).**
+
+**IF the task is THE COMPOSITION FEATURE (building, planning, or specifying) →**
+1. **START:** `composition-definition.md` — the concept. *(⚠ lags the newest stamps; see its banner.)*
+2. **THE LIVE SPEC:** `composition-technical-spec.md` — data · invariants · behaviors · UI states · acceptance · **§6 the open register.**
+3. Capabilities: `composition-surface-spec.md`. Shelf: `future-features.md` (F-1…F-9).
+4. **⚠ `composition-base-spec.md` is a PALIMPSEST** — historical trail with internal contradictions. **Never build from a single section of it.** Read `aerial-review-findings.md` first if you must consult it.
+
+**IF the task is CONNECTION / REFERENCES / LINKS →**
+`composition-technical-spec.md` §1.2 (the relations) → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2·S5·S12·S13. **The direction principle and flatness are settled — do not re-litigate them without the owner.**
+
+**IF the task is TABLES / TYPED FIELDS / TRACKERS →**
+`tables-and-structured-data.md` → `research-structured-data.md`. **The engine is parked; a table is formatting.**
+
+**IF the task is THE BIG PICTURE / STRATEGY / POSITIONING →**
+`convergent-surfaces-overview.md` → `convergent-surfaces-stress-test.md` (the challenge) → the `product-concept-*` family.
 
 ### `teaching-the-user.md` — 🟠 what a person must learn, and how (2026-09-02)
 **Contains:** the three things a person MUST understand (everything else discoverable) · must-teach vs can-discover · **the moments and what teaches at each** (hints, tooltips, structural teaching, F-9's door) · the vocabulary users meet vs ours-only · **what the design teaches without words** · the opens. The user-facing counterpart to the specs.
