@@ -209,14 +209,12 @@ export function BoardSurface({
     return zAbove(cards); // one definition (board-arrange) — no drifting twin (M1)
   }
 
-  // Create doors — every way a card is born onto the surface, plus the board-born
-  // bit's evaporate-if-empty lifecycle and the editor's markContentIfReal. Constructed
-  // BEFORE the remove acts (R1.3a): the acts consult isFreshEmpty/clearFresh so a
-  // remove on a never-had-content bit ABORTS it instead of minting blank litter.
-  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn, markContentIfReal, isFreshEmpty, clearFresh } =
+  // Create doors — every way a card is born onto the surface. (Evaporate retired,
+  // owner ruling D-138: an empty card persists until the owner removes/fills it.)
+  const { addNote, createTextCard, finishDoodle, onBoardDrop, onPickImage, onPickAudio, onPickPdf, bringIn } =
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
-      setSelectedIds, selectOne, setEditingId, editingId, setDrawMode, nextZ,
+      setSelectedIds, selectOne, setEditingId, setDrawMode, nextZ,
       trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr,
     });
 
@@ -231,7 +229,7 @@ export function BoardSurface({
   const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
-    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {
@@ -601,7 +599,6 @@ export function BoardSurface({
               }}
               onOpen={() => openSelected(c.placementId, c.bitId)}
               onChange={(patch, how) => {
-                markContentIfReal(c.placementId, patch.body); // first real content → no longer evaporates
                 // RECORD-ONLY suppression for a group drag (antagonist D3): the card's
                 // own onChange still persists it (onCardDragEnd deliberately skips the
                 // dragged card), but the group entry in onCardDragEnd covers the record —

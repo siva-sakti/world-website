@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { CardVM } from "./card";
 
 // THE GEOMETRY REGISTRY (geometry-registry-plan.md; D-135 phase 2) — one ledger
@@ -23,11 +23,6 @@ import type { CardVM } from "./card";
 
 export function useGeometry() {
   const sizes = useRef(new Map<string, { w: number; h: number }>());
-  // Dev-only probe handle (the stage-2 gate: ledger vs offsetWidth on every card
-  // type, in the browser). Same NODE_ENV gate as the undo readout; never ships.
-  if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
-    (window as unknown as { __geo?: Map<string, { w: number; h: number }> }).__geo = sizes.current;
-  }
   const observer = useRef<ResizeObserver | null>(null);
   const observedIds = useRef(new WeakMap<Element, string>());
   const callbacks = useRef(new Map<string, (el: HTMLElement | null) => void | (() => void)>());
@@ -89,6 +84,14 @@ export function useGeometry() {
       }),
     [],
   );
+
+  // Dev-only probe handle (the stage-2 gate: ledger vs offsetWidth in a real
+  // browser — owner-run). Same NODE_ENV gate as the undo readout; never ships.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      (window as unknown as { __geo?: Map<string, { w: number; h: number }> }).__geo = sizes.current;
+    }
+  }, []);
 
   return { measure, sizeOf, read };
 }

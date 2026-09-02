@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, abortBitCreate } from "@/lib/db/bits";
+import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards } from "@/lib/db/bits";
 import type { useUndo } from "./use-undo";
 import { confirm } from "@/components/confirm";
 import type { CardVM } from "./card";
@@ -47,28 +47,13 @@ export function useBoardActs(deps: {
   forget: (placementId: string) => void;
   setLooseRefresh: Dispatch<SetStateAction<number>>;
   onErr: (e: unknown) => void;
-  // Evaporate's contract reaches the remove acts (R1.3a): a NEVER-had-content
-  // board-born bit gets ABORTED, not unplaced/trashed (no blank-bit litter).
-  isFreshEmpty: (placementId: string) => boolean;
-  clearFresh: (placementId: string) => void;
 }) {
   const {
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
-    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, isFreshEmpty, clearFresh,
+    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,
   } = deps;
 
-  // The evaporate-instead-of-remove path: drop the card from state and abort the bit
-  // (its placement cascades). No looseRefresh bump — nothing became loose.
-  function abortFresh(c: CardVM) {
-    clearFresh(c.placementId);
-    setCards((cs) => cs.filter((x) => x.placementId !== c.placementId));
-    clearSelection();
-    setEditingId(null);
-    settled(c.placementId)
-      .then(() => abortBitCreate(supabase, c.bitId))
-      .catch(onErr);
-  }
 
   const isGoneError = (e: unknown) =>
     e instanceof Error && e.message.includes("no longer exists");
@@ -164,7 +149,7 @@ export function useBoardActs(deps: {
   // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
   function unplaceSelected(placementId: string) {
     const snap = cards.find((c) => c.placementId === placementId);
-    if (snap && isFreshEmpty(placementId)) return abortFresh(snap); // never-had-content → evaporate
+    // (Evaporate retired — D-138: an empty card removes like any other, and records.)
     setCards((cs) => cs.filter((c) => c.placementId !== placementId));
     clearSelection();
     setEditingId(null);
@@ -201,11 +186,6 @@ export function useBoardActs(deps: {
   // Trash the whole bit — hidden everywhere, restorable from /trash. With multi-board,
   // trash is the heavy act (off EVERY board), so the confirm is honest about it (F16).
   async function trashSelected(placementId: string, bitId: string) {
-    // A never-had-content bit has nothing to restore — skip the "restorable from
-    // Trash" confirm (it would promise a trash entry the abort never creates) and
-    // evaporate instead (the antagonist's honesty wrinkle, decided deliberately).
-    const fresh = cards.find((c) => c.placementId === placementId);
-    if (fresh && isFreshEmpty(placementId)) return abortFresh(fresh);
     let n = 1;
     try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
     const msg = n > 1
@@ -267,16 +247,10 @@ export function useBoardActs(deps: {
   // settled door (per placement). Rollback is PER-FAILURE, not all-or-nothing: each
   // card's write is independent, so only the ones that failed come back.
   function bulkUnplace() {
-    const all = cards.filter((c) => selectedIds.has(c.placementId));
-    const fresh = all.filter((c) => isFreshEmpty(c.placementId));
-    const chosen = all.filter((c) => !isFreshEmpty(c.placementId));
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
     setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
     clearSelection();
     setEditingId(null);
-    for (const c of fresh) {
-      clearFresh(c.placementId);
-      settled(c.placementId).then(() => abortBitCreate(supabase, c.bitId)).catch(onErr);
-    }
     // Refresh the loose column on the FIRST landed leg (so genuinely-loose bits show even
     // if a later leg fails) AND once more when all settle (so late legs aren't invisible).
     let landed = 0;
@@ -332,14 +306,7 @@ export function useBoardActs(deps: {
   }
 
   async function bulkTrash() {
-    const everything = cards.filter((c) => selectedIds.has(c.placementId));
-    const freshOnes = everything.filter((c) => isFreshEmpty(c.placementId));
-    const chosen = everything.filter((c) => !isFreshEmpty(c.placementId));
-    for (const c of freshOnes) {
-      clearFresh(c.placementId);
-      setCards((cs) => cs.filter((x) => x.placementId !== c.placementId));
-      settled(c.placementId).then(() => abortBitCreate(supabase, c.bitId)).catch(onErr);
-    }
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
     if (chosen.length === 0) { clearSelection(); setEditingId(null); return; }
     const bitIds = [...new Set(chosen.map((c) => c.bitId))];
     let onOtherBoards = 0;
