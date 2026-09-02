@@ -255,6 +255,9 @@ straighten out compositions."* Claude's read is in §4g.
 *"You're on a board, you want that same bit — you just want a copy of it… we have to think about
 nuances there, like how is that identified now… I thought we were also saying, well, it's not the
 same exact one that's on a board, right, it's a COPY of a bit."*
+> **RULED 2026-09-02 — the copy carries the original's tags.** *"I think we would copy all the
+> original tags that were in a bit."* Source, and whether the copy knows where it came from,
+> are still open.
 > **The owner has already spotted the crux.** The DB enforces one placement per bit per board
 > (`placement_bit_once`), so "put it on this board twice" is impossible by construction —
 > duplicating must mint a **new bit**. Open, and genuinely model-level: does the copy carry the
@@ -267,9 +270,17 @@ same exact one that's on a board, right, it's a COPY of a bit."*
 > the artist using it, and that was recorded as *"evidence for the aesthetics phase's re-entry
 > question, the owner's call then"* (`geometry-registry-plan.md` §4b). This is the owner making that
 > call — the re-entry condition is met.
-> ⚠ **It interacts with card alignment.** A rotated card's edges are no longer its bounding box, so
-> snapping, the guides, tidy and align all have to decide what they align: the box, or the shape.
-> If both are coming, the ORDER matters, and rotation-after-alignment means revisiting alignment.
+> **RULED 2026-09-02 — rotation is in, and the sequencing trap is dissolved.** *"I do think
+> rotation matters now that we're getting more visual spatial… if we do alignment, I think we
+> should just let alignment happen. Sometimes it doesn't need to work for every case — if they've
+> done certain things with the cards then it can no longer align."*
+> **A rotated card simply opts OUT of alignment**, exactly as a locked card does. So alignment
+> never has to reason about rotated shapes, and rotation can land before or after it without
+> either being rebuilt. It is not a new concept for the owner either — "some cards opt out" is the
+> rule locked cards already follow.
+> *Noted for when rotation is actually built, not now:* **centres survive rotation** — spin a card
+> about its middle and the middle does not move, so centre-alignment stays exactly correct while
+> "left edge" stops meaning anything. A future refinement, deliberately not designed today.
 
 ### 3 · Three new bit types — a table · a checklist · a general file
 *"I want three other bits… one table, one that's a checklist, and one that's for general files that

@@ -126,3 +126,86 @@ export function firstClearSpot(
   }
   return clearButOffscreen;
 }
+
+// ---- CARD ALIGNMENT: align & distribute (card-alignment-spec.md §2.3) ----
+//
+// The owner's ask, in her words: *"usually what I see, like for example PowerPoint, they
+// have a range vertical, range horizontal, center — you press those buttons so we don't
+// have to guess."*
+//
+// Deliberately simpler than tidy, and that is the point. Tidy builds a GRID, so it needs
+// a reading order (the 40px banding above) to decide which card lands in which slot.
+// Alignment has no slots: "make these left edges match" does not care which card is
+// first. The owner spotted that herself and it is why this exists rather than an
+// extension of tidy.
+//
+// LOCKED CARDS ARE EXCLUDED BY THE CALLER, exactly as they are for tidy (owner ruling,
+// 2026-09-02: "cards have to be unlocked to align"). Nothing here checks `locked` — the
+// caller passes only what may move, which keeps this a pure function of its input.
+//
+// Sizes come from the caller's MEASUREMENTS (the geometry ledger), never from stored
+// w/h — a text card's stored height is stale by design.
+
+export type AlignEdge = "left" | "hcenter" | "right" | "top" | "vmiddle" | "bottom";
+export type Axis = "h" | "v";
+
+type Measured = { card: ArrangeCard; w: number; h: number };
+
+const patchIfMoved = (m: Measured, x: number, y: number): Patch[] =>
+  x !== m.card.x || y !== m.card.y
+    ? [{ bitId: m.card.bitId, placementId: m.card.placementId, x, y }]
+    : [];
+
+/** Make one edge (or the centre line) of every card match.
+ *
+ *  The target is the SELECTION'S BOUNDING BOX, not an average — so "align left" puts
+ *  everything on the leftmost card's edge and that card does not move, which is what a
+ *  hand expects. Centre alignment uses the box's midline, so differently-sized cards end
+ *  up centred on each other rather than edge-matched. */
+export function alignPatches(measured: Measured[], edge: AlignEdge): Patch[] {
+  if (measured.length < 2) return [];
+  const minX = Math.min(...measured.map((m) => m.card.x));
+  const maxX = Math.max(...measured.map((m) => m.card.x + m.w));
+  const minY = Math.min(...measured.map((m) => m.card.y));
+  const maxY = Math.max(...measured.map((m) => m.card.y + m.h));
+  return measured.flatMap((m) => {
+    switch (edge) {
+      case "left":    return patchIfMoved(m, minX, m.card.y);
+      case "right":   return patchIfMoved(m, maxX - m.w, m.card.y);
+      case "hcenter": return patchIfMoved(m, (minX + maxX) / 2 - m.w / 2, m.card.y);
+      case "top":     return patchIfMoved(m, m.card.x, minY);
+      case "bottom":  return patchIfMoved(m, m.card.x, maxY - m.h);
+      case "vmiddle": return patchIfMoved(m, m.card.x, (minY + maxY) / 2 - m.h / 2);
+    }
+  });
+}
+
+/** Even out the GAPS between cards along one axis — not their positions.
+ *
+ *  Equal gaps, not equal spacing of origins: cards of different sizes should LOOK evenly
+ *  spread, which is about the air between them. The two outermost cards never move (they
+ *  define the span), so this tightens or opens what is already there rather than
+ *  relocating the group. Needs 3 — with 2 there is nothing between them to even out.
+ *
+ *  If the cards already overlap more than the span allows, the gap comes out negative and
+ *  they overlap EVENLY. That is the honest answer; refusing would be worse than doing the
+ *  arithmetic the owner asked for. */
+export function distributePatches(measured: Measured[], axis: Axis): Patch[] {
+  if (measured.length < 3) return [];
+  const pos = (m: Measured) => (axis === "h" ? m.card.x : m.card.y);
+  const size = (m: Measured) => (axis === "h" ? m.w : m.h);
+  const sorted = [...measured].sort((a, b) => pos(a) - pos(b));
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const span = pos(last) + size(last) - pos(first);
+  const occupied = sorted.reduce((sum, m) => sum + size(m), 0);
+  const gap = (span - occupied) / (sorted.length - 1);
+  const out: Patch[] = [];
+  let cursor = pos(first) + size(first) + gap;
+  for (let i = 1; i < sorted.length - 1; i++) {
+    const m = sorted[i];
+    out.push(...(axis === "h" ? patchIfMoved(m, cursor, m.card.y) : patchIfMoved(m, m.card.x, cursor)));
+    cursor += size(m) + gap;
+  }
+  return out;
+}

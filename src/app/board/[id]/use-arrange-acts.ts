@@ -158,9 +158,17 @@ export function useArrangeActs(deps: {
   /** Tidy-up: the entry replays the STORED patches — never re-runs tidy (it
    *  measures live DOM and would compute a different grid; antagonist catch). */
   function recordTidy(patches: Patch[], befores: Map<string, Pos>) {
+    recordPlacements(`tidy up ${patches.length} cards`, patches, befores);
+  }
+
+  /** Any act that MOVES a set of cards to computed positions — tidy, align, distribute.
+   *  The entry replays the STORED patches and never re-runs the computation: tidy measures
+   *  live sizes and would produce a different grid on a second run, and align would compute
+   *  a different bounding box once the first align had already moved things. */
+  function recordPlacements(label: string, patches: Patch[], befores: Map<string, Pos>) {
     if (!patches.length) return;
     record(
-      `tidy up ${patches.length} cards`,
+      label,
       patches.map((p) => p.bitId),
       () => applyAll(patches.flatMap((p) => { const b = befores.get(p.bitId); return b ? [{ bitId: p.bitId, pos: b }] : []; })),
       () => applyAll(patches.map((p) => ({ bitId: p.bitId, pos: { x: p.x, y: p.y } }))),
@@ -187,5 +195,5 @@ export function useArrangeActs(deps: {
       () => doToggle(bitId, on));
   }
 
-  return { recordMove, recordGroupMove, recordResize, noteNudge, closeNudgeWindow, recordTidy, recordSendToBack, recordLock };
+  return { recordMove, recordGroupMove, recordResize, noteNudge, closeNudgeWindow, recordTidy, recordPlacements, recordSendToBack, recordLock };
 }

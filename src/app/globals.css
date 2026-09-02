@@ -91,6 +91,21 @@ body {
   align-items: center;
   gap: 8px;
 }
+/* The align cluster reads as ONE control, not eight loose buttons — tighter gaps than
+   its neighbours, and a hairline to separate it from the acts either side. */
+.compose-align {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  border-left: 1px solid #e6e2da;
+  border-right: 1px solid #e6e2da;
+}
+.compose-align .compose-btn {
+  padding: 2px 5px;
+  font-size: 14px;
+  line-height: 1;
+}
 .marquee-box {
   position: absolute;
   z-index: 4;

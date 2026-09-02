@@ -1,3 +1,4 @@
+import type { AlignEdge, Axis } from "./board-arrange";
 import type { RefObject } from "react";
 
 // The board's top toolbar — create acts (+ text / + image / pen), the select toggle,
@@ -12,6 +13,8 @@ export function BoardToolbar({
   onBulkUnplace,
   onBulkTrash,
   onTidy,
+  onAlign,
+  onDistribute,
   onDuplicate,
   duplicating,
   onFit,
@@ -39,7 +42,9 @@ export function BoardToolbar({
   selectedCount: number;
   onBulkUnplace: () => void;
   onBulkTrash: () => void;
-  onTidy: () => void; // arrange the selection in a neat grid (owner-approved tidy-up)
+  onTidy: () => void;
+  onAlign: (edge: AlignEdge) => void;
+  onDistribute: (axis: Axis) => void; // arrange the selection in a neat grid (owner-approved tidy-up)
   onDuplicate: () => void; // a copy arranging the same bits; the dialog offers open-or-stay
   duplicating: boolean;
   onFit: () => void;
@@ -92,6 +97,23 @@ export function BoardToolbar({
           <button className="compose-btn subtle" onClick={onTidy} title="Arrange the selected cards in a neat grid">
             tidy up
           </button>
+          {/* CARD ALIGNMENT — line the selection up without rearranging it. Distribute needs
+              three: with two there is no gap between them to even out. Locked cards are
+              excluded by the board, exactly as they are from tidy. */}
+          <span className="compose-align" role="group" aria-label="Align the selected cards">
+            <button className="compose-btn subtle" onClick={() => onAlign("left")} title="Line up their left edges">⇤</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("hcenter")} title="Line up their centres, side to side">⇹</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("right")} title="Line up their right edges">⇥</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("top")} title="Line up their top edges">⤒</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("vmiddle")} title="Line up their middles, top to bottom">⇳</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("bottom")} title="Line up their bottom edges">⤓</button>
+            {selectedCount > 2 && (
+              <>
+                <button className="compose-btn subtle" onClick={() => onDistribute("h")} title="Even out the gaps, left to right">↔</button>
+                <button className="compose-btn subtle" onClick={() => onDistribute("v")} title="Even out the gaps, top to bottom">↕</button>
+              </>
+            )}
+          </span>
           <button className="compose-btn subtle" onClick={onBulkUnplace} title="Remove all selected cards from this board">
             remove from board
           </button>
