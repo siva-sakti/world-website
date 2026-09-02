@@ -49,5 +49,8 @@ The app serves a **rhythm: diverge → converge → diverge → converge** — n
 5. **The external telling** — how this feature is taught and told (level 2): flows not definitions · templates as the teacher · the demo moment. ⚑ Owner-written, after naming. Material: `integration-scenes.md` §The external layer.
 6. **Storage** — decided last, after behavior; invisible either way.
 
+## 4b · Teaching this feature
+What a person must learn about compositions, and at which moment — **`teaching-the-user.md`** (the three must-understands; everything else discoverable; the vocabulary users meet vs ours-only).
+
 ## 5 · Where the depth lives
 `composition-base-spec.md` — every ruling with its trail, the lifecycle, the open cells · `composition-surface-spec.md` — the document-capability research and cut · `note-storage-audit.md` — why the separation from bits is happening · `convergent-surfaces-overview.md` — the wider diverge/converge picture this sits in.

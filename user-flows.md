@@ -7,6 +7,7 @@
 ---
 
 ## Arc 0 · ONBOARDING (first run — how a new mind learns the app) 🔲 NOT BUILT
+> **This arc is the MECHANISM.** What must actually be taught, and at which moment, now lives in **`docs/teaching-the-user.md`**; the persona stories in `docs/product-concept-people.md`. Family map: `docs/teaching-the-user.md` §7.
 Teach the model *by doing*, not a slideshow. A new user arrives empty.
 - **Welcome:** one warm line of *what this is* (from `vision-and-language.md`) + **one** first action — "catch your first thing" (jot/paste/image) **or** a pre-seeded example board to poke at.
 - **Progressive reveal, one move at a time:** catch a **bit** → put it on a **board** → **write** a note → mark something **alive** so the desk greets you. Each step introduced only when it's the natural next thing.

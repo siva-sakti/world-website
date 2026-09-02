@@ -253,6 +253,13 @@ INDEX.md ................ this file — where everything is
 ### `aerial-review-findings.md` — 🔵 the independent audit of the whole composition stack (2026-09-03)
 **Contains:** the verdict (close, not consolidation-ready) · the worst findings (three answers to one question · the definition lagging the stamps · evaporate's three readings · the evaporate×I-L2 lifecycle hole) · Claude's own caught errors · the drift strike-list · the KEEP-verbatim five · **the consolidation recipe.** Drives the clean-document pass.
 
+### 🧵 THREADS — follow a topic across files
+- **TEACHING / ONBOARDING:** `teaching-the-user.md` (literal: what + when) → `product-concept-people.md` (personas & flows) → `integration-scenes.md` (the moments) → `../user-flows.md` Arc 0 (the mechanism) → `product-concept-promise.md` (the pitch) → `../vision-and-language.md` (the voice).
+- **THE COMPOSITION FEATURE:** `composition-definition.md` (concept) → `composition-technical-spec.md` (build-grade) → `composition-surface-spec.md` (capabilities) → `composition-base-spec.md` (⚠ trail/palimpsest) → `aerial-review-findings.md` (the audit) → `future-features.md` (the shelf).
+- **CONNECTION / THE FABRIC:** `composition-technical-spec.md` §1.2 → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2/S5/S12/S13.
+- **STRUCTURED DATA:** `tables-and-structured-data.md` → `research-structured-data.md`.
+- **THE BIG PICTURE:** `convergent-surfaces-overview.md` → `convergent-surfaces-stress-test.md` → `product-concept-*`.
+
 ### `teaching-the-user.md` — 🟠 what a person must learn, and how (2026-09-02)
 **Contains:** the three things a person MUST understand (everything else discoverable) · must-teach vs can-discover · **the moments and what teaches at each** (hints, tooltips, structural teaching, F-9's door) · the vocabulary users meet vs ours-only · **what the design teaches without words** · the opens. The user-facing counterpart to the specs.
 
