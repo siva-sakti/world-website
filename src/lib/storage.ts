@@ -134,12 +134,3 @@ export function linkThumbPath(bitId: string): string {
 export function audioPath(bitId: string, ext: string): string {
   return `audio/${bitId}.${ext}`;
 }
-
-/** EVERY extension an audio upload could have used — the orphan sweep's input when the
- *  real one is unknown (a failure before the extension was captured). Blunt on purpose:
- *  removing paths that were never written costs nothing, and missing the one that WAS
- *  written leaves a file behind forever. */
-export const AUDIO_EXTS = ["m4a", "mp3", "mp4", "aac", "wav", "ogg", "oga", "opus", "webm", "flac"];
-export function audioPathsAllExts(bitId: string): string[] {
-  return AUDIO_EXTS.map((ext) => audioPath(bitId, ext));
-}

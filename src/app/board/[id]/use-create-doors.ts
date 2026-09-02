@@ -10,7 +10,7 @@ import {
   callInBit,
   abortBitCreate,
 } from "@/lib/db/bits";
-import { uploadObject, removeObjects, imagePaths, pdfPaths, audioPath, audioPathsAllExts } from "@/lib/storage";
+import { uploadObject, removeObjects, imagePaths, pdfPaths, audioPath } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
@@ -175,6 +175,9 @@ export function useCreateDoors(deps: {
     // HEIC decoding takes a few seconds; only then does it show a notice.
     const heic = isHeic(file);
     if (heic) setConverting((n) => n + 1);
+    // Every path we ATTEMPT to upload, recorded BEFORE the attempt — see the sweep note
+    // in the catch. Same shape in all six upload doors (board + loose x image/audio/pdf).
+    const attempted: string[] = [];
     const chain = importImage(file)
       .then(async (img) => {
         const dispScale = Math.min(1, MAX_DISP / img.width);
@@ -188,6 +191,7 @@ export function useCreateDoors(deps: {
         ]);
         selectOne(placementId);
         const { full: storagePath, thumb: thumbPath } = imagePaths(bitId);
+        attempted.push(storagePath, thumbPath);
         // The two uploads are independent — send them together, not one-then-two.
         await Promise.all([
           uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" }),
@@ -203,11 +207,11 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        // The uploads may have landed before the row insert failed — remove them or
-        // they're orphans forever (paths are deterministic from bitId; removing a
-        // never-uploaded path is a no-op; cleanup failure must not mask the error).
-        const p = imagePaths(bitId);
-        removeObjects(supabase, [p.full, p.thumb]).catch(() => {});
+        // Sweep what we TRIED to upload. Recording the intent BEFORE the attempt is the
+        // whole trick: a half-landed upload (the object stored, the response lost) is
+        // exactly the case a "record it after it succeeds" sweep misses. Removing a
+        // never-written path is a no-op; a failed cleanup must not mask the real error.
+        removeObjects(supabase, attempted).catch(() => {});
         onErr(e);
       })
       .finally(() => {
@@ -228,6 +232,7 @@ export function useCreateDoors(deps: {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     const z = zOverride ?? nextZ();
+    const attempted: string[] = [];
     const localUrl = URL.createObjectURL(file);
     setCards((cs) => [
       ...cs,
@@ -237,6 +242,7 @@ export function useCreateDoors(deps: {
     const chain = importAudio(file)
       .then(async (audio) => {
         const storagePath = audioPath(bitId, audio.ext);
+        attempted.push(storagePath);
         await uploadObject(supabase, { path: storagePath, body: audio.blob, contentType: audio.mime });
         await createAudioBit(supabase, {
           bitId, placementId, boardId, storagePath,
@@ -249,13 +255,10 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        // The upload may have landed before the insert failed — sweep every possible
-        // extension (the real one lives in the .then's closure; removing absent paths
-        // is a no-op).
-        removeObjects(
-          supabase,
-          audioPathsAllExts(bitId),
-        ).catch(() => {});
+        // Sweep what we tried. This used to guess at all ten possible audio extensions,
+        // because the real one was trapped in the .then's closure — recording it before
+        // the upload makes the guess unnecessary.
+        removeObjects(supabase, attempted).catch(() => {});
         onErr(e);
       });
     trackCreate(placementId, chain);
@@ -273,6 +276,7 @@ export function useCreateDoors(deps: {
     const bitId = crypto.randomUUID();
     const placementId = crypto.randomUUID();
     const z = zOverride ?? nextZ();
+    const attempted: string[] = [];
     const chain = importPdf(file)
       .then(async (pdf) => {
         let w = PDF_W;
@@ -292,6 +296,8 @@ export function useCreateDoors(deps: {
         const { file: storagePath, thumb: pdfThumb } = pdfPaths(bitId);
         const thumbPath = pdf.thumb ? pdfThumb : undefined;
         // The uploads are independent — the PDF plus (when present) its page-1 thumb.
+        attempted.push(storagePath);
+        if (thumbPath) attempted.push(thumbPath);
         const uploads = [
           uploadObject(supabase, { path: storagePath, body: pdf.file, contentType: "application/pdf" }),
         ];
@@ -309,8 +315,7 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        const pp = pdfPaths(bitId);
-        removeObjects(supabase, [pp.file, pp.thumb]).catch(() => {}); // orphan sweep
+        removeObjects(supabase, attempted).catch(() => {}); // orphan sweep — see the image door
         onErr(e);
       });
     trackCreate(placementId, chain);
