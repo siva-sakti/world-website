@@ -90,13 +90,16 @@ entry already works). Nudges/tidy: never snap (tidy IS the aligner; a nudge is p
 | board with 0 cards | empty ledger; consumers already handle empty |
 | (if guides) drag near an edge | guide shows, drop snaps; ⌘ held → no snap; the undo entry records the SNAPPED position (truthful) |
 
-## 4 · The owner's questions (asked 2026-09-01)
+## 4 · The owner's ruling (2026-09-01)
 
-1. **Bundle the first visible payoff?** The registry alone changes nothing you can see. Options:
-   pure floor now (fastest, safest) · +snap guides (the one classic basic the board still lacks;
-   ~a sitting more; needs feel-tuning by the owner's hand) · guides later as its own loop.
-2. *(No other owner-level forks found — sequencing was ruled in D-135; everything else here is
-   technical and goes to the antagonist.)*
+**Snap/alignment guides: RULED IN, bundled with the registry** — and with REFERENCE MATERIAL
+incoming: the owner is sending screenshots of an artist mood-boarding in Photoshop (dragging
+images/text boxes with live guides), with instructions to study the TOP HALF of each image and
+take notes on what real artist mood-boarding looks like in action. **The guides' look and feel
+(threshold, line style, what aligns to what) get designed FROM those references** — the
+design-working-method rule: reference-exact, owner as visual oracle, never invented. The
+registry floor (stages 1–3) doesn't depend on the pictures and builds meanwhile; stage 4's
+design section gets written when the references arrive.
 
 ## 5 · Stages & proof
 
