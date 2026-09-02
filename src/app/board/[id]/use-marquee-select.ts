@@ -13,6 +13,7 @@ export function useMarqueeSelect(
   screenToWorld: (clientX: number, clientY: number) => { x: number; y: number },
   setSelectedIds: (ids: Set<string>) => void,
   clearSelection: () => void,
+  sizeOf: (placementId: string) => { w: number; h: number } | null, // the geometry ledger (stage 3)
 ) {
   const marquee = useRef<{ sx: number; sy: number; moved: boolean } | null>(null);
   const [marqueeBox, setMarqueeBox] = useState<MarqueeBox | null>(null);
@@ -41,10 +42,12 @@ export function useMarqueeSelect(
     const dy = e.clientY - mq.sy;
     if (!mq.moved && Math.hypot(dx, dy) < 4) return true; // a tap, not yet a drag
     if (!mq.moved) {
+      // True sizes from THE LEDGER (registry stage 3) — one snapshot per gesture,
+      // same cadence as the old per-gesture DOM sweep, single-sourced now.
       sizes.current.clear();
       for (const c of cards) {
-        const el = document.querySelector(`[data-pid="${c.placementId}"]`);
-        if (el instanceof HTMLElement) sizes.current.set(c.placementId, { w: el.offsetWidth, h: el.offsetHeight });
+        const m = sizeOf(c.placementId);
+        if (m) sizes.current.set(c.placementId, m);
       }
     }
     mq.moved = true;
