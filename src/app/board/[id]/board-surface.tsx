@@ -79,7 +79,6 @@ export function BoardSurface({
   // The geometry registry (D-135 phase 2): every card's true rendered size, one
   // ledger — dark until the consumers switch (stage 3) and the guides land.
   const { measure, sizeOf, read } = useGeometry();
-  void sizeOf; void read; // stage 3 switches the consumers onto these
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
   const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, zoomBy, zoomTo, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
@@ -337,17 +336,10 @@ export function BoardSurface({
   function tidySelected() {
     const chosen = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked); // locked cards stay put
     if (chosen.length < 2) return;
-    // Real rendered sizes via data-pid (text heights are stale in state by design);
-    // the MATH lives in board-arrange.ts, pure and unit-tested (undo floor 2a).
-    const measured = chosen.map((c) => {
-      const el = document.querySelector(`[data-pid="${c.placementId}"]`);
-      return {
-        card: c,
-        w: el instanceof HTMLElement ? el.offsetWidth : c.w,
-        h: el instanceof HTMLElement ? el.offsetHeight : c.h,
-      };
-    });
-    const patches = tidyPatches(measured);
+    // Real rendered sizes from THE LEDGER (registry stage 3 — read() is tidyPatches'
+    // exact input shape, state-fallback where unmeasured); the MATH stays pure in
+    // board-arrange.ts.
+    const patches = tidyPatches(read(chosen));
     const befores = new Map(chosen.map((c) => [c.bitId, { x: c.x, y: c.y }]));
     for (const p of patches) patchCard(p.placementId, p.bitId, { x: p.x, y: p.y });
     arrange.recordTidy(patches, befores); // redo replays THESE patches, never re-runs tidy
