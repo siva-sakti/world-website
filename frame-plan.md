@@ -99,14 +99,19 @@ never a blank void). Camera memory unchanged.
 | undo add-frame after moving it | entries reverse in order: move reverses, then add reverses (frame leaves) |
 | guides off (pre-stage-4) | the frame still works — it's furniture first, snap-source second |
 
-## 5 · The owner's rulings (asked 2026-09-01)
+## 5 · The owner's rulings (2026-09-01)
 
-1. **One frame or several?** (rec: one — the reference is one page; several is additive later)
-2. **Starting size:** a sensible default + freeform resize always — or named presets too
-   (portrait page / square / story…)? If presets, WHICH ones is the artist's call.
-3. **The word:** "frame"? "page"? — the owner writes the voice; also the label tab's text.
-4. **The look:** paper-white fill vs outline-only — can be decided at the feel-tune with both
-   on screen, if preferred.
+1. **ONE frame per board** — ruled. Several = additive later, door named.
+2. **Size: sensible default + freeform** (Claude's default after the owner's clarifying
+   question, overridable at the feel-tune; presets join later only if wanted).
+3. **The word: "frame"** — ruled.
+4. **The look: paper-white fill** — ruled now, sight-unseen.
+
+**The understanding the owner confirmed before ruling (recorded because it's load-bearing):**
+there are NOT two canvases or modes. One canvas; the snap guides work everywhere card-to-card
+with no frame; the frame is optional furniture whose edges merely JOIN the snap candidates.
+A true GRID (repeating mesh, snap-to-grid) is a separate, unspecced feature — the owner
+mentioned the word; filed as an open offer, not built, not implied by this plan.
 
 ## 6 · Stages & proof
 
