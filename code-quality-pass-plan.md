@@ -313,8 +313,43 @@ The extraction must move these VERBATIM and preserve their order exactly.
 **Expected landing:** `board-surface.tsx` ~500-550, `use-create-doors.ts` ~380. Both still large,
 both legitimately so — an orchestrator wiring a dozen hooks is a long file, and that is fine now.
 
-**Proof per step:** the four gates after EVERY move + a named flow trace. E5 additionally needs the
-owner's hands: pan, pinch-zoom on a phone, double-tap to make a card, and marquee-select in select mode.
+**Proof per step:** the four gates after EVERY move + a named flow trace.
+
+### ⛔ E5 IS CANCELLED — do not extract the pointer machine (2026-09-02)
+
+An independent adversarial review of the planned extraction recommended against it. **I verified
+its central reason rather than taking it on trust, and it is correct — in fact stronger than stated.**
+
+**The reason that decides it:** `board-actions-technical-audit.md:355` (layer 1 of the committed
+six-layer target, D-135) rules the next board step as *"one gesture engine (tap · double-tap · drag ·
+resize · pan · pinch · marquee), phone-first, replacing react-rnd"* — and says outright:
+**"Pan/pinch/marquee/taps/group-drag are already our code."** Those four handlers ARE that work's raw
+material. `CLAUDE.md` carries the same ruled sequence: undo → geometry → **own the input** → note
+panel → links. Extracting them into a pan-only hook now builds scaffolding the input engine deletes.
+
+**The supporting reasons:**
+- **The interface would be bigger than the code:** 58 lines out, ~14 arguments in. Every argument
+  converts a variable the compiler tracks for free into a prop that must be threaded correctly.
+- **It barely moves the number:** 689 → ~631 (8%), and the line ceiling is no longer the motive (§5.9).
+- **No safety net.** Nothing in the repo tests these handlers, and the failure modes are invisible to
+  `tsc`, to `build`, and to a desktop mouse. Two need a touch device.
+
+**The specific trap it saved me from:** moving handlers into a hook invites wrapping them in
+`useCallback`. That would break them PARTIALLY — the ref-reading half (tap position, all pinch
+behaviour, the marquee box) keeps working while the state-reading half (`cam`, `selectMode`, `cards`)
+silently freezes at mount values. Partial correctness is the hardest kind to diagnose, and neither
+TypeScript nor the linter would have caught it.
+
+**Also recorded from that review, for whoever builds the input engine** — the load-bearing ordering
+these handlers encode: `pinchMove` must run FIRST and unconditionally (it books-keeps finger
+positions even when it returns false; demote it and a second finger landing mid-pan snaps the world);
+the `e.target !== boardRef.current` guard belongs in Down ONLY; `marquee.cancel()` not `end()` in the
+pinch branch (`end` clears the selection); the 4px dead zone must precede the `moved` flip or
+double-tap-to-create dies intermittently; `scheduleSave()` also clears `justFitted`, so the ⊹ button's
+snap-back depends on it.
+
+**Stage E therefore ends at E4.** `board-surface.tsx` lands at 651 — a long file, legitimately: an
+orchestrator wiring a dozen hooks is what it is, and the ruled input work will reshape it properly.
 
 ## 6. Done so far
 
