@@ -1,86 +1,119 @@
-# Alignment — the spec (everything that helps things line up)
+# Lining up — the spec
 
-**Status: 🟡 SPEC, not a build order.** Written 2026-09-02, before any code, at the owner's
-instruction: *"what are all the things that feature needs to have… actually defining this and
-figuring out what you don't know, what you need to ask me about, what you need to think about,
-and then only building."*
+**Working name: "lining up."** ⚪ *Owner's call — `lexicon.md` is the naming authority.* The owner
+asked for something more specific than "alignment" (*"alignment can be so many things"*) and
+offered "grid alignment"; that is not proposed, because **four of the five pieces are not a grid**
+and the guides were explicitly ruled *"a whisper, never a grid."* Naming the family after its
+least-used member would deepen the confusion it is meant to fix. Seeds offered: **lining up** ·
+straightening · guides & grid.
 
-**The owner also widened it:** *"does this also touch the fact that someone can turn on the grid
-lines on the background of a board so they can align to things, snap to things — to me
-rearranging is also part of this feature set."* Yes to both. This document covers the family.
-
----
-
-## 1 · The five pieces
-
-| # | Piece | What it does | Who drives it | State |
-|---|---|---|---|---|
-| 1 | **tidy up** | rearranges a selection into a uniform grid | a button | ✅ **built** (owner ruled: stays as-is, not extended) |
-| 2 | **alignment guides** | magenta lines while you drag ONE card; it lands aligned on release | your hand | maths ✅ built + tested, **unwired** |
-| 3 | **align / distribute** | make several cards' edges or centres match | a button | ❌ not built |
-| 4 | **background grid** | a visible lattice on the board you can place against | a toggle | ❌ **not specified — the new piece** |
-| 5 | *ruler guides* | lines you drag out and place yourself, permanent | your hand | ❌ not raised — named only so the family is complete. **Not proposed.** |
-
-**They are genuinely different jobs**, which is why they can coexist without overlapping:
-1 and 3 move cards *for* you · 2 helps *your own hand* · 4 gives you something to aim at.
+**Status: 🟡 SPEC — definition, success criteria and cases. The technical plan is §8, and it is
+to be independently checked before any code**, at the owner's instruction: *"write it all out and
+then use that to plan, and do the technical plan, check that plan, and then build."*
 
 ---
 
-## 2 · THE TENSION THAT HAS TO BE RESOLVED FIRST
+## 1 · What this is, in one line
 
-The guides' design (`geometry-registry-plan.md` §4b) was ruled **from the owner's own reference
-screenshots**, and the ruling was:
-
-> **"snapping is a whisper, never a grid"** — small threshold, easy to drift past, edges and
-> centres only. Her practice: *"alignment is available but the composition stays LOOSE — varied
-> scales, deliberate slight overlaps, some rotation, generous white ground."*
-
-**A visible background grid pulls the other way.** A lattice invites you to sit on it; that is
-what a lattice is for. It is not a contradiction — a grid can be opt-in and off by default —
-but the two features have opposite instincts, and building both without saying so would quietly
-undo a ruling made from the owner's own references.
-
-**This is the first question in §6, and it is genuinely open.**
+Everything that helps things sit straight on a board — whether the app does it for you, or your
+own hand does it with help.
 
 ---
 
-## 3 · Precedence — what wins when two things could claim the same drop
+## 2 · The five pieces, defined precisely
 
-This is the real design work, and one obvious answer is wrong.
+### 2.1 · Tidy up — ✅ BUILT, not being changed
+Rearranges a selection into a uniform grid, anchored at the selection's own top-left, cells sized
+to the largest card, in reading order (rows banded at 40px, left-to-right within a row).
+**Owner ruled 2026-09-02: stays exactly as built, not extended** — align buttons cover what she
+actually wanted from it, without needing a reading order at all.
 
-**The wrong answer: "nearest wins."** A grid line is *everywhere* — at 20px spacing, something
-is always within 6px. Nearest-wins would let the grid swallow card-to-card alignment entirely
-and you would never see a card guide again.
+### 2.2 · Alignment guides — maths built + tested, UNWIRED
+While you drag **one** card, thin magenta lines appear wherever an edge or centre of it comes
+within a small distance of an edge or centre of any other card. On release the card lands exactly
+on that alignment. Lines vanish on release. Each card offers 3 lines per axis: **near edge ·
+centre · far edge**. Axes are decided independently. Nearest candidate wins; ties keep the first.
+
+### 2.3 · Align & distribute — NOT BUILT
+Buttons acting on a selection of 2+ cards.
+**Align:** left · horizontal centre · right · top · vertical middle · bottom.
+**Distribute:** horizontally · vertically — equal gaps between adjacent cards.
+No dragging, no grid, no reading order. Cards move to match *each other*.
+
+### 2.4 · The background grid — NOT BUILT (the owner's addition)
+**A toggle** (owner-ruled 2026-09-02: *"background grid should be a toggle… I was just thinking
+it comes with the set of this type of work"*). When on, a faint lattice is drawn on the board's
+ground, and a dragged card can settle onto it. **Off by default.** Visible ⇒ it snaps; hidden ⇒
+it does not (a visible grid that ignores you is decoration; an invisible one that pulls is spooky).
+
+### 2.5 · Ruler guides — NOT PROPOSED
+Lines you drag out and place yourself, persisting until removed. Named only so the family is
+complete and nobody re-discovers the gap as an oversight. **Not in scope.**
+
+---
+
+## 3 · SUCCESS CRITERIA — how we know each piece works
+
+Each is a statement that is either true or false on a real board. "It feels nice" is not here;
+feel is §7.
+
+**Guides — drawing (step 1)**
+- G1 Dragging a card whose left edge comes within ~6 screen px of another card's left edge shows
+  ONE vertical magenta line at that position.
+- G2 The line extends past **both** cards (24 world px each end), so what it aligns to is visible.
+- G3 Dragging with nothing in range shows no line.
+- G4 The line disappears on release, always — including a release outside the window.
+- G5 Both a vertical and a horizontal line can show at once, from **different** neighbours.
+- G6 Lines pan and zoom with the board; they never float over the screen.
+- G7 Dragging at 0.2× and at 3× zoom triggers a line at the same *apparent* distance.
+- G8 A single-card drag still causes **zero React re-renders** (it does today; it must stay so).
+
+**Guides — snapping (step 2)**
+- S1 On release, the card's stored position equals the neighbour's exactly — not within a pixel.
+- S2 Holding Alt through the release: no line shown, raw drop position stored.
+- S3 The drag records **one** undo entry; undo returns the card to where it was **before the
+  drag** (not to the un-snapped drop).
+- S4 Nothing snaps that was not hand-dragged: arrow nudges, tidy, align, file drops, call-in,
+  undo/redo all place exactly where they intend.
+- S5 A locked card can be snapped **to**, and never snapped **by** (it cannot be dragged at all).
+
+**Guides — group drags (step 3)**
+- P1 The card under the hand generates the candidates; **every** selected card moves by that same
+  delta, so relative positions are preserved exactly.
+- P2 One undo entry for the whole gesture; undo restores every card.
+- P3 A locked card inside the selection does not move (it is excluded from group drags today).
+
+**Align & distribute (step 4)**
+- A1 After "align left" on 3 cards, all three report an identical x.
+- A2 "Align horizontal centre" matches centres, so differently-sized cards are centred on each
+  other — not left-matched.
+- A3 Distribute makes the **gaps** equal, not the positions; the outermost two cards do not move.
+- A4 One undo entry restores every card the button moved.
+- A5 Buttons are unavailable with fewer than 2 selected (distribute: fewer than 3).
+- A6 Locked cards are excluded, and the buttons still work on the rest.
+
+**The grid (step 5, only if built)**
+- R1 Off by default; the toggle persists across a reload.
+- R2 With the grid ON and no card in range, a dropped card's position is an exact multiple of the
+  spacing from the board's origin.
+- R3 With the grid ON and a card in range, **the card wins** (§4) — the grid does not claim that axis.
+- R4 With the grid OFF, behaviour is bit-for-bit what it was before the grid existed.
+- R5 Below the hide-threshold zoom, the grid is neither drawn nor snapped to.
+
+---
+
+## 4 · Precedence — what wins when two things claim the same drop
+
+**The obvious answer is wrong.** "Nearest wins" fails: at any sane spacing a grid line is
+*always* within threshold, so the grid would swallow card-to-card alignment and the guides would
+never be seen again.
 
 **The rule: cards beat the grid, per axis, independently.**
-- Horizontally: if any card alignment is in range, take it. Otherwise, if the grid is on, take
-  the grid. Otherwise leave it where the hand put it.
-- Vertically: the same, decided separately.
+1. Horizontal: a card alignment in range takes it. Else, grid if on. Else, the hand's position.
+2. Vertical: decided separately, the same way.
 
-So you can be card-aligned left while grid-aligned top. That falls out of the axes already being
-independent in `snapTo`, and it is what a hand expects.
-
-**Corollary:** a visible grid never *replaces* the card guides; it fills in where they are silent.
-
----
-
-## 4 · The rules, stated flatly
-
-- **Only a hand-drag snaps.** Never: arrow-key nudges · tidy · the align buttons · dropping a
-  file · calling a bit in from the drawer · undo/redo. Those all place things deliberately, and
-  a snap would fight the intent.
-- **Alt/Option refuses the snap** for that gesture (⌘ is additive-select — collision ruled, D6).
-- **Guides live in the canvas**, so they pan and zoom with the board rather than floating over
-  the screen.
-- **Guides appear only during the gesture** and vanish on release.
-- **Locked cards are targets, not draggers** — you can align against something you can't move.
-- **Threshold is SCREEN pixels ÷ zoom**, so the feel is identical at every zoom (a world-space
-  threshold would be 1.2px at 0.2× and 18px at 3×).
-- **Visible grid = snapping grid.** A visible grid that does not snap is decoration; an invisible
-  grid that snaps is spooky. One toggle, both behaviours.
-- **Align buttons ignore the grid.** Making cards match *each other* is the whole point; landing
-  on a grid line is coincidence, not a goal.
-- **A snapped drop records as one ordinary move** — undo reverses it like any other.
+So card-aligned left + grid-aligned top is a normal outcome. The grid fills in where the cards
+are silent; it never replaces them.
 
 ---
 
@@ -88,73 +121,71 @@ independent in `snapTo`, and it is what a hand expects.
 
 | Situation | What happens |
 |---|---|
-| drag a card, nothing near | no guide, no snap, lands where you put it |
-| drag near one card's left edge | vertical magenta line; lands edge-matched on release |
-| drag near one card horizontally AND another vertically | both lines; snaps in both, to different neighbours |
-| drag with Alt held | no guide, no snap |
-| drag a group | the card under your hand finds the alignment; the whole selection moves by that delta |
-| drag near a LOCKED card | snaps to it (it is a target) |
-| drag a captioned image | aligns the **picture's** box, not the caption below it — flagged for the feel-tune |
-| grid on, no card in range | grid claims the axis |
-| grid on, a card in range | **the card wins**; grid silent on that axis |
-| zoomed far out, grid on | grid hides (see §7) — snapping to a 4-screen-px lattice is meaningless |
-| nudge with arrows | never snaps, grid or not |
-| tidy / align buttons | never snap; they place deliberately |
+| drag, nothing near | no line, no snap |
+| drag near one card's left edge | vertical line; edge-matched on release |
+| drag near one card horizontally, another vertically | two lines, two neighbours, both snap |
+| drag with Alt held | no line, no snap |
+| drag a group | hand's card finds it; whole selection moves by that delta |
+| drag near a locked card | snaps to it |
+| drag a captioned image | aligns the **picture**, not the caption below it — flagged for feel-tune |
+| grid on, nothing near | grid claims the axis |
+| grid on, a card near | card wins; grid silent on that axis |
+| grid on, zoomed far out | grid hidden and inert |
+| grid off | exactly today's behaviour |
+| arrow-key nudge | never snaps |
+| tidy / align buttons | never snap |
+| align with 1 card selected | buttons unavailable |
+| distribute with 2 cards | unavailable (nothing to distribute between) |
+| align a selection containing a locked card | the locked one holds still; the rest align |
+| undo after a snap | back to the pre-drag position, one step |
 
 ---
 
-## 6 · WHAT I NEED FROM THE OWNER (nothing here is Claude's to decide)
+## 6 · The honest limits — said before building
 
-1. **Do you actually want the background grid — or were you naming what other tools have?**
-   §2 is the reason this is a real question, not a formality. Both can exist; but if the grid is
-   built, it should be because you want a lattice to compose against, not because InDesign has one.
-2. **If yes: what is it FOR?** Two different features wear the same clothes —
-   (a) *visual rhythm* — a faint ground that makes the composition feel ordered; you may not even
-   snap to it. (b) *precision placement* — you want things ON the lines.
-   The answer changes the spacing, the contrast, and whether it snaps at all.
-3. **Spacing.** A feel-tune, best judged on a real board rather than chosen in advance.
-4. **Per board, or one setting for the whole app?** A grid on your moodboard but not on your
-   reading list is plausible; so is one preference everywhere.
-5. **What do we CALL this family?** `lexicon.md` is the naming authority and Claude should not
-   mint a product word. "Guides"? "Alignment"? Something of yours.
-6. **The magenta, and how strong the pull is.** Already scheduled as stage 4's gate — needs your
-   eyes on a live board, not a value picked in advance.
+- **The card will not stick to a line while you drag.** The line shows live; the card settles on
+  release. react-rnd ignores position changes mid-drag (traced through its source). Magnetic pull
+  requires the ruled input-engine work; this is not it.
+- **No live equal-gap guides** (the "spacing hints" some tools show). Distribute is a button.
+- **No rotation.** Ruled out of v1; the references show it in use, recorded for the aesthetics phase.
+- **No ruler guides** (§2.5).
 
 ---
 
-## 7 · What Claude settles by investigation (not owner questions)
+## 7 · Feel — the owner's, at the end, on a live board
 
-- **How the grid renders.** A repeating CSS gradient on the world layer costs nothing and scales
-  with the zoom transform for free. To confirm before relying on it.
-- **The zoom threshold at which the grid hides**, and whether it should coarsen (double the
-  spacing) instead of hiding. Measurable, not a matter of taste.
-- **Whether guides can render imperatively** without causing React re-renders per drag frame — a
-  single-card drag causes ZERO re-renders today and must stay that way.
-- **Where the align buttons live.** The selected-card bar only appears for a SINGLE selection;
-  align needs two or more, so it belongs on the multi-select toolbar. To verify.
+Not decidable in advance, and not Claude's: the exact magenta against the paper ground · how
+strong the pull is (~6 screen px is a starting guess) · the grid's spacing and faintness · whether
+the caption rule in §5 reads right.
 
 ---
 
-## 8 · The honest limits, stated before building
+## 8 · THE TECHNICAL PLAN — to be independently checked before code
 
-- **The card will not stick to a line while you drag.** The guide shows live; the card settles on
-  release. react-rnd ignores position changes mid-drag — traced through its source. Magnetic pull
-  needs the ruled input-engine work, and this is not it.
-- **No spacing/distribution *guides*** (the "equal gaps" hints some tools show). The align family
-  gets a *distribute button*; live equal-gap guides are a bigger job and are not proposed.
-- **No rotation.** Ruled out of v1 long ago; the references show it in use, recorded as evidence
-  for the aesthetics phase, not re-opened here.
+**8.1 · What exists.** `snapTo(dragged, others, threshold)` in `geometry.ts` — pure, 7 tests,
+**no caller**. The size ledger (`use-geometry`) gives live true sizes. `card.tsx:184` reports live
+drag coords; `card.tsx:185-188` reports the drop.
 
----
+**8.2 · The ordering constraint.** `card.tsx:186` writes the RAW drop (`onChange({x,y},"move")`)
+and only then calls `onDragEnd`. A snap must land **before both**, or the saved position and the
+undo entry record the un-snapped truth. → Card gains one prop, `snapDrop?: (x,y) => {x,y}`,
+supplied by the board (which owns the ledger, the card list and the camera). Card stays dumb.
 
-## 9 · Proposed order (each gated and committed alone)
+**8.3 · Steps, each gated and committed alone.**
+1. **Draw only.** A ref'd overlay in the world layer. On each `onDragMove`, the board computes
+   `snapTo` and mutates the overlay **imperatively** — G8 forbids a re-render per frame.
+2. **Snap on release.** `snapDrop` in `onDragStop`; threshold = screen px ÷ `cam.scale`; Alt refuses.
+3. **Group drags.** Candidates from the dragged card; whole selection moves by the delta.
+4. **Align & distribute.** Pure functions in `board-arrange.ts` + tests; one undo entry, the shape
+   `recordTidy` already uses; controls on the multi-select toolbar.
+5. **The grid.** Repeating CSS gradient on the world layer; toggle persisted via `writeLocal`;
+   precedence per §4.
 
-1. **Guides — draw only.** Lines appear during a drag, nothing moves yet. Cheapest proof the
-   maths is wired to reality, and it lets the owner judge the *feel* before cards start relocating.
-2. **Guides — snap on release**, single card, Alt to refuse.
-3. **Guides — group drags.**
-4. **Align / distribute buttons** — the owner's PowerPoint ask; simpler than the guides, and
-   likely more daily use.
-5. **The background grid** — *only if §6.1 says yes*, and after the guides, so the precedence rule
-   in §3 can be judged against something real.
-6. *(Optional, owner offered earlier)* the live W×H readout during a resize.
+**8.4 · What Claude verifies rather than assumes.** That a CSS gradient grid scales correctly
+under the existing world transform · the zoom at which the grid stops being legible · that the
+imperative overlay really does avoid re-renders · where the align controls fit in the toolbar ·
+that `recordMove`'s `after` is the snapped value (so undo is honest).
+
+**8.5 · Risks.** Guides are additive and off the persistence path — low. The snap writes a
+position, so it touches the same door every move already uses — medium, covered by S1–S5. The
+grid is a new stored preference — low. **Nothing here changes the schema.**
