@@ -61,7 +61,7 @@ export function useCreateDoors(deps: {
   const {
     supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
     setSelectedIds, selectOne, setEditingId, setDrawMode, nextZ,
-    trackCreate, reconcileId, setConverting, setCapturing, setWordsFor, onErr,
+    trackCreate, reconcileId, setConverting, setCapturing, setWordsFor, onErr, sizeOf,
   } = deps;
 
   const spawnStep = useRef(0); // last-resort cascade when no clear spot is found
@@ -79,9 +79,9 @@ export function useCreateDoors(deps: {
 
   // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate
   // against every card on the board, step down-right until clear — preferring a
-  // spot fully IN VIEW (a new thing must never seem to not-appear). Text heights
-  // in state are stale by design (height:auto), so measure the rendered card via
-  // data-pid and fall back to state. Deterministic; last resort = plain cascade.
+  // spot fully IN VIEW (a new thing must never seem to not-appear). True sizes come
+  // from THE LEDGER (registry stage 3; state fallback where unmeasured) — a NAMED
+  // improvement over the old text-only DOM query: audio cards now measure too.
   function findClearSpot(w0: number, h0: number): { x: number; y: number } {
     const r = boardRef.current?.getBoundingClientRect();
     if (!r) {
@@ -92,8 +92,8 @@ export function useCreateDoors(deps: {
     const tl = screenToWorld(r.left, r.top);
     const br = screenToWorld(r.left + r.width, r.top + r.height);
     const rects = cards.map((c) => {
-      const el = c.type === "text" ? document.querySelector(`[data-pid="${c.placementId}"]`) : null;
-      return { x: c.x, y: c.y, w: c.w, h: el instanceof HTMLElement ? el.offsetHeight : c.h };
+      const m = sizeOf(c.placementId);
+      return { x: c.x, y: c.y, w: m?.w ?? c.w, h: m?.h ?? c.h };
     });
     const MARGIN = 12;
     const start = { x: anchor.x - w0 / 2, y: anchor.y };
