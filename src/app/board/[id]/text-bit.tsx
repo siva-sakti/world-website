@@ -43,12 +43,18 @@ type Picker = { query: string; from: number; to: number; left: number; caretTop:
 export function TextBit({
   html,
   editing,
+  selected = false,
   onChange,
   selfBitId,
   onReady,
 }: {
   html: string;
   editing: boolean;
+  /** Board cards pass their selection so a resting link needs TWO clicks: the
+   *  first selects the card (arrangement first), the second opens — in a NEW tab.
+   *  A plain click on an in-text anchor used to navigate the whole board away
+   *  mid-drag-attempt (soak finding, 2026-09-01). */
+  selected?: boolean;
   onChange: (html: string) => void;
   selfBitId?: string; // excluded from the picker — you can't gather the note you're writing
   // Hands the parent a way to gather from OUTSIDE the editor (N4b — the note
@@ -191,7 +197,25 @@ export function TextBit({
   return (
     <>
       {editing && editor && <Toolbar editor={editor} />}
-      <EditorContent editor={editor} className="tiptap" />
+      <EditorContent
+        editor={editor}
+        className="tiptap"
+        onClickCapture={(e) => {
+          // The resting-link click grammar (soak finding, 2026-09-01): a plain
+          // click on an in-text anchor used to navigate the WHOLE TAB away mid-
+          // arrangement. Now: first click = select the card (never navigate);
+          // second click (already selected) = open in a NEW tab, board preserved.
+          if (editing) return; // in the editor, openOnClick:false already rules
+          const a = (e.target as HTMLElement).closest?.("a");
+          const href = a?.getAttribute("href");
+          if (!a || !href) return;
+          e.preventDefault();
+          if (selected) {
+            e.stopPropagation(); // the open click must not ALSO enter edit mode
+            window.open(href, "_blank", "noopener,noreferrer");
+          }
+        }}
+      />
       {editing && picker && candidates !== null && (
         <GatherPicker
           supabase={supabase}

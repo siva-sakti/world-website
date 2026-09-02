@@ -39,17 +39,19 @@ export type CardVM = {
 // Resize dots in two sizes: 11px for a mouse, 22px for a coarse (touch) pointer —
 // a fingertip can't grab an 11px dot (writing-experience-plan v1.4). Offsets scale
 // with the size so the dots stay centered on the edge (plan review finding 9).
-function handleStyles(size: number) {
+function handleStyles(size: number, hit = size) {
+  // The GRAB zone is `hit`; the visible dot (size `size`) is DRAWN centered in it
+  // with a radial gradient (soak finding, 2026-09-01: an 11px dot was also an 11px
+  // target — "a very narrow window" between resize and move). The hit area grows,
+  // the quiet look stays.
+  const r = size / 2;
   const dot = {
-    width: size,
-    height: size,
-    borderRadius: size < 16 ? 3 : 6,
-    background: "#fffdfa",
-    border: "1.5px solid #365a8c",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+    width: hit,
+    height: hit,
+    background: `radial-gradient(circle, #fffdfa 0 ${r - 1.5}px, #365a8c ${r - 1.5}px ${r}px, transparent ${r}px)`,
   };
-  const off = -Math.round(size / 2) - 1;
-  const mid = -(size / 2);
+  const off = -Math.round(hit / 2) - 1;
+  const mid = -(hit / 2);
   return {
     topLeft: { ...dot, left: off, top: off },
     topRight: { ...dot, right: off, top: off },
@@ -64,8 +66,8 @@ function plainText(html: string | undefined): string {
   return (html ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-const HANDLE_STYLES = handleStyles(11);
-const HANDLE_STYLES_COARSE = handleStyles(22);
+const HANDLE_STYLES = handleStyles(11, 26); // 26px to grab, 11px to see
+const HANDLE_STYLES_COARSE = handleStyles(22, 34);
 // text → LEFT/RIGHT handles reflow (width); height follows the text.
 // image/drawing → CORNER handles scale, aspect-locked.
 const RESIZE_TEXT = { left: true, right: true };
@@ -247,6 +249,7 @@ export function Card({
           <TextBit
             html={card.body || ""}
             editing={editing}
+            selected={selected}
             onChange={(body) => onChange({ body }, "write")}
           />
         )}
