@@ -358,14 +358,13 @@ export async function unplaceBit(
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
-/** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
- * row was touched (0 rows = the act missed — surface it). */
+/** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). The 0-row
+ * assert lives in setResting now, so every resting act carries it, not just this one. */
 export async function trashBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const n = await setResting(supabase, "bit", bitId, "deleted_at", true);
-  if (!n) throw new Error("that note no longer exists — reload");
+  await setResting(supabase, "bit", bitId, "deleted_at", true);
 }
 
 /** Compensating erase of a bit created MOMENTS ago by a multi-step intake whose
@@ -380,14 +379,13 @@ export async function abortBitCreate(supabase: SupabaseClient, bitId: string): P
 }
 
 /** Restore a trashed bit — back to the world exactly, everywhere it was (§2g).
- *  Asserts the row count (R2.12): restoring against an emptied trash must SAY so,
- *  not silently no-op while the owner believes the thing is back. */
+ *  Restoring against an emptied trash must SAY so, not silently no-op while the owner
+ *  believes the thing is back (R2.12) — asserted in setResting for every path. */
 export async function restoreBit(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<void> {
-  const n = await setResting(supabase, "bit", bitId, "deleted_at", false);
-  if (!n) throw new Error("that's no longer in the trash — it may have been destroyed");
+  await setResting(supabase, "bit", bitId, "deleted_at", false);
 }
 
 /** DESTROY a bit permanently (I-L10) — only if trashed. Removes its media files,

@@ -138,14 +138,13 @@ export async function trashBoard(
   await setResting(supabase, "board", id, "deleted_at", true);
 }
 
-/** Restore a trashed board — its arrangement returns exactly (§2g). Asserts the row
- *  count (R2.12): restoring against an emptied trash must say so, not silently no-op. */
+/** Restore a trashed board — its arrangement returns exactly (§2g). Restoring against
+ *  an emptied trash must say so, not silently no-op (R2.12) — asserted in setResting. */
 export async function restoreBoard(
   supabase: SupabaseClient,
   id: string,
 ): Promise<void> {
-  const n = await setResting(supabase, "board", id, "deleted_at", false);
-  if (!n) throw new Error("that's no longer in the trash — it may have been destroyed");
+  await setResting(supabase, "board", id, "deleted_at", false);
 }
 
 /** DESTROY a board permanently (I-L6) — only if trashed. Cascade deletes its

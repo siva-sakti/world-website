@@ -5,17 +5,24 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // keep the call sites readable. Destroy stays its own act (a hard delete + storage).
 // The `state` generated column derives live/archived/trashed from the two timestamps.
 
-/** Set or clear a resting-state timestamp on a bit or board. Returns the affected-row
- *  count so a caller can assert the thing still exists. **Trash wins:** trashing also
- *  clears `archived_at`, so a thing is in exactly ONE resting place — restore-from-trash
- *  returns it to *live*, not to archive (owner ruling, 2026-08-29). */
+/** Set or clear a resting-state timestamp on a bit or board. **Trash wins:** trashing
+ *  also clears `archived_at`, so a thing is in exactly ONE resting place — restore-from-
+ *  trash returns it to *live*, not to archive (owner ruling, 2026-08-29).
+ *
+ *  THROWS when the update touches no row. Every resting act — put away, take back out,
+ *  trash, restore, for bits AND boards — passes through here, so asserting once here is
+ *  what stops any of them failing silently. Before this, 6 of the 9 paths ignored the
+ *  count: putting a thing away from a stale page did nothing at all, with no error, and
+ *  the screen simply re-rendered it still sitting there (owner-flagged, 2026-09-02).
+ *  Zero rows means the thing is gone, or RLS refused — either way the act did not
+ *  happen, and saying so is the house standard. */
 export async function setResting(
   supabase: SupabaseClient,
   thing: "bit" | "board",
   id: string,
   column: "deleted_at" | "archived_at",
   on: boolean,
-): Promise<number> {
+): Promise<void> {
   const patch: Record<string, string | null> = {
     [column]: on ? new Date().toISOString() : null,
   };
@@ -28,7 +35,18 @@ export async function setResting(
   if (column === "archived_at" && on) patch.pinned_at = null;
   const { data, error } = await supabase.from(thing).update(patch).eq("id", id).select("id");
   if (error) throw error;
-  return data?.length ?? 0;
+  if (!data?.length) throw new Error(goneMessage(column, on));
+}
+
+/** The sentence a vanished thing gets. The two RESTORE wordings are the ones the
+ *  restore paths already showed, kept verbatim. The put-away/trash wording drops the
+ *  noun ("that note…" → "that…") because one sentence now serves bits AND boards, and
+ *  "note" was wrong for a board — flagged for the owner's own words. */
+function goneMessage(column: "deleted_at" | "archived_at", on: boolean): string {
+  if (on) return "that no longer exists — reload";
+  return column === "deleted_at"
+    ? "that's no longer in the trash — it may have been destroyed"
+    : "that's no longer in the archive — it may have been taken back out";
 }
 
 /** Archive a thing — hide-but-keep, its own area, restorable; NEVER deletes. */
