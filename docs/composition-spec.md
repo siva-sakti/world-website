@@ -76,8 +76,8 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 | **peek** | tap a chip → a floating glimpse of the target beside it, with a door to open it. *Shipped Aug 2026.* |
 | **block** | a pulled-in thing rendered **in place** in the flow — preview-sized. *Ruled, unbuilt.* ⚑ *the word is overloaded (Notion's paragraph word) — naming session item.* |
 | **frame** | ⛔ **not used in this spec.** The word belongs to the board's alignment feature (other track). |
-| **toggle** | a **collapsible section**: a line of text with a triangle; click to unfold hidden content beneath it, click to fold it away. Manages length in long pieces. ⚠ Collapsed content is invisible content — and a search hit inside a fold must open it. ⚪ in/out of v1 |
-| **callout** | a **boxed aside** — tinted, often with an icon — set apart from the flowing text (*"💡 Remember: the deadline moved"*). Emphasis, not structure. 🔵 Claude's lean: **out of v1** — a quote block already sets text apart, and it is trivial to add later |
+| **toggle** | a **collapsible section**: a labelled line with a triangle; click to unfold hidden content, click to fold it away. Manages length in long pieces. **Ruled IN** — collapsed content stays searchable; a hit inside a fold auto-unfolds it (§13.7) |
+| **callout** | a **boxed aside** — tinted, often with an icon — set apart from the flowing text. ⛔ **Ruled out** (§13.8) |
 | **frame (the three)** | in this spec, **floater · side panel · full page** — the three windows onto one composition. Not related to the board's alignment feature. |
 
 **3.4 · The laws**
@@ -339,9 +339,9 @@ Returns everything carrying that word — bits, boards, and now compositions, mi
 
 ### 13.1 Blocks — the v1 set
 **In** *(the converged core; every source agrees — `research-block-editors.md`)*:
-paragraph · headings *(2 levels)* · bulleted list · numbered list · **checklist** · quote · divider · code · **table** · image · **the pulled-in thing** (chip or block, §9)
+paragraph · headings *(2 levels)* · bulleted list · numbered list · **checklist** · quote · divider · code · **table** · image · **toggle / collapsible section** *(owner-ruled IN — §13.7)* · **the pulled-in thing** (chip or block, §9)
 
-**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · **toggles** *(collapsible sections — see glossary; ⚪ the research puts them in Notion's core set, and they are the only block that manages LENGTH; the owner's Notion session decides)* · equations · embeds · **callouts** *(boxed asides — see glossary; 🔵 Claude's lean: leave out of v1, add later if missed)*
+**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · equations · embeds · **callouts** *(ruled out — §13.8)*
 
 **Already installed but unexposed:** headings · lists · quote · divider · code ship inside the editor library today with **no UI to reach them** — much of v1 is surfacing, not building.
 
@@ -363,6 +363,19 @@ paragraph · headings *(2 levels)* · bulleted list · numbered list · **checkl
 8. **Never-empty** — deleting the last block inserts a fresh empty paragraph; the editor cannot reach an invalid state.
 
 **Known traps to design against** ⚠: a rigid pre-baked block framework *(a team abandoned one and rebuilt on raw tiptap — we are on raw tiptap already)* · the slash menu re-firing on paste/undo · making text nodes draggable directly *(fights text selection — use hover-revealed handles)*.
+
+### 13.7 Toggles (collapsible sections) — **RULED IN** *(owner, 2026-09-02)*
+1. **What it is:** a labelled line with a triangle; content beneath folds away and unfolds on click.
+2. **Making one:** **select blocks → "collapse these"** (they fold under a line you name) · or insert an empty toggle from the `/` menu and write inside it.
+3. **What stays visible when folded:** the toggle's **own line** — its label, which the owner writes — plus the fold triangle. ⚪ *whether it also shows how much is hidden (a count · a faint first-line preview · nothing). 🔵 Claude's lean: nothing but the label.*
+4. ⭐ **Collapsed content remains SEARCHABLE** *(owner-ruled: "collapse is invisible, but it should still be searchable — it's just not visible")*. Out of sight is never out of reach.
+5. **Consequence to build:** a search result inside a collapsed toggle must **auto-unfold it** on arrival, or the reader lands on a match they cannot see.
+6. **Why it earns its place:** it is the only block that manages **length** — what long-form writing actually needs.
+
+### 13.8 Callouts — **RULED OUT** *(owner, 2026-09-02)* — and the standing test it produced
+Out of v1 and out of the plan. **The owner's reasoning generalises:**
+> ⭐ **THE BOARDS TEST — is this Notion feature solving a problem we don't have, because we have boards?**
+Her words: *"a lot of the time something like Notion is trying to solve the fact that they don't have the board interface."* A callout is a boxed aside for something that must stand apart from the flow — **we have an entire spatial surface for that.** Notion needs callouts partly because it has nowhere else to put them. **Apply this test to every future Notion-shaped feature request.**
 
 ### 13.4 What is exposed in which frame *(owner-ruled)*
 | frame | toolkit |
