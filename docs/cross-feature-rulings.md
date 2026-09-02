@@ -21,6 +21,36 @@
 | X9 | **The `+ checklist` door on the board** births a text bit pre-shaped as a checklist | **boards** | owner, 2026-09-03 | in the code-window handoff |
 | X10 | **Nothing vanishes under your hands while you rearrange** — the principle behind bit-cards persisting (D-138) and behind evaporation being birth-scoped | **boards · all card behavior** | owner: *"I don't want that bit to disappear… I architected it that way for a bit"* | ruled, honored today |
 
+## ⭐ BUILD STATUS — decided ≠ built *(owner-asked, 2026-09-02: "did you build these out on the other surface?")*
+
+**Nothing in this register is built. All ten are decided-only.** Status legend: **DECIDED** (ruled, no code) · **HANDED OFF** (in a build plan) · **BUILT** (in the app, verified).
+
+| # | ruling | status | its build home |
+|---|---|---|---|
+| X1 | global date format | **DECIDED** | ⚑ no home — needs the feature queue |
+| X2 | the pull's kind filter | **DECIDED** | ⚑ no home |
+| X3 | homepage search titles-only | **BUILT** — matches today's behavior | — |
+| X4 | table as a bit type | **DECIDED** | ⚑ belongs beside the file-bit build (`editor-formatting-and-file-bit-plan.md`) |
+| X5 | boards get auto-titles | **DECIDED** | ⚑ no home |
+| X6 | global private mark | **DEFERRED** | the privacy session |
+| X7 | "frame" belongs to the board feature | **BUILT** (the other window's work) | — |
+| X8 | "link" is taken | **BUILT** (the link bit type ships) | — |
+| X9 | `+ checklist` door | **HANDED OFF** | `editor-formatting-and-file-bit-plan.md` |
+| X10 | nothing vanishes while rearranging | **BUILT** for bits (D-138) · **DECIDED** for compositions | the migration |
+
+## ⭐ THE BUILD ORDER — the architecture first *(owner-ruled, 2026-09-02)*
+> *"You need to at least build the underlying architecture of the composition being a different place than just a big bit as it is right now… that elementary starting-off first, before fixing the other things."*
+
+**Correct, and it matches the tiers** (T1 = the functional floor): everything else in the feature stands on compositions being their own thing. Building composition behavior first means building it twice.
+
+**The order:**
+1. ⚑ **THE STORAGE SESSION** — decides the shape (own home · shared surface table · which columns). **This is the critical path; nothing below can start.**
+2. **The migration** — compositions leave the bit table; search index follows; export lockstep; references and placements repoint. *(Code window's lane, house method: backup → throwaway-proven → owner's go.)*
+3. **Then** composition behavior: the floater · the block/chip work · the editor's v1 blocks.
+4. **Then** the cross-feature items above, which are independent and can slot anywhere after their own build homes exist.
+
+⛔ **Do not build composition behavior before step 2.** *(This is the sequencing the spec has carried since the tiers; the owner has now stated it independently.)*
+
 ## How to keep track
 - **This file is the index of them.** Anything here that is unbuilt eventually becomes a build item in `organize-phase-plan.md` (the app's real feature queue) or a handoff doc.
 - **The composition spec cross-references here** wherever a ruling reaches beyond it.
