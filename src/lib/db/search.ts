@@ -13,7 +13,7 @@ export type SearchResult = Bit & { tags: { id: string; word: string }[] };
 
 export type SearchArgs = { q?: string; tagId?: string; type?: BitType; kind?: "bit" | "note" };
 
-export async function searchBits(
+async function searchBits(
   supabase: SupabaseClient,
   args: SearchArgs,
 ): Promise<SearchResult[]> {

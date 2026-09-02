@@ -6,9 +6,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // URLs (they expire); resolve to a URL at read time via signedUrl. v1 is entirely
 // private; the public tier arrives with the sharing gradient.
 
-export const PRIVATE_BUCKET = "private";
+const PRIVATE_BUCKET = "private";
 
-export type UploadArgs = {
+type UploadArgs = {
   path: string; // object key, e.g. `images/<uuid>.webp`
   body: Blob | File | ArrayBuffer;
   contentType: string;

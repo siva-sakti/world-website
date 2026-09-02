@@ -39,7 +39,7 @@ export type CardVM = {
 // Resize dots in two sizes: 11px for a mouse, 22px for a coarse (touch) pointer —
 // a fingertip can't grab an 11px dot (writing-experience-plan v1.4). Offsets scale
 // with the size so the dots stay centered on the edge (plan review finding 9).
-function handleStyles(size: number, hit = size) {
+function handleStyles(size: number, hit: number) {
   // The GRAB zone is `hit`; the visible dot (size `size`) is DRAWN centered in it
   // with a radial gradient (soak finding, 2026-09-01: an 11px dot was also an 11px
   // target — "a very narrow window" between resize and move). The hit area grows,

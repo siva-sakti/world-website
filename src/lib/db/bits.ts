@@ -358,24 +358,6 @@ export async function unplaceBit(
   if (!data?.length) throw new Error("that card no longer exists — reload the board");
 }
 
-/** Put a note away, or take it back out (N5). Archive is a RESTING state, not
- *  trash-lite: it leaves the rooms you work in (and find — I-L8 rules archived OUT
- *  of search; the archive page is its surface).
- *
- *  Delegates to the ONE resting door (setResting), which clears the star on archive
- *  — "nothing is both alive-right-now and put away" is app-enforced there tonight;
- *  the DB CHECK is queued for the owner's cloud paste (review R2.6 — the check this
- *  comment used to cite fell out of the resting-state rewrite; two doors had
- *  diverged). Keeps the 0-row assert this page's caller relies on. */
-export async function archiveBit(
-  supabase: SupabaseClient,
-  bitId: string,
-  on: boolean,
-): Promise<void> {
-  const n = await setResting(supabase, "bit", bitId, "archived_at", on);
-  if (!n) throw new Error("that note no longer exists — reload");
-}
-
 /** Trash the whole bit — a freeze, hidden everywhere, restorable (§2g). Asserts a
  * row was touched (0 rows = the act missed — surface it). */
 export async function trashBit(

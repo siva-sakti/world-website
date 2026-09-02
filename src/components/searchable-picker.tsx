@@ -17,9 +17,6 @@ export function SearchablePicker({
   placeholder = "search…",
   disabled,
   noneLabel,
-  onCreate,
-  resetOnPick = true,
-  className,
   title,
 }: {
   options: PickerOption[];
@@ -27,9 +24,6 @@ export function SearchablePicker({
   placeholder?: string;
   disabled?: boolean;
   noneLabel?: string; // a top row (shown when not searching) that clears a bound value via onPick("")
-  onCreate?: (text: string) => void; // a "create '…'" row when the typed text isn't an existing option
-  resetOnPick?: boolean; // action-mode clears the box after a pick
-  className?: string;
   title?: string; // tooltip on the input
 }) {
   const [q, setQ] = useState("");
@@ -43,17 +37,13 @@ export function SearchablePicker({
   const rows: MenuRow[] = [];
   if (noneLabel && !query) rows.push({ key: "__none", label: noneLabel, special: true, act: () => choose("") });
   for (const o of hits) rows.push({ key: o.id, label: o.label, act: () => choose(o.id) });
-  const exact = options.some((o) => o.label.trim().toLowerCase() === query.toLowerCase());
-  if (onCreate && query && !exact) {
-    rows.push({ key: "__create", label: `Create “${query}”`, special: true, act: () => { onCreate(query); after(); } });
-  }
 
   // Show only once the user has typed (start typing → the dropdown forms), or via ArrowDown.
   // A query with NO rows still shows the menu — with a quiet "no match" line, never a silent vanish.
   const showMenu = open && (query.length > 0 || (rows.length > 0 && Boolean(noneLabel)));
 
   function choose(id: string) { onPick(id); after(); }
-  function after() { if (resetOnPick) setQ(""); setOpen(false); setHi(0); }
+  function after() { setQ(""); setOpen(false); setHi(0); }
   const closeMenu = useCallback(() => setOpen(false), []);
 
   function onKey(e: React.KeyboardEvent) {
@@ -64,7 +54,7 @@ export function SearchablePicker({
   }
 
   return (
-    <div className={`picker${className ? " " + className : ""}`}>
+    <div className="picker">
       <input
         ref={inputRef}
         className="picker-input"

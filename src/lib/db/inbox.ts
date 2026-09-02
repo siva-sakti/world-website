@@ -8,8 +8,6 @@ import { pagedRows, chunk } from "@/lib/db/paged";
 // tags (many) + the live boards it sits on (many). `boards` empty ⇔ LOOSE.
 export type BoardRef = { id: string; title: string | null };
 export type PanelBit = Bit & { source: Source | null; tags: Tag[]; boards: BoardRef[] };
-// The inbox item is the loose subset — same shape minus the (empty) board list.
-export type InboxItem = Bit & { source: Source | null; tags: Tag[] };
 
 // listAllBits — EVERY live bit + source + tags + its live board memberships. The
 // on-board panel's one read (the all-bits browser); the inbox derives from it.
@@ -96,11 +94,4 @@ export async function listAllBits(supabase: SupabaseClient): Promise<PanelBit[]>
     tags: tagsByBit.get(b.id) ?? [],
     boards: boardsByBit.get(b.id) ?? [],
   }));
-}
-
-// The inbox = the LOOSE subset of all bits (F19 — one definition, no drift with the
-// on-board panel). A bit is loose ⇔ no live membership on a non-trashed board.
-export async function listInbox(supabase: SupabaseClient): Promise<InboxItem[]> {
-  const all = await listAllBits(supabase);
-  return all.filter((b) => b.boards.length === 0);
 }

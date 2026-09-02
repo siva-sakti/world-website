@@ -2,7 +2,7 @@
 // drifted: one escaped 4 entities, one 5; the 5-entity version wins). Used by every door
 // that turns pasted/typed plain text into a text bit's body.
 
-export function escapeHtml(s: string): string {
+function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

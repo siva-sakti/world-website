@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateBitContent, trashBit, getBitBoards, archiveBit } from "@/lib/db/bits";
+import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
 import { confirm } from "@/components/confirm";
 import { registerSave } from "@/lib/save-guard";
 
@@ -152,61 +152,6 @@ export function BitTrash({
         title={failed ? "that didn't save — try again" : "Move this note to the trash — hidden everywhere, restorable"}
       >
         {busy ? "trashing…" : "trash"}
-      </button>
-      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
-    </span>
-  );
-}
-
-// PUT AWAY (N5) — the thin slice. Archive is a resting state, not trash: the note
-// leaves the rooms you work in AND find (I-L8 — the archive page is its surface).
-// Starring and archiving are opposite claims about a thing, so putting away also
-// un-stars it (setResting's one door; the DB CHECK is queued, 20260902000002) —
-// the label says so rather than surprising you.
-export function BitArchive({
-  bitId,
-  archived,
-  starred,
-}: {
-  bitId: string;
-  archived: boolean;
-  starred: boolean;
-}) {
-  const [supabase] = useState(() => createClient());
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
-
-  async function go() {
-    if (busy) return;
-    setBusy(true);
-    setFailed(false);
-    try {
-      await archiveBit(supabase, bitId, !archived);
-      router.refresh();
-    } catch (e) {
-      console.error("archive failed:", e);
-      setFailed(true); // visible — a silent busy-release is not feedback
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <span>
-      <button
-        className="text-neutral-500 underline underline-offset-4 hover:no-underline disabled:opacity-50"
-        disabled={busy}
-        onClick={() => void go()}
-        title={
-          archived
-            ? "take this back out — it returns to your notes"
-            : starred
-              ? "put this away — it leaves your notes (and loses its star); the archive page holds it"
-              : "put this away — it leaves your notes; the archive page holds it"
-        }
-      >
-        {archived ? "take back out" : "put away"}
       </button>
       {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
     </span>
