@@ -58,6 +58,7 @@
 ## Display words (keep these crisp)
 
 - **card** — a bit's visual box on a board (draggable, resizable).
+- **card alignment** — the family of things that help cards sit straight on a board: **tidy up** (built) · **alignment guides** (the magenta lines while you drag) · **align & distribute** (buttons) · **the background grid** (a toggle). Named 2026-09-02; spec in `card-alignment-spec.md`. *Not* "bit alignment" — bits are not what sits on a board — and not "grid alignment", since only one of the four is a grid.
 - **board-card** — a board shown *as a card* on another board (title + small preview; tap to enter).
 - **full / small** — a placement's display size (the thing itself, vs a compact card: first words, tap to expand).
 - **canvas** — a board's **spatial rendering mode**. ⚠ NEVER a synonym for "board."

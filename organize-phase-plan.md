@@ -213,7 +213,7 @@ out → it returns.
 
 ## 4e · ALIGN & DISTRIBUTE BUTTONS (owner-raised 2026-09-02)
 
-**→ Now specified as part of the whole family in `alignment-spec.md` (§1 piece 3, §9 step 4).** The
+**→ Now specified as part of the whole family in `card-alignment-spec.md` (§1 piece 3, §9 step 4).** The
 owner widened the ask the same day to include a background grid; the spec covers tidy · guides ·
 align/distribute · the grid together, because they compete for the same drop and needed one
 precedence rule. What follows is the original capture.

@@ -1,11 +1,16 @@
-# Lining up — the spec
+# Card alignment — the spec
 
-**Working name: "lining up."** ⚪ *Owner's call — `lexicon.md` is the naming authority.* The owner
-asked for something more specific than "alignment" (*"alignment can be so many things"*) and
-offered "grid alignment"; that is not proposed, because **four of the five pieces are not a grid**
-and the guides were explicitly ruled *"a whisper, never a grid."* Naming the family after its
-least-used member would deepen the confusion it is meant to fix. Seeds offered: **lining up** ·
-straightening · guides & grid.
+**Name: CARD ALIGNMENT** (owner, 2026-09-02: *"maybe call it board bit alignment or something"*).
+
+Sharpened against `lexicon.md`, which is the naming authority: **the thing on a board is a CARD,
+not a bit** — *"card — a bit's visual box on a board (draggable, resizable)"*. A bit exists whether
+or not any board shows it; a card is the box you actually drag. So what gets lined up is cards.
+
+Rejected along the way, with reasons, so the question is not reopened from scratch:
+- **"alignment"** alone — the owner's objection stands: *"alignment can be so many things."*
+- **"grid alignment"** — four of the five pieces are not a grid, and the guides were ruled *"a
+  whisper, never a grid"*; naming the family after its least-used member deepens the confusion.
+- **"bit alignment"** — lexically wrong: bits are not what sits on a board.
 
 **Status: 🟡 SPEC — definition, success criteria and cases. The technical plan is §8, and it is
 to be independently checked before any code**, at the owner's instruction: *"write it all out and
