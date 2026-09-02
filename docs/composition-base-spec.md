@@ -205,6 +205,10 @@ Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavi
 4. **⚪ Does `[[` offer archived things?** Trashed: no. Archived: lean **excluded by default** (find stays the deliberate way back) — the August audit flagged this leak. Owner's cell.
 5. **⚪ Duplicate-a-piece** — wanted by the owner's own stitching instinct, never designed. Sketch only: copies references (same bits), not placements. Future op, filed.
 6. **The same piece open twice** — the frame-handoff debt, confirmed real, Claude's engineering design owed.
+**⭐ The cache, re-architected on the owner's push (2026-09-03):** **display goes LIVE; the cache becomes a SHADOW.** On screen a chip always shows the target's current face (fetched live — the peek machinery half-does this already); the cached text stays in the body **only for search + export**, healing on save. Stale labels become UI-impossible; no rename-fanout (never rewrite other bodies — the August lessons); search and standalone-export keep working.
+**Archive-edit: two shapes for the owner's feel:** (a) **quiet revive** — typing un-archives, a whisper says so · (b) **archive is READ-ONLY** — greyed, readable, one visible "bring back to edit" tap. Claude's slight lean: (b) — matches her greyed-chip instinct; archive means something crisp. ⚑ hers.
+**Picker: ✅ STAMPED — archived excluded.**
+**"Block" the word is overloaded** (Notion's paragraph word) — naming-session item; interim: "shown in place."
 **The pattern: every procedural gap is about TIME** — caches aging, states colliding, ops repeating. Snapshot-invisible, film-obvious.
 
 ## Open (only these)

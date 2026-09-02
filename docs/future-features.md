@@ -30,8 +30,11 @@ Select anything in your writing → the deliberate catch act, performable mid-fl
 **The ladder:** ① second browser window (today, legal, scaffolding) → ② **a board tab in the drawer** (read-only, fit-to-view — Claude's first-step lean) → ③ **floating board-peeks, multiple** (the true mirror). Coexist fine.
 **Sequencing:** composition-surface behavior → after the migration, with the floater. Filed so it can't slip.
 
+## F-7 · Duplicate a piece *(owner-loved 2026-09-03: "I would love that")*
+"Duplicate" on the piece's page + card menu → a new composition: **body verbatim — chips come along free** (they carry target ids; first save mints the copy's own reference rows to the same bits — existing machinery, zero new code) · tags copied · same folder · fresh dates · no star · **no placements** (unless duplicated from a board card → lands beside the original) · no backlinks (correct automatically). **Quietly answers VERSIONS:** duplicate-before-rewrite is manual versioning — the shape people actually reach for. Post-migration (composition behavior).
+
 ## The full cool-ideas list (owner-requested tracker — keep current)
-resurfacing (V2, F-1) · board-peek on the composition (F-6) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
+resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piece (F-7) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
 
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
