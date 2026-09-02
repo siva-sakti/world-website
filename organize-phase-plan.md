@@ -89,6 +89,22 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
      ~1000 bits or a slow /search load. Not now.
   *(Note→bit division: the owner is working it in the OTHER window — not this track.)*
 
+- **THE FRAME (owner idea, 2026-09-01 — filed from the reference-screenshots conversation):**
+  an **optional page-shaped frame summonable onto any board** — NOT a second board mode. The
+  board stays the free infinite canvas; the frame is a fixture on it: its edges/margins/center
+  join the snap-guide candidates (the geometry-registry machinery, trivially composable), cards
+  drift in/out freely, per-board and stored (tiny owner-gated migration), and someday the
+  natural boundary for EXPORTING a board as a finished image (what the reference artist is
+  literally making). Key fact that shaped it: object-to-object snapping needs NO page — the
+  frame adds *edges to compose against*, which is the real thing the owner saw in the
+  references ("alignment exists, but the composition is deliberately loose"). **Sequence:**
+  after the guides land; either side of the input-engine phase. **Owner rulings for its loop:**
+  size presets vs freeform pull-to-size · one frame or several · visibility toggle wording.
+  **Adjacency flag:** runs near the other window's composition thread (notes as composition
+  surfaces) — board-territory, doesn't touch that model, but the windows must not drift.
+  **Owner also re-affirmed (same conversation): magnetic stickiness matters → the input engine
+  (own the drag) stays the committed next phase after registry+guides.**
+
 - **ACCOUNTS + PRIVACY + STORAGE — the owner's shape (2026-09-02), input to the other window's
   privacy/publishing session (its ④, the great unblocker) — NOT built here until that session rules:**
   the owner sees accounts as *part of* the convergent-surfaces thread — *"if we have accounts, people
