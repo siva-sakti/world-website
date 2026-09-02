@@ -43,32 +43,3 @@ export function countLabel(verb: string, n: number, suffix?: string): string {
   const thing = n === 1 ? "card" : `${n} cards`;
   return suffix ? `${verb} ${thing} ${suffix}` : `${verb} ${thing}`;
 }
-
-// THE TRASH CONFIRMS. Trash is the heavy act — it takes the bit off EVERY board, not
-// just this one — so the wording says so whenever more than one board is involved (F16).
-//
-// TWO SENTENCES, DELIBERATELY KEPT, and two functions rather than one with a mode flag:
-// the doors count DIFFERENT THINGS. The single-card door counts the boards that one
-// card sits on; the bulk door counts how many of the selected cards are shared. Folding
-// them into one signature would mean a parameter that means two things — the exact
-// muddiness this pass exists to remove.
-//
-// They produce different sentences for a single card, which is a real inconsistency in
-// the app today. Unifying that is a COPY change, and copy is the owner's to write — so
-// it is preserved verbatim and logged on the wording checklist (§5b of the plan).
-
-/** The selected-card bar's confirm. `boards` = how many boards this one card is on. */
-export function trashOneConfirm(boards: number): string {
-  return boards > 1
-    ? `This card is on ${boards} boards — trashing removes it from all of them (restorable from Trash). Continue?`
-    : `Move this card to the trash? Hidden everywhere, restorable from Trash.`;
-}
-
-/** The toolbar's bulk confirm. `n` = cards selected; `shared` = how many of them also
- *  live on a board other than this one. */
-export function trashManyConfirm(n: number, shared: number): string {
-  const cards = `${n} card${n === 1 ? "" : "s"}`;
-  return shared > 0
-    ? `Trash ${cards}? ${shared} of them also live on other boards — this removes them from all of them (restorable from Trash).`
-    : `Trash ${cards}? Hidden everywhere, restorable from Trash.`;
-}

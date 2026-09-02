@@ -8,8 +8,8 @@ import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
 import { placeBitsOnBoard, trashBits, archiveBits } from "./actions";
 import { confirmArchive } from "@/app/archive/archive-confirm";
+import { confirmTrash } from "@/app/trash/trash-confirm";
 import { SearchablePicker } from "@/components/searchable-picker";
-import { confirm } from "@/components/confirm";
 import type { ShelfGroup } from "@/lib/db/shelf";
 
 // The bit-first view (organize plan O2): tabs loose (default) | all, in-memory
@@ -111,12 +111,7 @@ export function NotesBrowser({
   async function bulkTrash() {
     if (bulkPending || selectedIds.size === 0) return;
     const n = selectedIds.size;
-    const ok = await confirm({
-      message: n === 1 ? "Trash this bit? You can restore it from the trash." : `Trash these ${n} bits? You can restore them from the trash.`,
-      confirmLabel: "Trash",
-      danger: true,
-    });
-    if (!ok) return;
+    if (!(await confirmTrash({ count: n, noun: "bit" }))) return;
     setBulkPending(true);
     setBulkErr(null);
     try {

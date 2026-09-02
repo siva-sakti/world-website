@@ -93,7 +93,7 @@ export default async function BitPage({
               put away (owner, 2026-09-02). `noun` because "bit" is the right word here;
               the note page keeps the default. */}
           <ArchiveButton thing="bit" id={b.id} noun="bit" returnTo="/bits" />
-          <BitTrash bitId={b.id} />
+          <BitTrash bitId={b.id} noun="bit" />
         </div>
       </header>
 

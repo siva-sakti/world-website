@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { useUndo } from "./use-undo";
 import type { CardVM } from "./card-vm";
-import { runLegs, countLabel, trashOneConfirm, trashManyConfirm } from "./act-rules";
+import { runLegs, countLabel } from "./act-rules";
 
 /** THE OUTSIDE WORLD, passed in rather than imported.
  *
@@ -29,7 +29,10 @@ export type RemoveDoors = {
   ) => Promise<{ id: string }>;
   setPlacementLock: (s: SupabaseClient, placementId: string, on: boolean) => Promise<void>;
   getBitBoards: (s: SupabaseClient, bitId: string) => Promise<{ id: string; title: string | null }[]>;
-  confirm: (spec: { message: string; confirmLabel?: string; cancelLabel?: string; danger?: boolean }) => Promise<boolean>;
+  /** Ask before trashing — THE one trash confirm (app/trash/trash-confirm), shared with
+   *  /bits, /bit/[id] and /write. Injected rather than imported so this module stays
+   *  loadable by the test runner, and so a test can answer yes/no without a dialog. */
+  confirmTrash: (args: { count?: number; noun?: string; onBoards?: number; shared?: number }) => Promise<boolean>;
 };
 
 // The board's REMOVE acts (I-W1: two distinct, labeled acts), singular and in bulk:
@@ -298,7 +301,7 @@ export function removeActs(deps: {
   async function trashSelected(placementId: string, bitId: string) {
     let boards = 1;
     try { boards = (await doors.getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
-    if (!(await doors.confirm({ message: trashOneConfirm(boards), confirmLabel: "Trash", danger: true }))) return;
+    if (!(await doors.confirmTrash({ noun: "card", onBoards: boards }))) return;
     removeGesture("trash", cards.filter((c) => c.bitId === bitId));
   }
 
@@ -315,7 +318,7 @@ export function removeActs(deps: {
       const counts = await Promise.all(bitIds.map((bid) => doors.getBitBoards(supabase, bid)));
       shared = counts.filter((boards) => boards.length > 1).length;
     } catch { /* fall back to the plain confirm */ }
-    if (!(await doors.confirm({ message: trashManyConfirm(bitIds.length, shared), confirmLabel: "Trash", danger: true }))) return;
+    if (!(await doors.confirmTrash({ count: bitIds.length, noun: "card", shared }))) return;
     removeGesture("trash", chosen);
   }
 

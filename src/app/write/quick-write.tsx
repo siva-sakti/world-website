@@ -7,7 +7,7 @@ import { createLooseTextBit, updateBitBody, updateBitContent, trashBit } from "@
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import { registerSave } from "@/lib/save-guard";
 import { TextBit } from "@/app/board/[id]/text-bit";
-import { confirm } from "@/components/confirm";
+import { confirmTrash } from "@/app/trash/trash-confirm";
 
 // The writer behind /write. The loose bit is born on the FIRST real content — no
 // empty-note litter from opening the page and leaving — guarded by a SYNCHRONOUS
@@ -173,14 +173,7 @@ export function QuickWrite() {
   async function trashNote() {
     const id = bitId.current;
     if (!id) return;
-    if (
-      !(await confirm({
-        message: "Trash this note?",
-        confirmLabel: "Trash",
-        danger: true,
-      }))
-    )
-      return;
+    if (!(await confirmTrash({ noun: "note" }))) return;
     try {
       await create.current; // never trash before the row exists (the settled gate)
       await trashBit(supabase, id);

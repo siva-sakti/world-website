@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { runLegs, countLabel, trashOneConfirm, trashManyConfirm } from "./act-rules.ts";
+import { runLegs, countLabel } from "./act-rules.ts";
 
 // THE SURVIVOR RULE (antagonist D4) — the rule that used to live twice, untested, in
 // the two act layers. These lock the behaviour the reverses depend on.
@@ -78,48 +78,4 @@ test("countLabel: the suffix form matches the un-place wording exactly", () => {
 
 test("countLabel: zero reads as plural", () => {
   assert.equal(countLabel("move", 0), "move 0 cards");
-});
-
-// THE TRASH CONFIRM — wording pinned verbatim. These tests exist so a future tidy-up
-// can't quietly reword a destructive confirm; the owner writes this copy, not Claude.
-
-test("trashConfirm (one card, one board): the plain sentence", () => {
-  assert.equal(
-    trashOneConfirm(1),
-    "Move this card to the trash? Hidden everywhere, restorable from Trash.",
-  );
-});
-
-test("trashConfirm (one card, several boards): says how many boards", () => {
-  assert.equal(
-    trashOneConfirm(3),
-    "This card is on 3 boards — trashing removes it from all of them (restorable from Trash). Continue?",
-  );
-});
-
-test("trashConfirm (bulk, none shared): counts the cards", () => {
-  assert.equal(
-    trashManyConfirm(5, 0),
-    "Trash 5 cards? Hidden everywhere, restorable from Trash.",
-  );
-});
-
-test("trashConfirm (bulk, some shared): names how many are shared", () => {
-  assert.equal(
-    trashManyConfirm(5, 2),
-    "Trash 5 cards? 2 of them also live on other boards — this removes them from all of them (restorable from Trash).",
-  );
-});
-
-test("trashConfirm (bulk of exactly one) keeps its own singular", () => {
-  assert.equal(
-    trashManyConfirm(1, 0),
-    "Trash 1 card? Hidden everywhere, restorable from Trash.",
-  );
-});
-
-test("the two doors genuinely differ for one card — a known inconsistency, pinned", () => {
-  // Not a bug being introduced: this is what the app does TODAY, preserved through the
-  // collapse. Unifying it is a copy decision, logged on the wording checklist.
-  assert.notEqual(trashOneConfirm(1), trashManyConfirm(1, 0));
 });

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
-import { confirm } from "@/components/confirm";
+import { confirmTrash } from "@/app/trash/trash-confirm";
 import { registerSave } from "@/lib/save-guard";
 
 // The note's own words above its body (plan v1.2): the same `content` field the
@@ -104,10 +104,15 @@ export function BitTrash({
   bitId,
   returnTo = "/bits",
   compact = false,
+  noun = "note",
 }: {
   bitId: string;
   returnTo?: string;
   compact?: boolean; // small/grey to match a row's board-trash (home list); default = the page style
+  /** What to CALL this in the confirm. Storage can't tell a note from a photo (bit rows
+   *  hold both), so the page says. Defaults to "note" — right where this started, on the
+   *  note page; /bit/[id] passes "bit". */
+  noun?: string;
 }) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
@@ -121,11 +126,9 @@ export function BitTrash({
     } catch {
       /* fall back to the plain confirm */
     }
-    const msg =
-      n > 1
-        ? `This note is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
-        : `Move this note to the trash? Hidden everywhere, restorable from Trash.`;
-    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
+    // THE one trash confirm (app/trash/trash-confirm) — shared with the board, /bits
+    // and /write, so the same act asks the same question wherever you meet it.
+    if (!(await confirmTrash({ noun, onBoards: n }))) return;
     setBusy(true);
     setFailed(false);
     try {

@@ -67,7 +67,10 @@ function makeBoard(initial, opts = {}) {
       callInBit: async (_s, args) => { log.calledIn.push(args.bitId); return { id: args.placementId }; },
       setPlacementLock: async (_s, pid, on) => { log.locked.push([pid, on]); },
       getBitBoards: async () => opts.boards ?? [{ id: "board-1", title: "b" }],
-      confirm: async (spec) => { log.confirms.push(spec.message); return opts.confirm !== false; },
+      // The trash confirm is now ONE door (app/trash/trash-confirm) shared with /bits,
+      // /bit/[id] and /write. This records what was ASKED, not how it was worded — the
+      // wording has its own tests in trash-message.test.mjs.
+      confirmTrash: async (args) => { log.confirms.push(args); return opts.confirm !== false; },
     },
   });
 
@@ -168,13 +171,13 @@ test("trash one: declining the confirm does nothing at all", async () => {
   assert.equal(b.entries.length, 0, "nothing happened, so nothing is remembered");
 });
 
-test("trash one: the confirm names the other boards when there are some", async () => {
+test("trash one: the confirm is TOLD how many boards the card is on", async () => {
   const b = makeBoard([card("a")], {
     boards: [{ id: "board-1", title: "x" }, { id: "board-2", title: "y" }, { id: "board-3", title: "z" }],
   });
   await b.acts.trashSelected("p-a", "a");
   await b.flush();
-  assert.match(b.log.confirms[0], /on 3 boards/);
+  assert.deepEqual(b.log.confirms[0], { noun: "card", onBoards: 3 }, "so the shared door can warn it leaves all of them");
 });
 
 test("trash one: UNDO restores the bit globally, then repaints the card", async () => {
@@ -201,6 +204,7 @@ test("trash many: one entry, plural label, every bit frozen", async () => {
   const b = makeBoard([card("a"), card("b")], { selectedIds: new Set(["p-a", "p-b"]) });
   await b.acts.bulkTrash();
   await b.flush();
+  assert.deepEqual(b.log.confirms[0], { count: 2, noun: "card", shared: 0 }, "asked ONCE, for the whole gesture");
   assert.deepEqual(b.log.trashed.sort(), ["a", "b"]);
   assert.equal(b.entries.length, 1);
   assert.equal(b.entries[0].label, "trash 2 cards");

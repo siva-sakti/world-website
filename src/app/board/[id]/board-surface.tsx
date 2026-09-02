@@ -21,6 +21,7 @@ import { Drawer } from "@/components/drawer";
 import { registerSave } from "@/lib/save-guard";
 import { duplicateBoard } from "@/lib/db/boards";
 import { confirm } from "@/components/confirm";
+import { confirmTrash } from "@/app/trash/trash-confirm";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useBoardKeys } from "./use-board-keys";
@@ -247,7 +248,7 @@ export function BoardSurface({
     // The db doors + confirm, passed IN (see RemoveDoors): the acts module has no
     // React in it, so injecting these is what lets a test drive all four gestures
     // with fakes. This is the production wiring.
-    doors: { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, confirm },
+    doors: { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, confirmTrash },
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {
