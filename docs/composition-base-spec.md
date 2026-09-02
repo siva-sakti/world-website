@@ -216,7 +216,7 @@ Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavi
 - **The words CHIP and BLOCK: owner-loved** (*"really cute words, let's keep that"*) — carried to the naming session as incumbents.
 - **The beauty pointer (for the aesthetics track):** blocks are where the composition's visual life will live — a text bit shown in place as a designed pull-quote; an image block matted like the board's cards. The papers moment, for the writing surface.
 **⭐ THE "FRAME" WORD, SETTLED BY DISSOLUTION (owner, 2026-09-03):** the word belongs to **the other window's canvas feature** (alignment/snapping — Photoshop-precision as an option beyond freeform; a board upgrade, not a page fixture — Claude's earlier description corrected). The deck will NOT call its pages "frames" (owner). The convergence operation formerly called "frame" is now plainly **"what it's for"** (audience · length · deadline — the S7 idea). Three claims → one owner. Naming session relieved of this item.
-**⚪ The evaporate question, stated concretely (D-138 tension):** empty composition at click-out — **vanish as if never made** (our earlier ruling) or **persist as a date-titled empty piece** (the D-138 direction for bit-cards)? One word, hers.
+**✅ The evaporate question — RE-STAMPED (owner, 2026-09-03): the empty composition VANISHES completely** (*"if you click out of a piece it should just go away completely"*). D-138's persist stays a **bit-card** rule; the two coexist, each deliberate: material persists, an unbegun weaving never existed.
 **The pattern: every procedural gap is about TIME** — caches aging, states colliding, ops repeating. Snapshot-invisible, film-obvious.
 
 ## Open (only these)
