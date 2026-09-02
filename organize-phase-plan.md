@@ -211,7 +211,13 @@ proven one, and the button already exists as a component. **Proof:** the four ga
 select bits on `/bits` → archive → they leave the list → they appear in `/archive` → take one back
 out → it returns.
 
-## 4e · ALIGN & DISTRIBUTE BUTTONS (owner-raised 2026-09-02, not yet planned)
+## 4e · ALIGN & DISTRIBUTE BUTTONS (owner-raised 2026-09-02)
+
+**→ Now specified as part of the whole family in `alignment-spec.md` (§1 piece 3, §9 step 4).** The
+owner widened the ask the same day to include a background grid; the spec covers tidy · guides ·
+align/distribute · the grid together, because they compete for the same drop and needed one
+precedence rule. What follows is the original capture.
+
 
 **The owner:** *"usually what I see, like for example PowerPoint, they have like a range vertical,
 range horizontal, center — you know what I mean, you press those buttons so we don't have to guess."*
