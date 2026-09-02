@@ -47,6 +47,8 @@ The app serves a **rhythm: diverge → converge → diverge**, never a one-way a
 
 **The composition is convergence made legible:** a board's arrangement speaks mostly to its maker; a composition can be read by anyone, including future-you. *(This sentence is teaching material, not a build constraint — `teaching-the-user.md`.)*
 
+> ⭐ **THE NORTH STAR** *(the owner, verbatim)*: **"Notion, with Obsidian-like knowledge connection and graph capabilities."** Notion's editing; Obsidian's fabric. Every decision in this document serves that sentence.
+
 **Why it exists at all:** the app built its divergent half well and converged into a text box. The positioning claim — *"we accommodate the process of getting from divergent to convergent"* — rests on this half.
 
 ## 3 · The model
@@ -201,7 +203,8 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 3. **Tap** → the peek (§9.5). A chip does **not** navigate on tap.
 4. **Undo** removes it like any editor content; the reference row disappears at the next save's reconcile.
 5. **Copy/paste** carries it; the destination composition mints its **own** reference row on its next save.
-6. **The same target pulled in twice** → two chips, **one** reference row. Removing one chip while the other remains leaves the row intact.
+6. **Renaming a target** — chips elsewhere show the new face **immediately**, because display is live (§9.4.2). ⚠ The *stored* copy inside other compositions' bodies stays stale until each is next saved — which affects **only search snippets and exports**, never what a reader sees.
+7. **The same target pulled in twice** → two chips, **one** reference row. Removing one chip while the other remains leaves the row intact.
 
 ### 9.5 The peek
 Opens beside the chip, without moving the writing. Contents:
@@ -315,8 +318,24 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 4. **Archived things: excluded by default, with a control to include them** (§11.2).
 5. ⚠ **REQUIRED WORK, or compositions vanish from search:** search reads the bit table today. When compositions move, **the search index must follow them** — a generated column on their new home, and the query taught to read both. *(Caught by writing the technical spec; the single largest silent-breakage risk in the migration.)*
 
+### 12.1b Backlinks — **the full treatment** *(owner-ruled: "an entire backlink thing you can click on, and a graph view, the way it comes up in Obsidian")*
+1. **On a bit's page:** the list of compositions that pulled it in *(exists today as "gathered into")*.
+2. **On a composition's page:** the same list — the compositions that reference it *(new; identical pattern, no new invention)*.
+3. **Clickable, not decorative:** each entry opens the referencing composition.
+4. ⚪ Whether the list is a quiet footer section or a **dedicated panel** — the owner asked for a panel; the footer is what exists. *Design decision, unresolved.*
+5. **The graph** draws the same rows — parked (§12.6), but this is the other half of what the owner asked for.
+6. ⛔ **Boards have no backlink surface** — they receive no references (direction principle); placement is their relation and the canvas shows it.
+
 ### 12.2 Tags
 Identical to bits and boards: apply, remove, and pull. A composition carries its own tags; ⛔ tags are never inherited from the bits it references or the boards it sits on.
+
+### 12.2b Visibility *(owner-ruled, N1 — the full ruling has never been in a spec until now)*
+1. **Controls exist in the UI** — on **boards and compositions at least**; bits get a **mark-private** control.
+2. **A composition is born private.**
+3. **A bit's private mark is GLOBAL** — ⛔ never per-board. A bit marked private is private everywhere it appears; one cannot be private on one board and public on another.
+4. **Unmarked bits follow the board** they sit on.
+5. This re-derives the existing ruled composition rule *(a guest sees a thing only if its surface is reachable **and** the thing itself is public)*; the machinery is unchanged — **what is new is the controls and the composition's private default.**
+6. ⚪ **The publishing session is separate and still owed** — this section covers marking, not publishing. Nothing is public today; no publish act exists.
 
 ### 12.3 Folders
 **One folder per composition**, exactly as boards and bits. Deleting a folder strands nothing — its contents simply leave it *(existing set-null behavior)*.
@@ -389,6 +408,16 @@ Her words: *"a lot of the time something like Notion is trying to solve the fact
 1. A floating toolbar appears: formatting marks.
 2. **"Make this a bit"** — the selected text becomes a new bit *(F-5; the selection **stays** in the writing; the new bit records that it was made from this composition; ⚪ its subtle underline mark, toggleable off)*.
 3. ⚪ Whether anything else belongs here.
+
+### 13.5b Owner-wanted features that are NOT in this spec *(they live in `future-features.md`; listed here so the spec does not pretend they do not exist)*
+| feature | status |
+|---|---|
+| **version history** (F-8) | **owner-wanted** — she overruled "duplicate covers it"; forks are not history. Post-migration. |
+| **duplicate a composition** (F-7) | owner-loved; body + chips copy free, no placements, no backlinks |
+| **"write about this"** from a bit (F-9) | the steering door — the answer to "I want to connect my bits" without breaking flatness |
+| **the board-peek** (F-6) | typing big, boards small — the mirror of the floater; the true content of the board-connection itch |
+| **resurfacing while you write** (F-1) | V2, owner-loved; tier 1 needs no intelligence layer |
+| **piece-as-board · timelines · make-board-from-tag** (F-2/3/4) | shelved |
 
 ### 13.6 What the editor never does ⛔
 Auto-format your words into anything · auto-create bits from pasted content · write text you did not type *(the one exception: the date-time title at exit, §7)*.
