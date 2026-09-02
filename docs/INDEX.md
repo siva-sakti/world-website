@@ -253,6 +253,9 @@ INDEX.md ................ this file — where everything is
 ### `aerial-review-findings.md` — 🔵 the independent audit of the whole composition stack (2026-09-03)
 **Contains:** the verdict (close, not consolidation-ready) · the worst findings (three answers to one question · the definition lagging the stamps · evaporate's three readings · the evaporate×I-L2 lifecycle hole) · Claude's own caught errors · the drift strike-list · the KEEP-verbatim five · **the consolidation recipe.** Drives the clean-document pass.
 
+### `teaching-the-user.md` — 🟠 what a person must learn, and how (2026-09-02)
+**Contains:** the three things a person MUST understand (everything else discoverable) · must-teach vs can-discover · **the moments and what teaches at each** (hints, tooltips, structural teaching, F-9's door) · the vocabulary users meet vs ours-only · **what the design teaches without words** · the opens. The user-facing counterpart to the specs.
+
 ### `composition-technical-spec.md` — 🟠 THE BUILD-GRADE CONSOLIDATION (2026-09-03)
 **Contains:** data layer (tables · relations · the migration) · **the invariant map, paid** (I-C1–C6) · behaviors in build language · **the UI inventory with states** · acceptance criteria (provable vs feel-test) · **the honest open register** · §7: five things the writing itself caught (search-must-learn-surfaces the biggest). Read AFTER the definition; the enactment plan derives from §1.3.
 
