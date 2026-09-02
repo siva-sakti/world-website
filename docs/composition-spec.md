@@ -564,7 +564,7 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 | a **chip** | ✅ | opens the peek |
 | a **block's content** (the image, the quoted text) | ⚪ **conflicted — see §20.5b(3)** | *peek* (as drafted) or *select* (Claude's lean, after the owner's copy-paste ruling) |
 | **text inside a block** | ✅ **selectable and copyable** *(owner-ruled: "any text can be copy and pasted by the user — they'd just put their mouse over it")*. It is text on the screen and behaves like text. |
-| a **drag handle** | 🔵 **objects only**, on hover — never on text (§20.5) | drag to move · click for the block menu |
+| a **drag handle** | ✅ on hover | drag UP or DOWN to reorder (§20.5) · click for the block menu |
 | a **toggle's line** | ✅ | folds/unfolds |
 | the **title / subtitle** | ✅ when writable | edits in place; ⛔ inert when read-locked (§20.3) |
 | **footer entries** (tags · boards · "pulled into") | ✅ | navigate to that thing |
