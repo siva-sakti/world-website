@@ -97,7 +97,7 @@ Three states at the DB (live · archived · trashed), proven 8/8 on a throwaway.
 
 ### Trash / restore ✅⚠️
 Un-place and trash are distinct, labelled acts. `/trash` lists both kinds with restore.
-- ⚠️ **F7 — "nothing is ever destroyed" is FALSE.** I wrote that here on 2026-08-28 and an audit disproved it the same day. `destroyBit` (`lib/db/bits.ts:274`) is a real hard `DELETE`, with two callers — and one of them, the **empty-note evaporate** (`use-create-doors.ts:142`), runs with **no confirmation at all**. The trash page also tells the owner nothing is destroyed. Either the copy is wrong or the evaporate is; that's a ruling, not a patch.
+- ✅ **F7 — CLOSED by D-138 (2026-09-01).** Its own question — "is the copy wrong, or the evaporate?" — was answered: **the evaporate was**; the owner retired it and empty cards persist. Destroy now has exactly ONE caller (`src/app/actions.ts` — /trash only, double-confirmed, D-125), so "nothing is destroyed outside the trash" is true. *(Historical note kept: the 2026-08-28 copy-vs-code catch was real.)*
 - ❌ **Empty-the-trash does not exist** — long-standing, deliberate.
 
 ### Export ✅
@@ -130,7 +130,7 @@ Login wall, RLS at the boundary. A logged-out client sees zero rows — asserted
 | **F4** | low | The folder-delete confirm counts archived notes among what "comes out of the folder". Falls out of F1. |
 | **F2** | — | `/bits` shows written notes as well as bits. **Awaiting your ruling**, already recorded in the plan. Not a bug. |
 | **F5** | low | A hard tab-close can drop the final in-flight save. Filed as N4c with a reasoned recommendation not to fix yet. |
-| **F7** | **high** | **"Nothing is ever destroyed" is false** — a hard `DELETE` exists, and the empty-note evaporate calls it with **no confirmation**. The trash page tells the owner otherwise. A ruling: is the copy wrong, or the evaporate? |
+| **F7** | ✅ closed | Answered by D-138: the evaporate was the wrong half — retired; empty cards persist; destroy lives only in /trash behind the double confirm. |
 | **F8** | medium | **Reading writes.** Selecting a card to look at it re-stacks the board and writes `placement.z`. |
 | **F9** | medium | **Typing resizes.** Text growing past a threshold permanently widens the card, with no resize gesture. |
 | **F10** | medium | **Bulk mutation hidden behind vocabulary management** — one dropdown pick rewrites `source_id` across unbounded bits, or cascades tag rows off every carrier including trashed ones. Invisible from any bit's page; the scale is never stated. |

@@ -75,7 +75,6 @@ export function useCreateDoors(deps: {
   const cardsRef = useRef(cards);
   cardsRef.current = cards; // latest-value ref: the unmount sweep must see live cards, not the []-closure
 
-  // The /write test, board-side: real content = visible text or a gather chip.
 
   // Look-then-place (plan v1.1): start at the natural spot, hit-test the candidate
   // against every card on the board, step down-right until clear — preferring a
@@ -139,11 +138,7 @@ export function useCreateDoors(deps: {
     trackCreate(placementId, p);
   }
 
-  // First real content → the bit is truly born; it no longer evaporates. The
-  // editor's onChange calls this before persisting the patch.
 
-  // The remove acts consult these (R1.3a): a remove/trash on a NEVER-had-content
-  // board-born bit must ABORT it (evaporate's contract), not mint a blank loose/
 
   // Pen "Done": convert the session's strokes (screen space) into world space,
   // bundle into ONE drawing bit at their bounding box (widths kept). Empty → nothing.

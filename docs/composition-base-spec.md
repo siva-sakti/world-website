@@ -18,7 +18,7 @@ A **surface where you weave material into writing** — one made whole with a th
 ## 1.2 The principle that governs the board's side
 > **The board catches material; surfaces are made on purpose.**
 
-Everything that lands on a board by quick gesture — paste, drop, typing a card — is **a bit**. Starting a composition is always **a deliberate act**. (An empty just-born text bit still evaporates; uncontroversial now that it's a bit.)
+Everything that lands on a board by quick gesture — paste, drop, typing a card — is **a bit**. Starting a composition is always **a deliberate act**. (An empty just-born text bit ~~still evaporates~~ — **SUPERSEDED by D-138, 2026-09-01: empty bit-cards PERSIST on boards** — the owner reversed bit-evaporate mid-soak; compositions' own born-on-first-content ruling below is untouched.)
 
 ## 1.3 Birth — three doors, all deliberate
 1. **`/write`** — the composing room itself.
@@ -247,7 +247,7 @@ Also surfaced: ⚑ **the owner's Notion feel-session is still owed** and the fin
 | **N5 · phone** | **Full page for now** — the floater "wouldn't be as dynamic"; maybe later; revisit, not a blocker. |
 | **N7 · arrows** | Dissolved into the prior, already-parked question: connectors exist in schema, **no drawing UI was ever built**, and the recorded lean stands (*arrangement is the connection; lines a rare power-move*). Stays parked; if ever built, compositions are uniform cards. |
 
-**N6 · ✅ RULED (2026-09-02): EVAPORATE.** Clicking out with zero content is the *typical* gesture (a misclick, a changed mind) — nothing persists, no date-titled ghosts. Born-on-first-content everywhere; the born-then-emptied edge evaporates (D-111's rule carried forward).
+**N6 · ✅ RULED (2026-09-02): EVAPORATE.** Clicking out with zero content is the *typical* gesture (a misclick, a changed mind) — nothing persists, no date-titled ghosts. Born-on-first-content everywhere; the born-then-emptied edge evaporates (for COMPOSITIONS — n.b. D-138 later retired the *bit-card* half of D-111's world; this composition ruling stands on its own).
 
 ## ⚑ NEW owner questions (the checker's — it was barred from answering)
 | # | question |
@@ -257,5 +257,5 @@ Also surfaced: ⚑ **the owner's Notion feel-session is still owed** and the fin
 | N3 | A composition that other writing ties to gets **trashed** — its chips elsewhere: frozen? greyed? gone? |
 | N4 | The floater/panel: the **full block toolkit** (slash menu, drag, tables) or the light editor, full kit page-only? |
 | N5 | On a **phone**, what do the floater and docked panel become? |
-| N6 | An **empty just-born composition**: evaporate like an empty bit, or persist under its stand-in title? |
+| N6 | An **empty just-born composition**: evaporate ~~like an empty bit~~ *(analogy inverted by D-138 — empty bits now persist)*, or persist under its stand-in title? |
 | N7 | Do **arrows (connectors)** get to point at a composition's card, like any other card? |

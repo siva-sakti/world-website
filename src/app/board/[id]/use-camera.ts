@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { CardVM } from "./card";
+import { boundsOf } from "./geometry";
 import { anchorToCamera, cameraToAnchor, loadAnchor, saveAnchor, type Anchor, type Size } from "./camera-storage";
 
 const MIN_ZOOM = 0.2;
@@ -130,18 +131,18 @@ export function useCamera(
     // Text/audio cards render at height:auto, so their stored h is stale (smaller than
     // the real card) — true sizes come from THE LEDGER (registry stage 3; seeded
     // synchronously at attach, so even the mount-effect fit reads real boxes).
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const c of cards) {
-      const m = sizeOf(c.placementId);
-      const w = m?.w ?? c.w;
-      const h = m?.h ?? c.h;
-      minX = Math.min(minX, c.x);
-      minY = Math.min(minY, c.y);
-      maxX = Math.max(maxX, c.x + w);
-      maxY = Math.max(maxY, c.y + h);
-    }
-    const bw = Math.max(1, maxX - minX);
-    const bh = Math.max(1, maxY - minY);
+    // The union math lives in geometry.ts (boundsOf, unit-tested) — the health
+    // check caught fitView hand-rolling an inline twin of it, the exact drift the
+    // one-definition rule forbids.
+    const b = boundsOf(
+      cards.map((c) => {
+        const m = sizeOf(c.placementId);
+        return { x: c.x, y: c.y, w: m?.w ?? c.w, h: m?.h ?? c.h };
+      }),
+    )!; // cards.length checked above — never null here
+    const bw = Math.max(1, b.w);
+    const bh = Math.max(1, b.h);
+    const minX = b.x, minY = b.y;
     const pad = 80;
     const scale = Math.max(MIN_ZOOM, Math.min(1, (r.width - pad) / bw, (r.height - pad) / bh));
     const cx = minX + bw / 2;

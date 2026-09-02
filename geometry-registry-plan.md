@@ -1,6 +1,7 @@
 # The geometry registry — plan
 
-**Status:** planned → owner ruled (guides IN, references received) → **antagonist: "build with
+**Status:** ✅ **stages 1–3 SHIPPED (2026-09-01; stage 2's gate passed by the OWNER'S hand — ledger vs real matched on every card incl. a 377px grown text card); stage 4 (the guides) next.**
+Planned → owner ruled (guides IN, references received) → **antagonist: "build with
 changes" (8 defects + 5 missed items folded, 2026-09-01)** → build. Headline catches: the
 mount-timing race that would have opened boards mis-fit to phantom 60px cards (fixed by
 synchronous seeding), and the honest guides limit — **snap-on-release now, magnetic stick only
@@ -82,9 +83,9 @@ measure: (placementId: string) => (el: HTMLElement | null) => void  // the ref-c
 
 | today | after |
 |---|---|
-| `tidySelected`'s `document.querySelector` loop (board-surface:339) | `read(chosen)` — its exact input shape |
-| `fitView`'s measure loop (use-camera:130) | `read(cards)` |
-| marquee hit-testing's per-card query (use-marquee-select:46) | `sizeOf()` |
+| `tidySelected`'s querySelector loop | ✅ `read(chosen)` |
+| `fitView`'s measure loop | ✅ `sizeOf` per card + `boundsOf` for the union |
+| marquee hit-testing's per-card query | ✅ `sizeOf()` |
 | find-a-clear-spot's text-height query (use-create-doors:93) | `sizeOf()` — **a named behavior CHANGE, not identical**: today it measures text cards only and trusts state widths; the registry also measures audio cards (state height 56 vs the real player) — an improvement, verified deliberately at stage 3 |
 | auto-widen's `innerRef.offsetHeight` (card.tsx) | **stays** — it reads its OWN element during typing |
 | `onResizeStop`'s root read (card.tsx) | **stays** — it IS the write side (root ≡ inner, verified) |

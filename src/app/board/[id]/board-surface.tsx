@@ -99,9 +99,8 @@ export function BoardSurface({
   const { patchCard, saveContent, trackCreate, reconcileId, settled, forget, flushNow, flushAll, pendingCreates, chain } =
     usePersistence(supabase, setCards, onErr);
 
-  // THE UNDO SEAM (dark — stage 2b): arranging acts RECORD; nothing on screen can
-  // act on an entry until stage 5's buttons. The dev readout below is the soak's
-  // evidence surface. onErr here takes the seam's owner-facing copy directly.
+  // THE UNDO SEAM (live — D-137): every deliberate act records; ↶ ↷ + ⌘Z replay.
+  // The dev readout below stays as the dev-only truth surface.
   const { record, onBeforeRecord, fail, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
   // Stage 5 (live): the transient "undid: …" receipt — the ruled substitute for
   // moving the view (undo never pans/zooms; the note says what just reversed).

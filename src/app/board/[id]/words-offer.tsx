@@ -34,7 +34,10 @@ export function WordsOffer({
         }
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") value.trim() ? onSave(value) : onSkip();
+          if (e.key === "Enter") {
+            if (value.trim()) onSave(value);
+            else onSkip();
+          }
           if (e.key === "Escape") onSkip();
         }}
       />

@@ -304,7 +304,7 @@ INDEX.md ................ this file — where everything is
 |---|---|---|
 | `drawer-on-the-note-page-plan.md` | N4b — the drawer on the note page + gather from it; one `lib/search.ts` for every box | ⚑ **built, awaiting owner feel-test** |
 | `note-as-surface-plan.md` | N1/N3 — a note is a surface, not a bit | 📜 built |
-| `writing-experience-plan.md` | the real writing experience (`/write`, note-shaped notes, evaporate) | 📜 built (D-111/D-112) |
+| `writing-experience-plan.md` | the real writing experience (`/write`, note-shaped notes, evaporate) | 📜 built (D-111/D-112) — **evaporate half SUPERSEDED by D-138** (empty cards persist) |
 | `call-in-build-plan.md` | bring a loose bit onto a board | 📜 built (D-104, hardened D-106) |
 | `gather-build-plan.md` · `gather-picker-plan.md` | gather end-to-end: `[[`, chips, peek | 📜 built (D-110) |
 | `gather-g1-checkpoint-A.md` · `capture-slice1-checkpoint-A.md` · `source-stage0-checkpoint.md` | the signed-off owner checkpoints for each applied data layer | 📜 signed |
@@ -352,3 +352,12 @@ backups/          local db dumps (gitignored)
 ```
 
 - **`../board-actions-technical-audit.md`** — the board's technical audit + committed six-layer target (D-135): listening/seeing pipelines, the amended undo design, the ruled build sequence. Read before board-machinery work.
+
+## Added 2026-09-01 (the board-machinery arc)
+
+| doc | what it holds | status |
+|---|---|---|
+| `../board-actions-technical-audit.md` | ⭐ the board's technical audit + the committed six-layer target (D-135) | live reference |
+| `../board-undo-technical-plan.md` | undo/redo: the full plan, two antagonist rounds, the scaffolding ledger | ✅ shipped (D-137) |
+| `../geometry-registry-plan.md` | the measuring layer + the snap-guide design from the owner's references | stages 1–3 ✅ · guides next |
+| `../frame-plan.md` | the optional page fixture on a board — antagonist-hardened, owner-ruled | ready to build (migration owner-gated) |

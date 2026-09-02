@@ -22,7 +22,7 @@ no deploy without the owner's word · stage 5 (the visible UI) lands only after 
 A capped (20), per-board-visit, session-only undo/redo of every **deliberate act** on a board —
 moves · resizes · nudges · tidy · send-to-back · lock · un-place · trash · tags · source — with
 ↶ ↷ toolbar buttons (phone-first) + ⌘Z/⌘⇧Z, each button naming its next act. Reflexes
-(click-to-front, auto-widen), system repairs, creates, evaporate, and destroy never enter.
+(click-to-front, auto-widen), system repairs, creates and destroy never enter *(evaporate: retired outright by D-138 — empty cards now remove-and-record like any other)*.
 Undo of an un-place *revives* (travel preserved); undo of a trash *restores*. The stack is
 memory, never stored (the three-layer save ruling).
 
@@ -62,11 +62,11 @@ is owed to the owner when the input engine ships and this table reads empty.
 | record-only suppression in group drag | the input engine (gestures become entries natively) |
 | the `onChange` intent tag | the input engine (intent born in the recognizer) |
 | react-rnd's uncontrolled mid-drag hole | the input engine (scheduled, D-135) |
-| DOM-measured geometry (tidy, arrows-to-be) | the geometry registry (scheduled, D-135) |
+| ~~DOM-measured geometry~~ | ✅ **DEMOLISHED — registry stage 3 (2026-09-01): zero ad-hoc card measurers remain.** The first row falls, on schedule. |
 | `cardsRef` + resolve-at-reverse | the store step: state becomes single truth |
 | `settled`/`trackCreate` choreography on reverses | the store step: landing states native |
 | refresh signals into tag/source bars | the store step (bars read the store) |
-| the unmount `record:false` carve | the store step (no orphaned commits) |
+| the unmount report-false carve (positional `add(w, false)`) | the store step (no orphaned commits) |
 | snapshot signed-URL expiry | refresh-on-error (audit F5 class, evidence-gated) |
 | **`chain()` per-row ordering** | **survives** — absorbed into the persistence adapter |
 | **`movePlacementForced`** | **survives** — a real policy (undo may move locked) |
@@ -83,7 +83,7 @@ the last demolition.*
 | 0 ✅ | `pnpm test` runs every suite · group-drag fix `a447a95` | done |
 | 1 ✅ | the pure stack (9 tests) + seam + `chain()` — `27837f6` | done |
 | 2 ✅ | arranging acts record, dark — `e4681d3`+`5d27d0d`; **antagonist round `8c72573`** (4 defects incl. the REPRODUCED buried-burst corruption; D1 class-fixed via `onBeforeRecord`); truth-checked live (nudge · coalescing · burst-split · send-to-back · lock) | done |
-| 3 ✅ | keeping acts record — `8739d81`; truth-checked live (remove · trash-through-confirm · evaporate stays silent) | done |
+| 3 ✅ | keeping acts record — `8739d81`; truth-checked live (remove · trash-through-confirm · the then-live evaporate correctly silent — since retired, D-138) | done |
 | 4 ✅ | meaning acts record — `073d131`; truth-checked live (tag add via the bar's input · untag via the chip ×, honest global labels); `setBitSourceId` added | done — **floors 3–4 antagonist read in flight** |
 | 5 ✅ | ↶ ↷ beside zoom (each names its next act; disabled when empty) + ⌘Z/⌘⇧Z at the verified guard slot + the "undid: …" receipt + closeNudgeWindow-before-pop | done — **proven live: undo→redo→undo→reload, the DB holds the reversed position.** OWED: the owner's label-wording pass (incl. J6: should "trash card" say "everywhere"?) |
 
@@ -224,8 +224,8 @@ Each remove act snapshots the full `CardVM`(s) before the optimistic removal, th
   (D9):** a snapshot restored >1h into a session carries an expired signed media URL → broken
   image until reload; same class as audit F5, fixed with that class, not here.
 - **bulk** versions: one entry, N snapshots, per-leg failures coalesced to one banner.
-- **Excluded structurally:** the evaporate/abort path (`isFreshEmpty` → `abortBitCreate`
-  DELETES the bit row — un-creating is not undoable, ruled) records nothing. The
+- **Excluded structurally:** ~~the evaporate/abort path~~ *(moot after D-138 — evaporate is
+  retired; an empty card now removes and RECORDS like any other, a consistency gain)*. The
   `isGoneError` carve (write failed but the screen is right) → entry marked dead.
 - `TRASHED_BIT`/`TRASHED_BOARD` from the revive get owner-facing copy ("that bit is in the
   trash now — restore it from there"), not raw codes.

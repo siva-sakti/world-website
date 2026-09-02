@@ -99,3 +99,8 @@
 - **I-Ref6 — Destroy cascades both ways.** Destroying a bit removes every reference where it is the source *and* every one where it is the target; other bits are untouched. → `constraint` (`on delete cascade` on both columns).
 - **I-Ref7 — References are in the export.** A reference is a stored record kind, so it joins `/export` and the completeness check — or "you own everything" silently breaks (I-G1). → `app` + the I-G1 test.
 - **I-Ref8 — The chip caches the target's face for search/labels, refreshed lazily.** A chip stores a copy of the target's face so notes are findable by what they reference and list-labels read naturally; the copy self-heals on the note's next save/view — no rename fan-out. A **knowing carve to Principle 9** (agreements §1 carve / §6 amendment), recorded as a trade. → `app` (lazy reconcile-on-read).
+
+## Undo (D-137)
+
+- **I-U1 · An undo entry never outlives its board visit, and never replays into a different board.** The stack is session memory (the three-layer save ruling: durable recovery is trash/archive/travel — never a stored undo stack). Enforced by construction: the stack lives in the board's own hook and dies with it.
+- **I-U2 · Only deliberate acts enter the stack.** Reflexes (click-to-front, auto-grow) and the system's repairs (rollbacks) route through the raw door and cannot record. A failed act's entry is marked and never replays.
