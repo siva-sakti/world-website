@@ -257,6 +257,30 @@ user-facing sentence this pass wrote or changed, so none is lost:
 Not in scope for that sweep but noted by the audit: **five different spellings of "nothing matches"**
 across home, the drawer, `/bits`, `/outline` and `/search`.
 
+## 5d. The drawer's "where" filter — owner's question, 2026-09-02 (answered, not yet acted on)
+
+**Nothing is broken and nothing needs building** — but the default is narrower than the
+owner's mental model, and the owner spotted it.
+
+Today's four scopes (`drawer.tsx:106-107, 226-231`): **unplaced** (default; `boards.length === 0`
+— on NO board anywhere) · **this board** · **other boards** · **anywhere**.
+
+The owner's model: *"the active display is stuff that's not placed anywhere on THIS board, while
+we're on the board."* That set is **unplaced ∪ other boards** — and no single option produces it.
+Seeing everything you could bring in currently means flipping between two settings.
+
+**The owner's logic check is sound, and worth writing down:** a bit lives on many boards (one
+placement each) but on any given board only once — so "can I bring this in?" is exactly "is it not
+already here?". Every bit is in one of three buckets: loose · already on this board · on other
+boards but not this one. First and third are fair game; only the middle isn't. The
+one-placement-per-board rule doesn't complicate the question — it is what makes it answerable. The
+excluded case is already handled: an already-here row is marked "on this board" and clicking it
+glides the camera to it (`onJumpTo`) instead of placing a duplicate.
+
+**Proposed (owner's call — a behaviour change, not cleanup):** add a fifth scope **"not on this
+board"** = `!onThis(n)`, and make it the default. Alternatives: add it without changing the
+default; or rename "unplaced", which reads looser than it is.
+
 ## 6. Done so far
 
 - **Stage A** (`6d561f1`) — 96 lines of verified dead code deleted, incl. the two-functions-one-name
@@ -266,3 +290,22 @@ across home, the drawer, `/bits`, `/outline` and `/search`.
   update, so all 9 paths carry the assert instead of 3 of them. RLS verified permissive first, so
   the new throw cannot misfire on a live thing. **Owner hand-test still owed:** put a note away from
   the home screen, take it back out from `/archive`.
+- **Stage B2** (`7eb19b8`) — the drifted card tables closed; `CardVM` freed from the 500-line
+  component; `card.tsx` twins merged.
+- **Stage C** (`eb7d7dd`) — the safety net: `act-rules.ts` + 16 tests. The survivor rule, written
+  twice in two files, becomes one tested function.
+- **Stage D** (`9e3de3b`) — the four remove acts collapse into one gesture (385 → 295), with the
+  equivalence written out first in `collapse-equivalence.md`.
+- **Stage D2** (`432918d`) — the collapse gets REAL tests: doors injected, `test-resolve-ts.mjs`
+  added (test-only), 19 tests covering all four gestures × undo × redo, the rollbacks, the
+  refused-flush carve and the J1 survivor rule. Suite 64 → 83.
+  **✅ OWNER-VERIFIED ON THE REAL BOARD (2026-09-02):** *"yes, everything is working. I just took
+  the whole test. It all works perfectly."* All six walkthrough steps — remove one / remove several /
+  trash one / trash several, each with undo and redo, plus the drawer's loose column and a locked
+  card returning still locked. **This is what took the collapse from ~75% to verified**; the tests
+  cover the logic, this covered the real database round-trip, real batching and real timing.
+
+**Flagged for the owner, not acted on:** `useBoardActs` is named like a React hook but is not one
+(no hooks inside — which is exactly why it became testable); its siblings `useCreateDoors` and
+`useArrangeActs` really are hooks. eslint's rules-of-hooks fires on the NAME. Renaming is a
+signature change → the owner's call.
