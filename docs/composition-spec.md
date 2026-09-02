@@ -276,7 +276,7 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 | its **chips** in other writing | greyed, **still enterable** — tapping opens it, clearly marked archived |
 | its **card** on boards | ⚪ *proposed: greyed, present, still opens — matching its chips. Never stamped.* |
 | the `[[` **picker** | **excluded** *(owner-stamped)* |
-| **search** | ⚪ *included or excluded? Archive means "out of my active world," but find has been the deliberate way back. Undecided.* |
+| **search** | **excluded by default, with a control to include the archive** *(owner-ruled 2026-09-02: "should it just be with active, that you can turn on allowing to bring things in from the archive?")*. Matches archive's meaning — out of the active world, not out of existence — and makes returning deliberate, the same principle as the picker's exclusion. |
 | the compositions list | out of the main view; reachable through the archive |
 
 ### 11.3 Trashed
@@ -295,3 +295,33 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 
 ### 11.5 What is never a state ⛔
 "Draft" · "published" · "finished" — ⚪ *the last is the parked **pieces** idea (F-series), testable today with a `finished` tag; it is not part of this spec.*
+
+## 12 · Cross-cutting — how a composition joins the rest of the app
+
+### 12.1 Search *(verified against `src/lib/db/search.ts`, 2026-09-02)*
+**Today:** search reads **bits and notes** — things with words — filtered by kind (all · bit · note), matching the bit's search index. **A board never appears in search**, by design: it has no content of its own. Boards are reached by name through **jump-to**, the separate tool *(the "two kinds of looking" split, D-122)*.
+
+**After compositions separate:**
+1. Search covers **bits and compositions**; the kind filter becomes **all · bits · compositions**.
+2. A composition matches on **its title and its body**.
+3. ⛔ Boards stay out of search; jump-to remains their door.
+4. **Archived things: excluded by default, with a control to include them** (§11.2).
+5. ⚠ **REQUIRED WORK, or compositions vanish from search:** search reads the bit table today. When compositions move, **the search index must follow them** — a generated column on their new home, and the query taught to read both. *(Caught by writing the technical spec; the single largest silent-breakage risk in the migration.)*
+
+### 12.2 Tags
+Identical to bits and boards: apply, remove, and pull. A composition carries its own tags; ⛔ tags are never inherited from the bits it references or the boards it sits on.
+
+### 12.3 Folders
+**One folder per composition**, exactly as boards and bits. Deleting a folder strands nothing — its contents simply leave it *(existing set-null behavior)*.
+
+### 12.4 Star ("alive")
+A composition can be starred; starred things lead the desk. Unchanged from today.
+
+### 12.5 Export
+Compositions join `/api/export` **in the same migration that moves them** — not after. *(Invariant I-G1: every stored record kind appears in the export. This is not optional and not deferrable.)*
+
+### 12.6 The graph *(parked — its own round)*
+The graph draws references and placements as lines. Compositions are ⚪ *presumably* nodes; nothing here decides it. **The rows accrue correctly from day one regardless**, so parking costs nothing.
+
+### 12.7 The pull (tapping a tag)
+Returns everything carrying that word — bits, boards, and now compositions, mixed. ⚪ *whether the pull gains kind-filters like search has.*
