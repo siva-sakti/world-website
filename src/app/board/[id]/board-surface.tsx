@@ -82,7 +82,7 @@ export function BoardSurface({
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
   const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, zoomBy, zoomTo, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
-    useCamera(boardRef, boardId);
+    useCamera(boardRef, boardId, sizeOf);
   const marquee = useMarqueeSelect(boardRef, screenToWorld, setSelectedIds, clearSelection, sizeOf);
 
   function onErr(e: unknown) {

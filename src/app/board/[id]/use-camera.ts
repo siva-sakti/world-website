@@ -14,7 +14,12 @@ export type Camera = { x: number; y: number; scale: number };
 // zoom (the wheel is mouse-only; touch-action:none turns the browser's own pinch
 // off). The board's pointer handlers dispatch to pinchDown/Move/Up exactly like
 // the marquee's start/move/end pattern (board-touch-zoom-plan.md).
-export function useCamera(boardRef: RefObject<HTMLDivElement | null>, boardId: string) {
+export function useCamera(
+  boardRef: RefObject<HTMLDivElement | null>,
+  boardId: string,
+  // The geometry ledger (registry stage 3): true rendered sizes, state-fallback.
+  sizeOf: (placementId: string) => { w: number; h: number } | null,
+) {
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, scale: 1 });
   const camRef = useRef(cam);
   // Touch pointers currently down on empty board space (touch pointers get
@@ -122,14 +127,14 @@ export function useCamera(boardRef: RefObject<HTMLDivElement | null>, boardId: s
       setCam({ x: 0, y: 0, scale: 1 });
       return;
     }
-    // Text/audio cards render at height:auto, so their stored h is stale (smaller than the
-    // real card) — measure the actual rendered box via data-pid so fit never crops a grown
-    // card (the same measure findClearSpot uses; offsetW/H are pre-transform world units).
+    // Text/audio cards render at height:auto, so their stored h is stale (smaller than
+    // the real card) — true sizes come from THE LEDGER (registry stage 3; seeded
+    // synchronously at attach, so even the mount-effect fit reads real boxes).
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const c of cards) {
-      const elc = document.querySelector(`[data-pid="${c.placementId}"]`);
-      const w = elc instanceof HTMLElement ? elc.offsetWidth : c.w;
-      const h = elc instanceof HTMLElement ? elc.offsetHeight : c.h;
+      const m = sizeOf(c.placementId);
+      const w = m?.w ?? c.w;
+      const h = m?.h ?? c.h;
       minX = Math.min(minX, c.x);
       minY = Math.min(minY, c.y);
       maxX = Math.max(maxX, c.x + w);
