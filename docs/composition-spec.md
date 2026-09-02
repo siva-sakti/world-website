@@ -1,6 +1,15 @@
 # The composition — the specification
 
-> ## STATUS · in progress, written section by section with the owner (started 2026-09-02)
+> # ⚠ DRAFT — NOT YET VERIFIED LINE BY LINE. DO NOT BUILD FROM THIS.
+> ## STATUS · draft, written section by section with the owner (started 2026-09-02)
+>
+> **The owner's standard for this document (2026-09-02):** *"I want you to be way more checking every last detail — confirming what was in our conversation and what made it into the document, so you don't miss anything and you don't hallucinate."*
+>
+> **What that means, mechanically:** every claim must trace to **an owner ruling** (quoted or dated) · **verified code** · **a marked 🔵 proposal** · or be **⚪ open**. **A claim that cannot be pointed at is removed, not softened.** The check instrument is `ruling-register.md` — re-run after every change.
+>
+> **Claude's failure mode, named so it can be guarded rather than trusted away:** fluent generation of plausible detail, which is indistinguishable from correct detail to the author. On 2026-09-02 this produced three inventions written as settled (the recursion guard · the silent-bit-hood forbidden-list · the drawer's focus requirement) and one "discovery" of a schema guard that already existed. **The guard is citation, never care.**
+>
+> **Before this stops being a draft:** a line-by-line verification pass against the conversation trail, not a spot-check.
 > **This supersedes `composition-technical-spec.md`** when complete; that file and `composition-base-spec.md` retire to trail-status. Nothing here is invented: every ruling carries its provenance, and anything unruled is marked ⚪ inline rather than smoothed over.
 
 ---
