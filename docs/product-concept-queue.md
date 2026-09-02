@@ -60,6 +60,13 @@ The owner framed level 1 not as *gap-finding* but as **"what makes a complete se
 
 ---
 
+## ⭐ THE CLOSING SEQUENCE (owner-set, 2026-09-03)
+1. **The aerial review** — dispatched (independent; charter: contradictions between layers · drift · untraceable rulings · unknown ambiguities · factual errors · principle violations; findings-only, cited, severity-classed).
+2. **Finish the walk** — stations 4 (the scenes, formally) + 5 (the deliberate absences read back).
+3. **THE CLEAN DOCUMENT** — the finished walk as its spine; one practical, actionable spec; the palimpsest layers retired to trail-status. *(The owner: "a separate document that's very clean, actionable, practical.")*
+4. **On the side:** the cross-window migration choreography (who runs it, when, what freezes).
+5. **After the basics are built:** the owner's UX passes (the flatness-list shape, the feel work). *(Her sequencing: "once I see the basics built out I can do the UX stuff.")*
+
 ## The queue
 
 **⚑ = waiting on the owner.**
