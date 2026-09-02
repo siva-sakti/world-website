@@ -3,6 +3,7 @@
 > ## STATUS · 2026-09-02 · 🟢 THE SOURCE OF TRUTH for this feature, going forward
 > The owner: *"I want this to be our starting source of truth now — this is the future, this is what it is."* Concept first, then the definition, then what it can do. Clean — no history, no rulings-trail (that lives in `composition-base-spec.md`). **The language transitions here:** this doc says **composition**; the app currently says "note" — the sweep follows once naming is fully ruled.
 > Amend this doc only when the owner rules a change.
+> ⚠ **2026-09-03: the aerial review found this doc lags the newest stamps** (comp→comp · the block · evaporate's scope · archive missing from §3's lifecycle) — **re-issue pending as part of the consolidation**; until then `composition-technical-spec.md` + `aerial-review-findings.md` carry the corrections.
 
 ---
 

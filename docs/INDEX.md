@@ -250,6 +250,9 @@ INDEX.md ................ this file — where everything is
 ### `composition-definition.md` — 🟢 THE SOURCE OF TRUTH: what a composition is (2026-09-02)
 **Contains:** the concept over everything (diverge→converge; the board converges *privately*, the composition is **convergence made legible** — the owner's cut) · the definition · every action, shipped-ideal · what's deliberately open · where the depth lives. **Owner-blessed as the starting source of truth; amend only on her ruling. The language transitions here: it says "composition."**
 
+### `aerial-review-findings.md` — 🔵 the independent audit of the whole composition stack (2026-09-03)
+**Contains:** the verdict (close, not consolidation-ready) · the worst findings (three answers to one question · the definition lagging the stamps · evaporate's three readings · the evaporate×I-L2 lifecycle hole) · Claude's own caught errors · the drift strike-list · the KEEP-verbatim five · **the consolidation recipe.** Drives the clean-document pass.
+
 ### `composition-technical-spec.md` — 🟠 THE BUILD-GRADE CONSOLIDATION (2026-09-03)
 **Contains:** data layer (tables · relations · the migration) · **the invariant map, paid** (I-C1–C6) · behaviors in build language · **the UI inventory with states** · acceptance criteria (provable vs feel-test) · **the honest open register** · §7: five things the writing itself caught (search-must-learn-surfaces the biggest). Read AFTER the definition; the enactment plan derives from §1.3.
 
