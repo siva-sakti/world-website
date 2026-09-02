@@ -90,3 +90,72 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 
 **3.6 · What it is NOT** ⛔
 Not material · not a container things are placed *onto* (*"text-forward, like Notion"*) · not convertible to or from a bit · never auto-born · not a task manager — **though it holds facts about its own job** (a word-count target · a due date · who it's for), specified in Part III's lifecycle section *(owner: "that kind of project management layer")*.
+
+---
+
+# PART II · THE FLOWS
+
+*Every step of every path, exactly. "Nothing exists" means no database row. ⚪ = genuinely undecided.*
+
+## 4 · Birth
+
+### 4.1 From the write page
+1. Owner opens the write page. Editor renders empty, **focused**. Title field empty, no placeholder text.
+2. **Nothing exists.** No row.
+3. Owner types the first character **in the body** → **the composition is created**: one row (state `live`, visibility `private`, title `null`, body = that character). *(Title alone never births it — typing only in the title creates nothing.)*
+4. From here: §6 saving.
+5. It appears in the compositions list immediately on creation.
+6. **On leaving with a still-empty body** → nothing was ever created; nothing to clean up.
+
+### 4.2 From within a board — the compose door
+1. Owner taps **compose** on the board toolbar. *(Distinct from `+ text`, which makes a bit.)*
+2. **The floater opens** over the canvas — the board stays visible and interactive behind it. ⚪ *opening position: centred in viewport / near the toolbar / last-used position.*
+3. Floater contents: title field · body editor (focused) · **basic toolbar only** (§8.2) · close control. ⚪ *whether it also shows a save indicator — see §6.4.*
+4. **Nothing exists** until the first body character.
+5. On first body character → **two rows created together**: the composition, and its **placement on this board** *(auto-place, owner-ruled)*.
+6. The card appears on the board immediately, at ⚪ *a clear spot found by the existing find-a-clear-spot logic — confirm this is the right placement rule.*
+7. **On closing with an empty body → nothing was ever created**: no composition row, no placement row, no card. *(The evaporate rule; the placement cannot orphan because it was never written.)*
+
+### 4.3 Templates — a mode, not a door *(future, T3)*
+At either door above, the owner may choose **blank** *(today's only option)* or **a template** — a composition that opens pre-shaped. Entrances are unchanged.
+
+### 4.4 What can never create a composition ⛔
+Pasting · importing · the system · any automatic path. **No exceptions.**
+
+## 5 · Opening an existing composition
+
+| from | opens | notes |
+|---|---|---|
+| **its card on a board** | the **floater** | the default; board stays live behind |
+| the floater's dock control | the **side panel** | board still visible, narrower |
+| either frame's expand control | the **full page** | leaves the board |
+| the compositions list · search results | the **full page** directly | no board context to preserve |
+| a **chip** in some writing | the **peek** first; the peek's door opens the full page | reading is not interrupted |
+| **on a phone** | the **full page**, always | no floater, no panel |
+
+**5.1 · Multiple open at once:** allowed — several floaters may be open on one board *(owner-ruled)*. ⚪ *the same composition open in two frames simultaneously: undesigned (the frame-handoff problem). Until designed, the second open should ⚪ focus the existing frame rather than open a duplicate.*
+
+## 6 · Writing and saving
+
+1. Typing updates the body locally; **nothing is written immediately**.
+2. **350 ms after the last keystroke**, the body is written *(existing debounce)*.
+3. On the same write, **references reconcile**: the chips currently in the body become the composition's reference rows — added and removed to match *(existing mechanism)*.
+4. The save is **also flushed** on: leaving the page · the tab being hidden · the app being switched · the window closing *(existing save-guard)*.
+5. Status shows **"saving…" → "saved"**; on failure, a visible error — **never silent** *(house rule)*.
+6. ⚪ **The floater and side panel need the same status indicator.** Unspecified today; without it, a failed save in a floater is invisible.
+
+## 7 · The title
+
+1. Editable at any time, in any frame.
+2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: minted at exit, never on entry, never on autosave)*.
+3. That minted title is **an ordinary title** — replaceable forever, no special state.
+4. ⚪ **the exact format string** (e.g. `Sep 2, 9:41 AM`).
+5. ⚠ This is the one place the app writes into an owner-owned field. It is a **ruled exception** to *the machine never writes your words*.
+
+## 8 · What a piece knows about its job *(owner-ruled: "that kind of project management layer")*
+
+A composition may carry: **a word-count target** · **a due date** · **who it's for**.
+- All three are **optional**; a composition with none is normal and complete.
+- The **word count is always shown**; the target, when set, is shown against it. ⚪ *where: the footer / near the title / the editor's edge.*
+- ⚪ **Does the due date surface anywhere outside the piece** (the compositions list, home)? *If yes, this becomes a scheduling feature; if no, it is a note-to-self.* **This is the line between "a piece knows its job" and "a task manager" — and it needs the owner's word.**
+- ⛔ Not: assignees · statuses · reminders · notifications.
