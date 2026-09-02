@@ -66,6 +66,12 @@ Today's honest paths: pull *both* into this piece and write the contradiction in
 **⭐ Owner evidence (2026-09-02):** she IS this person — and her *founding* model of connection was exactly *"a note where I'm typing, but I'm bringing bits in."* The writing-tie is her native gesture. The live question narrows to **steering** — a faster on-ramp to the connective note from deep-in-text — not the mechanism.
 ⚑ **The choice this scene sharpens** (S5's sibling, from inside the text): is *the relation lives in writing* enough for the connector — or does deep-in-text work need a faster gesture, made without breaking the sentence? **This is the scene that decides whether the bit-web needs anything new.**
 
+## S13 · The Obsidian-only person *(owner-asked, 2026-09-03: no boards, just linked notes — does it still feel good?)*
+Their life here: **their atoms are small compositions** — many little pieces linking each other with `[[`, chips in text, backlink sections accruing, tags, search, folders. The composition layer alone is a complete Obsidian (plus block editing). **Bits aren't their layer, so "bits can't link" never touches them.** The teachable line: *if it does the pointing, it's a piece; if it gets pointed at, it's material.*
+**The honest edge:** a jotted bit that grows link-hungry → the signal itself: a thought that wants to weave is writing — start a piece, pull it in. One extra step; keeps material flat.
+**⚠ The gap this persona exposes: THE GRAPH** — their love language, parked. This scene raises the graph round's priority for the day we court them. *(Also: the compositions list must handle MANY small pieces gracefully — sorts/folders exist; watch it at scale.)*
+**The reference-system status note:** the eight-rule design is under discussion, NOT stamped — the owner is mid-thinking, deliberately.
+
 ---
 
 ## THE EXTERNAL LAYER — telling and teaching this feature *(owner-asked, same day)*
