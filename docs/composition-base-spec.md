@@ -198,6 +198,15 @@ Stations: **1 concept ✅** · 2 the four dimensions · 3 the life (every behavi
 **The named cost (accepted-pending-stamp):** the tiny connective thought (S5's answer) becomes a **small composition** — a thought that weaves IS a small piece of writing; the list sorts. **Migration footnote:** existing text-bit-authored ties get grandfathered/converted at enactment, counted then.
 **Link-bit chips:** the face = the captured headline, else the domain — the retired bookmark's own face rule, revived for the link type.
 
+## ⭐ THE PROCEDURAL PASS (2026-09-03 — the design run as a FILM; owner-asked "what's up there procedurally")
+1. **The rename ripple** — chips cache their label (searchability), healing on next open; stale-until-visited applies to composition-chips too. Named, acceptable, deliberate.
+2. **🆕 THE RECURSION GUARD (mandatory rule, previously nowhere):** block previews render ONE level deep — nested chips stay chips, never expand. (A↔B mutual blocks would otherwise recurse forever.)
+3. **⚪ Editing while archived** — archived pieces are enterable (ruled); typing in one is a state contradiction — the exact class that broke archive-v1. Lean (from that autopsy): **using a thing revives it** — editing quietly un-archives. Owner's cell.
+4. **⚪ Does `[[` offer archived things?** Trashed: no. Archived: lean **excluded by default** (find stays the deliberate way back) — the August audit flagged this leak. Owner's cell.
+5. **⚪ Duplicate-a-piece** — wanted by the owner's own stitching instinct, never designed. Sketch only: copies references (same bits), not placements. Future op, filed.
+6. **The same piece open twice** — the frame-handoff debt, confirmed real, Claude's engineering design owed.
+**The pattern: every procedural gap is about TIME** — caches aging, states colliding, ops repeating. Snapshot-invisible, film-obvious.
+
 ## Open (only these)
 Q1 storage drawer (decided LAST, after behavior) · card look (mock it — bit-card vs piece-card distinctly styled) · **the graph's lines** (own round) · auto-place on birth-board · floater count · drawer docking · archived-chip marking (design) · **the words (Q9)**.
 
