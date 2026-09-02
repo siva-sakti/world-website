@@ -1,5 +1,18 @@
 # The joints, as scenes — how it's actually used
 
+> ## ⭐ STATION 4 WALKED (owner, 2026-09-02) — the scenes' true state
+> **Closed by the walk:** S1 · S2 · S9 · S10 · S13 (answered by this week's rulings) — plus four closed BY THE OWNER during the walk itself:
+> - **S5 + S12 · the steering on-ramp — CLOSED.** *"What else could it be other than the writing tie?"* Nothing. The connective note IS the gesture; no faster on-ramp until real use asks.
+> - **S11 · audio — CLOSED.** The recording sits on the board beside the work; `[[` brings it into the writing when wanted. Both paths already exist.
+> - **S8 · the project seen whole — CLOSED.** *"I don't think the pieces need to be a set."* The board is enough.
+> - **S6 · the excerpt — RE-FRAMED by the owner into two doors of one family:** *from a long bit* (bit-level, on the bit's page — her "duplicating a bit" neighborhood) and *from your writing* (composition-level: highlight → make a bit). Same underlying thing; still unbuilt, now correctly located.
+>
+> **Still live after the walk — TWO:**
+> 1. **S7 · "what is this piece for"** — a composition holding its own assignment (word target vs live count · who it's for · when it's due) or nothing at all. **The owner's top-flagged idea; still untouched.**
+> 2. **S3 · the card's look** — title-only vs title-plus-first-lines. Needs a specimen, not an argument. ⚑ *who builds it: Claude (a throwaway specimen) or the code window?* — owner's call.
+
+
+
 > ## STATUS · 2026-09-02 · 🟠 WORKING — the sitting's material
 > The owner's unfinished list: confident on the composition itself; **not confident on the joints** — composition↔bit, composition↔board, the bit's larger role, *"how will people actually use this, what do they want to see."* The abstract connection questions bounced three times; so here they are **as moments of use**, each with its open choice ⚑ embedded where it can be *felt*, not argued. The sitting = walking these together; the owner corrects the scenes from life, then answers the ⚑ inside each.
 
