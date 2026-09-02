@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { typeLabel } from "@/lib/labels";
 import type { ShelfGroup } from "@/lib/db/shelf";
 import { GroupPicker, PinToggle } from "@/components/shelf-controls";
 import type { PanelBit } from "@/lib/db/inbox";
@@ -132,7 +133,7 @@ export function NoteCard({
       </div>
 
       <div className="inbox-card-foot">
-        <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
+        <span className="inbox-card-kind-tag">{typeLabel(item.type)}</span>
         <span className="inbox-card-actions">
           <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />

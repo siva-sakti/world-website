@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SearchItem, SearchKind } from "@/lib/db/search";
 import type { TagChoice } from "@/lib/db/tags";
+import { typeLabel } from "@/lib/labels";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { SearchTips } from "./search-tips";
 import { SearchFilters } from "./search-filters";
@@ -15,7 +16,7 @@ import { SearchFilters } from "./search-filters";
 
 function badge(item: SearchItem): string {
   if (item.kind === "note") return "note";
-  return item.mediaType === "drawing" ? "doodle" : item.mediaType ?? "bit";
+  return typeLabel(item.mediaType);
 }
 
 export function SearchLive({

@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { PanelBit } from "@/lib/db/inbox";
-import { bitLabel } from "@/lib/labels";
+import { bitLabel, typeLabel } from "@/lib/labels";
 
 // A single outline entry — READ-ONLY (no place/pin/trash doors; those live on the
 // board & inbox surfaces). Marker · face/title · link to its page · source · tags.
 // A note opens /note/[id], a bit /bit/[id]; the marker stays kind-neutral (type).
 export function OutlineRow({ item }: { item: PanelBit }) {
   const href = item.kind === "note" ? `/note/${item.id}` : `/bit/${item.id}`;
-  const marker = item.type === "drawing" ? "sketch" : item.type;
+  const marker = typeLabel(item.type);
   const label = item.content?.trim() || item.face?.trim() || null;
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { typeLabel } from "@/lib/labels";
 import type { PanelBit } from "@/lib/db/inbox";
 import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
@@ -50,7 +51,7 @@ export function NoteRow({
           : undefined
       }
     >
-      <span className="inbox-card-kind-tag">{item.type === "drawing" ? "sketch" : item.type === "audio" ? "recording" : item.type}</span>
+      <span className="inbox-card-kind-tag">{typeLabel(item.type)}</span>
       <Link href={`/bit/${item.id}`} className="notes-row-title" title="open">
         {(item.type === "image" || item.type === "pdf" || item.type === "link") && img && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -59,7 +60,7 @@ export function NoteRow({
         {title ? (
           <span>{title}</span>
         ) : (
-          <span className="notes-row-empty">{item.type === "image" ? "image" : item.type === "pdf" ? "PDF" : item.type === "audio" ? "recording" : "empty note"}</span>
+          <span className="notes-row-empty">{item.type === "text" ? "empty note" : typeLabel(item.type)}</span>
         )}
       </Link>
       {item.source && (
