@@ -21,10 +21,12 @@ export function useBoardKeys(deps: {
   nudgeSelected: (dx: number, dy: number) => void;
   zoomBy: (factor: number) => void;
   zoomTo: (target: number) => void;
+  onUndo: () => void;
+  onRedo: () => void;
 }) {
   const {
     enabled, editingId, selectedCount, setEditingIdNull, clearSelection,
-    selectAll, removeSelected, nudgeSelected, zoomBy, zoomTo,
+    selectAll, removeSelected, nudgeSelected, zoomBy, zoomTo, onUndo, onRedo,
   } = deps;
 
   useEffect(() => {
@@ -43,6 +45,10 @@ export function useBoardKeys(deps: {
       if (meta && (e.key === "-" || e.key === "_")) { e.preventDefault(); zoomBy(1 / 1.2); return; }
       if (meta && e.key === "0") { e.preventDefault(); zoomTo(1); return; }
       if (meta && e.key.toLowerCase() === "a") { e.preventDefault(); selectAll(); return; }
+      // ⌘Z/⌘⇧Z — BEFORE the selectedCount guard (undo needs no selection). The
+      // guards above already protect every other Z: inputs ①, the text editor's
+      // own undo while editing ③, the pen's stroke-undo via drawMode (!enabled ④).
+      if (meta && e.key.toLowerCase() === "z") { e.preventDefault(); if (e.shiftKey) onRedo(); else onUndo(); return; }
       if (e.key === "Escape") { clearSelection(); return; } // two-step rung 2
       if (selectedCount === 0) return;
       if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSelected(); return; }
@@ -53,5 +59,5 @@ export function useBoardKeys(deps: {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [enabled, editingId, selectedCount, setEditingIdNull, clearSelection, selectAll, removeSelected, nudgeSelected, zoomBy, zoomTo]);
+  }, [enabled, editingId, selectedCount, setEditingIdNull, clearSelection, selectAll, removeSelected, nudgeSelected, zoomBy, zoomTo, onUndo, onRedo]);
 }

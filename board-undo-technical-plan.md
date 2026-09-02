@@ -1,6 +1,9 @@
 # Board undo/redo — the technical plan
 
-**Status:** planned → **antagonist: "build with changes" (14 defects folded, 2026-09-01)** → build.
+**Status:** ✅ **SHIPPED (2026-09-01)** — all five floors built · two antagonist rounds folded
+(floor 2: 4 defects incl. a reproduced corruption; floors 3–4: 4 defects + 5 judgment calls) ·
+the owner's first soak folded (link click grammar · resize hit zones) · the full cycle proven
+live. Owed: the owner's label pass.
 Headline catch: the lock-bypass gate as first written could NEVER fire (locked cards can't be
 dragged/nudged/tidied, so no position entry ever snapshots `locked:true`) — the forced door now
 decides against the CURRENT card at reverse time, or every locked-card undo would have shipped
@@ -82,7 +85,7 @@ the last demolition.*
 | 2 ✅ | arranging acts record, dark — `e4681d3`+`5d27d0d`; **antagonist round `8c72573`** (4 defects incl. the REPRODUCED buried-burst corruption; D1 class-fixed via `onBeforeRecord`); truth-checked live (nudge · coalescing · burst-split · send-to-back · lock) | done |
 | 3 ✅ | keeping acts record — `8739d81`; truth-checked live (remove · trash-through-confirm · evaporate stays silent) | done |
 | 4 ✅ | meaning acts record — `073d131`; truth-checked live (tag add via the bar's input · untag via the chip ×, honest global labels); `setBitSourceId` added | done — **floors 3–4 antagonist read in flight** |
-| 5 | ↶ ↷ toolbar buttons + ⌘Z/⌘⇧Z + the transient "undid: …" note + **the owner's label-wording pass** | after the antagonist verdict + the soak |
+| 5 ✅ | ↶ ↷ beside zoom (each names its next act; disabled when empty) + ⌘Z/⌘⇧Z at the verified guard slot + the "undid: …" receipt + closeNudgeWindow-before-pop | done — **proven live: undo→redo→undo→reload, the DB holds the reversed position.** OWED: the owner's label-wording pass (incl. J6: should "trash card" say "everywhere"?) |
 
 The antagonist reads THIS PLAN before stage 1 and the **stage-2 diff** (the review's retarget:
 stage 2 owns the group-drag ground and the lock bypass — the real risk).

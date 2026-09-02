@@ -18,6 +18,11 @@ export function BoardToolbar({
   onZoomIn,
   onZoomOut,
   zoomPct,
+  onUndo,
+  onRedo,
+  undoLabel,
+  redoLabel,
+  undoNote,
   fileRef,
   onPickImage,
   audioRef,
@@ -41,6 +46,15 @@ export function BoardToolbar({
   onZoomIn: () => void;
   onZoomOut: () => void;
   zoomPct: number;
+  // Undo/redo (stage 5): the label IS the tooltip — the button always names its
+  // next act ("undo: move 3 cards"), so nothing ever reverses invisibly. Null →
+  // disabled. undoNote is the transient "undid: …" receipt (the ruled substitute
+  // for moving the view — undo never pans/zooms).
+  onUndo: () => void;
+  onRedo: () => void;
+  undoLabel: string | null;
+  redoLabel: string | null;
+  undoNote: string | null;
   fileRef: RefObject<HTMLInputElement | null>;
   onPickImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
   audioRef: RefObject<HTMLInputElement | null>;
@@ -99,6 +113,31 @@ export function BoardToolbar({
         <span className="compose-zoom-pct" title="current zoom">
           {Math.round(zoomPct * 100)}%
         </span>
+      </span>
+      <span className="compose-zoom">
+        <button
+          className="compose-btn"
+          disabled={!undoLabel}
+          onClick={onUndo}
+          title={undoLabel ? `undo: ${undoLabel}` : "nothing to undo"}
+          aria-label={undoLabel ? `undo: ${undoLabel}` : "nothing to undo"}
+        >
+          ↶
+        </button>
+        <button
+          className="compose-btn"
+          disabled={!redoLabel}
+          onClick={onRedo}
+          title={redoLabel ? `redo: ${redoLabel}` : "nothing to redo"}
+          aria-label={redoLabel ? `redo: ${redoLabel}` : "nothing to redo"}
+        >
+          ↷
+        </button>
+        {undoNote && (
+          <span className="compose-undone" role="status">
+            {undoNote}
+          </span>
+        )}
       </span>
       <input ref={fileRef} type="file" multiple accept="image/*,.heic,.heif,image/heic,image/heif" hidden onChange={onPickImage} />
       <input ref={audioRef} type="file" multiple accept="audio/*" hidden onChange={onPickAudio} />

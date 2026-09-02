@@ -98,8 +98,26 @@ export function BoardSurface({
   // act on an entry until stage 5's buttons. The dev readout below is the soak's
   // evidence surface. onErr here takes the seam's owner-facing copy directly.
   const { record, onBeforeRecord, fail, undo, redo, undoLabel, redoLabel, devSnapshot } = useUndo((msg) => setError(msg));
-  void undo; void redo; void undoLabel; void redoLabel; // stage 5 wires the buttons
+  // Stage 5 (live): the transient "undid: …" receipt — the ruled substitute for
+  // moving the view (undo never pans/zooms; the note says what just reversed).
+  const [undoNote, setUndoNote] = useState<string | null>(null);
+  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashNote = (msg: string) => {
+    if (noteTimer.current) clearTimeout(noteTimer.current);
+    setUndoNote(msg);
+    noteTimer.current = setTimeout(() => setUndoNote(null), 2500);
+  };
   const arrange = useArrangeActs({ supabase, cardsRef, record, onBeforeRecord, patchCard, setCards, settled, chain });
+  async function doUndo() {
+    arrange.closeNudgeWindow(); // never pop an entry a burst is still extending (D12)
+    const r = await undo();
+    if (r?.ok) flashNote(`undid: ${r.label}`);
+  }
+  async function doRedo() {
+    arrange.closeNudgeWindow();
+    const r = await redo();
+    if (r?.ok) flashNote(`redid: ${r.label}`);
+  }
   // The meaning acts (undo §6 — tags + source, GLOBAL reach, honest labels) + the
   // refresh signal their reverses bump so mounted bars repaint themselves. Scoped
   // PER BIT (antagonist J3): a global counter set every bar loading on any reverse,
@@ -381,6 +399,8 @@ export function BoardSurface({
     nudgeSelected,
     zoomBy,
     zoomTo,
+    onUndo: () => void doUndo(),
+    onRedo: () => void doRedo(),
   });
 
   // ---- pan + pinch + tap on empty space ----
@@ -462,6 +482,11 @@ export function BoardSurface({
         onZoomOut={() => zoomBy(1 / 1.2)}
         onFit={() => fitOrToggleBack(cards)}
         zoomPct={cam.scale}
+        onUndo={() => void doUndo()}
+        onRedo={() => void doRedo()}
+        undoLabel={undoLabel}
+        redoLabel={redoLabel}
+        undoNote={undoNote}
         fileRef={fileRef}
         onPickImage={onPickImage}
         audioRef={audioRef}

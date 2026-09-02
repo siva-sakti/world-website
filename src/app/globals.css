@@ -76,6 +76,11 @@ body {
   border-color: #d6cec1;
   color: #2b2620;
 }
+.compose-undone {
+  font-size: 12px;
+  color: #6b6257;
+  white-space: nowrap;
+}
 .compose-selected {
   font-size: 12px;
   color: #6b6257;

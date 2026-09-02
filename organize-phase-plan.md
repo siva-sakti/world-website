@@ -69,8 +69,11 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
      review is naming what exists). **The highest-value gap in the app.**
   2. **LOST SIGNAL** — *"we need to think about"*: nothing survives a dropped connection today; for
      a capture tool, losing a thought in a tunnel is the worst failure. Offline/draft-safety.
-  3. **UNDO** — owner: *"smart."* Re-raised from Phase 4: the one basic every canvas tool has and
-     this doesn't. Needs its own plan (it crosses the debounced-save + optimistic-create machinery).
+  3. ✅ **UNDO — SHIPPED (D-137, 2026-09-01).** ↶ ↷ on the board toolbar + ⌘Z/⌘⇧Z: every
+     deliberate act (moves · resizes · nudges · tidy · send-to-back · lock · remove · trash ·
+     tags · source) reversible, capped 20, per-visit, buttons name their next act. Built dark
+     floor-by-floor with two antagonist rounds + the owner's soak before any button existed.
+     Plan + full record: `board-undo-technical-plan.md`. OWED: the owner's label-wording pass.
   4. ✅ **A RECENT SECTION — BUILT (D-134), migration owed to the owner.** "where you were": the
      last 5 surfaces you OPENED, on home, across devices. New `opening` table (its own — the
      `updated_at` trigger on bit/board would have made opening look like editing). **The A7 check
