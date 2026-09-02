@@ -89,6 +89,12 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
      ~1000 bits or a slow /search load. Not now.
   *(Note→bit division: the owner is working it in the OTHER window — not this track.)*
 
+- **OLD EMPTY BITS — tracked (owner, 2026-09-01, post-D-138):** with evaporate retired, empty
+  cards persist by ruling — but bits from BEFORE the change (or edge leftovers of the old
+  sweeps) may sit in the DB as blank strays. Owed: a small audit (count empty-bodied text bits;
+  loose vs placed), then the owner decides — leave them (they're legitimate cards now), surface
+  them for hand-cleaning, or a one-time offered cleanup. Can wait; tracked so it can't be lost.
+
 - **THE FRAME (owner idea, 2026-09-01 — filed from the reference-screenshots conversation):**
   an **optional page-shaped frame summonable onto any board** — NOT a second board mode. The
   board stays the free infinite canvas; the frame is a fixture on it: its edges/margins/center
