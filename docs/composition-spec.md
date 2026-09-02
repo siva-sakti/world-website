@@ -159,3 +159,75 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 - The **word count is always shown**; the target, when set, is shown against it. ⚪ *where: the footer / near the title / the editor's edge.*
 - ⚪ **Does the due date surface anywhere outside the piece** (the compositions list, home)? *If yes, this becomes a scheduling feature; if no, it is a note-to-self.* **This is the line between "a piece knows its job" and "a task manager" — and it needs the owner's word.**
 - ⛔ Not: assignees · statuses · reminders · notifications.
+
+## 9 · Pulling things in
+
+*The one act with two doors: `[[` when you know what you want; the drawer when you want to look.*
+
+### 9.1 The `[[` trigger
+1. Typing `[[` in the body opens the **picker** at the caret. The two characters are consumed by the trigger, not left in the text.
+2. Every character typed after the trigger filters the picker; **Backspace past the trigger closes it**, restoring nothing to the text.
+3. **Escape** closes it, inserting nothing.
+4. ⛔ The trigger does **not** fire inside a code block.
+5. ⚪ Whether `[[` also triggers in the title field. *(Default: no.)*
+
+### 9.2 The picker
+1. Two sections, in this order: **your material** (bits), then **your compositions**. Section headers always shown, even when one section is empty.
+2. **Ordering within each section:** most recently touched first, before any query is typed.
+3. **Matching** follows the app's one search rule *(word-start matching; `lib/search-query`)*, applied to a bit's **face** and a composition's **title**. ⚪ *whether composition bodies are also matched — bodies are large; default: title only.*
+4. **Excluded, always:** trashed things · **archived things** *(owner-ruled)* · the composition being written (no self-reference) · **boards** *(direction principle — boards never appear)*.
+5. **Visual bits** (image, drawing) show a thumbnail in the row; others show their face.
+6. **No matches:** the picker shows an empty state and **offers nothing** — ⛔ it does not offer to create anything. *(Create-on-miss is ⚪, unbuilt: if ever built, it must ask which kind — bit or composition.)*
+7. **Selection:** Enter or click inserts at the caret and closes the picker. The caret lands **immediately after** the inserted thing.
+
+### 9.3 What gets inserted
+| target type | inserted as | why |
+|---|---|---|
+| text bit · link bit · PDF · audio | **a chip** | born small; the sentence stays a sentence |
+| **image · drawing** | **a block** | you pulled in a picture to see it |
+| a composition | **a chip**, styled distinctly from a bit-chip | it is a whole piece, not a scrap |
+
+### 9.4 The chip
+1. **An atom**: one indivisible unit. Backspace deletes the whole chip, never characters of it. It cannot be edited in place.
+2. **Renders the target's CURRENT face**, fetched live. *(The face text also sits in the stored body — for search and export only. Display never uses the stored copy.)*
+3. **Tap** → the peek (§9.5). A chip does **not** navigate on tap.
+4. **Undo** removes it like any editor content; the reference row disappears at the next save's reconcile.
+5. **Copy/paste** carries it; the destination composition mints its **own** reference row on its next save.
+6. **The same target pulled in twice** → two chips, **one** reference row. Removing one chip while the other remains leaves the row intact.
+
+### 9.5 The peek
+Opens beside the chip, without moving the writing. Contents:
+- the target's face · a glimpse of its content *(text: an excerpt · image/drawing: the picture · audio: ⚪ a player or a static row · PDF: ⚪ first-page thumbnail or filename)*
+- its **source**, if it has one
+- **"open →"** — opens the target's own page (full page)
+- **"show in place"** — converts the chip to a block (§9.6)
+Tapping anywhere else closes it. ⛔ The peek never edits the target.
+
+### 9.6 The block
+1. Created by "show in place" from a peek; **images and drawings arrive as blocks directly** (§9.3).
+2. **Renders preview-sized by default; full only when full is small:**
+   - **image / drawing:** shown, sized per instance (⚪ the size control's form), **text wraps around it; it never floats** *(owner-ruled)*
+   - **short text bit:** its content, whole
+   - **long text bit:** its first lines, with an expand control
+   - **PDF / audio:** ⚪ undesigned — a titled row, a thumbnail, or a player
+3. **Renders one level deep only.** Chips inside a block's content stay chips and never expand. *(Prevents infinite recursion.)*
+4. Carries a control to **tuck back to a chip**. Reversible forever, per instance.
+5. **Silent bit-hood applies:** no badge, border, or icon marks it as pulled-in content. Its bit-life appears on tap/hover only.
+
+### 9.7 The drawer (the second door)
+1. Available on the composition's **page and side panel**. ⚪ *whether it fits in the floater at all.*
+2. Tabs: **bits · compositions · all**, plus **"in this piece"**.
+3. **"In this piece"** lists everything this composition currently references, each **readable in full** in the drawer — so long material stays cropped in the flow but whole at your side.
+4. **Clicking any row inserts it at the caret**, exactly as picker selection does (§9.2.7). The row must not steal focus from the editor — the caret survives the click.
+5. Same exclusions as the picker (§9.2.4).
+
+### 9.8 Pulling in — the edge cases
+| case | behavior |
+|---|---|
+| the target is trashed after being pulled in | the chip **greys and freezes**; tapping says *"this is in your trash — bring it out to see it"* with a restore door. The writing is unchanged. |
+| the target is archived after being pulled in | the chip **greys but stays enterable**; tapping opens it, clearly marked archived |
+| the target is destroyed (empty-trash) | the chip **degrades to plain text** of its stored face; the reference row is gone; the sentence still reads |
+| the composition itself is trashed | its chips elsewhere freeze (as above); its own content is untouched |
+| a chip is deleted from the body | the reference row is removed at the next save |
+| the save fails mid-reconcile | the body is the truth; references re-derive on the next successful save *(self-healing)* |
+| ⚪ a bit that already contains chips (historical) | migration cleans them up — the owner has ruled her existing data expendable |
