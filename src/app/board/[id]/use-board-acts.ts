@@ -136,234 +136,159 @@ export function useBoardActs(deps: {
     onErr(e);
   }
 
-  // Take the card off THIS board only; the bit lives on (its travel keeps the leg).
-  function unplaceSelected(placementId: string) {
-    const snap = cards.find((c) => c.placementId === placementId);
-    // (Evaporate retired — D-138: an empty card removes like any other, and records.)
-    setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-    clearSelection();
-    setEditingId(null);
-    const act = settled(placementId)
-      .then(async (id) => {
-        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6: words first, POST-reconcile key
-        return unplaceBit(supabase, id);
-      })
-      .then(() => {
-        forget(placementId); // the card is gone — drop any queued/restored writes for it
-        setLooseRefresh((n) => n + 1); // loose again — only once it's TRUE
-      });
-    // The entry rides the act's own promise (`settled` field): pressing ↶ 200ms in
-    // waits for the un-place to land before reviving (stage-1 D6). Lifecycle: a
-    // refused/failed act un-happened → entry FAILED (never replays); the already-
-    // gone carve → the reverse can't succeed → entry DEAD (plan §5).
-    const entry = snap
-      ? record(
-          countLabel("remove", 1, "from board"), [snap.bitId],
-          () => reviveOne(snap),
-          () => unplaceOne(snap.bitId),
-          act,
-        )
-      : null;
-    trackRemove(
-      act.catch((e) => {
-        if (entry) fail(entry);
-        if (isFlushRefused(e)) { if (snap) restore(snap); return; } // banner already up; the card stays
-        if (snap) handleRemoveFailure(snap, e);
-      }),
-    );
+  /** Undo of a trash = RESTORE the bit globally (it returns everywhere trash froze
+   *  it), then the card back on screen. DB first, so a failed restore never paints a
+   *  ghost card over a bit that is still frozen. */
+  async function restoreOne(snap: CardVM): Promise<void> {
+    await restoreBit(supabase, snap.bitId);
+    setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
   }
 
-  // Trash the whole bit — hidden everywhere, restorable from /trash. With multi-board,
-  // trash is the heavy act (off EVERY board), so the confirm is honest about it (F16).
-  async function trashSelected(placementId: string, bitId: string) {
-    let n = 1;
-    try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
-    const msg = trashOneConfirm(n);
-    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
-    const snap = cards.find((c) => c.placementId === placementId);
-    setCards((cs) => cs.filter((c) => c.bitId !== bitId));
-    clearSelection();
-    setEditingId(null);
-    const act = settled(placementId)
-      .then(async (id) => {
-        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-      })
-      .then(() => trashBit(supabase, bitId))
-      .then(() => forget(placementId));
-    // Undo = RESTORE (global — the bit returns everywhere trash froze it), then the
-    // card back on screen; DB first so a failed restore never paints a ghost. Redo
-    // re-trashes WITHOUT re-asking the confirm (ruled). A restore refused because
-    // the bit was destroyed → "no longer in the trash" → terminal → dead, honestly.
-    const entry = snap
-      ? record(
-          countLabel("trash", 1), [snap.bitId],
-          async () => {
-            await restoreBit(supabase, bitId);
-            setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
-          },
-          async () => {
-            const cur = cardsRef.current?.find((c) => c.bitId === snap.bitId);
-            setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId));
-            try {
-              // The redo honors the owner-found seam exactly like the act (antagonist
-              // D4): type into the restored card, press ↷ inside the debounce, and
-              // without this the typed tail would be forgotten with the freeze.
-              if (cur) {
-                const id = await settled(cur.placementId);
-                if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
-              }
-              await trashBit(supabase, bitId);
-              if (cur) forget(cur.placementId);
-            } catch (e) {
-              if (cur) setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, cur]));
-              throw e;
-            }
-          },
-          act,
-        )
-      : null;
-    trackRemove(
-      act.catch((e) => {
-        if (entry) fail(entry);
-        if (isFlushRefused(e)) { if (snap) restore(snap); return; }
-        if (snap) handleRemoveFailure(snap, e);
-      }),
-    );
+  /** Redo of a trash = trash again, resolved against the CURRENT card. Honors the
+   *  owner-found flush seam exactly like the act does (antagonist D4): type into the
+   *  restored card, press redo inside the 350ms debounce, and without the gate the
+   *  typed tail would be forgotten along with the freeze. */
+  async function trashOne(snap: CardVM): Promise<void> {
+    const cur = cardsRef.current?.find((c) => c.bitId === snap.bitId);
+    setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId));
+    try {
+      if (cur) {
+        const id = await settled(cur.placementId);
+        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+      }
+      await trashBit(supabase, snap.bitId);
+      if (cur) forget(cur.placementId);
+    } catch (e) {
+      if (cur) setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, cur]));
+      throw e;
+    }
   }
 
-  // Bulk acts (multi-select, ②c) — the same I-W1 acts, looped, each through the
-  // settled door (per placement). Rollback is PER-FAILURE, not all-or-nothing: each
-  // card's write is independent, so only the ones that failed come back.
-  function bulkUnplace() {
-    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
-    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
+  // ---- ONE gesture, four doors ----
+  // These four acts (un-place / trash, one card / many) used to be four hand-written
+  // copies of the same shape: the same flush gate, the same J1 landed bookkeeping, the
+  // same failure carve, the same "one entry for the whole gesture" scaffold. The trash
+  // legs were character-identical apart from variable names.
+  //
+  // The insight that collapses them: SINGULAR IS BULK WITH ONE CARD. Every difference
+  // that looked real resolves at n = 1 (the loose-refresh dance fires once; the
+  // all-legs-failed test is 1 === 1; allSettled over one leg settles with that leg).
+  // The equivalence was written out case by case before this was touched.
+  //
+  // What did NOT collapse, and stays at the door: the confirm sentences. The two trash
+  // doors count different things and say different things, and that is copy — the
+  // owner's to write, not mine to standardise (see act-rules.ts).
+
+  type RemoveKind = "unplace" | "trash";
+
+  /** One card's DB write. Every remove goes through the settled door (a write fired
+   *  while the card's create is in flight matches 0 rows and silently loses the act),
+   *  then the flush gate (hunt #3+#6: the owner's typed tail lands BEFORE the row is
+   *  frozen, keyed POST-reconcile), then forget() so no queued write outlives the card. */
+  async function removeLeg(kind: RemoveKind, card: CardVM): Promise<void> {
+    const id = await settled(card.placementId);
+    if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+    if (kind === "unplace") await unplaceBit(supabase, id);
+    else await trashBit(supabase, card.bitId);
+    forget(card.placementId);
+  }
+
+  /** Remove these cards — optimistically on screen, then one independent write each.
+   *  Rollback is PER-FAILURE, never all-or-nothing: only the legs that failed come back. */
+  function removeGesture(kind: RemoveKind, chosen: CardVM[]) {
+    // Cleared FIRST so an empty selection still resets the bar (bulkUnplace did this
+    // even with nothing chosen — preserved).
     clearSelection();
     setEditingId(null);
-    // Refresh the loose column on the FIRST landed leg (so genuinely-loose bits show even
-    // if a later leg fails) AND once more when all settle (so late legs aren't invisible).
-    let landed = 0;
-    let settledCount = 0;
-    const done = () => {
-      settledCount++;
-      if (settledCount === chosen.length && landed > 1) setLooseRefresh((n) => n + 1);
-    };
-    // ONE entry for the whole gesture (plan §5): undo revives every survivor, redo
-    // un-places them again — the D4 survivor rule via allLegs. The entry rides the
-    // WHOLE gesture's writes; if EVERY leg fails the gesture un-happened → FAILED.
+    if (!chosen.length) return;
+
     const snaps = chosen.map((c) => ({ ...c }));
-    const legs: Promise<unknown>[] = [];
-    let failedLegs = 0;
-    // J1: a leg that FAILED (its card was restored) leaves `alive` — the reverses
-    // iterate only what actually landed, so undo-then-redo never does more than the
-    // gesture did. The label still counts the GESTURE (a deliberate overstatement,
-    // one word of noise beats a shifting label).
+    const gone = new Set(snaps.map((c) => c.bitId));
+    setCards((cs) => cs.filter((c) => !gone.has(c.bitId)));
+
+    // J1: a leg that FAILED (its card was restored) drops out of `landedSet`, so the
+    // reverses iterate only what actually LEFT — undo-then-redo never does more than
+    // the gesture did. The label still counts the whole gesture: a deliberate
+    // overstatement, because one word of noise beats a label that shifts under you.
     const landedSet = new Set(snaps.map((c) => c.bitId));
     const live = () => snaps.filter((c) => landedSet.has(c.bitId));
-    const entry = snaps.length
-      ? record(
-          countLabel("remove", snaps.length, "from board"),
-          snaps.map((c) => c.bitId),
-          () => runLegs(live().map((c) => () => reviveOne(c))),
-          () => runLegs(live().map((c) => () => unplaceOne(c.bitId))),
-        )
-      : null;
-    for (const c of chosen) {
-      const leg = settled(c.placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-          return unplaceBit(supabase, id);
-        })
+
+    // ONE entry for the whole gesture (plan §5), both reverses under the survivor rule.
+    const entry = record(
+      kind === "unplace"
+        ? countLabel("remove", snaps.length, "from board")
+        : countLabel("trash", snaps.length),
+      snaps.map((c) => c.bitId),
+      () => runLegs(live().map((c) => () => (kind === "unplace" ? reviveOne(c) : restoreOne(c)))),
+      () => runLegs(live().map((c) => () => (kind === "unplace" ? unplaceOne(c.bitId) : trashOne(c)))),
+    );
+
+    // The loose column repaints on the FIRST landed leg (so genuinely-loose bits show
+    // even if a later leg fails) and once more when all have settled (so late legs
+    // aren't invisible). Un-place only: a trashed bit isn't loose, it's gone.
+    let landed = 0;
+    let settledCount = 0;
+    let failedLegs = 0;
+    const legs = snaps.map((c) => {
+      const leg = removeLeg(kind, c)
         .then(() => {
-          forget(c.placementId);
           landed++;
-          if (landed === 1) setLooseRefresh((n) => n + 1);
-          done();
+          if (kind === "unplace" && landed === 1) setLooseRefresh((n) => n + 1);
         })
         .catch((e) => {
           failedLegs++;
-          landedSet.delete(c.bitId); // this card never left — the reverses skip it (J1)
-          if (entry && failedLegs === chosen.length) fail(entry); // nothing happened → no memory
+          landedSet.delete(c.bitId);
+          if (failedLegs === snaps.length) fail(entry); // nothing happened → no memory
+          // A refused flush already showed its banner and re-queued the words; the
+          // card simply stays. Anything else goes through the gone-row carve.
           if (isFlushRefused(e)) restore(c);
           else handleRemoveFailure(c, e);
-          done();
+        })
+        .finally(() => {
+          settledCount++;
+          if (kind === "unplace" && settledCount === snaps.length && landed > 1) {
+            setLooseRefresh((n) => n + 1);
+          }
         });
-      legs.push(leg);
       trackRemove(leg);
-    }
-    if (entry) entry.settled = Promise.allSettled(legs); // ↶ waits for the gesture to land (D6)
+      return leg;
+    });
+    // Pressing undo 200ms in waits for the gesture's writes to land first (stage-1 D6).
+    entry.settled = Promise.allSettled(legs);
+  }
+
+  // ---- the four doors ----
+
+  /** Take the card off THIS board only; the bit lives on (its travel keeps the leg).
+   *  (Evaporate retired — D-138: an empty card removes like any other, and records.) */
+  function unplaceSelected(placementId: string) {
+    removeGesture("unplace", cards.filter((c) => c.placementId === placementId));
+  }
+
+  /** Trash the whole bit — hidden everywhere, restorable from /trash. Trash is the
+   *  heavy act (it comes off EVERY board), so the confirm is honest about it (F16). */
+  async function trashSelected(placementId: string, bitId: string) {
+    let boards = 1;
+    try { boards = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
+    if (!(await confirm({ message: trashOneConfirm(boards), confirmLabel: "Trash", danger: true }))) return;
+    removeGesture("trash", cards.filter((c) => c.bitId === bitId));
+  }
+
+  function bulkUnplace() {
+    removeGesture("unplace", cards.filter((c) => selectedIds.has(c.placementId)));
   }
 
   async function bulkTrash() {
     const chosen = cards.filter((c) => selectedIds.has(c.placementId));
     if (chosen.length === 0) { clearSelection(); setEditingId(null); return; }
     const bitIds = [...new Set(chosen.map((c) => c.bitId))];
-    let onOtherBoards = 0;
+    let shared = 0;
     try {
       const counts = await Promise.all(bitIds.map((bid) => getBitBoards(supabase, bid)));
-      onOtherBoards = counts.filter((boards) => boards.length > 1).length;
+      shared = counts.filter((boards) => boards.length > 1).length;
     } catch { /* fall back to the plain confirm */ }
-    const n = bitIds.length;
-    const msg = trashManyConfirm(n, onOtherBoards);
-    if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
-    setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
-    clearSelection();
-    setEditingId(null);
-    const snaps = chosen.map((c) => ({ ...c }));
-    const legs: Promise<unknown>[] = [];
-    let failedLegs = 0;
-    const landedSet = new Set(snaps.map((c) => c.bitId)); // J1 — see bulkUnplace
-    const live = () => snaps.filter((c) => landedSet.has(c.bitId));
-    const entry = snaps.length
-      ? record(
-          countLabel("trash", snaps.length),
-          snaps.map((c) => c.bitId),
-          // Undo = restore each bit (DB first), then its card back; redo re-trashes
-          // without re-asking (ruled). The D4 survivor rule both ways.
-          () =>
-            runLegs(
-              live().map((c) => async () => {
-                await restoreBit(supabase, c.bitId);
-                setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, c]));
-              }),
-            ),
-          () =>
-            runLegs(
-              live().map((c) => async () => {
-                const cur = cardsRef.current?.find((x) => x.bitId === c.bitId);
-                setCards((cs) => cs.filter((x) => x.bitId !== c.bitId));
-                try {
-                  if (cur) {
-                    const id = await settled(cur.placementId); // the D4 flush gate, bulk leg
-                    if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
-                  }
-                  await trashBit(supabase, c.bitId);
-                  if (cur) forget(cur.placementId);
-                } catch (e) {
-                  if (cur) setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, cur]));
-                  throw e;
-                }
-              }),
-            ),
-        )
-      : null;
-    for (const c of chosen) {
-      const leg = settled(c.placementId)
-        .then(async (id) => {
-          if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED); // hunt #3+#6
-        })
-        .then(() => trashBit(supabase, c.bitId))
-        .then(() => forget(c.placementId))
-        .catch((e) => {
-          failedLegs++;
-          landedSet.delete(c.bitId); // J1
-          if (entry && failedLegs === chosen.length) fail(entry);
-          if (isFlushRefused(e)) restore(c);
-          else handleRemoveFailure(c, e);
-        });
-      legs.push(leg);
-      trackRemove(leg);
-    }
-    if (entry) entry.settled = Promise.allSettled(legs); // ↶ waits for the gesture to land (D6)
+    if (!(await confirm({ message: trashManyConfirm(bitIds.length, shared), confirmLabel: "Trash", danger: true }))) return;
+    removeGesture("trash", chosen);
   }
 
   return { unplaceSelected, trashSelected, bulkUnplace, bulkTrash };
