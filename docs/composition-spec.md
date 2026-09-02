@@ -501,3 +501,48 @@ Every control reachable by keyboard · the picker and peek are focus-trapped whi
 
 ## 19 · What Part III does NOT cover
 Visual style — type, colour, spacing, the paper treatments — belongs to the **aesthetics track** (`aesthetics-phase.md`), not here. This Part specifies **structure and state**; the look is the owner's, and the two must be reconciled at her refinement pass.
+
+## 20 · Living with a composition — navigation, reading, history *(owner-ruled 2026-09-02; previously unnamed)*
+
+### 20.1 Headings and subheadings — structure that can be navigated
+Headings are not only formatting: they are **the document's structure**, and everything below depends on them. *(Owner: "headings and subheadings is a great idea.")* ⚪ how many levels — two is the current v1 cut; a table of contents may want three.
+
+### 20.2 A table of contents *(owner: "a great idea")*
+A composition can show its own contents — its headings, in order, as a navigable list. Clicking an entry jumps to it.
+- ⚪ **Where it lives:** a panel beside the writing · a collapsible block at the top · the drawer as another tab.
+- 🔵 **It should be a view of the headings, never a thing you maintain** — it updates as you write.
+- 🔵 **The strong version:** reordering entries in the contents **reorders the document**. Pairs with §20.5's heading-drag question — if a heading carries its section, the contents becomes the document's outline control.
+
+### 20.3 A read/write lock *(owner: "that's a great feature idea")*
+A composition can be **locked to reading** — the cursor is not live, the text cannot be changed by accident, and the piece can be read as a piece. One control returns it to writing.
+- Distinct from **archive** (a resting state for the whole thing); this is a **posture** you switch at will.
+- 🔵 Candidate defaults: a **finished** piece opens locked · an archived one is locked by its state (§11.2) · everything else opens writable.
+- ⚪ Whether the lock is remembered per composition or is per-visit.
+
+### 20.4 Undo and redo *(owner-ruled)*
+Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go back to a certain number and not be able to go forward or backward anymore, like maybe 15")*. Beyond the bound, the earlier state is gone.
+- ⚪ Whether the bound is steps, time, or session.
+- ⚠ **Undo must cover the pulled-in acts too** — inserting a chip, converting chip↔block, collapsing a toggle — not only typed characters. Reference rows follow the body at the next save (§9.4.4).
+
+### 20.5 Moving blocks — the design space *(owner: "I don't know if you've really thought about this" — correct; here it is)*
+| question | options | 🔵 lean |
+|---|---|---|
+| **Drag a heading — does its section follow?** | just the heading (Notion's answer) · **the heading takes everything under it** to the next equal heading | **takes its section** — it makes reorganising one gesture, and makes §20.2's contents a real outline control |
+| **Drop onto a collapsed toggle** | goes inside (invisibly) · lands after it · **unfolds it first, then drops in** | **unfold first** — silently hiding just-moved content loses work |
+| **Several blocks at once** | one at a time · multi-select then drag | ⚪ — multi-select exists on boards; unclear it is wanted here |
+| **A block that IS a pulled-in thing** | — | drags like any other block; no special case |
+
+### 20.6 Affordances — what is clickable *(the owner's framing: "what do they click, what can they not click")*
+| thing | clickable? | what happens |
+|---|---|---|
+| a **chip** | ✅ | opens the peek |
+| a **block's content** (the image, the quoted text) | ✅ | opens the peek — same as its chip form |
+| **text inside a block** | ⚪ | selectable for copying, or an atom like a chip? **Unresolved — affects whether a reader can quote from a pulled-in quote.** |
+| a **drag handle** | ✅ on hover | drag to move · click for the block menu |
+| a **toggle's line** | ✅ | folds/unfolds |
+| the **title / subtitle** | ✅ when writable | edits in place; ⛔ inert when read-locked (§20.3) |
+| **footer entries** (tags · boards · "pulled into") | ✅ | navigate to that thing |
+
+### 20.7 Two compositions side by side *(owner: "sounds nice — I wonder what we'd need, or do people just open two windows")*
+**Today it already works: two browser windows.** Zero cost, zero build.
+🔵 **Recommendation: don't build it.** A built version means real window management inside the app for a need that the browser already serves. Revisit only if two windows proves genuinely bad in use.
