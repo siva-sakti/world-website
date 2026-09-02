@@ -51,5 +51,11 @@ A findings list, no prose essay. Each finding: **ID · verdict · the claim · t
 - **Flag uncertainty as uncertainty.** A confident wrong finding is worse than a flagged doubt.
 - **Quote, don't paraphrase,** when reporting drift.
 
+## PASS 4 · BUILD-READINESS *(owner-asked, 2026-09-02 — run LAST, after the remaining composition items are decided)*
+A different question from Passes 1–3. Those ask **is this true?**; this asks **is this ENOUGH?**
+**The brief:** an agent reads `composition-spec.md` as a **builder about to implement it**, with no access to the conversation. For every section it answers: *could I build this without guessing?* Its output is a list of **guess-points** — places where it would have to invent a decision — each with what it would need to know.
+**Rules:** it may not consult the trail or the transcript *(the point is whether the spec stands alone)* · it reports guess-points, never fixes · a guess-point already marked ⚪ is **fine** and should be listed separately from unmarked ones. **Unmarked guess-points are the finding.**
+**Why last:** running it before the remaining items are decided would just re-report the known opens.
+
 ## After the pass
 The author fixes each finding **and states the source of each fix**. The register is re-run. The DRAFT banner comes off only when Pass 1 has zero UNSOURCED and Pass 2 has zero MISSING.
