@@ -524,32 +524,30 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 - ⚪ Whether the bound is steps, time, or session.
 - ⚠ **Undo must cover the pulled-in acts too** — inserting a chip, converting chip↔block, collapsing a toggle — not only typed characters. Reference rows follow the body at the next save (§9.4.4).
 
-### 20.5 What drags, and what does not *(owner-corrected, 2026-09-02 — Claude had imported Notion's model unexamined)*
+### 20.5 What drags *(RESOLVED 2026-09-02 — the disagreement was a misunderstanding of the word)*
 
-**The owner's distinction, and it is the right one:** *text is flow* — you edit it with the keyboard, select it, cut and paste it. *An image is a thing* — it has a shape and takes up space, so dragging it makes sense. **Draggability follows from thing-ness, not from calling everything a "block."**
+⚠ **The whole exchange below turned on one word.** Claude said "dragging"; the owner heard **board-dragging** — moving a thing anywhere on the surface. In a document, dragging only ever means **up and down**: pick a paragraph up, drop it above another one. **Reordering, not positioning.**
 
-> Her words: *"I don't think we should allow people to drag headings like text — it should still be backspace and copy and paste as the main thing… maybe the block should drag because they're taking up space; every block is not going to behave like an image, because it's a shape."*
+> **Owner, once the word was clear:** *"oh, you don't mean dragging around anywhere — just dragging up and down? Oh, I think we should be able to do, right."* ✅ **Drag-to-reorder is IN.**
 
-**The fork:**
-| model | what drags | cost |
-|---|---|---|
-| **Notion** | everything — paragraphs, headings, lists | handles everywhere; the surface feels riggy; dragging competes with selecting |
-| **Docs — the owner's lean** | **objects only**: images · tables · pulled-in things | text moves by cut/paste (universal muscle memory); the page stays calm |
-| hybrid | objects **+ containers** (a toggle holds things, so it may want to move as a unit) | one extra case to explain |
+**What that settles:**
+- ✅ **Dragging in a composition = reordering in the flow.** There is no free positioning here — that is the board's nature and stays there. Consistent with the ⛔ float ruling in §7.
+- ✅ **The table of contents does NOT drag.** Navigation only. *(Owner, twice: "I don't think table of contents and heading dragging are the same feature at all"; "I don't think we need to have headline dragging at all [in the] table of contents.")*
+- 📜 **SUPERSEDED — the "edges test."** Claude proposed that only things with their own edges (image · table · pulled-in block) could drag, and text could not. **That was a correction to a misreading, and it is now void as a drag rule.** *Kept because the distinction it names is still true elsewhere:* things with edges are the ones that **resize and wrap** (§7); flow text does not. Same observation, wrong law.
+- ⚠ **§13.3 needs no re-scoping after all** — its *"hover drag-handle moves a block"* stands as written.
 
-🔵 **Claude's read after the correction: the Docs model.** Dragging text is what makes block editors feel fiddly, and cut/paste is what people already do. **It also dissolves the heading question entirely** — you move a section by selecting and cutting it, which needs no rule about what a heading "carries."
-⚪ **Open: does a toggle drag as a unit?** It is a container, so it is the one genuine hybrid case.
-⚠ **Consequence for §13.3:** the eight interaction musts include *"a hover drag-handle moves a block"* — that came from Notion research and **must be re-scoped to objects** if this lean holds.
+**⚪ THE ONE THING STILL AMBIGUOUS — flagged, not resolved.** *(Two of the owner's sentences read in opposite directions, and Claude's named failure mode is silently resolving exactly this.)*
+- She said **"I don't think we should allow people to drag headings like text"** and **"I don't think we need to have headline dragging at all"** — but also that up/down dragging should exist generally.
+- **Reading A:** headings do not drag; paragraphs, lists and objects do.
+- **Reading B:** the "no heading dragging" remarks were both about the *table of contents*, and headings drag like everything else.
+- **If B, one question comes back:** does dragging a heading carry the section under it? 🔵 *Claude's lean: yes — a heading owns what is beneath it until the next heading of equal or higher level. Otherwise a dragged heading abandons its own text, which is never what anyone means.*
 
-**🔵 The test that decides it, in one question: *does it have its own edges?***
-
-| has its own edges — a shape you can see | takes the column's shape — it is just flow |
-|---|---|
-| image · drawing · table · PDF · a pulled-in bit shown as a **block** | paragraph · heading · list · quote |
-
-The two columns are not arbitrary: **the things with edges are the things that came from a board.** Material has a shape (it lived somewhere spatial); writing has a flow. So the rule falls out of the model instead of being imposed on it — **you can drag the material you brought in; you cannot drag the words you wrote.**
-
-**🔵 And the reframe that unblocks this: dragging is a convenience, not a capability.** *Everything* that can move can already move by **cut and paste** — the owner's stated main path. Drag adds speed over a short distance and nothing else. So this can be answered **last**, after the surface works, and adding it later cannot break anything upstream. **Nothing is blocked on it.**
+### 20.5c Headings as destinations *(owner, 2026-09-02: "we definitely need headers, jump to headers, linking to headers")*
+1. ✅ **Headings** — structure inside the writing (§20.1).
+2. ✅ **Jump to a heading** — the table of contents does this; clicking an entry scrolls there.
+3. ✅ **Link to a heading** — a heading is a **destination that can be pointed at**, not only a label. *This is new (2026-09-02) and has no prior entry.*
+   - ⚪ **From where?** Within the same composition is certain. **From another composition — i.e. can `[[` gather a *heading* rather than a whole thing — is open**, and it is a model question, not a UI one: today a reference points at a bit. Belongs to the storage session.
+   - ⚪ **What the link needs:** a heading must carry a **stable id** that survives being renamed and being moved, or every link breaks the first time the owner edits a title.
 
 ### 20.5b What the owner's own path (backspace · copy · paste) actually requires
 *These are not drag questions. They sit on the path she named, so they must be answered.*

@@ -253,16 +253,31 @@ ruled and recorded on 2026-09-01; it is restated here so it is not re-discovered
 
 The owner re-shared the six screenshots; this is from looking at them, not from notes.
 
-**THE DIAGONAL X — earlier guess was WRONG.** Claude guessed "an empty picture frame waiting
-for content" from a verbal description. The images say otherwise:
-- glyph image (1), ballet-shoe photo (4), handwritten note (6): **content present, selected,
-  X shown**
-- the two TEXT boxes (2, 3): selected, outlined, **no X**
+**THE DIAGONAL X — TWO READINGS, NOT SETTLED. Do not treat either as fact.**
 
-So the X marks **"this object is a placed image"** — Illustrator's linked-image affordance. It
-appears on selection and distinguishes a picture from a text box. **Not a mechanism, an identity
-cue.** Our cards already read as different by type, so it is NOT proposed — recorded as an
-aesthetic option for the aesthetics/frame phase, the owner's call there.
+Claude first guessed (from a verbal description, before seeing the images) "an empty picture
+frame waiting for content." **That is definitively wrong** — the X appears on images that
+plainly HAVE content: the glyph (1), the ballet-shoe photo (4), the handwritten note (6). The
+two TEXT boxes (2, 3) are selected and show NO X.
+
+Claude then read it as "marks a placed image, shown on selection" (Illustrator's linked-image
+affordance). **The owner reads it as an ACTIVE-MANIPULATION cue** — *"she's basically dragging
+that image on the board when I took the screenshot… it means actively you're picking it up and
+moving it."*
+
+**The owner's reading is better supported by the frames**, and this is the honest verdict: in
+EVERY X instance something is being manipulated — image 1 shows the W/H readout (which only
+appears mid-resize) plus a resize cursor · image 4 has the cursor on the photo · image 5 shows
+the ROTATE cursor at a corner · image 6 has the move cursor on the note. The two X-less frames
+show a text I-beam: being typed in, not moved. Claude's reading rests on tool-family knowledge;
+the owner's rests on what is visible.
+
+**What would settle it:** one frame with an image SELECTED BUT IDLE — cursor elsewhere, nothing
+transforming. None of the six shows that.
+
+**Why it does not matter for the build:** we are not building the X under either reading. Our
+cards already read as different by type, and an extra selection decoration is an aesthetics-phase
+option, not a mechanism. Recorded so the question is not silently re-answered later from a guess.
 
 **Confirmed directly, all previously noted second-hand:** the live magenta guide (image 5 — a
 thin horizontal line across the blue-wall photo, extending well past it) · the W/H readout
