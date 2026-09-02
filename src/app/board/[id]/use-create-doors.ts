@@ -56,6 +56,7 @@ export function useCreateDoors(deps: {
   // the prompt the owner is typing in — offers wait their turn in board-surface.
   setWordsFor: (v: { bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" }) => void;
   onErr: (e: unknown) => void;
+  sizeOf: (placementId: string) => { w: number; h: number } | null; // the geometry ledger (stage 3)
 }) {
   const {
     supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,

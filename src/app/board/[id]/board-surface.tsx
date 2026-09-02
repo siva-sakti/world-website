@@ -214,7 +214,7 @@ export function BoardSurface({
     useCreateDoors({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, setDrawMode, nextZ,
-      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr,
+      trackCreate, settled, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr, sizeOf,
     });
 
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
