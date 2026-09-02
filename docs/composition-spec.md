@@ -541,13 +541,32 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 ⚪ **Open: does a toggle drag as a unit?** It is a container, so it is the one genuine hybrid case.
 ⚠ **Consequence for §13.3:** the eight interaction musts include *"a hover drag-handle moves a block"* — that came from Notion research and **must be re-scoped to objects** if this lean holds.
 
+**🔵 The test that decides it, in one question: *does it have its own edges?***
+
+| has its own edges — a shape you can see | takes the column's shape — it is just flow |
+|---|---|
+| image · drawing · table · PDF · a pulled-in bit shown as a **block** | paragraph · heading · list · quote |
+
+The two columns are not arbitrary: **the things with edges are the things that came from a board.** Material has a shape (it lived somewhere spatial); writing has a flow. So the rule falls out of the model instead of being imposed on it — **you can drag the material you brought in; you cannot drag the words you wrote.**
+
+**🔵 And the reframe that unblocks this: dragging is a convenience, not a capability.** *Everything* that can move can already move by **cut and paste** — the owner's stated main path. Drag adds speed over a short distance and nothing else. So this can be answered **last**, after the surface works, and adding it later cannot break anything upstream. **Nothing is blocked on it.**
+
+### 20.5b What the owner's own path (backspace · copy · paste) actually requires
+*These are not drag questions. They sit on the path she named, so they must be answered.*
+
+1. ⚪ **A folded toggle, and the backspace key.** Cursor at the end of a folded line; press backspace. Does it delete the section you cannot see, or unfold first?
+   🔵 **Lean: unfold first.** *Never delete what is not on screen.* The second press then deletes normally. Costs one keystroke; removes a whole class of "where did my writing go."
+2. ✅ **Selecting a whole block — already answered, no new mechanism.** Sweep from before it to after it and the block falls inside the selection (as in any editor); backspace immediately after a block deletes it. **This follows from the owner's ruling** that text inside a block is ordinary selectable text.
+3. ⚪ **What a single CLICK on a block does — a real conflict to settle.** §20.6 as drafted says a click opens the **peek**. But if a block is an object in *your* document — and the owner has ruled its text is yours to select and copy — a click should probably **select** it, the way clicking an image does everywhere else, with a small separate door to open the original.
+   🔵 **Lean: click selects; a hover door opens the original.** Otherwise clicking your own page navigates you off it.
+
 ### 20.6 Affordances — what is clickable *(the owner's framing: "what do they click, what can they not click")*
 | thing | clickable? | what happens |
 |---|---|---|
 | a **chip** | ✅ | opens the peek |
-| a **block's content** (the image, the quoted text) | ✅ | opens the peek — same as its chip form |
+| a **block's content** (the image, the quoted text) | ⚪ **conflicted — see §20.5b(3)** | *peek* (as drafted) or *select* (Claude's lean, after the owner's copy-paste ruling) |
 | **text inside a block** | ✅ **selectable and copyable** *(owner-ruled: "any text can be copy and pasted by the user — they'd just put their mouse over it")*. It is text on the screen and behaves like text. |
-| a **drag handle** | ✅ on hover | drag to move · click for the block menu |
+| a **drag handle** | 🔵 **objects only**, on hover — never on text (§20.5) | drag to move · click for the block menu |
 | a **toggle's line** | ✅ | folds/unfolds |
 | the **title / subtitle** | ✅ when writable | edits in place; ⛔ inert when read-locked (§20.3) |
 | **footer entries** (tags · boards · "pulled into") | ✅ | navigate to that thing |
