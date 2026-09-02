@@ -1,6 +1,8 @@
 # The frame — plan
 
-**Status:** planned → antagonist → the owner's rulings → build. Born from the owner's
+**Status:** planned → owner ruled → **antagonist: "build with changes" (14 items folded,
+2026-09-01 — the CHECK constraint WRITTEN AND PROVEN on a throwaway PG17, including the NaN
+hole it found; the schema half survived every attack; the rendering claim corrected)** → build. Born from the owner's
 reference screenshots (2026-09-01): the artist composes on a *page*; the owner wants that
 available "without forcing everything into one thing." Filed concept: `organize-phase-plan.md`.
 **Standing limits:** the migration is owner-pasted · migration before deploy · owner-gated.
@@ -29,9 +31,23 @@ What it's FOR, in order of arrival:
 **A frame is not a thing (bit), not meaning (tag), not membership (placement).** It is a
 property of one board's arrangement — four numbers. Therefore:
 - **No new table.** Four nullable columns on `board`: `frame_x/frame_y/frame_w/frame_h`
-  (double precision, matching placement's coordinate space), with an all-or-none CHECK and
-  `frame_w > 0 AND frame_h > 0` when set. Null = no frame. The migration is tiny, additive,
-  throwaway-proven, owner-pasted.
+  (double precision — they map 1:1 onto geometry.ts's `Box`, so the snap spread is literal).
+  **The CHECKs, antagonist-written and PROVEN on a throwaway PG17** (all-or-none via
+  `num_nulls` — integer result, no NULL-comparison pitfall; positivity with the NaN/Infinity
+  guard, since Postgres orders NaN above everything and `'NaN' > 0` is TRUE):
+  ```sql
+  constraint board_frame_all_or_none check (num_nulls(frame_x, frame_y, frame_w, frame_h) in (0, 4)),
+  constraint board_frame_positive    check (
+    (frame_w is null or (frame_w > 0 and frame_w < 'Infinity'::float8)) and
+    (frame_h is null or (frame_h > 0 and frame_h < 'Infinity'::float8)))
+  ```
+  x/y stay signed (world coords). Null = no frame. Additive, no backfill, instant.
+- **The `home` view stays frozen, deliberately** (the lock/description precedent, stated in the
+  migration comment): the board page reads the TABLE (`getBoard` select *), so the frame reaches
+  its surface; `home` doesn't need it. **Type honesty:** the frame fields stay OFF `HomeBoard`
+  (Omit or a separate type at build) — the standing `description` type-lie is not extended.
+- **Export · RLS · search · marquee · graph · trash/archive: ZERO edits** — all verified riders
+  (export selects *, policies are row-level, search_tsv is title-only generated).
 - **One frame per board in v1** (owner question §5). Several frames = artboards = a different
   product; if ever wanted, it's additive (a `frame` table) with zero rework — the door is
   named, not built.
@@ -42,12 +58,15 @@ property of one board's arrangement — four numbers. Therefore:
 
 ## 3 · The specs
 
-### Rendering
-- Drawn in the WORLD layer, **under every card**: a paper-white rectangle with a hairline
-  border and the faintest shadow — a page lying on the canvas ground. (Visual candidates for
-  the owner's feel-tune: filled paper vs outline-only.)
-- A small **label tab** at its top-left corner (placeholder word "frame" — the owner writes
-  the voice, §5).
+### Rendering — TWO layers (the antagonist's F1: one layer cannot be both under the cards and clickable)
+- **The paper**: first child of the world layer at an explicit FLOOR z (below `backZ`'s
+  reachable range — send-to-back mints negative z's, and inside the transformed world's
+  stacking context a z-auto div would paint ABOVE them). `#fffdfa` + hairline + faint shadow —
+  the cards' own paper against the `#faf8f3` ground (the "paper-white on paper" contrast is
+  carried by the border+shadow, same as every card; feel-tune confirms).
+- **The chrome**: the label tab + resize handles render AFTER the cards at a z above
+  `nextZ(cards)` — the honest claim replacing the false one: *only the tab and handle rects —
+  a few hundred px² — sit above cards*; the paper steals nothing.
 
 ### Interaction — the one decision everything hangs on
 **The frame's body is pointer-transparent.** Panning, marquee, double-tap-create, card drags —
@@ -61,14 +80,29 @@ This keeps every existing gesture untouched — the frame can never steal a clic
 canvas owns today.
 
 ### Acts (undo — the layer built for exactly this)
-`add frame` · `move frame` · `resize frame` · `remove frame` — all deliberate, all recorded,
-all reversible through the existing stack (before-values captured at gesture start, the same
-shape as card acts). The first proof of "future acts inherit undo for free."
+`add frame` · `move frame` · `resize frame` · `remove frame` — recorded with the exact shape
+`record("move frame", [], () => applyFrame(before), () => applyFrame(after), inFlightWrite)`:
+- **`bitIds: []` is verified-safe** (stored, read by nothing — stated so nobody "fixes" it);
+- **the `settled` 5th argument is REQUIRED** (↶ 200ms after "remove frame" must wait for the
+  write — the stack's D6 machinery, reused);
+- `applyFrame`'s 0-row assert says **"that board no longer exists"** (classifies terminal —
+  a destroyed board must not loop "try again");
+- **keyboard parity:** a selected frame joins the Escape rung (deselect) and Delete
+  (= remove frame, recorded) — the keys hook gains a frame-selection guard before the
+  selectedCount return.
 
 ### Persistence
-Frame writes are RARE and SMALL (one rect): write on gesture-end (no debounce machinery —
-a plain board-row update through one new db fn `setBoardFrame(supabase, boardId, frame|null)`,
-0-row-asserted). No interaction with the placement chains — different table, different row.
+Frame writes are RARE and SMALL (one rect): write on gesture-end via one new db fn
+`setBoardFrame(supabase, boardId, frame|null)`, 0-row-asserted ("that board no longer
+exists"). No placement-chain interaction. **Two named consequences (antagonist):**
+- a frame write registers in the duplicate-await set (the hunt-#9 shape) — ⧉ mid-frame-drag
+  must not copy the pre-drag rect;
+- **every frame move bumps the board's `updated_at` → home's touched_at re-sorts. RULED
+  ACCEPTED:** moving furniture IS an edit — exactly as card moves already bump it. Consistent,
+  chosen, not accidental.
+**duplicateBoard: TWO hand-written lists** (the select at boards.ts:44 AND the insert at :52)
+each gain the four columns — there is no column loop; the frame is silently dropped today.
+Proof of the copy = the stage browser truth-check (the SQL harness can't run TypeScript).
 
 ### Snap integration (lands with/after the guides)
 The frame contributes candidates exactly like a card box: left · centerX · right · top ·
@@ -77,8 +111,16 @@ page; the page itself does NOT snap to cards in v1 (the frame is the reference, 
 follower). Margins as candidates: later, only if the owner wants a margin ruling.
 
 ### Fit + camera
-`fitView` includes the frame's box in its bounds (an empty board with a frame fits the page —
-never a blank void). Camera memory unchanged.
+`fitView(cards, extra?: Box | null)` — the frame unions in; **three guards change, not one**
+(fitView's empty-return, board-surface's mount early-return, and the phone branch's
+`initialCards[0]` — each becomes `…&& !frame`). **Sequencing rule: registry stage 3 rewires
+fitView FIRST** (both plans touch it — ordered, no merge fight). Camera memory unchanged.
+**Summon size**: derived from the VIEWPORT (a portrait rect ~70% of the visible height at the
+current zoom, centered) — a fixed page at 100% zoom could summon mostly off-screen.
+**The toolbar door is a toggle**: "+ frame" ⇄ "remove frame" (one per board — a second press
+must never silently overwrite the rect).
+**findClearSpot ignores the frame** — new cards may land on the page. Consistent with "cards
+drift freely"; stated, not discovered.
 
 ## 4 · The cases
 
@@ -123,7 +165,12 @@ mentioned the word; filed as an open offer, not built, not implied by this plan.
    behind the toolbar door; acts recorded.
 3. Move/resize by label/handles + undo entries + fitView inclusion.
 4. Snap candidates join `snapTo` (one line once the guides exist).
-5. Browser truth-check each stage; the owner's feel-tune closes it (look · default size · word).
+5. Browser truth-check each stage (incl. duplicate-copies-the-frame and send-to-back-stays-
+   above-the-paper); the owner's feel-tune closes it (look · default size).
+6. **The record stage (CLAUDE.md step 9):** lexicon gains **frame** (noting the two internal
+   code uses of the word — the selection outline and fitView's "frame in view" verb — renamed
+   or disambiguated in comments at build) · invariants gains the two CHECKs · model.md gains
+   the furniture line · the D-entry ships with the feature.
 
 ## 7 · Adjacency, restated
 
