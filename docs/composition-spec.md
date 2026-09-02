@@ -244,11 +244,11 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 
 ### 9.6 The block
 1. Created by "show in place" from a peek; **images and drawings arrive as blocks directly** (§9.3).
-2. **Renders preview-sized by default; full only when full is small:**
-   - **image / drawing:** shown, sized per instance (⚪ the size control's form), **text wraps around it; it never floats** *(owner-ruled)*
+2. **The block is the bit as it appears on a board** (the rule above); the chip is its collapsed name. Sizing:
+   - **image / drawing:** shown, **resized by dragging a corner**, and **draggable to reposition within the text** *(owner, 2026-09-02)*. Text wraps around it. ⚠ **NEEDS ONE CLARIFICATION:** the owner earlier ruled *"wrap yes, float no"* and has now said *"if we have float amongst text, we should be able to allow that smoothly."* Reading (a): the image stays **in the flow**, positioned left/right/centre, text reflowing — standard document behaviour, compatible with the earlier ruling. Reading (b): it floats **freely over the text** like a card on a canvas — a reversal. **Claude's read is (a); the owner's word settles it.** *(She also offered a reference for a smooth wrap-and-reflow technique.)*
    - **short text bit:** its content, whole
    - **long text bit:** its first lines, with an expand control
-   - **PDF / audio:** ⚪ undesigned — a titled row, a thumbnail, or a player
+   - **PDF · audio · anything else:** ⭐ **THE GENERAL RULE (owner, 2026-09-02): the BLOCK is however that bit looks ON A BOARD; the CHIP is its collapsed form — its filename or title.** One rule; no per-type decisions, and any future bit type is covered automatically.
 3. 🔵 **Renders one level deep only.** Chips inside a block's content stay chips and never expand. *(Prevents infinite recursion when A blocks B and B chips A.)* **Claude's rule, found in the procedural pass — never owner-stamped.** Mandatory on technical grounds; flagged so it is not mistaken for a ruling.
 4. Carries a control to **tuck back to a chip**. Reversible forever, per instance.
 5. **Silent bit-hood applies:** no badge, border, or icon marks it as pulled-in content. Its bit-life appears on tap/hover only.
@@ -293,7 +293,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 1. A per-board control hides **all** composition-cards on that board.
 2. **Presentation only:** placements are untouched; the compositions stay placed and related; nothing is un-placed, moved, or deleted.
 3. Purpose, in the owner's words: *"if you just want to compose but don't want to see them on your surface, and you want them to be linked and related."*
-4. ⚪ Whether the toggle's state persists per board (stored) or is per session (local).
+4. ✅ **The toggle PERSISTS** *(owner-ruled 2026-09-02: "the hide toggle should definitely persist")* — a board remembers it between visits. Stored, not session-local.
 
 ## 11 · States
 
@@ -378,7 +378,7 @@ Compositions join `/api/export` **in the same migration that moves them** — no
 The graph draws references and placements as lines. Compositions are ⚪ *presumably* nodes; nothing here decides it. **The rows accrue correctly from day one regardless**, so parking costs nothing.
 
 ### 12.7 The pull (tapping a tag)
-Returns everything carrying that word — bits, boards, and now compositions, mixed. ⚪ *whether the pull gains kind-filters like search has.*
+Returns everything carrying that word — bits, boards, and compositions, mixed — **with a kind filter, as search has** *(owner-ruled 2026-09-02: "tapping a tag, I think you should have a filter as well there")*. ⚑ **Not a composition-only change** — this alters the pull for every kind; see `cross-feature-rulings.md`.
 
 ## 13 · The editor — what the composition surface can do
 
@@ -414,7 +414,7 @@ paragraph · headings *(2 levels)* · bulleted list · numbered list · **checkl
 ### 13.7 Toggles (collapsible sections) — **RULED IN** *(owner, 2026-09-02)*
 1. **What it is:** a labelled line with a triangle; content beneath folds away and unfolds on click.
 2. **Making one:** **select blocks → "collapse these"** (they fold under a line you name) · or insert an empty toggle from the `/` menu and write inside it.
-3. **What stays visible when folded:** the toggle's **own line** — its label, which the owner writes — plus the fold triangle. ⚪ *whether it also shows how much is hidden (a count · a faint first-line preview · nothing). 🔵 Claude's lean: nothing but the label.*
+3. **What stays visible when folded:** the toggle's **own line** — its label — plus a **collapse/expand control** *(owner, 2026-09-02: "there can be a collapse and expand button, something like that")*. ⛔ No hidden-count; the label is what you chose to say about the contents.
 4. ⭐ **Collapsed content remains SEARCHABLE** *(owner-ruled: "collapse is invisible, but it should still be searchable — it's just not visible")*. Out of sight is never out of reach.
 5. **Consequence to build:** a search result inside a collapsed toggle must **auto-unfold it** on arrival, or the reader lands on a match they cannot see.
 6. **Why it earns its place:** it is the only block that manages **length** — what long-form writing actually needs.

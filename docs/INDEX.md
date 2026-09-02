@@ -285,6 +285,9 @@ INDEX.md ................ this file — where everything is
 ### `verification-procedure.md` — how the spec gets checked (2026-09-02)
 **Contains:** the three passes (TRACE · ABSENCE · CONTRADICTION), the five verdicts, the output format, and the rule that an **independent agent** runs it — never the spec's author. **The DRAFT banner comes off only when Pass 1 has zero UNSOURCED and Pass 2 zero MISSING.**
 
+### `cross-feature-rulings.md` — ⭐ decisions from the composition work that touch OTHER features (2026-09-02)
+**Contains:** X1–X10 — the global date format · the pull's kind filter · table-as-a-bit-type · boards' auto-title · the "frame" and "link" word claims · the nothing-vanishes-while-rearranging principle · and more. **Built because these would otherwise be buried in a composition spec and never reach whoever builds boards or search.** The rule: a ruling that reaches outside the composition gets a row here in the same edit.
+
 ### `ruling-register.md` — ⭐ THE PARALLEL CHECK: every ruling, numbered (2026-09-02)
 **Contains:** all 61 composition rulings extracted from the trail, grouped A–K, each with its spec location. **Re-run this check after any spec change — a ruling with no spec home is a defect.** Built at the owner's ask for a systematic verification instrument rather than ad-hoc checking.
 
