@@ -15,6 +15,9 @@
 
 If someone understands those three, every other behavior is discoverable. **Nothing else is mandatory learning.**
 
+### The legibility line — teaching material (moved here 2026-09-02)
+*A board's arrangement speaks mostly to its maker; a composition is synthesis made legible to any reader.* The owner: *"that was a way for us to do teaching — I don't think it affects how we build stuff."* Correct: it explains **why** the two surfaces differ, in one sentence a person can hold. Candidate copy for the compose-door moment; ⚑ owner's words, when she writes them.
+
 ## 2 · What must be taught vs. what can be discovered
 
 | must be taught | can be discovered |

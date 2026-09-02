@@ -59,8 +59,14 @@ Dropped from the old note-rows: `source_id` (ruled out) · face machinery (title
 **Provable by test:** migration counts (rows in = rows out; refs repointed; zero orphans) · evaporate (create-empty-close ⇒ no row) · title-at-exit minting · reference rules (I-C1: bit-authored insert refused; self refused; board-target refused) · archive read-only (write refused until revive) · export completeness · search hits a body phrase post-migration.
 **Owner feel-test list:** the floater feel over a board · the chain (tap→float→dock→page) · chip⇄block gestures · the hide toggle · archived grey-and-enterable · the drawer's in-this-piece reading · list at many-small-pieces scale.
 
+## 5b · ⭐ CLOSED IN THE 09-02 SWEEP
+- **Existing note-rows' sources + old chips inside bit bodies: ✅ RESOLVED** — the owner: *"I'm OK if we actually break what I've been playing with… I've just been using it very casually."* → migration **cleans both up**; no special preservation, no grandfathering machinery. (Report counts in the migration log for the record; nothing more.)
+- **The "reference system whole-block" stamp: ✅ CLOSED AS ALREADY-STAMPED** — the owner has since ruled every one of its eight rules individually (who references · what's referenceable · front-links-are-the-writing · backlinks-everywhere-alike · chip/peek/block · resting behavior · the graph later · migration handling). No further stamp needed; the block was bookkeeping, not a question.
+- **The legibility line: moved out of the build register** — the owner: *"that was a way for us to do teaching; I don't think it affects how we build stuff."* → belongs to `teaching-the-user.md`, not here.
+- **⚑ STORAGE (Q1) PROMOTED to its own session** — the owner pushed back on a lean: *"wouldn't compositions be their own thing… we need to make sure that is very straight with our three components — bit, boards and compositions."* **The backend session covers all three, not just this fork.** Tradeoff for that session: shared columns exist once vs twice; every board/composition-alike feature (tag · folder · star · place · reference) needs one code path or two, forever.
+
 ## 6 · ⚪ THE OPEN REGISTER (everything, honestly)
-**Owner:** reference-system whole-block (under discussion, her pace) · Q1 one-vs-two tables (rec: one) · the card mock verdict · station-1 legibility re-confirm · **the naming session** (the sweep list: route `/note`→? · "composition" vs the collision · chip/block blessing · the tie-word · drawer scopes) · her Notion feel-session (final toolkit cut).
+**Owner:** **the backend/storage session** (all three components; supersedes the Q1 one-vs-two fork) · **the naming session** (the sweep list: route `/note`→? · "composition" vs the collision · chip/block blessing · the tie-word · drawer scopes) · her Notion feel-session (final toolkit cut).
 **Claude:** the card mock · frame-handoff design · floater mechanics detail (size/z/persistence) · drawer-docking detail · the enactment plan doc (from §1.3, for the code window).
 **Deferred by design:** privacy/visibility session · the graph round · T3 shelf · deck · sheet/engine.
 
