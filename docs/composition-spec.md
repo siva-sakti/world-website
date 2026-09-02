@@ -177,12 +177,17 @@ Pasting · importing · the system · any automatic path. **No exceptions.**
 5. Status shows **"saving…" → "saved"**; on failure, a visible error — **never silent** *(house rule)*.
 6. ⚪ **The floater and side panel need the same status indicator.** Unspecified today; without it, a failed save in a floater is invisible.
 
+## 6b · The composition's parts *(owner, 2026-09-02 — subtitle is NEW)*
+A composition has **a title · a subtitle · a body**, plus its decorations (tags · folder · dates · job facts), *"of course not all of it has to display."*
+- **subtitle** — optional; a line beneath the title. ⚪ its exact role (a standfirst? a note-to-self? shown where?) — newly introduced, not yet worked through.
+- Both title and subtitle are the owner's words; only the title is ever machine-minted (§7).
+
 ## 7 · The title
 
 1. Editable at any time, in any frame.
 2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: **only on exit.** Never on entry, **never on autosave** — confirmed 2026-09-02: "don't mint on autosave… only when you exit can a title be put." The earlier reading was right, but it had been assumed rather than asked.)*.
 3. That minted title is **an ordinary title** — replaceable forever, no special state.
-4. ⚪ **the exact format string** (e.g. `Sep 2, 9:41 AM`).
+4. **One global date format for the whole app** *(owner-ruled 2026-09-02: "we have to pick a global date format for everything in this app")* — the minted title uses it, as does every other date the app shows. ⚪ the format itself, chosen once and applied everywhere.
 5. ⚠ This is the one place the app writes into an owner-owned field. It is a **ruled exception** to *the machine never writes your words*.
 
 ## 8 · What a composition knows about its job *(owner-ruled: "that kind of project management layer")*
@@ -202,12 +207,12 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 2. Every character typed after the trigger filters the picker; **Backspace past the trigger closes it**, restoring nothing to the text.
 3. **Escape** closes it, inserting nothing.
 4. 🔵 The trigger does **not** fire inside a code block. *(Claude's; never decided — flagged by verification as unsourced.)*
-5. ⚪ Whether `[[` also triggers in the title field. *(Default: no.)*
+5. ⛔ **`[[` does not trigger in the title or subtitle — ruled (owner, 2026-09-02).**
 
 ### 9.2 The picker
 1. Two sections, in this order: **your material** (bits), then **your compositions**. Section headers always shown, even when one section is empty.
 2. 🔵 **Ordering within each section:** most recently touched first, before any query is typed. *(Claude's; unsourced.)*
-3. **Matching** follows the app's one search rule *(word-start matching; `lib/search-query`)*, applied to a bit's **face** and a composition's **title**. ⚪ *whether composition bodies are also matched — bodies are large; default: title only.*
+3. **Matching** follows the app's one search rule *(word-start matching; `lib/search-query`)*, applied to a bit's **face** and a composition's **title**. ✅ **RULED (owner, 2026-09-02): composition BODIES are searched** in the full search. *(The homepage's quick search stays titles-only — titles of compositions and boards; the full search reads everything.)*
 4. **Excluded, always:** trashed things · **archived things** *(owner-ruled)* · the composition being written (no self-reference) · **boards** *(direction principle — boards never appear)*.
 5. **Visual bits** (image, drawing) show a thumbnail in the row; others show their face.
 6. **No matches:** the picker shows an empty state and **offers nothing** — ⛔ it does not offer to create anything. *(Create-on-miss is ⚪, unbuilt: if ever built, it must ask which kind — bit or composition.)*
@@ -249,7 +254,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 5. **Silent bit-hood applies:** no badge, border, or icon marks it as pulled-in content. Its bit-life appears on tap/hover only.
 
 ### 9.7 The drawer (the second door)
-1. Available on the composition's **page and side panel**. ⚪ *whether it fits in the floater at all.*
+1. Available on the composition's **page and side panel**. ⛔ **NOT in the floater — ruled (owner, 2026-09-02):** *"too hard, and if you're composing while you're already on a board, you don't need the drawer — you have your stuff right there."* The board itself is the drawer in that posture.
 2. Tabs: **bits · compositions · all**, plus **"in this piece"**.
 3. **"In this piece"** lists everything this composition currently references, each **readable in full** in the drawer — so long material stays cropped in the flow but whole at your side.
 4. **Clicking any row inserts it at the caret**, exactly as picker selection does (§9.2.7). 🔵 The row must not steal focus from the editor — the caret survives the click. *(Claude's implementation requirement, from the N4b build's known risk; not an owner ruling.)*
@@ -270,7 +275,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 
 ### 10.1 The card
 1. A placed composition renders as a card on the canvas, **visibly different from a bit-card** *(owner-ruled; the difference must be legible at a glance)*.
-2. ⚪ **What it shows: its title only, or its title plus the opening lines of the writing?** *(Today's built behavior is title + a faint preview. Decided by a specimen, not argument — the code window builds two and the owner points.)*
+2. ✅ **RULED (owner, 2026-09-02): title + subtitle** — and where there is no subtitle, **the opening lines** stand in. *(Supersedes the specimen question; today's built behavior — title + faint preview — is the fallback case, already close.)*
 3. ⚪ Whether the card is resizable, and whether size changes what it shows.
 4. **Tap → the floater opens** (§5). The card does not navigate away.
 5. Otherwise it behaves as any card: moved, selected, marquee-selected, moved together with others.
