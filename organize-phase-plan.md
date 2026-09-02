@@ -242,6 +242,87 @@ selection's own bounding box or the average; whether locked cards are anchors or
 built right AFTER the guides while that code is open — but it is genuinely independent, and
 nothing in stage 4 depends on it.
 
+## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
+
+Given verbatim-in-substance, unsorted, at the owner's pace: *"I'll read what you said as questions,
+but I wanted to give you this briefly."* **Nothing here is planned or ordered yet.** Claude's notes
+are first-pass observations only — what already exists, what a thing would touch — not designs.
+
+The owner's own framing question: *"I don't know if this should happen before or after we
+straighten out compositions."* Claude's read is in §4g.
+
+### 1 · Duplicate a bit
+*"You're on a board, you want that same bit — you just want a copy of it… we have to think about
+nuances there, like how is that identified now… I thought we were also saying, well, it's not the
+same exact one that's on a board, right, it's a COPY of a bit."*
+> **The owner has already spotted the crux.** The DB enforces one placement per bit per board
+> (`placement_bit_once`), so "put it on this board twice" is impossible by construction —
+> duplicating must mint a **new bit**. Open, and genuinely model-level: does the copy carry the
+> original's tags? its source? does it know it came from the original, or is it free-standing?
+> Nothing here is decided; it needs `model.md`'s authority, not a feature plan.
+
+### 2 · Rotation
+*"I think everything should be able to be rotated. There should be like a whole little rotation thing."*
+> **This RE-OPENS a ruling.** Rotation was ruled out of v1 long ago; the reference screenshots showed
+> the artist using it, and that was recorded as *"evidence for the aesthetics phase's re-entry
+> question, the owner's call then"* (`geometry-registry-plan.md` §4b). This is the owner making that
+> call — the re-entry condition is met.
+> ⚠ **It interacts with card alignment.** A rotated card's edges are no longer its bounding box, so
+> snapping, the guides, tidy and align all have to decide what they align: the box, or the shape.
+> If both are coming, the ORDER matters, and rotation-after-alignment means revisiting alignment.
+
+### 3 · Three new bit types — a table · a checklist · a general file
+*"I want three other bits… one table, one that's a checklist, and one that's for general files that
+didn't get captured in the other file types. We have to talk a lot more about this."*
+> Deepest item in the dump. `bit.type` is a CHECK-constrained column, so each new type is a
+> migration + a renderer + an intake + decisions about what it means on a board vs in a note.
+> "General file" is the smallest of the three (it is mostly the existing file intake with the type
+> guard relaxed). Table and checklist are each their own editor.
+
+### 4 · Make a board from a composition's bits
+*"You have a composition and a bunch of bits referenced in it — you click and say, yeah, I want to
+make a board from that."* The owner adds: *"that might be happening on the composition surface, so
+maybe ignore that."*
+> Captured anyway. Depends on compositions being defined.
+
+### 5 · Board timeline view
+*"When you're making a board you pull things in on different dates, so there's a fun view — here's
+your board in a timeline view."*
+> **The data already exists.** Every placement carries `arrived_at` (and `left_at`). This is a VIEW
+> over rows we already write — no schema, no new writes.
+
+### 6 · A bit's journey
+*"Similar thing but specifically for a bit — it's a journey, like where it went and what dates."*
+> **Also already stored**, and already read: `getBitTravel` exists in `lib/db/bits.ts`. This is a
+> surface over data the app has kept all along. Cheapest item in the dump.
+
+### 7 · Make a board from a tag, or from a multi-select
+*"From a tag, or from multi-select — both of those options — and an option to make this a board,
+and then it would just gather everything into a board and you'd have to arrange it."*
+> Mostly assembly of parts that exist: `placeBitsOnBoard` already sends a multi-selection to a
+> board; the pull already gathers by tag. The new piece is "create a board and place into it in one
+> act", plus where the entry point lives.
+
+### 8 · Hide compositions — a board toggle
+*"Once we set up compositions, there's going to be a toggle on a board to hide compositions."*
+> Blocked on compositions by definition.
+
+## 4g · Claude's read on ordering (NOT a ruling — for the owner to overturn)
+
+**Blocked on compositions, definitionally:** #4, #8.
+
+**Independent of compositions, and cheap because the data already exists:** #6 (a bit's journey),
+#5 (board timeline), #7 (make a board from a tag / selection). These are surfaces over rows already
+written — no schema, no new invariants.
+
+**Independent but deep:** #1 (duplicate — a model question before it is a feature), #3 (three bit
+types — a migration each), #2 (rotation).
+
+**The one sequencing trap worth naming now:** rotation (#2) and card alignment interact. Alignment
+assumes a card's edges ARE its bounding box. Build alignment first and rotation later, and
+alignment gets revisited. Build rotation first and alignment is designed knowing about it. Neither
+is wrong; it should be a choice rather than an accident.
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.
