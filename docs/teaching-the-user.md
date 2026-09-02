@@ -48,5 +48,20 @@ The **compose door being deliberate** teaches that compositions are made, not ca
 ## 6 · Open
 ⚑ The **stories** (the musician, the artist, the scholar) — owner-written, after naming · ⚑ where hints live technically (a dismissed-hints record) · ⚑ whether ① needs one deliberate first-run moment or can be entirely in-the-moment · ⚑ the words themselves (naming session gates most copy above).
 
-## 7 · Where this sits
+## 7 · The teaching family — every doc that teaches, and its job
+
+| doc | its teaching job | when you need it |
+|---|---|---|
+| **`teaching-the-user.md`** (this) | **the literal register** — what must be learned, taught at which moment, in what form | writing hints, tooltips, first-run copy |
+| `product-concept-people.md` | **the story register** — who these people are · the persona flows (⚑ owner-written) · *flows not definitions* · templates-as-teacher · the two levels (build vs framing) | writing the stories; deciding who we speak to |
+| `product-concept-promise.md` | **the pitch** — the switching argument (*"you already do this in Are.na — here's the delta"*) · required artifacts per discipline | landing-page words; the demo moment |
+| `integration-scenes.md` | **the scenes** — S1–S13, real moments; the hero candidates for stories (S3/S9 = writing beside the work) | choosing what to show |
+| `user-flows.md` Arc 0 | **the mechanism** — first-run detection (empty owner → seed or guide), the `onboarded` flag | building onboarding |
+| `composition-definition.md` | **what's true** — the concept the teaching must not misstate | fact-checking any copy |
+| `vision-and-language.md` | **the voice** — phrase bank, the problem told three ways (⚑ owner re-voices) | when words need warmth |
+| `product-concept-language.md` | **the outward line** + the naming state | before any user-facing word ships |
+
+**The flow:** *who* (`people`) → *what we claim* (`promise`) → *what's true* (`definition`) → **what must be learned + when (this doc)** → *how it's built* (`user-flows` Arc 0) → *the actual words* (⚑ owner, after naming).
+
+## 8 · Where this sits (upstream/downstream)
 Upstream: `product-concept-people.md` (who they are · flows-not-definitions · templates as teacher) · `composition-definition.md` (what's true). Downstream: the actual copy, after naming. `user-flows.md` Arc 0 holds the *technical* first-run mechanism (detect empty owner → seed or guide).

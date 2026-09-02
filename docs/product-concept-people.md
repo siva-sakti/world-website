@@ -1,5 +1,7 @@
 # Product concept — the people and their flows
 
+> **Teaching family:** this doc is the **story register** (who they are · the flows). Its literal counterpart — *what a person must learn, taught at which moment* — is **`teaching-the-user.md`**; the mechanism is `user-flows.md` Arc 0. See the family table in `teaching-the-user.md` §7.
+
 > ## STATUS · 2026-08-30
 > **🟢 SETTLED**
 > · **teach with cases and examples, not definitions**
