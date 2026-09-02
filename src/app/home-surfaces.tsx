@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useAct } from "@/components/use-act";
 import type { Surface } from "@/lib/surfaces";
 import {
   type ShelfGroup,
@@ -51,8 +51,6 @@ export function HomeSurfaces({
   deskEmpty: boolean;
 }) {
   const [supabase] = useState(() => createClient());
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
   const [kind, setKind] = useState<Kind>("all");
   const [view, setView] = useState<View>("folders");
   const [sort, setSort] = useState<Sort>("alive");
@@ -81,22 +79,10 @@ export function HomeSurfaces({
   }
   const showBody = deskEmpty || !collapsed;
 
-  const [actErr, setActErr] = useState<string | null>(null);
-  async function act(fn: () => Promise<unknown>) {
-    if (busy) return;
-    setBusy(true);
-    setActErr(null);
-    try {
-      await fn();
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-      // A failed pin/folder/duplicate must be VISIBLE — the busy flag releasing is not feedback.
-      setActErr("Couldn't save that — check your connection and try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
+  // The one act door (use-act). Home shows a SENTENCE rather than the small
+  // "failed — try again" its siblings use — the door supplies the machinery, the caller
+  // still chooses how the failure looks. That difference is presentation, not policy.
+  const { busy, failed, run: act, clearFailed } = useAct();
 
   const pin = (s: Surface) =>
     void act(() =>
@@ -336,10 +322,10 @@ export function HomeSurfaces({
 
   return (
     <div>
-      {actErr && (
+      {failed && (
         <p className="mb-3 text-sm text-red-700" role="status">
-          {actErr}{" "}
-          <button className="underline" onClick={() => setActErr(null)}>
+          Couldn&apos;t save that — check your connection and try again.{" "}
+          <button className="underline" onClick={clearFailed}>
             ok
           </button>
         </p>

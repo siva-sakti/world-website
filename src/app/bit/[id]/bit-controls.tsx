@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useAct, FailedNote } from "@/components/use-act";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateBitContent, trashBit, getBitBoards } from "@/lib/db/bits";
@@ -116,8 +117,8 @@ export function BitTrash({
 }) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // keepBusyOnSuccess: this leaves the page — see use-act.
+  const { busy, failed, run } = useAct({ keepBusyOnSuccess: true });
 
   async function onTrash() {
     let n = 1;
@@ -129,17 +130,10 @@ export function BitTrash({
     // THE one trash confirm (app/trash/trash-confirm) — shared with the board, /bits
     // and /write, so the same act asks the same question wherever you meet it.
     if (!(await confirmTrash({ noun, onBoards: n }))) return;
-    setBusy(true);
-    setFailed(false);
-    try {
+    await run(async () => {
       await trashBit(supabase, bitId);
       router.push(returnTo);
-      router.refresh();
-    } catch (e) {
-      console.error("trash failed:", e);
-      setFailed(true); // visible — a silent busy-release is not feedback (the house standard)
-      setBusy(false);
-    }
+    });
   }
 
   return (
@@ -156,7 +150,7 @@ export function BitTrash({
       >
         {busy ? "trashing…" : "trash"}
       </button>
-      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+      <FailedNote failed={failed} />
     </span>
   );
 }

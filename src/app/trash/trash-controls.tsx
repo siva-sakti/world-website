@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAct, FailedNote } from "@/components/use-act";
 import { confirm } from "@/components/confirm";
 import { destroyItemAction, emptyTrashAction } from "@/app/actions";
 
@@ -18,9 +17,7 @@ export function DestroyButton({
   id: string;
   label: string;
 }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const { busy, failed, run } = useAct({ keepBusyOnSuccess: true });
 
   async function onClick() {
     const name = label.trim() || (thing === "board" ? "this board" : "this note");
@@ -44,16 +41,7 @@ export function DestroyButton({
       }))
     )
       return;
-    setBusy(true);
-    setFailed(false);
-    try {
-      await destroyItemAction(thing, id);
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-      setFailed(true); // visible — a silent busy-release is not feedback
-      setBusy(false);
-    }
+    await run(() => destroyItemAction(thing, id));
   }
 
   return (
@@ -66,15 +54,14 @@ export function DestroyButton({
       >
         {busy ? "destroying…" : "destroy"}
       </button>
-      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+      <FailedNote failed={failed} />
     </span>
   );
 }
 
 export function EmptyTrashButton({ count }: { count: number }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // The trash page stays put and just empties, so the button releases.
+  const { busy, failed, run } = useAct();
 
   async function onClick() {
     if (
@@ -93,16 +80,7 @@ export function EmptyTrashButton({ count }: { count: number }) {
       }))
     )
       return;
-    setBusy(true);
-    setFailed(false);
-    try {
-      await emptyTrashAction();
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-      setFailed(true); // visible — a silent busy-release is not feedback
-      setBusy(false);
-    }
+    await run(() => emptyTrashAction());
   }
 
   return (
@@ -115,7 +93,7 @@ export function EmptyTrashButton({ count }: { count: number }) {
       >
         {busy ? "emptying…" : "empty trash"}
       </button>
-      {failed && <span className="ml-1 text-xs text-red-700">failed — try again</span>}
+      <FailedNote failed={failed} />
     </span>
   );
 }

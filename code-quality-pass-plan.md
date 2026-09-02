@@ -379,3 +379,49 @@ orchestrator wiring a dozen hooks is what it is, and the ruled input work will r
 (no hooks inside — which is exactly why it became testable); its siblings `useCreateDoors` and
 `useArrangeActs` really are hooks. eslint's rules-of-hooks fires on the NAME. Renaming is a
 signature change → the owner's call.
+
+---
+
+## 7. THE DOORS (owner ruling, 2026-09-02) — the follow-on phase
+
+**The owner:** *"I would love doors for each of these things — to me that's part of cleanup,
+that's part of DRY principles… my guess is it's actually pretty straightforward as long as you
+check the codebase and we run through it, and at the end I can run tests for all of these."*
+
+**What a door is** (the app's own word — "the one door", "the settled door", "the create doors"):
+*one place that decides one thing, that everywhere else goes through.*
+
+**The test for whether something IS one:** *if I changed it in one place, would I want it changed
+everywhere?* Yes → one decision written many times; it will drift; make it a door. No → different
+decisions wearing the same clothes; merging destroys real information.
+
+### Built already
+- ✅ **The archive question** (`app/archive/archive-confirm.ts`) — was 2 places.
+- ✅ **The trash question** (`app/trash/trash-confirm.ts`) — was **5**, in three nouns.
+
+### The queue (counts re-verified 2026-09-02, not taken from the audit)
+
+| # | Door | Copies today | Kind | Risk |
+|---|---|---|---|---|
+| **D1** | the button that goes busy, then says "failed — try again" | 7 handlers in 4 files, plus `act()` in home-surfaces and `run()` in shelf-controls — the same shape under 3 names | machinery | low |
+| **D2** | "save my work before I leave" (`registerSave` + commit-on-unmount) | **10 files** | machinery | **highest — every copy carries a bug-fix comment about phones backgrounding; needs the owner's phone to prove** |
+| **D3** | the words for file kinds (`audio` vs `recording`, `pdf` vs `PDF`) | 6+ tables | **WORDS — owner's** | low once ruled |
+| **D4** | where uploaded files are stored (`images/${id}.jpg` ...) | 16 sites in 3 files | machinery | low |
+| **D5** | remembering a collapsed panel in local storage | 4 (excluding `jot-draft` + `camera-storage`, which are tested and genuinely different) | machinery | low |
+| **D6** | the empty-state sentences ("Nothing matches" x5, "Nothing here yet" x2) | 7 across 5 files | **WORDS — owner's** | low once ruled |
+
+**Order:** D1 -> D4 -> D5 -> D3 -> D6 -> **D2 last** (riskiest, and the only one needing a phone).
+
+### Two questions the owner must answer (they are copy, not code)
+
+1. **D3 - which word wins per file kind?** Claude will not choose these. Note the trap: the *badge*
+   word (what KIND of file this is) must stay separate from the owner's **doodle / sketch / drawing**
+   vocabulary, which is expressive and was ruled untouchable (§5.4b). Proposal, to veto or replace:
+   image -> "image" - audio -> "recording" - pdf -> "PDF" - drawing -> "drawing" - link -> "link" -
+   text -> "text".
+2. **D6 - the empty states.** These are TWO different situations currently blurred together:
+   *"you have nothing yet"* vs *"your filter matched nothing."* They should stay two sentences, one
+   wording each. The owner writes both.
+
+**Proof:** the four gates after every door, plus a pure test for any door that produces WORDS
+(the archive and trash doors set that precedent). The owner runs the app-level pass at the end.

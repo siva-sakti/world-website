@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAct } from "@/components/use-act";
 import { createClient } from "@/lib/supabase/client";
 import { pinBit, setBitGroup, createGroup, type ShelfGroup } from "@/lib/db/shelf";
 import { FolderPicker } from "@/components/folder-picker";
@@ -22,22 +22,7 @@ export function GroupPicker({
   groups: ShelfGroup[];
 }) {
   const [supabase] = useState(() => createClient());
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const router = useRouter();
-  async function run(fn: () => Promise<unknown>) {
-    setBusy(true);
-    setFailed(false);
-    try {
-      await fn();
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-      setFailed(true); // visible — a silent busy-release is not feedback
-    } finally {
-      setBusy(false);
-    }
-  }
+  const { busy, failed, run } = useAct(); // the one act door — stays on the page
   return (
     <>
       <FolderPicker
@@ -74,9 +59,7 @@ export function PinToggle({
   greetsHome?: boolean;
 }) {
   const [supabase] = useState(() => createClient());
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const router = useRouter();
+  const { busy, failed, run } = useAct();
   return (
     <button
       className={`shelf-pin${failed ? " text-red-700" : ""}`}
@@ -90,19 +73,7 @@ export function PinToggle({
               ? "mark alive — it greets you on home"
               : "mark alive — it floats to the top of your bits"
       }
-      onClick={async () => {
-        setBusy(true);
-        setFailed(false);
-        try {
-          await pinBit(supabase, bitId, !pinned);
-          router.refresh();
-        } catch (e) {
-          console.error(e);
-          setFailed(true); // visible — a silent busy-release is not feedback
-        } finally {
-          setBusy(false);
-        }
-      }}
+      onClick={() => void run(() => pinBit(supabase, bitId, !pinned))}
     >
       {pinned ? "★" : "☆"}
     </button>
