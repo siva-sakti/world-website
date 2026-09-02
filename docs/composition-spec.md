@@ -63,7 +63,7 @@ The app serves a **rhythm: diverge → converge → diverge**, never a one-way a
 ## 3 · The model
 
 **3.1 · The three things**
-- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**.)* ⚪ **TABLE — an OPEN fork, not a ⛔.** The owner: *"a table can be formatting inside a composition, or its own type of bit — **I'm fine with that**."* Both remain allowed; **an earlier draft of this spec wrongly ruled it out.** *(Found by verification, 2026-09-02.)*. **Flat: a bit never references anything.** *(the flatness call)*
+- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**)* · ✅ **TABLE — RULED A BIT TYPE (owner, 2026-09-02):** *"a table should be its own bit — I'm gonna have in the boards a bit that can be a table."* **Both are true at once:** a table can be **formatting inside writing** (the editor) AND **its own bit** (a thing on a board, pullable into a composition). Not a fork — both. *(An earlier draft wrongly excluded the bit form; caught by verification.)*. **Flat: a bit never references anything.** *(the flatness call)*
 - **board** — a spatial surface. Holds material by **placement** (a position).
 - **composition** — a linear surface. Holds material by **reference** (pulled into the writing).
 
@@ -180,7 +180,7 @@ Pasting · importing · the system · any automatic path. **No exceptions.**
 ## 7 · The title
 
 1. Editable at any time, in any frame.
-2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: minted at exit, never on entry. ⚪ **Autosave is AMBIGUOUS** — her words: "if anything autosaves that would need a title, but that doesn't happen on the board itself, it happens in the background." An earlier draft resolved this silently as "never on autosave"; it needs her word.)*.
+2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: **only on exit.** Never on entry, **never on autosave** — confirmed 2026-09-02: "don't mint on autosave… only when you exit can a title be put." The earlier reading was right, but it had been assumed rather than asked.)*.
 3. That minted title is **an ordinary title** — replaceable forever, no special state.
 4. ⚪ **the exact format string** (e.g. `Sep 2, 9:41 AM`).
 5. ⚠ This is the one place the app writes into an owner-owned field. It is a **ruled exception** to *the machine never writes your words*.
@@ -304,7 +304,7 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 | returning to work | one visible **"bring back to edit"** control → returns to live |
 | its **chips** in other writing | greyed, **still enterable** — tapping opens it, clearly marked archived |
 | its **card** on boards | ⚪ *proposed: greyed, present, still opens — matching its chips. Never stamped.* |
-| the `[[` **picker** | **excluded** — ⚑ *the owner said "probably not," a hedge; recorded here and in the register as a stamp, which it was not. Needs a real ruling.* |
+| the `[[` **picker** | ✅ **excluded — RULED (owner, 2026-09-02):** *"no — it could add clutter."* *(Previously recorded as stamped on the strength of a "probably not"; now genuinely ruled.)* |
 | **search** | **excluded by default, with a control to include the archive** *(owner-ruled 2026-09-02: "should it just be with active, that you can turn on allowing to bring things in from the archive?")*. Matches archive's meaning — out of the active world, not out of existence — and makes returning deliberate, the same principle as the picker's exclusion. |
 | the compositions list | out of the main view; reachable through the archive |
 
@@ -356,7 +356,7 @@ Identical to bits and boards: apply, remove, and pull. A composition carries its
 1. **Controls exist in the UI** — on **boards and compositions at least**; bits get a **mark-private** control.
 2. **A composition is born private.**
 3. **A bit's private mark is GLOBAL** — ⛔ never per-board. A bit marked private is private everywhere it appears; one cannot be private on one board and public on another.
-4. ⚪ **Unmarked bits and boards** — the owner said *"anytime it appears on a board it's going to be public"*; an earlier draft rendered this as *"follow the board they sit on,"* which differs materially for a **private** board. **Needs her word.**
+4. ⚪⚪ **THE WHOLE VISIBILITY MODEL IS DEFERRED** *(owner, 2026-09-02: "we still have a lot to decide in terms of private and public — I think we haven't even touched that yet. Right now everything is public; later we're gonna have toggles and we have to think through that logic.")* **What stands:** controls should exist, and a composition should be born private. **What is NOT decided:** inheritance (what an unmarked bit does on any board), the toggle logic, and everything about publishing. **Do not build visibility from this section** — it is the privacy session's subject.
 5. This re-derives the existing ruled composition rule *(a guest sees a thing only if its surface is reachable **and** the thing itself is public)*; the machinery is unchanged — **what is new is the controls and the composition's private default.**
 6. ⚪ **The publishing session is separate and still owed** — this section covers marking, not publishing. Nothing is public today; no publish act exists.
 

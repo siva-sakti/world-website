@@ -26,7 +26,7 @@
 | B4 | **Fixed kind** — no conversion, ever | ✓ §3.4 |
 | B5 | **Silent bit-hood** — pulled things render as normal content; powers on tap/hover only | ✓ §3.4, §9.6.5 |
 | B6 | **The four dimensions** — content · structure · relation · organization | ✓ §3.2 |
-| B7 | **Bit roster:** text · image · drawing · audio · PDF · link; candidates video · file. ⚪ **TABLE IS AN OPEN FORK** — the owner said *"I'm fine with that"* about a table being its own bit type; an earlier register entry wrongly recorded it as excluded | ✓ §3.1 |
+| B7 | **Bit roster:** text · image · drawing · audio · PDF · link; candidates video · file. ✅ **TABLE IS A BIT TYPE** (owner, 2026-09-02) *and* formatting — both true at once | ✓ §3.1 |
 
 ## C · The fabric
 | # | ruling | in spec |
@@ -65,7 +65,7 @@
 | # | ruling | in spec |
 |---|---|---|
 | F1 | `[[` opens a **search picker, two sections** (material · compositions) | ✓ §9.2 |
-| F2 | Archived excluded from the picker — ⚑ **NOT a stamp**: the owner said *"probably not"*; recorded here as stamped in error | ✓ §9.2.4 (now flagged) |
+| F2 | **Archived excluded from the picker** — ✅ genuinely ruled 2026-09-02 (*"no — it could add clutter"*) | ✓ §9.2.4 |
 | F3 | **Boards never** appear in the picker | ✓ §9.2.4 |
 | F4 | **Born as a chip**; images/drawings born as **blocks** | ✓ §9.3 |
 | F5 | The chip is an **atom**, shows the **live** face; the stored copy is a shadow for search/export | ✓ §9.4 |
@@ -115,7 +115,7 @@
 | J3 | **Backlinks, full treatment** — a clickable panel + a graph view (Obsidian-style) | ✓ §12.1b |
 | J4 | Tags · folders · star — identical to everything else | ✓ §12.2–12.4 |
 | J5 | **Export lockstep (I-G1)** in the same migration | ✓ §12.5 |
-| J6 | **Visibility:** controls in the UI; composition **born private**; a bit's private mark is **GLOBAL**, never per-board | ✓ §12.2b |
+| J6 | **Visibility:** controls wanted; composition born private. ⚪⚪ **The model is DEFERRED to the privacy session** (owner 2026-09-02: "we haven't even touched that yet") — inheritance and toggle logic undecided | ✓ §12.2b (marked deferred) |
 | J7 | **Rename ripple:** display live, stored copy stale until next save (search/export only) | ✓ §9.4.6 |
 | J8 | The **pull** returns all kinds; ⚪ whether it gains kind-filters | ✓ §12.7 |
 
