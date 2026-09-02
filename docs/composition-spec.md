@@ -536,33 +536,35 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 - 📜 **SUPERSEDED — the "edges test."** Claude proposed that only things with their own edges (image · table · pulled-in block) could drag, and text could not. **That was a correction to a misreading, and it is now void as a drag rule.** *Kept because the distinction it names is still true elsewhere:* things with edges are the ones that **resize and wrap** (§7); flow text does not. Same observation, wrong law.
 - ⚠ **§13.3 needs no re-scoping after all** — its *"hover drag-handle moves a block"* stands as written.
 
-**⚪ THE ONE THING STILL AMBIGUOUS — flagged, not resolved.** *(Two of the owner's sentences read in opposite directions, and Claude's named failure mode is silently resolving exactly this.)*
-- She said **"I don't think we should allow people to drag headings like text"** and **"I don't think we need to have headline dragging at all"** — but also that up/down dragging should exist generally.
-- **Reading A:** headings do not drag; paragraphs, lists and objects do.
-- **Reading B:** the "no heading dragging" remarks were both about the *table of contents*, and headings drag like everything else.
-- **If B, one question comes back:** does dragging a heading carry the section under it? 🔵 *Claude's lean: yes — a heading owns what is beneath it until the next heading of equal or higher level. Otherwise a dragged heading abandons its own text, which is never what anyone means.*
+✅ **RESOLVED (owner, 2026-09-02): headings DO drag, and the section comes along.** *"Let's do what Notion does — you drag the headline and the section comes along, yes."* A heading **owns everything beneath it until the next heading of equal or higher level**; that span is what moves. *(The earlier "no headline dragging" remarks were about the table of contents, now confirmed.)*
+
+✅ **This one rule also answers the toggle question** — the owner asked what toggle-dragging even meant. A "toggle" is just a collapsible section, so **a container carries its contents** by exactly the law above. No separate case.
+
+🔵 **The simplification it opens:** if a heading owns a span for *dragging*, let it own the same span for *folding* — **a heading IS the collapsible section**, and there is no separate toggle block type to build or explain. One concept, two operations. *(Satisfies the owner's "I think we should have collapsible sections" without a second mechanism. Not yet ruled.)*
 
 ### 20.5c Headings as destinations *(owner, 2026-09-02: "we definitely need headers, jump to headers, linking to headers")*
 1. ✅ **Headings** — structure inside the writing (§20.1).
 2. ✅ **Jump to a heading** — the table of contents does this; clicking an entry scrolls there.
 3. ✅ **Link to a heading** — a heading is a **destination that can be pointed at**, not only a label. *This is new (2026-09-02) and has no prior entry.*
-   - ⚪ **From where?** Within the same composition is certain. **From another composition — i.e. can `[[` gather a *heading* rather than a whole thing — is open**, and it is a model question, not a UI one: today a reference points at a bit. Belongs to the storage session.
+   - ✅ **Within the same composition: yes.** ⛔ **Across compositions: you link to the whole composition, not to a heading inside it** *(owner's lean 2026-09-02: "I think you can link to the full composition, but we can think about that"; Claude agrees — reasoning below).*
+     **Why the model itself says no:** the owner's own general rule is *"the block is however that bit looks ON A BOARD; the chip is its collapsed form."* A **heading inside a composition has no board form** — it is not a thing that can sit on a board — so it has no block, and the one rule that covers every other target cannot cover it. Pointing at a heading would also make references non-uniform: some at things, some at places inside things.
+     **And the escape hatch already exists:** if a section is important enough to be pointed at from elsewhere, it wants to *be its own composition* — which the model supports today, at no cost.
    - ⚪ **What the link needs:** a heading must carry a **stable id** that survives being renamed and being moved, or every link breaks the first time the owner edits a title.
 
 ### 20.5b What the owner's own path (backspace · copy · paste) actually requires
 *These are not drag questions. They sit on the path she named, so they must be answered.*
 
-1. ⚪ **A folded toggle, and the backspace key.** Cursor at the end of a folded line; press backspace. Does it delete the section you cannot see, or unfold first?
-   🔵 **Lean: unfold first.** *Never delete what is not on screen.* The second press then deletes normally. Costs one keystroke; removes a whole class of "where did my writing go."
+1. ✅ **A folded section, and the backspace key.** Cursor at the end of a folded line; press backspace. Does it delete the section you cannot see, or unfold first?
+   ✅ **RULED (owner, 2026-09-02): unfold first.** *"I think you'd unfold first."* Never delete what is not on screen; the second press then deletes normally.
 2. ✅ **Selecting a whole block — already answered, no new mechanism.** Sweep from before it to after it and the block falls inside the selection (as in any editor); backspace immediately after a block deletes it. **This follows from the owner's ruling** that text inside a block is ordinary selectable text.
-3. ⚪ **What a single CLICK on a block does — a real conflict to settle.** §20.6 as drafted says a click opens the **peek**. But if a block is an object in *your* document — and the owner has ruled its text is yours to select and copy — a click should probably **select** it, the way clicking an image does everywhere else, with a small separate door to open the original.
-   🔵 **Lean: click selects; a hover door opens the original.** Otherwise clicking your own page navigates you off it.
+3. ✅ **What a single CLICK on a block does — RULED.** §20.6 as drafted says a click opens the **peek**. But if a block is an object in *your* document — and the owner has ruled its text is yours to select and copy — a click should probably **select** it, the way clicking an image does everywhere else, with a small separate door to open the original.
+   ✅ **RULED (owner, 2026-09-02): "I think select it."** A click **selects** the block — it is content on your own page. A small hover door opens the original. *(Supersedes the draft's "click opens the peek." The chip still peeks on click; only the block form differs.)*
 
 ### 20.6 Affordances — what is clickable *(the owner's framing: "what do they click, what can they not click")*
 | thing | clickable? | what happens |
 |---|---|---|
 | a **chip** | ✅ | opens the peek |
-| a **block's content** (the image, the quoted text) | ⚪ **conflicted — see §20.5b(3)** | *peek* (as drafted) or *select* (Claude's lean, after the owner's copy-paste ruling) |
+| a **block's content** (the image, the quoted text) | ✅ | **selects the block** *(owner-ruled)*; a hover door opens the original |
 | **text inside a block** | ✅ **selectable and copyable** *(owner-ruled: "any text can be copy and pasted by the user — they'd just put their mouse over it")*. It is text on the screen and behaves like text. |
 | a **drag handle** | ✅ on hover | drag UP or DOWN to reorder (§20.5) · click for the block menu |
 | a **toggle's line** | ✅ | folds/unfolds |
