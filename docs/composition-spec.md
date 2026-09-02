@@ -63,7 +63,7 @@ The app serves a **rhythm: diverge → converge → diverge**, never a one-way a
 ## 3 · The model
 
 **3.1 · The three things**
-- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**. ⛔ Not `table` — a table is formatting; a text bit can contain one.)*. **Flat: a bit never references anything.** *(the flatness call)*
+- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**.)* ⚪ **TABLE — an OPEN fork, not a ⛔.** The owner: *"a table can be formatting inside a composition, or its own type of bit — **I'm fine with that**."* Both remain allowed; **an earlier draft of this spec wrongly ruled it out.** *(Found by verification, 2026-09-02.)*. **Flat: a bit never references anything.** *(the flatness call)*
 - **board** — a spatial surface. Holds material by **placement** (a position).
 - **composition** — a linear surface. Holds material by **reference** (pulled into the writing).
 
@@ -102,13 +102,16 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 | **fixed kind** | A thing's kind is set at birth and never converts: bit ↮ composition ↮ board. | D-121 |
 | **silent bit-hood** | In the writing, a pulled-in thing **renders as normal document content** — an image looks like an image, a quote reads as a quote. 🔵 **Forbidden: badges, borders, icons, or any persistent marker distinguishing pulled-in content from typed content.** *(The rule is the owner's — "it could be annoying for everything to be in this bit shape"; this specific forbidden-list is Claude's operationalisation of it.)* Its bit-life (source · tags · where else it lives) appears **only** on tap or hover. | owner |
 
+**3.4b · A composition has NO source** *(owner-ruled — absent from an earlier draft, restored by verification)*
+Unlike a bit, a composition carries no `source`. The owner: *"no, a composition would not have a single source — think of it like a board, there's multiple things happening there."* Its provenance is the material it gathers; citing something is a **link**, which is richer than a field. *(Corollary, also the owner's: **one source per bit** — the singular that survives.)*
+
 **3.5 · What a composition IS — the definition**
 > A **document you write.** Made of your words, with captured things pulled into the writing. It is **made, never captured** — it can never just happen. It always appears in your compositions list. It can sit on many boards as cards. It is not a bit and never becomes one.
 
 *(§2 gives the concept; this is the operative definition. Where they differ in wording, this one governs.)*
 
 **3.6 · What it is NOT** ⛔
-Not material · not a container things are placed *onto* (*"text-forward, like Notion"*) · not convertible to or from a bit · never auto-born · not a task manager — **though it holds facts about its own job** (a word-count target · a due date · who it's for), specified in Part III's lifecycle section *(owner: "that kind of project management layer")*.
+Not material · not a container things are placed *onto* (*"text-forward, like Notion"*) · not convertible to or from a bit · never auto-born · not a task manager — **though it holds facts about its own job** (a word-count target · a due date · who it's for), specified in §8 *(owner: "that kind of project management layer")*.
 
 ---
 
@@ -117,6 +120,12 @@ Not material · not a container things are placed *onto* (*"text-forward, like N
 *Every step of every path, exactly. "Nothing exists" means no database row. ⚪ = genuinely undecided.*
 
 ## 4 · Birth
+
+### 4.0 The doors, named *(owner: "you'll still enter into it either the composition tab, or pressing like new composition, or within a board adding a composition")*
+Three entrances: **the write page** (§4.1) · **"new composition" from the compositions list** (§4.1b) · **the compose door on a board** (§4.2). All deliberate; all born-on-first-content.
+
+### 4.1b From the compositions list — "new composition"
+Identical to §4.1 in every respect (born on first body content, lands in the list, on no board). It is the same door reached from where your compositions live. *(Named by the owner; absent from an earlier draft.)*
 
 ### 4.1 From the write page
 1. Owner opens the write page. Editor renders empty, **focused**. Title field empty, no placeholder text.
@@ -129,11 +138,16 @@ Not material · not a container things are placed *onto* (*"text-forward, like N
 ### 4.2 From within a board — the compose door
 1. Owner taps **compose** on the board toolbar. *(Distinct from `+ text`, which makes a bit.)*
 2. **The floater opens** over the canvas — the board stays visible and interactive behind it. ⚪ *opening position: centred in viewport / near the toolbar / last-used position.*
-3. Floater contents: title field · body editor (focused) · **basic toolbar only** (§8.2) · close control. ⚪ *whether it also shows a save indicator — see §6.4.*
+3. Floater contents: title field · body editor (focused) · **basic toolkit only** (§13.4) · close control. ⚪ *whether it also shows a save indicator — see §6.4.*
 4. **Nothing exists** until the first body character.
 5. On first body character → **two rows created together**: the composition, and its **placement on this board** *(auto-place, owner-ruled)*.
 6. The card appears on the board immediately, at ⚪ *a clear spot found by the existing find-a-clear-spot logic — confirm this is the right placement rule.*
 7. **On closing with an empty body → nothing was ever created**: no composition row, no placement row, no card. *(The evaporate rule; the placement cannot orphan because it was never written.)*
+
+### 4.2b The rule underneath §4.1–4.2, in the owner's words
+> **"Nothing exists until you put something in it. Once it exists, it's real — and it stays until you trash it."**
+Every case above derives from that one line rather than being memorised separately.
+**And the principle that scopes it to birth** *(the owner, from how she architected bits)*: *"sometimes you open the bit and then you resize the board and I don't want that bit to disappear… we should leave the composition on a board."* → ⭐ **Nothing ever vanishes under your hands while you are working.** Evaporation applies only to a thing that never held content; anything real persists until deliberately trashed.
 
 ### 4.3 Templates — a mode, not a door *(future, T3)*
 At either door above, the owner may choose **blank** *(today's only option)* or **a template** — a composition that opens pre-shaped. Entrances are unchanged.
@@ -166,17 +180,17 @@ Pasting · importing · the system · any automatic path. **No exceptions.**
 ## 7 · The title
 
 1. Editable at any time, in any frame.
-2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: minted at exit, never on entry, never on autosave)*.
+2. If empty when the owner **leaves or closes** the composition → the app **writes** a title in a fixed date-time format *(owner-ruled: minted at exit, never on entry. ⚪ **Autosave is AMBIGUOUS** — her words: "if anything autosaves that would need a title, but that doesn't happen on the board itself, it happens in the background." An earlier draft resolved this silently as "never on autosave"; it needs her word.)*.
 3. That minted title is **an ordinary title** — replaceable forever, no special state.
 4. ⚪ **the exact format string** (e.g. `Sep 2, 9:41 AM`).
 5. ⚠ This is the one place the app writes into an owner-owned field. It is a **ruled exception** to *the machine never writes your words*.
 
-## 8 · What a piece knows about its job *(owner-ruled: "that kind of project management layer")*
+## 8 · What a composition knows about its job *(owner-ruled: "that kind of project management layer")*
 
 A composition may carry: **a word-count target** · **a due date** · **who it's for**.
 - All three are **optional**; a composition with none is normal and complete.
 - The **word count is always shown**; the target, when set, is shown against it. ⚪ *where: the footer / near the title / the editor's edge.*
-- ⚪ **Does the due date surface anywhere outside the piece** (the compositions list, home)? *If yes, this becomes a scheduling feature; if no, it is a note-to-self.* **This is the line between "a piece knows its job" and "a task manager" — and it needs the owner's word.**
+- ⚪ **Does the due date surface anywhere outside the piece** (the compositions list, home)? *If yes, this becomes a scheduling feature; if no, it is a note-to-self.* **This is the line between "a composition knows its job" and "a task manager" — and it needs the owner's word.**
 - ⛔ Not: assignees · statuses · reminders · notifications.
 
 ## 9 · Pulling things in
@@ -187,17 +201,17 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 1. Typing `[[` in the body opens the **picker** at the caret. The two characters are consumed by the trigger, not left in the text.
 2. Every character typed after the trigger filters the picker; **Backspace past the trigger closes it**, restoring nothing to the text.
 3. **Escape** closes it, inserting nothing.
-4. ⛔ The trigger does **not** fire inside a code block.
+4. 🔵 The trigger does **not** fire inside a code block. *(Claude's; never decided — flagged by verification as unsourced.)*
 5. ⚪ Whether `[[` also triggers in the title field. *(Default: no.)*
 
 ### 9.2 The picker
 1. Two sections, in this order: **your material** (bits), then **your compositions**. Section headers always shown, even when one section is empty.
-2. **Ordering within each section:** most recently touched first, before any query is typed.
+2. 🔵 **Ordering within each section:** most recently touched first, before any query is typed. *(Claude's; unsourced.)*
 3. **Matching** follows the app's one search rule *(word-start matching; `lib/search-query`)*, applied to a bit's **face** and a composition's **title**. ⚪ *whether composition bodies are also matched — bodies are large; default: title only.*
 4. **Excluded, always:** trashed things · **archived things** *(owner-ruled)* · the composition being written (no self-reference) · **boards** *(direction principle — boards never appear)*.
 5. **Visual bits** (image, drawing) show a thumbnail in the row; others show their face.
 6. **No matches:** the picker shows an empty state and **offers nothing** — ⛔ it does not offer to create anything. *(Create-on-miss is ⚪, unbuilt: if ever built, it must ask which kind — bit or composition.)*
-7. **Selection:** Enter or click inserts at the caret and closes the picker. The caret lands **immediately after** the inserted thing.
+7. **Selection:** Enter or click inserts at the caret and closes the picker. 🔵 The caret lands **immediately after** the inserted thing. *(Claude's implementation detail; unsourced.)*
 
 ### 9.3 What gets inserted
 | target type | inserted as | why |
@@ -267,10 +281,10 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 2. **Later:** from the composition's own page, "place on a board…" — offering only boards it is not already on.
 3. **On many boards at once:** each placement independent — its own position, its own card. Un-placing from one leaves the others untouched.
 4. **Un-place** removes the card from that board; the composition is unaffected and remains in the list. The placement record survives *(travel history — I-L2)*.
-5. ⛔ **A composition is never "loose."** Un-placed from everywhere, it lives in the compositions list — it never appears in the bits inbox.
+5. 🔵 **A composition is never "loose."** Un-placed from everywhere, it lives in the compositions list — it never appears in the bits inbox.
 6. ⚪ Where a newly-placed card lands *(the existing find-a-clear-spot logic is the presumed answer)*.
 
-### 10.3 The hide-pieces toggle *(owner-ruled)*
+### 10.3 The hide-compositions toggle *(informally "hide pieces")* *(owner-ruled)*
 1. A per-board control hides **all** composition-cards on that board.
 2. **Presentation only:** placements are untouched; the compositions stay placed and related; nothing is un-placed, moved, or deleted.
 3. Purpose, in the owner's words: *"if you just want to compose but don't want to see them on your surface, and you want them to be linked and related."*
@@ -290,7 +304,7 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 | returning to work | one visible **"bring back to edit"** control → returns to live |
 | its **chips** in other writing | greyed, **still enterable** — tapping opens it, clearly marked archived |
 | its **card** on boards | ⚪ *proposed: greyed, present, still opens — matching its chips. Never stamped.* |
-| the `[[` **picker** | **excluded** *(owner-stamped)* |
+| the `[[` **picker** | **excluded** — ⚑ *the owner said "probably not," a hedge; recorded here and in the register as a stamp, which it was not. Needs a real ruling.* |
 | **search** | **excluded by default, with a control to include the archive** *(owner-ruled 2026-09-02: "should it just be with active, that you can turn on allowing to bring things in from the archive?")*. Matches archive's meaning — out of the active world, not out of existence — and makes returning deliberate, the same principle as the picker's exclusion. |
 | the compositions list | out of the main view; reachable through the archive |
 
@@ -342,7 +356,7 @@ Identical to bits and boards: apply, remove, and pull. A composition carries its
 1. **Controls exist in the UI** — on **boards and compositions at least**; bits get a **mark-private** control.
 2. **A composition is born private.**
 3. **A bit's private mark is GLOBAL** — ⛔ never per-board. A bit marked private is private everywhere it appears; one cannot be private on one board and public on another.
-4. **Unmarked bits follow the board** they sit on.
+4. ⚪ **Unmarked bits and boards** — the owner said *"anytime it appears on a board it's going to be public"*; an earlier draft rendered this as *"follow the board they sit on,"* which differs materially for a **private** board. **Needs her word.**
 5. This re-derives the existing ruled composition rule *(a guest sees a thing only if its surface is reachable **and** the thing itself is public)*; the machinery is unchanged — **what is new is the controls and the composition's private default.**
 6. ⚪ **The publishing session is separate and still owed** — this section covers marking, not publishing. Nothing is public today; no publish act exists.
 

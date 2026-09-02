@@ -26,7 +26,7 @@
 | B4 | **Fixed kind** — no conversion, ever | ✓ §3.4 |
 | B5 | **Silent bit-hood** — pulled things render as normal content; powers on tap/hover only | ✓ §3.4, §9.6.5 |
 | B6 | **The four dimensions** — content · structure · relation · organization | ✓ §3.2 |
-| B7 | **Bit roster:** text · image · drawing · audio · PDF · link; candidates video · file. ⛔ table is formatting, not a type | ✓ §3.1 |
+| B7 | **Bit roster:** text · image · drawing · audio · PDF · link; candidates video · file. ⚪ **TABLE IS AN OPEN FORK** — the owner said *"I'm fine with that"* about a table being its own bit type; an earlier register entry wrongly recorded it as excluded | ✓ §3.1 |
 
 ## C · The fabric
 | # | ruling | in spec |
@@ -37,7 +37,7 @@
 | C4 | **board → composition: single-channel** — holding as a card only | ✓ §10 |
 | C5 | board↔board doorway is a **placement**; the reverse view is parked | ✓ §12.1b.6 (boards have no backlink surface) |
 | C6 | A composition sits on **many boards**, each placement independent | ✓ §10.2.3 |
-| C7 | **Cardinalities:** all many-to-many except **one folder per thing** and **one source per bit** | ✓ §12.3 (folder) · ○ (source — Part III) |
+| C7 | **Cardinalities:** all many-to-many except **one folder per thing** and **one source per bit** | ✓ §12.3 (folder) · ✓ §3.4b (source) |
 | C8 | The self-doorway guard **already exists** in the schema (a Claude "find" that wasn't one) | ○ Part III |
 
 ## D · Birth & frames
@@ -65,7 +65,7 @@
 | # | ruling | in spec |
 |---|---|---|
 | F1 | `[[` opens a **search picker, two sections** (material · compositions) | ✓ §9.2 |
-| F2 | **Archived excluded** from the picker | ✓ §9.2.4 |
+| F2 | Archived excluded from the picker — ⚑ **NOT a stamp**: the owner said *"probably not"*; recorded here as stamped in error | ✓ §9.2.4 (now flagged) |
 | F3 | **Boards never** appear in the picker | ✓ §9.2.4 |
 | F4 | **Born as a chip**; images/drawings born as **blocks** | ✓ §9.3 |
 | F5 | The chip is an **atom**, shows the **live** face; the stored copy is a shadow for search/export | ✓ §9.4 |
@@ -132,6 +132,9 @@
 | K8 | **Storage shape** — owner's lean: compositions get their own home, peers of boards | ○ the backend session |
 
 ---
+## Verification results (independent fork-agent pass, 2026-09-02)
+219 spec claims traced: **148 TRACED · 38 CODE · 22 MARKED · 6 DRIFT · 5 UNSOURCED.** Register: 58 present · 2 partial · 1 wrong. **7 owner rulings found in the transcript that were in neither the register nor the spec** — all now added. The register's own two errors (B7's table exclusion, F2's false stamp) are corrected above. Procedure: `verification-procedure.md`.
+
 ## Coverage
 **A–J: 61 rulings, 61 present.** K: 8 items, 5 in the spec, 3 correctly awaiting unwritten Parts.
 **Known gaps are all ⚪-marked in the spec, not missing:** the card's look · the archived card's stamp · the block's PDF/audio form · picker-searches-bodies · drawer-in-floater · `[[`-in-title · image size control · toggle's hidden-count · hide-toggle persistence · the date format · pull kind-filters.
