@@ -101,6 +101,29 @@ design-working-method rule: reference-exact, owner as visual oracle, never inven
 registry floor (stages 1–3) doesn't depend on the pictures and builds meanwhile; stage 4's
 design section gets written when the references arrive.
 
+## 4b · The guides' design — FROM THE OWNER'S REFERENCES (received 2026-09-01)
+
+Six screenshots of an artist (@GODHEAD) mood-boarding in an InDesign-family tool, studied top
+halves per the owner's instruction. **The last frame shows the feature itself live: a thin
+MAGENTA guide line during a drag.** Notes:
+
+**Affordances observed:** the guide appears only during the gesture, thin, high-contrast
+magenta, extending well past both frames, gone on release · selection frames carry corner AND
+edge handles + a center mark · a live "W: 187.82 px / H: 159.28 px" readout floats at the
+corner while resizing · a rotate cursor at frame corners (used — one image placed sideways).
+
+**Her practice (shapes the spec):** alignment is available but the composition stays LOOSE —
+varied scales, deliberate slight overlaps, some rotation, generous white ground; text typed
+directly on canvas at many sizes (display word · quotes with attributions · tiny captions
+beside images). **Therefore: snapping is a whisper, never a grid** — small threshold (~6 world
+px), easy to drift past, ⌘/Ctrl refuses, edges + centers only.
+
+**Settled by the references:** guide color = magenta (`#e83e8c`-family against the paper
+ground; exact value at build) · gesture-only · full-length lines. **Bundled (owner offered,
+default yes):** the live W×H readout during a resize. **Observed, NOT proposed:** rotation —
+ruled out v1 long ago; recorded as artist-practice evidence for the aesthetics phase's
+re-entry question, the owner's call then.
+
 ## 5 · Stages & proof
 
 1. `geometry.ts` (pure: box math, alignment-candidates if guides ruled in) + tests.
