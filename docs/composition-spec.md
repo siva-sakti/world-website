@@ -76,6 +76,9 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 | **peek** | tap a chip → a floating glimpse of the target beside it, with a door to open it. *Shipped Aug 2026.* |
 | **block** | a pulled-in thing rendered **in place** in the flow — preview-sized. *Ruled, unbuilt.* ⚑ *the word is overloaded (Notion's paragraph word) — naming session item.* |
 | **frame** | ⛔ **not used in this spec.** The word belongs to the board's alignment feature (other track). |
+| **toggle** | a **collapsible section**: a line of text with a triangle; click to unfold hidden content beneath it, click to fold it away. Manages length in long pieces. ⚠ Collapsed content is invisible content — and a search hit inside a fold must open it. ⚪ in/out of v1 |
+| **callout** | a **boxed aside** — tinted, often with an icon — set apart from the flowing text (*"💡 Remember: the deadline moved"*). Emphasis, not structure. 🔵 Claude's lean: **out of v1** — a quote block already sets text apart, and it is trivial to add later |
+| **frame (the three)** | in this spec, **floater · side panel · full page** — the three windows onto one composition. Not related to the board's alignment feature. |
 
 **3.4 · The laws**
 
@@ -338,7 +341,7 @@ Returns everything carrying that word — bits, boards, and now compositions, mi
 **In** *(the converged core; every source agrees — `research-block-editors.md`)*:
 paragraph · headings *(2 levels)* · bulleted list · numbered list · **checklist** · quote · divider · code · **table** · image · **the pulled-in thing** (chip or block, §9)
 
-**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · toggles *(⚪ the research puts toggle in Notion's core; the owner's Notion session decides)* · equations · embeds · callouts *(⚪ maybe)*
+**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · **toggles** *(collapsible sections — see glossary; ⚪ the research puts them in Notion's core set, and they are the only block that manages LENGTH; the owner's Notion session decides)* · equations · embeds · **callouts** *(boxed asides — see glossary; 🔵 Claude's lean: leave out of v1, add later if missed)*
 
 **Already installed but unexposed:** headings · lists · quote · divider · code ship inside the editor library today with **no UI to reach them** — much of v1 is surfacing, not building.
 
