@@ -22,6 +22,8 @@
 **Provenance discipline — how this document guards against invention:**
 Every claim here traces to one of four sources: **an owner ruling** (quoted or dated) · **shipped code** (verified in the repo) · **a Claude proposal, marked 🔵** · or **⚪ open**. A claim with no source is a defect. *(This discipline exists because an audit on 2026-09-02 found three Claude inventions written as settled: the recursion guard, the silent-bit-hood forbidden-list, and the drawer's focus requirement — all now marked 🔵.)*
 
+**The verification pass (owner-set method, 2026-09-02):** when this document is complete, **every claim is traced back to its source in one systematic pass** — ruling, code, or marked proposal. Claims that cannot be traced are corrected or marked ⚪ before the spec is called done. *The owner: "it might take a bit of tokens, but to me it's worth it."*
+
 **The three rules for anyone extending this document:**
 1. **Amend in place.** Never add a contradicting layer below. *(This rule exists because it was broken — see `aerial-review-findings.md`.)*
 2. **Every ruling names its owner.** If you cannot say who decided something, it is ⚪ or 🔵, never RULED.
@@ -234,3 +236,62 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 | a chip is deleted from the body | the reference row is removed at the next save |
 | the save fails mid-reconcile | the body is the truth; references re-derive on the next successful save *(self-healing)* |
 | ⚪ a bit that already contains chips (historical) | migration cleans them up — the owner has ruled her existing data expendable |
+
+## 10 · On a board
+
+### 10.1 The card
+1. A placed composition renders as a card on the canvas, **visibly different from a bit-card** *(owner-ruled; the difference must be legible at a glance)*.
+2. ⚪ **What it shows: its title only, or its title plus the opening lines of the writing?** *(Today's built behavior is title + a faint preview. Decided by a specimen, not argument — the code window builds two and the owner points.)*
+3. ⚪ Whether the card is resizable, and whether size changes what it shows.
+4. **Tap → the floater opens** (§5). The card does not navigate away.
+5. Otherwise it behaves as any card: moved, selected, marquee-selected, moved together with others.
+6. ⚪ **Connectors (arrows) to a composition's card** — the connector feature is unbuilt and parked; if ever built, a composition's card is an ordinary card and participates.
+
+### 10.2 Placement
+1. **At birth from a board:** placed automatically on that board *(owner-ruled)*.
+2. **Later:** from the composition's own page, "place on a board…" — offering only boards it is not already on.
+3. **On many boards at once:** each placement independent — its own position, its own card. Un-placing from one leaves the others untouched.
+4. **Un-place** removes the card from that board; the composition is unaffected and remains in the list. The placement record survives *(travel history — I-L2)*.
+5. ⛔ **A composition is never "loose."** Un-placed from everywhere, it lives in the compositions list — it never appears in the bits inbox.
+6. ⚪ Where a newly-placed card lands *(the existing find-a-clear-spot logic is the presumed answer)*.
+
+### 10.3 The hide-pieces toggle *(owner-ruled)*
+1. A per-board control hides **all** composition-cards on that board.
+2. **Presentation only:** placements are untouched; the compositions stay placed and related; nothing is un-placed, moved, or deleted.
+3. Purpose, in the owner's words: *"if you just want to compose but don't want to see them on your surface, and you want them to be linked and related."*
+4. ⚪ Whether the toggle's state persists per board (stored) or is per session (local).
+
+## 11 · States
+
+*Three mutually exclusive states, inherited from the app's existing resting model (D-127): **live · archived · trashed**.*
+
+### 11.1 Live
+The default. Appears in the compositions list, in search, on its boards, and in the picker.
+
+### 11.2 Archived — **read-only** *(owner-ruled)*
+| aspect | behavior |
+|---|---|
+| the composition | opens **greyed and readable; not editable** |
+| returning to work | one visible **"bring back to edit"** control → returns to live |
+| its **chips** in other writing | greyed, **still enterable** — tapping opens it, clearly marked archived |
+| its **card** on boards | ⚪ *proposed: greyed, present, still opens — matching its chips. Never stamped.* |
+| the `[[` **picker** | **excluded** *(owner-stamped)* |
+| **search** | ⚪ *included or excluded? Archive means "out of my active world," but find has been the deliberate way back. Undecided.* |
+| the compositions list | out of the main view; reachable through the archive |
+
+### 11.3 Trashed
+| aspect | behavior |
+|---|---|
+| the composition | frozen: out of the list, out of search, not editable |
+| its **card** on boards | **vanishes**; on restore it **returns to its exact place** *(placement rows survive underneath)* |
+| its **chips** in other writing | greyed and **frozen**; tapping says *"this is in your trash — bring it out to see it"*, with a restore door |
+| **restore** | returns it **whole** — star intact, placements intact, references intact |
+| the trash page | lists it alongside trashed bits and boards |
+
+### 11.4 Destroyed
+1. Only by **emptying the trash** — the app's one irreversible act *(D-125)*.
+2. Removes the composition, its placements, and its references **in both directions**.
+3. Chips pointing at it **degrade to plain text** (§9.8).
+
+### 11.5 What is never a state ⛔
+"Draft" · "published" · "finished" — ⚪ *the last is the parked **pieces** idea (F-series), testable today with a `finished` tag; it is not part of this spec.*
