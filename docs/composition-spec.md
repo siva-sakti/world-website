@@ -511,7 +511,7 @@ Headings are not only formatting: they are **the document's structure**, and eve
 A composition can show its own contents — its headings, in order, as a navigable list. Clicking an entry jumps to it.
 - ⚪ **Where it lives:** a panel beside the writing · a collapsible block at the top · the drawer as another tab.
 - 🔵 **It should be a view of the headings, never a thing you maintain** — it updates as you write.
-- 🔵 **The strong version:** reordering entries in the contents **reorders the document**. Pairs with §20.5's heading-drag question — if a heading carries its section, the contents becomes the document's outline control.
+- ⛔ **It is navigation only.** *(Claude had proposed that reordering the contents reorders the document; the owner: "I don't think table of contents and heading dragging are the same feature at all." Correct — separated.)*
 
 ### 20.3 A read/write lock *(owner: "that's a great feature idea")*
 A composition can be **locked to reading** — the cursor is not live, the text cannot be changed by accident, and the piece can be read as a piece. One control returns it to writing.
@@ -524,20 +524,29 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 - ⚪ Whether the bound is steps, time, or session.
 - ⚠ **Undo must cover the pulled-in acts too** — inserting a chip, converting chip↔block, collapsing a toggle — not only typed characters. Reference rows follow the body at the next save (§9.4.4).
 
-### 20.5 Moving blocks — the design space *(owner: "I don't know if you've really thought about this" — correct; here it is)*
-| question | options | 🔵 lean |
+### 20.5 What drags, and what does not *(owner-corrected, 2026-09-02 — Claude had imported Notion's model unexamined)*
+
+**The owner's distinction, and it is the right one:** *text is flow* — you edit it with the keyboard, select it, cut and paste it. *An image is a thing* — it has a shape and takes up space, so dragging it makes sense. **Draggability follows from thing-ness, not from calling everything a "block."**
+
+> Her words: *"I don't think we should allow people to drag headings like text — it should still be backspace and copy and paste as the main thing… maybe the block should drag because they're taking up space; every block is not going to behave like an image, because it's a shape."*
+
+**The fork:**
+| model | what drags | cost |
 |---|---|---|
-| **Drag a heading — does its section follow?** | just the heading (Notion's answer) · **the heading takes everything under it** to the next equal heading | **takes its section** — it makes reorganising one gesture, and makes §20.2's contents a real outline control |
-| **Drop onto a collapsed toggle** | goes inside (invisibly) · lands after it · **unfolds it first, then drops in** | **unfold first** — silently hiding just-moved content loses work |
-| **Several blocks at once** | one at a time · multi-select then drag | ⚪ — multi-select exists on boards; unclear it is wanted here |
-| **A block that IS a pulled-in thing** | — | drags like any other block; no special case |
+| **Notion** | everything — paragraphs, headings, lists | handles everywhere; the surface feels riggy; dragging competes with selecting |
+| **Docs — the owner's lean** | **objects only**: images · tables · pulled-in things | text moves by cut/paste (universal muscle memory); the page stays calm |
+| hybrid | objects **+ containers** (a toggle holds things, so it may want to move as a unit) | one extra case to explain |
+
+🔵 **Claude's read after the correction: the Docs model.** Dragging text is what makes block editors feel fiddly, and cut/paste is what people already do. **It also dissolves the heading question entirely** — you move a section by selecting and cutting it, which needs no rule about what a heading "carries."
+⚪ **Open: does a toggle drag as a unit?** It is a container, so it is the one genuine hybrid case.
+⚠ **Consequence for §13.3:** the eight interaction musts include *"a hover drag-handle moves a block"* — that came from Notion research and **must be re-scoped to objects** if this lean holds.
 
 ### 20.6 Affordances — what is clickable *(the owner's framing: "what do they click, what can they not click")*
 | thing | clickable? | what happens |
 |---|---|---|
 | a **chip** | ✅ | opens the peek |
 | a **block's content** (the image, the quoted text) | ✅ | opens the peek — same as its chip form |
-| **text inside a block** | ⚪ | selectable for copying, or an atom like a chip? **Unresolved — affects whether a reader can quote from a pulled-in quote.** |
+| **text inside a block** | ✅ **selectable and copyable** *(owner-ruled: "any text can be copy and pasted by the user — they'd just put their mouse over it")*. It is text on the screen and behaves like text. |
 | a **drag handle** | ✅ on hover | drag to move · click for the block menu |
 | a **toggle's line** | ✅ | folds/unfolds |
 | the **title / subtitle** | ✅ when writable | edits in place; ⛔ inert when read-locked (§20.3) |
