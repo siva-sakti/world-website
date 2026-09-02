@@ -65,7 +65,7 @@ export function useArrangeActs(deps: {
 
   /** Apply a set of positions, skipping cards that no longer exist — the survivor rule
    *  (antagonist D4), which now lives ONCE in act-rules.ts and is tested there. It used
-   *  to be spelled out here AND in use-board-acts, the same loop twice. */
+   *  to be spelled out here AND in remove-acts, the same loop twice. */
   async function applyAll(entries: { bitId: string; pos: Pos }[]): Promise<void> {
     await runLegs(entries.map((e) => () => applyPos(e.bitId, e.pos)));
   }

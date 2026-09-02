@@ -1,7 +1,7 @@
 // THE BOARD'S ACT RULES — the decisions its acts make, with the machinery removed.
 //
 // No React, no Supabase, no DOM: everything here is a plain function of its inputs,
-// which is the whole point. The act layers (use-board-acts, use-arrange-acts) are the
+// which is the whole point. The act layers (remove-acts, use-arrange-acts) are the
 // densest bug-fix code on the board and had ZERO test coverage, because every rule was
 // tangled up with a promise chain or a setState. These are the parts that could be
 // untangled, so the rules are now pinned by tests even though the plumbing isn't.
@@ -16,7 +16,7 @@
  *  at the first failure left the board HALF-undone and killed the undo entry: a card
  *  that no longer exists has nothing to reverse and must not block its neighbours.
  *
- *  This was WRITTEN TWICE — `allLegs` in use-board-acts and `applyAll` in
+ *  This was WRITTEN TWICE — `allLegs` in remove-acts and `applyAll` in
  *  use-arrange-acts, the same loop, the same counters, the same final throw. Both
  *  comments credited the same ruling, and the second one even said it was "reused
  *  here" before copying the code. One definition now, under test. */

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { useBoardActs } from "./use-board-acts.ts";
+import { removeActs } from "./remove-acts.ts";
 
 // THE FOUR REMOVE GESTURES, driven for real against fake doors.
 //
-// This is the coverage the D-stage collapse was missing. useBoardActs has no React
+// This is the coverage the D-stage collapse was missing. removeActs has no React
 // hooks in it — it is a plain function of its arguments — so once the db calls and the
 // confirm dialog are passed IN rather than imported, the whole thing can be driven
 // here: un-place / trash, one card / many, each with its rollback, its refused-flush
@@ -19,15 +19,7 @@ function card(bitId, extra = {}) {
   };
 }
 
-/** A whole fake board. `acts` is the module under test, wired to spies.
- *
- *  The eslint disable below is a false positive worth understanding rather than just
- *  silencing: the rule fires on the NAME. `useBoardActs` is named like a React hook
- *  but is not one — it calls no React hooks, it is a plain function of its arguments.
- *  That is precisely why it can be driven from a test at all. (Its siblings
- *  `useCreateDoors` and `useArrangeActs` ARE real hooks — they hold refs and effects.
- *  So the name is a genuine mismatch; renaming it is a signature change, so it is
- *  flagged for the owner rather than done here.) */
+/** A whole fake board. `acts` is the module under test, wired to spies. */
 function makeBoard(initial, opts = {}) {
   const log = { unplaced: [], trashed: [], restored: [], calledIn: [], locked: [], forgot: [], errors: [], looseRefreshes: 0, confirms: [] };
   let cards = [...initial];
@@ -38,8 +30,7 @@ function makeBoard(initial, opts = {}) {
   const fail = { on: opts.failOn ?? null }; // a bitId whose db write rejects
   const flushRefusedFor = opts.flushRefusedFor ?? null;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- not a hook; see makeBoard's note
-  const acts = useBoardActs({
+  const acts = removeActs({
     supabase: {},
     boardId: "board-1",
     get cards() { return cards; },

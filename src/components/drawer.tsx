@@ -11,7 +11,8 @@ import { SearchablePicker } from "@/components/searchable-picker";
 // filterable by type/tag/source, reachable from a tab. It has TWO HOMES and the
 // same clothes in both; only the act at the end differs (N4b):
 //
-//   board — "where" scope (unplaced first), click PLACES the bit on this board;
+//   board — "where" scope (default "not on this board" — the set you can actually
+//           bring in, loose ones first), click PLACES the bit on this board;
 //           a bit placed on a second board lives on both (multi-board).
 //   note  — click GATHERS the bit into the writing at your caret; the note itself
 //           is excluded, and rows already gathered say so.
@@ -23,7 +24,7 @@ import { SearchablePicker } from "@/components/searchable-picker";
 // at this scale; server-side search + paging is the named scale trigger).
 
 type TypeFilter = "all" | "text" | "image" | "drawing" | "audio" | "pdf" | "link";
-type Scope = "loose" | "this" | "other" | "all";
+type Scope = "notHere" | "loose" | "this" | "other" | "all";
 type Kind = "all" | "bit" | "note"; // the drawer's primary split (owner: bits · notes · all)
 
 function faceOf(it: PanelBit): string {
@@ -61,7 +62,7 @@ export function Drawer(props: BoardMode | NoteMode) {
   const [thumbs, setThumbs] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scope, setScope] = useState<Scope>("loose");
+  const [scope, setScope] = useState<Scope>("notHere");
   const [kind, setKind] = useState<Kind>("all");
   const [query, setQuery] = useState("");
   const [tagId, setTagId] = useState("");
@@ -135,6 +136,10 @@ export function Drawer(props: BoardMode | NoteMode) {
     // keeps it off the screen). N4b §6.1.
     if (!onBoard && n.id === props.excludeId) return false;
     if (kind !== "all" && n.kind !== kind) return false;
+    // "not on this board" — everything you could bring in: loose bits AND bits that
+    // live on OTHER boards. A bit sits on a board at most once (placement_bit_once),
+    // so "can I place this here?" is exactly "is it not already here?" (owner, 2026-09-02).
+    if (onBoard && scope === "notHere" && onThis(n)) return false;
     if (onBoard && scope === "loose" && !isLoose(n)) return false;
     if (onBoard && scope === "this" && !onThis(n)) return false;
     if (onBoard && scope === "other" && (isLoose(n) || onThis(n))) return false;
@@ -147,8 +152,9 @@ export function Drawer(props: BoardMode | NoteMode) {
     }
     return true;
   });
-  // "all" shows loose first; JS sort is stable, so newest-first holds within groups.
-  if (onBoard && scope === "all") {
+  // "all" and "not on this board" show loose first; JS sort is stable, so newest-first
+  // holds within each group.
+  if (onBoard && (scope === "all" || scope === "notHere")) {
     filtered = [...filtered].sort((a, b) => (isLoose(b) ? 1 : 0) - (isLoose(a) ? 1 : 0));
   }
 
@@ -222,8 +228,10 @@ export function Drawer(props: BoardMode | NoteMode) {
     { key: "note", label: "notes" },
     { key: "all", label: "all" },
   ];
-  // "Where" — the placement filter, default unplaced (mostly you see not-yet-placed).
+  // "Where" — the placement filter. Default "not on this board": the set you can
+  // actually bring in. "unplaced" is the stricter cut (on NO board anywhere).
   const SCOPES: { key: Scope; label: string }[] = [
+    { key: "notHere", label: "not on this board" },
     { key: "loose", label: "unplaced" },
     { key: "this", label: "this board" },
     { key: "other", label: "other boards" },

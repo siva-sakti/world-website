@@ -27,7 +27,7 @@ import { useCamera } from "./use-camera";
 import { useBoardKeys } from "./use-board-keys";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
-import { useBoardActs } from "./use-board-acts";
+import { removeActs } from "./remove-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
 import { useMeaningActs } from "./use-meaning-acts";
@@ -234,7 +234,13 @@ export function BoardSurface({
     removesInFlight.current.add(p);
     void p.finally(() => removesInFlight.current.delete(p));
   };
-  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = useBoardActs({
+  // removeActs never reads cardsRef.current during render: every read is inside an async
+  // reverse (reviveOne / unplaceOne / trashOne), which is the whole POINT of passing the
+  // ref rather than a snapshot — a reverse must resolve the card as it is NOW. The rule
+  // fires only because removeActs is no longer named `use*` (2026-09-02 rename — it is
+  // not a hook); useArrangeActs and useMeaningActs take the same ref and aren't flagged.
+  // eslint-disable-next-line react-hooks/refs -- see above
+  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = removeActs({
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
     setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,

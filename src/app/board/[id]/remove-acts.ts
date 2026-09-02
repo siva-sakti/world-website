@@ -10,7 +10,7 @@ import { runLegs, countLabel, trashOneConfirm, trashManyConfirm } from "./act-ru
  *  so these seven calls were the ONLY thing standing between the board's most
  *  dangerous code and an automated test. Importing them by name also meant a test
  *  runner could not load the file at all (the `@/` paths don't resolve outside the
- *  Next build). board-surface.tsx passes the real ones; use-board-acts.test.mjs
+ *  Next build). board-surface.tsx passes the real ones; remove-acts.test.mjs
  *  passes fakes and drives all four gestures, their rollbacks, and undo/redo.
  *
  *  Deliberately structural, not `typeof unplaceBit` etc.: a test's fake should have
@@ -45,7 +45,7 @@ export type RemoveDoors = {
 // lies (a reload would resurrect it). Exception: the "no longer exists" throw means
 // the row is already gone (e.g. the leftover of a failed create) — removal from the
 // screen is then CORRECT; restoring would resurrect an un-removable zombie.
-export function useBoardActs(deps: {
+export function removeActs(deps: {
   supabase: SupabaseClient;
   boardId: string; // the revive (undo of un-place) needs its board
   cards: CardVM[];

@@ -51,7 +51,7 @@ Only actions enter undo. This is the ruled deliberate-vs-reflex carve (owner, 20
 | **click-to-front (reflex)** | inside `board-surface.tsx` `select()` — embedded in *selection* | → `patchCard` — indistinguishable from a deliberate z act |
 | **auto-widen (reflex)** | `card.tsx` (~:151) | → the same `onChange({w})` as a hand resize |
 | lock / unlock | `board-surface.tsx` toggleLock | direct db call, **own inline optimistic+rollback** |
-| un-place / trash (single+bulk) | `use-board-acts.ts` | direct db calls, **own hardened rollback + evaporate contract** |
+| un-place / trash (single+bulk) | `remove-acts.ts` | direct db calls, **own hardened rollback + evaporate contract** |
 | tag / untag | `tag-bar.tsx` | **its own supabase client**, own optimistic+revert, own error copy |
 | set / clear source | `source-picker.tsx` | **its own supabase client**, own error handling; card patches VM only |
 | creates (8+ doors) | `use-create-doors.ts` (566 lines) | own orchestration + trackCreate |
@@ -65,7 +65,7 @@ Only actions enter undo. This is the ruled deliberate-vs-reflex carve (owner, 20
   chains (no reorder on the wire), capture-at-fire with restore-on-failure, flushAll over
   timers ∪ pending ∪ in-flight, the settled-create gate. Hardened by four review rounds; each
   round found real bugs now fixed and comment-documented.
-- **The remove acts (`use-board-acts`, 185): A−.** Optimistic with per-failure rollback, the
+- **The remove acts (`remove-acts`, 295): A−.** Optimistic with per-failure rollback, the
   already-gone carve, the evaporate contract, the forget() sweep. Same hardening history.
 - **The model-side story: A.** Trash/archive/travel/destroy already match Part 1's ideal almost
   exactly. The database has always treated acts as first-class (records of acts).
@@ -78,7 +78,7 @@ Only actions enter undo. This is the ruled deliberate-vs-reflex carve (owner, 20
    report. **Two deliberately different policies, not five copies of one** — the refactor must
    preserve both, named. (b) tag-add and source-pick are *pessimistic* (await-then-paint), only
    their removes are optimistic. What IS true: the discrete revert-on-failure pattern is
-   hand-built in `use-board-acts`, `toggleLock`, `tag-bar.remove`, `source-picker.clear`,
+   hand-built in `remove-acts`, `toggleLock`, `tag-bar.remove`, `source-picker.clear`,
    `board-title` — and five MORE times in `use-create-doors` (out of scope, queued). Also: the
    "own supabase clients" jab is cosmetic — `createBrowserClient` returns a singleton.
 2. **Intent exists structurally but is recorded nowhere.** Your drag and the click-lift reflex
@@ -316,7 +316,7 @@ undoable (ruled out) · persist the stack (session memory, the three-layer save 
 |---|---|---|
 | 1 | the act engine + the pure undo stack (own files, unit-tested like camera-storage) | none |
 | 2 | arranging acts move in: drag · resize · nudge · tidy · z · lock; reflexes re-pointed at the raw door | none (identical on screen) |
-| 3 | keeping acts join: un-place/trash wrap the hardened `use-board-acts` internals | none |
+| 3 | keeping acts join: un-place/trash wrap the hardened `remove-acts` internals | none |
 | 4 | meaning acts join: tags + source onto the engine (their private copies die) | none |
 | 5 | ↶ ↷ ship: toolbar buttons + ⌘Z/⌘⇧Z, labels from act names | **undo/redo exists** |
 | — | `use-create-doors` trim: **its own later pass** — creates are outside undo's scope; bundling it here is the kitchen-sink failure | — |

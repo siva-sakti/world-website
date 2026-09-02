@@ -21,7 +21,7 @@ Teach the model *by doing*, not a slideshow. A new user arrives empty.
 ## Arc 2 · ARRANGE (compose in space — a board)
 - ✅ make a board · bring loose bits in (side-panel/call-in) · drag·resize·stack · multi-select move-together · arrows (connectors)
 - 🔲 board-on-board doorway · ✅ **note-on-board = a page-shaped doorway** (N3 — ~200×260 default, resizable)
-- ⚙ **technically:** `board` + `placement` (x·y·w·h·z, per-board); `callInBit` (insert-or-revive a departed leg, no dup); `board-surface.tsx` (the canvas — **broken up in N2: 699→362, via `use-create-doors` + `use-board-acts`**); `connector` rows. Note-doorway = a `kind==='note'` branch in `card.tsx` rendering a page-shaped card → `/note/[id]` (`kind` reaches the card via `getBitMeta`).
+- ⚙ **technically:** `board` + `placement` (x·y·w·h·z, per-board); `callInBit` (insert-or-revive a departed leg, no dup); `board-surface.tsx` (the canvas — **broken up in N2: 699→362, via `use-create-doors` + `remove-acts` (renamed from `use-board-acts`, 2026-09-02: it is not a React hook)**); `connector` rows. Note-doorway = a `kind==='note'` branch in `card.tsx` rendering a page-shaped card → `/note/[id]` (`kind` reaches the card via `getBitMeta`).
 
 ## Arc 3 · WRITE & GATHER (compose in words — a note)
 - ✅ write (`✎ write` / the note's page) · gather bits (`[[` → chip, tap=peek) · see **"gathered into"**
