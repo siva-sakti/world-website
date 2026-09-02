@@ -6,7 +6,7 @@ import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
-import { placeBitsOnBoard, trashBits } from "./actions";
+import { placeBitsOnBoard, trashBits, archiveBits } from "./actions";
 import { SearchablePicker } from "@/components/searchable-picker";
 import { confirm } from "@/components/confirm";
 import type { ShelfGroup } from "@/lib/db/shelf";
@@ -84,6 +84,27 @@ export function NotesBrowser({
       setBulkPending(false);
     }
   }
+  /** Archive the selection — set aside, hidden but kept, reversible from /archive.
+   *  No confirm, by owner ruling (2026-09-02): archive is reversible, so it does not
+   *  earn the interruption that trash does. */
+  async function bulkArchive() {
+    if (bulkPending || selectedIds.size === 0) return;
+    setBulkPending(true);
+    setBulkErr(null);
+    try {
+      const res = await archiveBits([...selectedIds]);
+      if (res.error) {
+        setBulkErr(res.error);
+        return;
+      }
+      exitSelect(); // the archived bits drop from the live list (revalidate)
+    } catch {
+      setBulkErr("Couldn't archive those — try again.");
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
   async function bulkTrash() {
     if (bulkPending || selectedIds.size === 0) return;
     const n = selectedIds.size;
@@ -276,6 +297,14 @@ export function NotesBrowser({
             disabled={bulkPending || selectedIds.size === 0}
             title="send the selected bits to a board"
           />
+          <button
+            onClick={() => void bulkArchive()}
+            disabled={bulkPending || selectedIds.size === 0}
+            className="text-neutral-500 underline underline-offset-2 hover:text-neutral-800 disabled:text-neutral-300 disabled:no-underline"
+            title="Archive the selected bits — set aside in your archive, un-archive anytime"
+          >
+            archive
+          </button>
           <button
             onClick={() => void bulkTrash()}
             disabled={bulkPending || selectedIds.size === 0}

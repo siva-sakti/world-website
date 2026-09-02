@@ -172,6 +172,45 @@ A spatial top strip: star a surface → it lands on the home board → drag to a
 
 **Empty home = the first impression.** A brand-new user has no surfaces, so home is empty on first run — that's onboarding's job (**N7**), and this arc feeds it: home's empty state should invite the first board / first note.
 
+## 4d · ARCHIVE REACHES EVERY BIT (owner-flagged 2026-09-02, while testing the archive fix)
+
+**The owner's words:** *"I was just checking the archive and I'm guessing by home you mean from the
+loose bits page — the problem is I don't think we have a way to archive directly from the loose bits
+page. We have trash, we have multi-select, we have all that, but we don't have archive."*
+Earlier ruling, same day: *"every bit should be able to be put away — and by put away we mean
+archiving and/or trash. They should all be treated the same way… simple, moving throughout the whole
+app, for it to be the same way."*
+
+**Verified first — the data path ALREADY WORKS end to end. This is a missing button, not a missing
+mechanism, and needs no migration:**
+`archiveBit` stamps `archived_at` → the generated `state` column becomes `'archived'` →
+`listAllBits` filters `.eq("state","live")` (`db/inbox.ts:28`) so the bit LEAVES `/bits` →
+`archive_listing` selects `state='archived'` (`20260830000002_archive.sql:7`) so it APPEARS in
+`/archive` → `unarchiveItemAction` reverses it. Nothing else to build underneath.
+
+**What is actually missing — the control, in two places:**
+
+| # | Where | Work |
+|---|---|---|
+| 1 | **Bulk on `/bits`** — beside the existing bulk trash in the selected-bar (`notes-browser.tsx:271-287`) | a server action `archiveBits(ids)` mirroring `trashBits` (`bits/actions.ts:198-215`) line for line, + one button |
+| 2 | **`/bit/[id]`** — the bit's own page has NO archive control at all | one line: `<ArchiveButton thing="bit" id={b.id} returnTo="/" />`, exactly as `/note/[id]:60` already does |
+
+(A *per-row* control on the list is deliberately NOT proposed: multi-select already covers it, and
+every row gaining a third verb makes the list noisier for no new power.)
+
+**Terminology finding, owner's call.** The app had TWO words for this act: the live control says
+**"archive"** (`archive-controls.tsx:70`); the dead `BitArchive` deleted in this session's stage A
+said **"put away" / "take back out"**. With the dead one gone the live vocabulary is "archive" —
+used here unless the owner rules otherwise. (`lexicon.md` governs; worth a line there either way.)
+
+**No confirm dialog**, matching the existing single archive button: archive is reversible and
+non-destructive, unlike trash (which does confirm, and should). Flagged as a choice, not an oversight.
+
+**Risk: low.** No schema change, no migration, no new pattern — the server action is a copy of a
+proven one, and the button already exists as a component. **Proof:** the four gates, then the owner:
+select bits on `/bits` → archive → they leave the list → they appear in `/archive` → take one back
+out → it returns.
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.

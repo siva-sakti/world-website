@@ -9,6 +9,7 @@ import { listGroups } from "@/lib/db/shelf";
 import { GroupPicker } from "@/components/shelf-controls";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash } from "./bit-controls";
+import { ArchiveButton } from "@/app/archive/archive-controls";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
@@ -87,6 +88,11 @@ export default async function BitPage({
       <header className="mb-8 flex items-baseline justify-between text-sm">
         <span className="font-semibold text-neutral-400">bit</span>
         <div className="flex items-baseline gap-5">
+          {/* The full range, matching /note/[id]: archive (set aside, reversible) then
+              trash. The bit page had only trash — a bit could be thrown away but never
+              put away (owner, 2026-09-02). `noun` because "bit" is the right word here;
+              the note page keeps the default. */}
+          <ArchiveButton thing="bit" id={b.id} noun="bit" returnTo="/bits" />
           <BitTrash bitId={b.id} />
         </div>
       </header>

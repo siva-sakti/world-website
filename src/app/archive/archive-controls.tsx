@@ -16,11 +16,18 @@ export function ArchiveButton({
   id,
   returnTo,
   compact = false,
+  noun,
 }: {
   thing: "bit" | "board";
   id: string;
   returnTo?: string;
   compact?: boolean;
+  /** What to CALL this in the confirm. `thing` is the storage kind (bit rows hold
+   *  both bits and notes), so it cannot answer this on its own — the call site knows.
+   *  Defaults to the old wording, which read "note" for every bit: correct on the note
+   *  page, wrong on a photo or a PDF, and only exposed once /bit/[id] gained this
+   *  button (2026-09-02). */
+  noun?: string;
 }) {
   const router = useRouter();
   const [supabase] = useState(() => createClient());
@@ -41,7 +48,7 @@ export function ArchiveButton({
         ? `This is on ${n} board${n === 1 ? "" : "s"} — archiving hides it from ${
             n === 1 ? "it" : "them"
           } until you un-archive.`
-        : `Archive this ${thing === "board" ? "board" : "note"}? It's set aside in your archive — un-archive anytime.`;
+        : `Archive this ${noun ?? (thing === "board" ? "board" : "note")}? It's set aside in your archive — un-archive anytime.`;
     if (!(await confirm({ message: msg, confirmLabel: "Archive" }))) return;
     setBusy(true);
     setFailed(false);

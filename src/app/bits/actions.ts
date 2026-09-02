@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/require-user";
 import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
+import { archiveBit } from "@/lib/db/resting";
 import { uploadObject, removeObjects } from "@/lib/storage";
 import { getBoardCards } from "@/lib/db/boards";
 import { anchorNearContent, pointForIndex } from "./placement-anchor";
@@ -195,6 +196,38 @@ export async function captureLink(
 /** Bulk trash from the loose multi-select (owner-ruled 2026-08-31). Trash is a freeze —
  * everything lands in /trash, restorable — so best-effort like the bulk send: a failure is
  * reported, the rest still land. */
+/** Archive the selected bits — set aside, hidden but kept, reversible from /archive.
+ *  Mirrors trashBits exactly (same loop, same partial-failure reporting): each bit is
+ *  independent, so one failure must not abandon the rest, and the owner is told whether
+ *  it was all of them or some.
+ *
+ *  No confirm here, by owner ruling (2026-09-02) — archive is reversible, unlike trash.
+ *  NOTE the asymmetry that leaves: the SINGLE archive button (archive-controls.tsx:45)
+ *  does ask. Flagged to the owner, deliberate, not an oversight.
+ *
+ *  Revalidates /bits (the bit leaves the live list — listAllBits filters state='live')
+ *  and /archive (where it now appears), the same pair archiveItemAction uses. */
+export async function archiveBits(ids: string[]): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  await requireUser(supabase);
+  let failed = 0;
+  for (const id of ids) {
+    try {
+      await archiveBit(supabase, id);
+    } catch (e) {
+      failed++;
+      console.error("archiveBits: a bit failed:", e);
+    }
+  }
+  revalidatePath("/bits");
+  revalidatePath("/archive");
+  revalidatePath("/");
+  if (failed) {
+    return { error: failed === ids.length ? "Couldn't archive those — try again." : "Couldn't archive some of those." };
+  }
+  return {};
+}
+
 export async function trashBits(ids: string[]): Promise<{ error?: string }> {
   const supabase = await createClient();
   await requireUser(supabase);
