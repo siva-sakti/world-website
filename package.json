@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "node --test 'src/**/*.test.mjs'"
+    "test": "node --import ./test-resolve-ts.mjs --test 'src/**/*.test.mjs'"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",

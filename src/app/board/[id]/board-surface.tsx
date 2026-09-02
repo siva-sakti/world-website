@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { updateBitContent, setPlacementLock } from "@/lib/db/bits";
+import {
+  updateBitContent,
+  setPlacementLock,
+  unplaceBit,
+  trashBit,
+  restoreBit,
+  callInBit,
+  getBitBoards,
+} from "@/lib/db/bits";
 import { MediaError } from "@/lib/media";
 import { Card } from "./card";
 import type { CardVM } from "./card-vm";
@@ -230,6 +238,10 @@ export function BoardSurface({
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
     setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,
+    // The db doors + confirm, passed IN (see RemoveDoors): the acts module has no
+    // React in it, so injecting these is what lets a test drive all four gestures
+    // with fakes. This is the production wiring.
+    doors: { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, confirm },
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {

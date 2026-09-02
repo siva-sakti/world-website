@@ -1,10 +1,36 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards } from "@/lib/db/bits";
 import type { useUndo } from "./use-undo";
-import { confirm } from "@/components/confirm";
 import type { CardVM } from "./card-vm";
 import { runLegs, countLabel, trashOneConfirm, trashManyConfirm } from "./act-rules";
+
+/** THE OUTSIDE WORLD, passed in rather than imported.
+ *
+ *  This module has no React hooks in it — it is a plain function of its arguments —
+ *  so these seven calls were the ONLY thing standing between the board's most
+ *  dangerous code and an automated test. Importing them by name also meant a test
+ *  runner could not load the file at all (the `@/` paths don't resolve outside the
+ *  Next build). board-surface.tsx passes the real ones; use-board-acts.test.mjs
+ *  passes fakes and drives all four gestures, their rollbacks, and undo/redo.
+ *
+ *  Deliberately structural, not `typeof unplaceBit` etc.: a test's fake should have
+ *  to satisfy the SHAPE the acts actually use, not import the db module to get it.
+ *  `callInBit` is typed by the one field this file reads (`id`). */
+export type RemoveDoors = {
+  unplaceBit: (s: SupabaseClient, placementId: string) => Promise<void>;
+  trashBit: (s: SupabaseClient, bitId: string) => Promise<void>;
+  restoreBit: (s: SupabaseClient, bitId: string) => Promise<void>;
+  callInBit: (
+    s: SupabaseClient,
+    args: {
+      bitId: string; boardId: string; placementId: string;
+      x: number; y: number; width?: number | null; height?: number | null; z?: number | null;
+    },
+  ) => Promise<{ id: string }>;
+  setPlacementLock: (s: SupabaseClient, placementId: string, on: boolean) => Promise<void>;
+  getBitBoards: (s: SupabaseClient, bitId: string) => Promise<{ id: string; title: string | null }[]>;
+  confirm: (spec: { message: string; confirmLabel?: string; cancelLabel?: string; danger?: boolean }) => Promise<boolean>;
+};
 
 // The board's REMOVE acts (I-W1: two distinct, labeled acts), singular and in bulk:
 //  · un-place — take the card off THIS board only; the bit lives on (travel keeps
@@ -48,11 +74,13 @@ export function useBoardActs(deps: {
   forget: (placementId: string) => void;
   setLooseRefresh: Dispatch<SetStateAction<number>>;
   onErr: (e: unknown) => void;
+  /** The db doors + the confirm dialog (see RemoveDoors). */
+  doors: RemoveDoors;
 }) {
   const {
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
-    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,
+    setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr, doors,
   } = deps;
 
 
@@ -83,7 +111,7 @@ export function useBoardActs(deps: {
     if (cardsRef.current?.some((c) => c.bitId === snap.bitId)) return; // already back (another door)
     setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
     try {
-      const p = callInBit(supabase, {
+      const p = doors.callInBit(supabase, {
         bitId: snap.bitId, boardId, placementId: snap.placementId,
         x: snap.x, y: snap.y, width: snap.w ?? null, height: snap.h ?? null, z: snap.z ?? 0,
       });
@@ -100,7 +128,7 @@ export function useBoardActs(deps: {
       // the other way. A failed re-lock is surfaced, not fatal; retrying the entry
       // would early-return on the already-back guard anyway.
       if (snap.locked) {
-        await chain(placement.id, () => setPlacementLock(supabase, placement.id, true)).catch((e) =>
+        await chain(placement.id, () => doors.setPlacementLock(supabase, placement.id, true)).catch((e) =>
           console.error("revive landed but the lock could not be re-applied:", e),
         );
       }
@@ -118,7 +146,7 @@ export function useBoardActs(deps: {
     try {
       const id = await settled(cur.placementId);
       if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
-      await unplaceBit(supabase, id);
+      await doors.unplaceBit(supabase, id);
       forget(cur.placementId);
       setLooseRefresh((n) => n + 1);
     } catch (e) {
@@ -140,7 +168,7 @@ export function useBoardActs(deps: {
    *  it), then the card back on screen. DB first, so a failed restore never paints a
    *  ghost card over a bit that is still frozen. */
   async function restoreOne(snap: CardVM): Promise<void> {
-    await restoreBit(supabase, snap.bitId);
+    await doors.restoreBit(supabase, snap.bitId);
     setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
   }
 
@@ -156,7 +184,7 @@ export function useBoardActs(deps: {
         const id = await settled(cur.placementId);
         if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
       }
-      await trashBit(supabase, snap.bitId);
+      await doors.trashBit(supabase, snap.bitId);
       if (cur) forget(cur.placementId);
     } catch (e) {
       if (cur) setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, cur]));
@@ -188,8 +216,8 @@ export function useBoardActs(deps: {
   async function removeLeg(kind: RemoveKind, card: CardVM): Promise<void> {
     const id = await settled(card.placementId);
     if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
-    if (kind === "unplace") await unplaceBit(supabase, id);
-    else await trashBit(supabase, card.bitId);
+    if (kind === "unplace") await doors.unplaceBit(supabase, id);
+    else await doors.trashBit(supabase, card.bitId);
     forget(card.placementId);
   }
 
@@ -269,8 +297,8 @@ export function useBoardActs(deps: {
    *  heavy act (it comes off EVERY board), so the confirm is honest about it (F16). */
   async function trashSelected(placementId: string, bitId: string) {
     let boards = 1;
-    try { boards = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
-    if (!(await confirm({ message: trashOneConfirm(boards), confirmLabel: "Trash", danger: true }))) return;
+    try { boards = (await doors.getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
+    if (!(await doors.confirm({ message: trashOneConfirm(boards), confirmLabel: "Trash", danger: true }))) return;
     removeGesture("trash", cards.filter((c) => c.bitId === bitId));
   }
 
@@ -284,10 +312,10 @@ export function useBoardActs(deps: {
     const bitIds = [...new Set(chosen.map((c) => c.bitId))];
     let shared = 0;
     try {
-      const counts = await Promise.all(bitIds.map((bid) => getBitBoards(supabase, bid)));
+      const counts = await Promise.all(bitIds.map((bid) => doors.getBitBoards(supabase, bid)));
       shared = counts.filter((boards) => boards.length > 1).length;
     } catch { /* fall back to the plain confirm */ }
-    if (!(await confirm({ message: trashManyConfirm(bitIds.length, shared), confirmLabel: "Trash", danger: true }))) return;
+    if (!(await doors.confirm({ message: trashManyConfirm(bitIds.length, shared), confirmLabel: "Trash", danger: true }))) return;
     removeGesture("trash", chosen);
   }
 
