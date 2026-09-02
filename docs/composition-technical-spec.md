@@ -74,6 +74,25 @@ Dropped from the old note-rows: `source_id` (ruled out) · face machinery (title
 | **C** | compositions get their OWN table, each shaped optimally | every shared behavior (tag · folder · star · place · reference) needs **two code paths, forever** |
 **B and C are both honest; A is not.** The session's question, in the owner's own framing: *what is genuinely shared between a board and a composition, and is that enough to be a real thing?*
 
+## 5c · 🌱 SEED FOR THE BACKEND SESSION (planted 2026-09-02 — read this first when the session starts)
+
+**The owner's lean, stated:** *"there should probably be a new way that we store compositions, and it's kind of like the same level of authority that we've been storing boards."* → **Option C: compositions get their own storage, as PEERS of boards.** Neither subordinate, neither conforming to the other's shape. *(She has now arrived here twice from different directions — first killing option A, then stating C positively.)*
+
+### What the session must decide (in order)
+1. **Confirm C** (or move to B — a shared `surface` table both boards and compositions move into as equals). C is the lean.
+2. **If C: what does a composition's table actually hold?** Designed from the composition's own needs, not copied from board: id · owner · title (nullable) · body · state (live/archived/trashed) · folder · star · visibility · timestamps · **the job facts (word target · due date · who it's for — S7)** · search index. *(Ask of each: does a composition need this because it's a composition, or because a board has it?)*
+3. **The relation columns — the real cost of C, and where it must be paid carefully:**
+   - `reference`: from = a composition. **to = a bit OR a composition** (two nullable columns + exactly-one CHECK).
+   - `placement`: target = a bit OR a board OR **a composition** (three nullable columns + exactly-one CHECK — this is the one that grows).
+   - `tag_application`: target = bit OR board OR **composition**.
+   *Under B these would each be one column fewer. That is the entire price of C — and it may be worth paying for honest shape.*
+4. **The shared behaviors and how they stay one thing, not two:** tag · folder · star · trash/archive/restore · search · export. **Decide the pattern once** (a shared helper layer? per-kind functions with one door?) rather than letting two code paths grow by accident. **This is where C fails if it fails.**
+5. **What the bit table returns to:** pure material — `kind` dropped entirely.
+6. **The migration order + the export lockstep (I-G1)** and which invariants change fate (see §2).
+
+### The principle to hold through it (the owner's)
+> *"Just because a composition can appear on a board analogous to a bit doesn't mean they are similar."* **Storage must reflect what each thing IS — never what it can appear inside.**
+
 ## 6 · ⚪ THE OPEN REGISTER (everything, honestly)
 **Owner:** **the backend/storage session** (all three components; supersedes the Q1 one-vs-two fork) · **the naming session** (the sweep list: route `/note`→? · "composition" vs the collision · chip/block blessing · the tie-word · drawer scopes) · her Notion feel-session (final toolkit cut).
 **Claude:** the card mock · frame-handoff design · floater mechanics detail (size/z/persistence) · drawer-docking detail · the enactment plan doc (from §1.3, for the code window).
