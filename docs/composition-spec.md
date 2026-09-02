@@ -449,3 +449,55 @@ Her words: *"a lot of the time something like Notion is trying to solve the fact
 
 ### 13.6 What the editor never does ⛔
 Auto-format your words into anything · auto-create bits from pasted content · write text you did not type *(the one exception: the date-time title at exit, §7)*.
+
+---
+
+# PART III · THE INTERFACE
+
+> 🔵 **This whole Part is Claude's draft.** The owner has been letting Claude carry UI decisions and plans **a refinement pass later** *(owner, 2026-09-02)*. Nothing here is an owner ruling unless it cites one. Treat it as a builder-usable default, not a settled design — **and expect it to change at her pass.**
+
+## 14 · The three frames — form and dimension
+
+### 14.1 The full page
+Single centred column for the writing — comfortable measure, not full-bleed. Top to bottom: **title** (large, editable in place) · **subtitle** (lighter, beneath) · **the body**. A quiet **footer** carries tags · folder · dates · job facts · "pulled into" · the boards it sits on. **The drawer** opens on the right, pushing the column left rather than overlaying it.
+
+### 14.2 The side panel
+The same content, narrower: title · subtitle · body, no footer by default *(a control reveals it)*. **Full toolkit.** Board remains visible and interactive to its left. ⚪ width: fixed, or draggable.
+
+### 14.3 The floater
+A small window over the canvas — **title and body only**; no subtitle field, no footer, **basic toolkit** *(owner-ruled)*, no drawer *(owner-ruled)*. Header carries: dock-to-panel · expand-to-page · close. Draggable by its header; ⚪ resizable.
+
+### 14.4 Moving between frames
+The chain is **floater → panel → page**, each a single control. **Content is never re-fetched or lost** across a move — same editor, same state, different container. ⚪ whether the movement animates or cuts.
+
+## 15 · Empty, loading, error — every screen
+
+| screen | empty | loading | error |
+|---|---|---|---|
+| **compositions list** | *"Nothing written yet"* + a **new composition** door — never a bare page | skeleton rows | the list's own error line; retry |
+| **a composition** (any frame) | a new one shows an empty body with the cursor in it — **no placeholder prose**, no hints beyond the first-run line *(`teaching-the-user.md`)* | skeleton title + body block | **the save error banner exists today; the floater and panel must show it too** *(a named gap — without it, failure is invisible)* |
+| **the `[[` picker** | *"Nothing matches"* — and ⛔ **it offers nothing**; no create door | the picker opens immediately and fills; never blocks typing | closes with a quiet error; the writing is unaffected |
+| **the drawer** | per tab: *"No bits yet" · "Nothing pulled into this piece yet"* | skeleton rows; thumbnails lazily | inline, retryable — the drawer never takes the page down |
+| **a peek** | — | a small spinner in place | *"Couldn't load this"* + the open-door still works |
+| **a board with compositions hidden** | the toggle's own state is the explanation — ⚪ whether a count shows ("3 hidden") | — | — |
+
+**The house rule this obeys:** *every list can be empty, every write can fail, and nothing fails silently.*
+
+## 16 · Keyboard
+- **Escape** — closes the picker (inserting nothing) · then the peek · then the floater. One layer per press, innermost first.
+- **Enter** — in the picker, selects. In the body, splits the block (§13.3).
+- **⌘/Ctrl+S** — no-op with a "saved" flash; saving is automatic and this key is muscle memory. 🔵
+- Standard marks (⌘B/I/U), undo/redo. ⚪ A shortcut for `[[` itself, for people who dislike the trigger.
+- ⚪ Tab order across title → subtitle → body → footer.
+
+## 17 · Responsive
+**Phone:** the full page only *(owner-ruled)* — no floater, no panel; the drawer becomes a full-screen sheet reached by a control, not a side column.
+**Tablet:** page and panel; ⚪ whether the floater makes sense at that size.
+**Desktop:** all three frames.
+⚪ The breakpoints themselves.
+
+## 18 · Accessibility — the floor
+Every control reachable by keyboard · the picker and peek are focus-trapped while open and return focus to the caret on close · chips and blocks are announced as what they are (*"reference: 〈face〉"*) rather than as decoration · the fold state of a toggle is announced · contrast meets the app's existing standard. 🔵 **Not yet specified in detail; this is the floor, not the design.**
+
+## 19 · What Part III does NOT cover
+Visual style — type, colour, spacing, the paper treatments — belongs to the **aesthetics track** (`aesthetics-phase.md`), not here. This Part specifies **structure and state**; the look is the owner's, and the two must be reconciled at her refinement pass.
