@@ -6,6 +6,7 @@ import { movePlacementForced } from "@/lib/db/bits";
 import type { CardVM } from "./card-vm";
 import type { Patch } from "./board-arrange";
 import type { useUndo } from "./use-undo";
+import { runLegs, countLabel } from "./act-rules";
 
 // The ARRANGING acts' recording layer (undo plan §4) — dark until stage 5: every
 // deliberate position gesture pushes an entry; reflexes (click-to-front, auto-grow)
@@ -62,36 +63,21 @@ export function useArrangeActs(deps: {
     patchCard(cur.placementId, cur.bitId, { x: pos.x, y: pos.y });
   }
 
-  /** Apply a set of positions, skipping cards that no longer exist (antagonist D4:
-   *  aborting mid-way left the board HALF-undone and killed the entry — a gone card
-   *  has nothing to reverse and must not block its neighbours). The entry fails
-   *  (terminal) only when NOTHING could be applied. */
+  /** Apply a set of positions, skipping cards that no longer exist — the survivor rule
+   *  (antagonist D4), which now lives ONCE in act-rules.ts and is tested there. It used
+   *  to be spelled out here AND in use-board-acts, the same loop twice. */
   async function applyAll(entries: { bitId: string; pos: Pos }[]): Promise<void> {
-    let applied = 0;
-    let firstErr: unknown = null;
-    for (const e of entries) {
-      try {
-        await applyPos(e.bitId, e.pos);
-        applied++;
-      } catch (err) {
-        if (firstErr === null) firstErr = err;
-      }
-    }
-    if (applied === 0 && firstErr !== null) throw firstErr;
+    await runLegs(entries.map((e) => () => applyPos(e.bitId, e.pos)));
   }
 
   async function applyMoves(moves: Move[], dir: "before" | "after"): Promise<void> {
     await applyAll(moves.map((m) => ({ bitId: m.bitId, pos: m[dir] })));
   }
 
-  function label(n: number, verb: string): string {
-    return n === 1 ? `${verb} card` : `${verb} ${n} cards`;
-  }
-
   /** One finished single-card drag. */
   function recordMove(m: Move) {
     if (m.before.x === m.after.x && m.before.y === m.after.y) return; // a click, not a move
-    record(label(1, "move"), [m.bitId], () => applyPos(m.bitId, m.before), () => applyPos(m.bitId, m.after));
+    record(countLabel("move", 1), [m.bitId], () => applyPos(m.bitId, m.before), () => applyPos(m.bitId, m.after));
   }
 
   /** One finished group drag — ONE entry for the whole gesture (dragged card included). */
@@ -99,7 +85,7 @@ export function useArrangeActs(deps: {
     const real = moves.filter((m) => m.before.x !== m.after.x || m.before.y !== m.after.y);
     if (!real.length) return;
     record(
-      label(real.length, "move"),
+      countLabel("move", real.length),
       real.map((m) => m.bitId),
       () => applyMoves(real, "before"),
       () => applyMoves(real, "after"),
@@ -156,7 +142,7 @@ export function useArrangeActs(deps: {
     // record() FIRST — it closes any open window (ours included, via onBeforeRecord);
     // the new window opens AFTER, so it can't be closed by its own act (D1).
     record(
-      label(moves.length, "nudge"),
+      countLabel("nudge", moves.length),
       moves.map((m) => m.bitId),
       () => applyAll([...befores].map(([bitId, pos]) => ({ bitId, pos }))),
       () => applyAll([...afters].map(([bitId, pos]) => ({ bitId, pos }))), // reads the EXTENDED afters

@@ -207,6 +207,41 @@ version catches.
    composition surface stuff."* Cleanup finishes first. Composition surfaces follow. Search
    consistency (§5.3) sits after those, as ruled.
 
+9. **The 150-line ceiling — RELAXED by the owner (2026-09-02):** *"I think it's OK if they're like
+   big files… let's see what makes sense."* **This changes the split rationale, and shrinks it.**
+   Chasing a line count invents seams that aren't real and spends risk on nothing. The test becomes:
+   *does this file hold jobs that change for different reasons?* Revised verdicts:
+   - **`use-board-acts.ts` — still collapse.** The problem was never length; one act is written four
+     times. Worth it if the file stayed 385 lines. ~200 is a side effect, not a target.
+   - **`use-create-doors.ts` — still split.** "Make a new thing" and "call an existing thing onto
+     this board" are genuinely different jobs. Real seam, plus the three near-identical importers.
+   - **`board-surface.tsx` — split LESS than planned.** Extract only the pan/pinch/tap machine (a
+     self-contained gesture state machine) and the selected-card bar (pure presentation). **Drop the
+     card-drag extraction**: those handlers are entangled with board state deliberately, and moving
+     them buys a smaller number and nothing else. Lands ~450-500, not ~330 — and that is the RIGHT
+     answer: an orchestrator wiring a dozen hooks is legitimately a long file.
+
+## 5c. Honest confidence + the compromises (stated 2026-09-02, owner asked directly)
+
+**All four gates are STATIC** — types, lint, unit tests over pure functions, and a build. None of
+them opens the app. Green gates mean internally consistent, not "works".
+
+| Change | Confidence | Why |
+|---|---|---|
+| Stage A dead code | High | Nothing referenced it; grep + compiler both agree |
+| CardVM move | High | Type-only; the compiler proves it |
+| card.tsx / media merges | Medium-high | Copies read and confirmed identical; failure mode is loud + instant |
+| **Archive fix (B1)** | **Medium — the real gap** | Verified by reading + the RLS policy + reasoning. **Never executed.** No test can cover it here |
+| **Card widths (B2)** | **Medium — visible, unseen** | Owner-ruled, correctly implemented, but never looked at on screen |
+
+**The four compromises, named:**
+1. **The archive fix has no test.** The suite only covers pure functions; anything touching the DB
+   has none. Building that infrastructure = new tooling + a new pattern = needs the owner's approval.
+2. **User-facing words were written by Claude** (three error sentences) — the owner's job by her own
+   norms. Parked on the §5b checklist.
+3. **The card-width change is visible and unverified visually.**
+4. **Concurrent session** committing docs onto this branch (harmless so far, but real).
+
 ## 5b. The wording checklist (owed — one copy pass, in the owner's voice, later)
 
 Approved to proceed with placeholders now and sweep them together later: *"as long as you write down

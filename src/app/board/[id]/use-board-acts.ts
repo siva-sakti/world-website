@@ -4,6 +4,7 @@ import { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBo
 import type { useUndo } from "./use-undo";
 import { confirm } from "@/components/confirm";
 import type { CardVM } from "./card-vm";
+import { runLegs, countLabel, trashOneConfirm, trashManyConfirm } from "./act-rules";
 
 // The board's REMOVE acts (I-W1: two distinct, labeled acts), singular and in bulk:
 //  · un-place — take the card off THIS board only; the bit lives on (travel keeps
@@ -126,17 +127,6 @@ export function useBoardActs(deps: {
     }
   }
 
-  /** N-legged reverse: every survivor is applied; terminal only when NOTHING could
-   *  be (the floor-2 antagonist's D4 rule, reused here). One banner, not N. */
-  async function allLegs(legs: (() => Promise<void>)[]): Promise<void> {
-    let applied = 0;
-    let firstErr: unknown = null;
-    for (const leg of legs) {
-      try { await leg(); applied++; } catch (e) { if (firstErr === null) firstErr = e; }
-    }
-    if (applied === 0 && firstErr !== null) throw firstErr;
-  }
-
   function handleRemoveFailure(snap: CardVM, e: unknown) {
     if (isGoneError(e)) {
       console.error("remove hit an already-gone row (leftover of a failed create?) — staying removed:", e);
@@ -168,7 +158,7 @@ export function useBoardActs(deps: {
     // gone carve → the reverse can't succeed → entry DEAD (plan §5).
     const entry = snap
       ? record(
-          "remove card from board", [snap.bitId],
+          countLabel("remove", 1, "from board"), [snap.bitId],
           () => reviveOne(snap),
           () => unplaceOne(snap.bitId),
           act,
@@ -188,9 +178,7 @@ export function useBoardActs(deps: {
   async function trashSelected(placementId: string, bitId: string) {
     let n = 1;
     try { n = (await getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
-    const msg = n > 1
-      ? `This card is on ${n} boards — trashing removes it from all of them (restorable from Trash). Continue?`
-      : `Move this card to the trash? Hidden everywhere, restorable from Trash.`;
+    const msg = trashOneConfirm(n);
     if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     const snap = cards.find((c) => c.placementId === placementId);
     setCards((cs) => cs.filter((c) => c.bitId !== bitId));
@@ -208,7 +196,7 @@ export function useBoardActs(deps: {
     // the bit was destroyed → "no longer in the trash" → terminal → dead, honestly.
     const entry = snap
       ? record(
-          "trash card", [snap.bitId],
+          countLabel("trash", 1), [snap.bitId],
           async () => {
             await restoreBit(supabase, bitId);
             setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
@@ -273,10 +261,10 @@ export function useBoardActs(deps: {
     const live = () => snaps.filter((c) => landedSet.has(c.bitId));
     const entry = snaps.length
       ? record(
-          snaps.length === 1 ? "remove card from board" : `remove ${snaps.length} cards from board`,
+          countLabel("remove", snaps.length, "from board"),
           snaps.map((c) => c.bitId),
-          () => allLegs(live().map((c) => () => reviveOne(c))),
-          () => allLegs(live().map((c) => () => unplaceOne(c.bitId))),
+          () => runLegs(live().map((c) => () => reviveOne(c))),
+          () => runLegs(live().map((c) => () => unplaceOne(c.bitId))),
         )
       : null;
     for (const c of chosen) {
@@ -315,10 +303,7 @@ export function useBoardActs(deps: {
       onOtherBoards = counts.filter((boards) => boards.length > 1).length;
     } catch { /* fall back to the plain confirm */ }
     const n = bitIds.length;
-    const msg =
-      onOtherBoards > 0
-        ? `Trash ${n} card${n === 1 ? "" : "s"}? ${onOtherBoards} of them also live on other boards — this removes them from all of them (restorable from Trash).`
-        : `Trash ${n} card${n === 1 ? "" : "s"}? Hidden everywhere, restorable from Trash.`;
+    const msg = trashManyConfirm(n, onOtherBoards);
     if (!(await confirm({ message: msg, confirmLabel: "Trash", danger: true }))) return;
     setCards((cs) => cs.filter((c) => !selectedIds.has(c.placementId)));
     clearSelection();
@@ -330,19 +315,19 @@ export function useBoardActs(deps: {
     const live = () => snaps.filter((c) => landedSet.has(c.bitId));
     const entry = snaps.length
       ? record(
-          snaps.length === 1 ? "trash card" : `trash ${snaps.length} cards`,
+          countLabel("trash", snaps.length),
           snaps.map((c) => c.bitId),
           // Undo = restore each bit (DB first), then its card back; redo re-trashes
           // without re-asking (ruled). The D4 survivor rule both ways.
           () =>
-            allLegs(
+            runLegs(
               live().map((c) => async () => {
                 await restoreBit(supabase, c.bitId);
                 setCards((cs) => (cs.some((x) => x.bitId === c.bitId) ? cs : [...cs, c]));
               }),
             ),
           () =>
-            allLegs(
+            runLegs(
               live().map((c) => async () => {
                 const cur = cardsRef.current?.find((x) => x.bitId === c.bitId);
                 setCards((cs) => cs.filter((x) => x.bitId !== c.bitId));
