@@ -47,23 +47,46 @@ The app serves a **rhythm: diverge → converge → diverge**, never a one-way a
 ## 3 · The model
 
 **3.1 · The three things**
-- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: file · video · table)*. **Flat: a bit never references anything.** *(the flatness call)*
+- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**. ⛔ Not `table` — a table is formatting; a text bit can contain one.)*. **Flat: a bit never references anything.** *(the flatness call)*
 - **board** — a spatial surface. Holds material by **placement** (a position).
 - **composition** — a linear surface. Holds material by **reference** (pulled into the writing).
 
-**3.2 · The laws**
+**3.2 · The four dimensions** *(the complete model in one frame — station 2)*
+
+| dimension | what it is | for a composition |
+|---|---|---|
+| **CONTENT** | the things themselves | your words + bits pulled in (one shared roster) |
+| **STRUCTURE** | how a surface groups its content | **sequence** — headings, lists, order *(a board's is **position**)* |
+| **RELATION** | how things point at each other | references (pulled in) · placements (held by boards) |
+| **ORGANIZATION** | how you categorize across everything | tags · one folder · star · search |
+
+Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
+
+**3.3 · The vocabulary** *(used throughout; the user never meets these words — see `teaching-the-user.md` §4)*
+
+| term | meaning |
+|---|---|
+| **face** | a bit's computed headline: the owner's caption → else its first words → else nothing (visual bits stand in with a thumbnail) |
+| **chip** | the inline pill a pulled-in thing becomes in the writing; shows the target's face. *Shipped Aug 2026.* |
+| **peek** | tap a chip → a floating glimpse of the target beside it, with a door to open it. *Shipped Aug 2026.* |
+| **block** | a pulled-in thing rendered **in place** in the flow — preview-sized. *Ruled, unbuilt.* ⚑ *the word is overloaded (Notion's paragraph word) — naming session item.* |
+| **frame** | ⛔ **not used in this spec.** The word belongs to the board's alignment feature (other track). |
+
+**3.4 · The laws**
 
 | law | statement | source |
 |---|---|---|
-| **content/structure** | Content is bits — one roster shared by both surfaces. Structure (headings · lists · checklists · tables) is **formatting**, never a bit. *A premise, not dogma: functionality wins over doctrine, and exceptions are chosen deliberately.* | owner |
+| **content/structure** | Content is bits — **one roster shared by both surfaces**: anything placeable on a board is pullable into a composition. Structure (headings · lists · checklists · tables) is **formatting** — it lives in the editor and is never a bit. **This is a premise, not dogma** — but an exception requires the owner's explicit ruling, recorded here; a builder never takes one unilaterally. | owner |
 | **flatness** | Material is flat; **only compositions weave.** A bit referencing bits would be a composition wearing the wrong label. | owner |
-| **direction** | **Boards hold; compositions are held.** A composition never contains or references a board. **Mention is not containment** — a plain hyperlink to a board stays legal (no stored tie, no backlink, no graph line). | owner |
+| **direction** | **Boards hold; compositions are held.** A composition never contains or references a board. **Mention is not containment** — a plain hyperlink to a board remains possible: it is an **ordinary editor link** (the link mark that already exists), **not a feature to build**, and it creates **no stored tie, no backlink, no graph line.** | owner |
 | **deliberateness** | A composition is **never** auto-created. The board catches material by default; making a composition is always an act. Pasting into writing stays mere content — never auto-minted as a bit. | owner |
 | **fixed kind** | A thing's kind is set at birth and never converts: bit ↮ composition ↮ board. | D-121 |
-| **silent bit-hood** | In the writing, a pulled-in thing **looks like normal content**; its bit-life (source, tags) appears only on tap or hover. Annoyance is ceremony; there is none. | owner |
+| **silent bit-hood** | In the writing, a pulled-in thing **renders as normal document content** — an image looks like an image, a quote reads as a quote. **Forbidden: badges, borders, icons, or any persistent marker distinguishing pulled-in content from typed content.** Its bit-life (source · tags · where else it lives) appears **only** on tap or hover. | owner |
 
-**3.3 · What a composition IS — the definition**
+**3.5 · What a composition IS — the definition**
 > A **document you write.** Made of your words, with captured things pulled into the writing. It is **made, never captured** — it can never just happen. It always appears in your compositions list. It can sit on many boards as cards. It is not a bit and never becomes one.
 
-**3.4 · What it is NOT** ⛔
-Not material · not a container things are placed *onto* (*"text-forward, like Notion"*) · not convertible to or from a bit · never auto-born · not a task manager *(though it holds facts about its own job — §7)*.
+*(§2 gives the concept; this is the operative definition. Where they differ in wording, this one governs.)*
+
+**3.6 · What it is NOT** ⛔
+Not material · not a container things are placed *onto* (*"text-forward, like Notion"*) · not convertible to or from a bit · never auto-born · not a task manager — **though it holds facts about its own job** (a word-count target · a due date · who it's for), specified in Part III's lifecycle section *(owner: "that kind of project management layer")*.
