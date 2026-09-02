@@ -24,6 +24,7 @@ import type { CardVM } from "./card-vm";
 import { isCardType } from "./card-vm";
 import { defaultCardSize, resolveCardMedia } from "./card-defaults";
 import type { Camera } from "./use-camera";
+import { firstClearSpot } from "./board-arrange";
 
 const MAX_DISP = 320; // an image card's initial on-board width
 
@@ -83,30 +84,27 @@ export function useCreateDoors(deps: {
   function findClearSpot(w0: number, h0: number): { x: number; y: number } {
     const r = boardRef.current?.getBoundingClientRect();
     if (!r) {
+      // No board rect yet (pre-paint): nothing to hit-test against, so cascade blind.
       const s = (spawnStep.current++ % 8) * 28;
       return { x: 40 + s, y: 84 + s };
     }
+    // The IMPURE half stays here — the board's rect, the world transform, and the
+    // geometry ledger's true sizes (state fallback where a card is unmeasured). The
+    // RULE itself is firstClearSpot in board-arrange, where it is tested.
     const anchor = screenToWorld(r.left + r.width / 2, r.top + Math.min(200, r.height / 2));
     const tl = screenToWorld(r.left, r.top);
     const br = screenToWorld(r.left + r.width, r.top + r.height);
-    const rects = cards.map((c) => {
+    const taken = cards.map((c) => {
       const m = sizeOf(c.placementId);
       return { x: c.x, y: c.y, w: m?.w ?? c.w, h: m?.h ?? c.h };
     });
-    const MARGIN = 12;
     const start = { x: anchor.x - w0 / 2, y: anchor.y };
-    let firstClear: { x: number; y: number } | null = null;
-    for (let i = 0; i < 24; i++) {
-      const x = start.x + i * 36;
-      const y = start.y + i * 36;
-      const taken = rects.some(
-        (q) => x < q.x + q.w + MARGIN && x + w0 + MARGIN > q.x && y < q.y + q.h + MARGIN && y + h0 + MARGIN > q.y,
-      );
-      if (taken) continue;
-      if (x >= tl.x && y >= tl.y && x + w0 <= br.x && y + h0 <= br.y) return { x, y }; // clear AND visible
-      if (!firstClear) firstClear = { x, y };
-    }
-    if (firstClear) return firstClear;
+    const spot = firstClearSpot({ w: w0, h: h0 }, start, taken, {
+      minX: tl.x, minY: tl.y, maxX: br.x, maxY: br.y,
+    });
+    if (spot) return spot;
+    // Nothing clear in 24 steps — the last-resort cascade, so two rapid spawns on a
+    // crowded board still don't land exactly on top of each other.
     const s = (spawnStep.current++ % 8) * 28;
     return { x: start.x + s, y: start.y + s };
   }
@@ -342,35 +340,34 @@ export function useCreateDoors(deps: {
     placeFiles(files, w.x, w.y);
   }
 
-  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+  /** The three file pickers are ONE handler. They differed only in the size estimate
+   *  passed to findClearSpot and which importer ran — the other 7 lines were identical
+   *  three times over. `estimate` is what to reserve before the real dimensions are
+   *  known (an image's arrive after decode, a PDF's after page 1 renders).
+   *
+   *  The batch cascade (36 across, 28 down, z0 + i) is the same one placeFiles uses:
+   *  a same-tick loop can't call nextZ() per file, because every call reads the same
+   *  stale render array and they would all z-tie. */
+  function pickFiles(
+    e: React.ChangeEvent<HTMLInputElement>,
+    estimate: { w: number; h: number },
+    importFile: (file: File, wx: number, wy: number, z: number) => void,
+  ) {
     const files = Array.from(e.target.files ?? []);
     if (files.length) {
-      const p = findClearSpot(320, 260); // dims unknown until decode — a sensible estimate
+      const p = findClearSpot(estimate.w, estimate.h);
       const z0 = nextZ();
-      files.forEach((f, i) => importImageFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
+      files.forEach((f, i) => importFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
     }
-    e.target.value = "";
+    e.target.value = ""; // always — re-picking the SAME file must fire change again
   }
 
-  function onPickAudio(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length) {
-      const p = findClearSpot(AUDIO_W, 90);
-      const z0 = nextZ();
-      files.forEach((f, i) => importAudioFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
-    }
-    e.target.value = "";
-  }
-
-  function onPickPdf(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length) {
-      const p = findClearSpot(PDF_W, PDF_H); // real dims arrive after page-1 render
-      const z0 = nextZ();
-      files.forEach((f, i) => importPdfFile(f, p.x + i * 36, p.y + i * 28, z0 + i));
-    }
-    e.target.value = "";
-  }
+  const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) =>
+    pickFiles(e, { w: 320, h: 260 }, importImageFile);
+  const onPickAudio = (e: React.ChangeEvent<HTMLInputElement>) =>
+    pickFiles(e, { w: AUDIO_W, h: 90 }, importAudioFile);
+  const onPickPdf = (e: React.ChangeEvent<HTMLInputElement>) =>
+    pickFiles(e, { w: PDF_W, h: PDF_H }, importPdfFile);
 
   // Paste onto the board: an image → an image card; TEXT → a bit holding it
   // (plan v1.1-D — one paste, one bit, no cleverness). Never while an editor or

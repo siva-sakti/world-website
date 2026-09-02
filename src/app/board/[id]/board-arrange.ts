@@ -81,3 +81,48 @@ export function nextZ(cards: { z: number }[]): number {
 export function backZ(cards: { z: number }[]): number {
   return cards.reduce((m, c) => Math.min(m, c.z), 0) - 1;
 }
+
+export type Box = { x: number; y: number; w: number; h: number };
+export type ViewRect = { minX: number; minY: number; maxX: number; maxY: number };
+
+const SPAWN_STEP = 36; // how far down-right each attempt moves
+const SPAWN_TRIES = 24; //  ... and how many attempts before giving up
+const SPAWN_MARGIN = 12; // breathing room demanded around an existing card
+
+/** LOOK-THEN-PLACE: where a new card should land so it doesn't cover another one.
+ *
+ *  Step down-right from `start`, and take the first spot that is clear of every box
+ *  in `taken` — PREFERRING one that also sits fully inside `view`, because a new
+ *  thing appearing off-screen reads as not having appeared at all. A spot that is
+ *  clear but off-screen is held as the fallback and returned only if nothing better
+ *  turns up.
+ *
+ *  Returns null when 24 steps found nothing clear at all; the caller then has its own
+ *  last-resort cascade. (Before this lived here it sat inside use-create-doors, where
+ *  it could only be checked by dropping files onto a board by hand — the rule is the
+ *  same, it can now be asserted. The impure parts — the board's rect, the world
+ *  transform, the geometry ledger — stay at the call site.) */
+export function firstClearSpot(
+  size: { w: number; h: number },
+  start: { x: number; y: number },
+  taken: Box[],
+  view: ViewRect,
+): { x: number; y: number } | null {
+  let clearButOffscreen: { x: number; y: number } | null = null;
+  for (let i = 0; i < SPAWN_TRIES; i++) {
+    const x = start.x + i * SPAWN_STEP;
+    const y = start.y + i * SPAWN_STEP;
+    const overlaps = taken.some(
+      (q) =>
+        x < q.x + q.w + SPAWN_MARGIN &&
+        x + size.w + SPAWN_MARGIN > q.x &&
+        y < q.y + q.h + SPAWN_MARGIN &&
+        y + size.h + SPAWN_MARGIN > q.y,
+    );
+    if (overlaps) continue;
+    const inView = x >= view.minX && y >= view.minY && x + size.w <= view.maxX && y + size.h <= view.maxY;
+    if (inView) return { x, y };
+    if (!clearButOffscreen) clearButOffscreen = { x, y };
+  }
+  return clearButOffscreen;
+}

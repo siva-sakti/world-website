@@ -281,6 +281,41 @@ glides the camera to it (`onJumpTo`) instead of placing a duplicate.
 board"** = `!onThis(n)`, and make it the default. Alternatives: add it without changing the
 default; or rename "unplaced", which reads looser than it is.
 
+## 5e. Stage E — the last piece: the two named files (plan, 2026-09-02)
+
+**Rationale reset (owner relaxed the 150-line ceiling, §5.9): split where a file holds jobs that
+change for DIFFERENT REASONS, never to hit a number.** Line counts below are consequences, not targets.
+
+### `use-create-doors.ts` (503) — three moves, safest first
+
+| # | Move | Why it is a real seam | Risk |
+|---|---|---|---|
+| **E1** | three `onPick*` handlers → one `pick(dims, importer)` | the same 8 lines three times, differing in two tokens ✓ diffed | very low — 3 call sites, wired to 3 `<input>`s |
+| **E2** | `findClearSpot`'s MATHS → `board-arrange.ts`, pure + tested | it is nearly pure already; the look-then-place rule ("prefer a spot fully IN VIEW", the 24-step cascade, MARGIN 12) is today verified only by dropping files by hand | low — impure parts (getBoundingClientRect, screenToWorld, sizeOf) stay at the call site |
+| **E3** | `bringIn` → its own module | **"make a NEW thing" and "call an EXISTING thing onto this board" are different jobs.** bringIn is the only door that reconciles a server-renamed placement id, and the only one that can find a card already rendered under the real id | medium — the id-reconcile + twin-drop logic is subtle |
+
+### `board-surface.tsx` (689) — two moves, and only two
+
+| # | Move | Why | Risk |
+|---|---|---|---|
+| **E4** | the selected-card action bar → `selected-bar.tsx` | pure presentation; five acts passed in. Zero logic travels | very low |
+| **E5** | the pan / pinch / double-tap machine (`:421-479`) → `use-board-pan.ts` | a self-contained gesture state machine over two refs (`pan`, `lastTap`) + `isPanning`. Same shape as `useMarqueeSelect` and useCamera's pinch trio, which already live in their own files | **medium — the riskiest left** |
+
+**NOT doing (dropped deliberately):** the card-drag / move-together handlers. They are entangled
+with board state on purpose; extracting them buys a smaller number and nothing else.
+
+**E5's specific hazard, named up front:** the pointer machine encodes ORDERING that is load-bearing
+and was bug-fixed before — a second finger must abandon any in-progress marquee (`:429-436`, "its
+anchor must not be stomped"); a pinch owns the move; a marquee owns the move before pan does; a
+finger lifting out of a pinch is never a tap; the double-tap test is scale-relative (`28 / cam.scale`).
+The extraction must move these VERBATIM and preserve their order exactly.
+
+**Expected landing:** `board-surface.tsx` ~500-550, `use-create-doors.ts` ~380. Both still large,
+both legitimately so — an orchestrator wiring a dozen hooks is a long file, and that is fine now.
+
+**Proof per step:** the four gates after EVERY move + a named flow trace. E5 additionally needs the
+owner's hands: pan, pinch-zoom on a phone, double-tap to make a card, and marquee-select in select mode.
+
 ## 6. Done so far
 
 - **Stage A** (`6d561f1`) — 96 lines of verified dead code deleted, incl. the two-functions-one-name
