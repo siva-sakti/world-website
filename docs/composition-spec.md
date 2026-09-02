@@ -298,6 +298,10 @@ The default. Appears in the compositions list, in search, on its boards, and in 
 
 ## 12 · Cross-cutting — how a composition joins the rest of the app
 
+### 12.0 Plain-language note: what "the search index" and "the migration" mean
+**The search index** is a pre-computed list of each thing's words, stored beside it, so searching is fast. It must exist wherever a thing lives. **The migration** is the one-time move of compositions out of the bits table into their own home — copy, re-point everything aimed at them, remove the originals; backup first, proven on a throwaway copy before real data is touched.
+**Search needs no redesign** — its behavior (one list, tabs to narrow) is already built and is what the owner wants. It needs one plumbing task, listed in 12.1.5.
+
 ### 12.1 Search *(verified against `src/lib/db/search.ts`, 2026-09-02)*
 **Today:** search reads **bits and notes** — things with words — filtered by kind (all · bit · note), matching the bit's search index. **A board never appears in search**, by design: it has no content of its own. Boards are reached by name through **jump-to**, the separate tool *(the "two kinds of looking" split, D-122)*.
 

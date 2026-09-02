@@ -86,6 +86,7 @@ Dropped from the old note-rows: `source_id` (ruled out) · face machinery (title
    - `placement`: target = a bit OR a board OR **a composition** (three nullable columns + exactly-one CHECK — this is the one that grows).
    - `tag_application`: target = bit OR board OR **composition**.
    *Under B these would each be one column fewer. That is the entire price of C — and it may be worth paying for honest shape.*
+3b. **SEARCH — plumbing, on this session's agenda (not its own session).** *Search's **behavior** is already decided because it already works this way: one list, tabs to narrow (all · bits · notes → compositions). No redesign.* What the storage choice decides: **where the word-list (search index) lives for compositions, and how the query reads both homes.** Under C (own table) that is a second generated index + a query that unions two sources; under B (shared surface table) it is one index on that table. **⚠ If this is not handled in the same migration, every composition silently disappears from search.**
 4. **The shared behaviors and how they stay one thing, not two:** tag · folder · star · trash/archive/restore · search · export. **Decide the pattern once** (a shared helper layer? per-kind functions with one door?) rather than letting two code paths grow by accident. **This is where C fails if it fails.**
 5. **What the bit table returns to:** pure material — `kind` dropped entirely.
 6. **The migration order + the export lockstep (I-G1)** and which invariants change fate (see §2).
