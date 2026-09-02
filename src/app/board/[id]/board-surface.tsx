@@ -16,7 +16,6 @@ import { MediaError } from "@/lib/media";
 import { Card } from "./card";
 import type { CardVM } from "./card-vm";
 import { DrawOverlay } from "./draw-overlay";
-import { TagBar } from "./tag-bar";
 import { WordsOffer } from "./words-offer";
 import { Drawer } from "@/components/drawer";
 import { registerSave } from "@/lib/save-guard";
@@ -27,6 +26,7 @@ import { useCamera } from "./use-camera";
 import { useBoardKeys } from "./use-board-keys";
 import { useMarqueeSelect } from "./use-marquee-select";
 import { BoardToolbar } from "./board-toolbar";
+import { SelectedBar } from "./selected-bar";
 import { removeActs } from "./remove-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
@@ -512,55 +512,17 @@ export function BoardSurface({
         onDismissError={() => setError(null)}
       />
       {selectedBit && (
-        <div className="selected-bar">
-          <TagBar
-            key={selectedBit.bitId}
-            target={{ bitId: selectedBit.bitId }}
-            refreshSignal={metaSignalFor(selectedBit.bitId)}
-            onTagAct={(kind, tag) =>
-              kind === "add"
-                ? meaning.recordTagAdd(selectedBit.bitId, tag)
-                : meaning.recordTagRemove(selectedBit.bitId, tag)
-            }
-          />
-          <div className="selected-actions">
-            <button
-              className="compose-btn subtle"
-              onClick={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
-              title="Open this card full-page — comfortable writing"
-            >
-              open
-            </button>
-            <button
-              className="compose-btn subtle"
-              onClick={() => toggleLock(selectedBit)}
-              title={selectedBit.locked ? "Unlock — this card can move again" : "Lock this card in place — a stray drag can't move it (removing it still works)"}
-            >
-              {selectedBit.locked ? "🔓 unlock" : "🔒 lock"}
-            </button>
-            <button
-              className="compose-btn subtle"
-              onClick={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
-              title="Send this card behind everything else"
-            >
-              send to back
-            </button>
-            <button
-              className="compose-btn subtle"
-              onClick={() => unplaceSelected(selectedBit.placementId)}
-              title="Take this card off THIS board — it lives on (its other boards, and loose in your bits)"
-            >
-              remove from this board
-            </button>
-            <button
-              className="compose-btn subtle"
-              onClick={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
-              title="Move this card to the trash — hidden everywhere, restorable"
-            >
-              trash
-            </button>
-          </div>
-        </div>
+        <SelectedBar
+          card={selectedBit}
+          metaRefresh={metaSignalFor(selectedBit.bitId)}
+          onTagAdd={(tag) => meaning.recordTagAdd(selectedBit.bitId, tag)}
+          onTagRemove={(tag) => meaning.recordTagRemove(selectedBit.bitId, tag)}
+          onOpen={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
+          onToggleLock={() => toggleLock(selectedBit)}
+          onSendToBack={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
+          onUnplace={() => unplaceSelected(selectedBit.placementId)}
+          onTrash={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
+        />
       )}
       <div
         ref={boardRef}
