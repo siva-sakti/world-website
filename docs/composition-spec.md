@@ -329,3 +329,50 @@ The graph draws references and placements as lines. Compositions are ⚪ *presum
 
 ### 12.7 The pull (tapping a tag)
 Returns everything carrying that word — bits, boards, and now compositions, mixed. ⚪ *whether the pull gains kind-filters like search has.*
+
+## 13 · The editor — what the composition surface can do
+
+*The composition and the board's text-cards share **one editor**. A capability added here appears in both. What differs is which capabilities are **exposed** in which frame (§13.4).*
+
+### 13.1 Blocks — the v1 set
+**In** *(the converged core; every source agrees — `research-block-editors.md`)*:
+paragraph · headings *(2 levels)* · bulleted list · numbered list · **checklist** · quote · divider · code · **table** · image · **the pulled-in thing** (chip or block, §9)
+
+**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · toggles *(⚪ the research puts toggle in Notion's core; the owner's Notion session decides)* · equations · embeds · callouts *(⚪ maybe)*
+
+**Already installed but unexposed:** headings · lists · quote · divider · code ship inside the editor library today with **no UI to reach them** — much of v1 is surfacing, not building.
+
+### 13.2 Text behavior the surface owes
+1. **Text alignment** (left · centre · right) — absent today; expected of any real text interface.
+2. **Text wraps around images** — anchored in the flow, book-page style. ⛔ **Never floating** *(owner-ruled: "wrap yes, float no" — floating is the board's nature)*.
+3. **Word count** — always available (§8).
+4. ⚪ Indentation / nesting depth for lists.
+
+### 13.3 The interaction grammar — the eight musts
+*(From the build-log research; these are what make a block editor feel right rather than fought.)*
+1. **Enter splits cleanly** — a new empty paragraph, nothing else; no menu opens.
+2. **Enter inside a list** creates a sibling item.
+3. **The `/` menu opens only on a typed `/`** — never re-triggered by paste, undo, or redo.
+4. **Turn-into is schema-aware** — offers only conversions the structure allows.
+5. **A hover drag-handle (⋮⋮)** moves a block, with a drop-indicator line; clicking it opens the block's menu.
+6. **Paste preserves structure** — multi-paragraph text becomes multiple blocks, never one blob.
+7. **Selection crosses blocks** — select from mid-paragraph across others and copy as text.
+8. **Never-empty** — deleting the last block inserts a fresh empty paragraph; the editor cannot reach an invalid state.
+
+**Known traps to design against** ⚠: a rigid pre-baked block framework *(a team abandoned one and rebuilt on raw tiptap — we are on raw tiptap already)* · the slash menu re-firing on paste/undo · making text nodes draggable directly *(fights text selection — use hover-revealed handles)*.
+
+### 13.4 What is exposed in which frame *(owner-ruled)*
+| frame | toolkit |
+|---|---|
+| **floater** | **basic** — text, marks, `[[` |
+| **side panel** | **full** |
+| **full page** | **full** |
+| a board's text-card | ⚪ *unchanged today; whether cards gain block UI is a separate decision — probably not (small cards, big menus)* |
+
+### 13.5 Selecting text — the acts available
+1. A floating toolbar appears: formatting marks.
+2. **"Make this a bit"** — the selected text becomes a new bit *(F-5; the selection **stays** in the writing; the new bit records that it was made from this composition; ⚪ its subtle underline mark, toggleable off)*.
+3. ⚪ Whether anything else belongs here.
+
+### 13.6 What the editor never does ⛔
+Auto-format your words into anything · auto-create bits from pasted content · write text you did not type *(the one exception: the date-time title at exit, §7)*.
