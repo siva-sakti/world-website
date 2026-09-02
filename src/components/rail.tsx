@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { readLocal, writeLocal } from "@/lib/local-storage";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { newBoard } from "@/app/actions";
@@ -25,12 +26,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Apply the remembered choice after mount (localStorage is client-only —
   // the same one-time capability-read pattern as card.tsx's coarse-pointer check).
   useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = window.localStorage.getItem("railCollapsed");
-    } catch {
-      /* storage blocked (Safari block-all) — fall back to the route default */
-    }
+    // null covers "never set", "no storage" and "storage refused" alike — all three
+    // mean: keep the route default. Restores BOTH true and false, deliberately: an
+    // explicit "expanded" must be able to override a route that defaults to collapsed.
+    const stored = readLocal("railCollapsed");
     if (stored !== null) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
       setCollapsed(stored === "1");
@@ -48,11 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const next = !collapsed;
     setCollapsed(next);
     setChosen(true);
-    try {
-      window.localStorage.setItem("railCollapsed", next ? "1" : "0");
-    } catch {
-      /* storage blocked — the choice just won't persist */
-    }
+    writeLocal("railCollapsed", next ? "1" : "0");
   }
 
   if (pathname === "/login") return <>{children}</>;

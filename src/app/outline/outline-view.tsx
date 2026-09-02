@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { readLocal, writeLocal } from "@/lib/local-storage";
 import { emptyMessage } from "@/lib/empty-message";
 import Link from "next/link";
 import type { Outline } from "@/lib/outline";
@@ -39,12 +40,14 @@ export function OutlineView({ outline }: { outline: Outline }) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    // A SET of collapsed section ids, not a flag — the JSON parse keeps its own guard
+    // because a corrupt value must degrade to "start expanded", not throw.
     try {
-      const raw = window.localStorage.getItem("outlineCollapsed");
+      const raw = readLocal("outlineCollapsed");
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
       if (raw) setCollapsed(new Set(JSON.parse(raw) as string[]));
     } catch {
-      /* storage blocked or corrupt — start expanded */
+      /* corrupt value — start expanded */
     }
   }, []);
 
@@ -53,11 +56,7 @@ export function OutlineView({ outline }: { outline: Outline }) {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
-      try {
-        window.localStorage.setItem("outlineCollapsed", JSON.stringify([...next]));
-      } catch {
-        /* storage full or blocked — the collapse just won't persist */
-      }
+      writeLocal("outlineCollapsed", JSON.stringify([...next]));
       return next;
     });
   }

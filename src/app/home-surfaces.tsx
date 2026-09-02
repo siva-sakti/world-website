@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { readLocal, writeLocal } from "@/lib/local-storage";
 import { emptyMessage } from "@/lib/empty-message";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -62,21 +63,15 @@ export function HomeSurfaces({
   // When the desk is empty we keep it open, so home is never a blank screen.
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
-      if (window.localStorage.getItem("homeListCollapsed") === "1") setCollapsed(true);
-    } catch {
-      /* storage blocked (Safari block-all) — a throw here would error-boundary HOME */
-    }
+    // Only "collapsed" is restored — an absent value means expanded, which is the
+    // default anyway. (The rail restores both; it has a route default to override.)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client storage read
+    if (readLocal("homeListCollapsed") === "1") setCollapsed(true);
   }, []);
   function toggleCollapsed() {
     const next = !collapsed;
     setCollapsed(next);
-    try {
-      window.localStorage.setItem("homeListCollapsed", next ? "1" : "0");
-    } catch {
-      /* storage blocked — the collapse just won't persist */
-    }
+    writeLocal("homeListCollapsed", next ? "1" : "0");
   }
   const showBody = deskEmpty || !collapsed;
 
