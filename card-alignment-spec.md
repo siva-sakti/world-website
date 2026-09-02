@@ -254,24 +254,28 @@ promises an alignment and then drops the card somewhere else is worse than no li
 
 **Revised order:** ① align & distribute → ② guides (draw + snap together) → ③ group drags → ④ the grid.
 
-## 10 · Open questions the review surfaced
+## 10 · The review's open questions — RULED by the owner (2026-09-02)
 
-**10.1–10.3 are the owner's. 10.4 is a design problem needing her eye.**
+- **10.1 Locked cards and align — RULED: a card must be unlocked to align.**
+  *"I guess the card with the anchor — but if not too complicated we just say that cards have to be
+  unlocked to align. I feel like that's not super annoying to a user."* Taken as: a locked card is
+  **excluded entirely** — it does not move, and it is not part of the target calculation; the
+  unlocked cards align among themselves. **This matches TIDY exactly**, which already filters
+  `!c.locked` before doing anything (`board-surface.tsx` tidySelected), so it is the app's existing
+  precedent rather than a new rule to learn. Distribute: same — locked cards are not endpoints.
+- **10.2 The grid toggle's scope — RULED: per board.**
+- **10.3 The grid's first paint** — still open, but only reachable once the grid is built (step ④).
+- **10.4 The selection-chrome problem — RULED: align the RESTING box.**
+  *"The resting box, I guess that's actually what you see."* Exactly the reason. "Chrome" was
+  Claude's jargon for the controls that appear AROUND a card's content when you select it — a title
+  field above, the "from …" source picker below (`card.tsx`: both are gated on `selected`). Neither
+  is content; both add height. So a selected card is genuinely taller than the same card at rest,
+  and the dragged card is always selected while its neighbours usually are not. Aligning the
+  inflated box would look right during the drag and visibly break the moment you clicked away.
 
-- **10.1 Locked cards and align.** If a locked card is in the selection, is it the ANCHOR the
-  others align to, or excluded from the calculation? Same for distribute when an outermost card is
-  locked. Both defensible; it changes what the button does.
-- **10.2 The grid toggle's scope.** Per board, or one setting everywhere? Per-board is more useful
-  (a grid on a moodboard, not on a reading list) and more work.
-- **10.3 The grid's first paint.** Storage can only be read after the page mounts, so a board with
-  the grid ON paints grid-off for one frame and flips. Accept the flicker, or hold the board back?
-- **10.4 THE SELECTION-CHROME PROBLEM.** A selected card renders a title field and a source picker
-  that an unselected one does not, and the ledger measures the whole thing. **The dragged card is
-  always selected; its neighbours usually are not.** So a centre- or bottom-edge snap aligns an
-  inflated box against a bare one — **and the alignment visibly breaks the moment you deselect.**
-  Left and top edges are unaffected (they are the anchor). This also inverts §5's captioned-image
-  row: the measured box *includes* the caption, so it aligns the card, not the picture.
-  Options: align the RESTING box (needs a second measurement) · restrict the dragged card to
-  top/left candidates while chrome is showing · accept it and let the feel-tune judge.
-  **Claude's recommendation: the resting box** — the composition's resting state is what is
-  actually being composed.
+## 11 · Build order, gates unchanged
+
+**① align & distribute → ② guides (draw + snap together) → ③ group drags → ④ the grid.**
+
+Nothing now blocks ①: it is pure functions over the ledger, locked cards are excluded exactly as
+tidy already excludes them, and it never touches the drag path.
