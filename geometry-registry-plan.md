@@ -185,3 +185,103 @@ re-entry question, the owner's call then.
 
 **Scaffolding ledger note:** this phase DELETES one row (DOM-measured geometry) rather than
 adding any — the first demolition, on schedule.
+
+---
+
+## 6 · STAGE 4 — THE BUILD (written 2026-09-02, before touching code)
+
+The maths shipped with stages 1–3 and has **no consumer**: `snapTo` in `geometry.ts` is pure
+and covered by 7 tests, and nothing calls it. This section is the WIRING plan — the part that
+was never written.
+
+### What exists vs what is missing
+
+| Piece | State |
+|---|---|
+| `snapTo(dragged, others, threshold)` → snapped x/y + vGuide/hGuide | ✅ built, 7 tests, **no caller** |
+| the size ledger (`use-geometry`) — live true sizes | ✅ built, 4 consumers |
+| live drag coords | ✅ `card.tsx:184` `onDrag → onDragMove(d.x, d.y)` |
+| the drop | ✅ `card.tsx:185-188` `onDragStop → onChange("move") → onDragEnd` |
+| **an overlay to draw guides into** | ❌ missing |
+| **anything that calls snapTo** | ❌ missing |
+
+### The ordering constraint that shapes the build
+
+`card.tsx:186` writes the RAW drop coords (`onChange({x: d.x, y: d.y}, "move")`) and only then
+calls `onDragEnd`. The snap must land **before both**, or the undo entry and the saved position
+record the un-snapped truth (§2: "the snap applies in onDragStop BEFORE onChange and onDragEnd").
+→ Card gains one prop, `snapDrop?: (x, y) => {x, y}`, supplied by the board (which owns the
+ledger, the card list and the camera). Card stays dumb; the board decides.
+
+### Steps, each gated and committed alone
+
+- **4a · The overlay + live guides, NO snapping.** A ref'd `<svg>`/div in the world layer; the
+  board computes `snapTo` on each `onDragMove` and mutates the overlay's style **imperatively**
+  (D8: a single-card drag causes zero React re-renders today and must stay that way). Nothing
+  moves yet — you just SEE the magenta lines appear and vanish. Cheapest possible proof the
+  maths is wired to reality.
+- **4b · Snap on release, single card.** `snapDrop` applied in `onDragStop`. Threshold ~6
+  **screen** px ÷ `cam.scale` (D7 — a world threshold would be 1.2px at 0.2× and 18px at 3×).
+  **Alt/Option refuses the snap** (⌘ is taken by additive select — D6).
+- **4c · Group drags.** The dragged card generates the candidates; the WHOLE selection
+  translates by the snapped delta (D5). Both undo entries record the snapped position.
+- **4d · (optional, owner offered) the live W×H readout during a resize.**
+
+**Never snaps:** nudges, tidy, call-in, revive. Only a hand-drag.
+
+### THE HONEST LIMIT — say it before building, not after
+
+**The card will NOT stick to the line while you drag.** The guide appears live, and the card
+settles into alignment **on release**. Magnetic pull mid-drag is structurally impossible with
+react-rnd (it ignores the `position` prop mid-drag and exposes no setter — traced through its
+source in the antagonist round) and only becomes possible with the ruled input engine. This was
+ruled and recorded on 2026-09-01; it is restated here so it is not re-discovered as a surprise.
+
+### What the owner is needed for
+
+- **Nothing to start.** The design is settled (§4b): magenta, gesture-only, thin, extends past
+  both frames, edges + centers, whisper-not-grid.
+- **At the end — the feel-tune sitting**, which §5 already names as stage 4's gate: the exact
+  magenta against the paper ground, and the threshold (~6 screen px is a starting guess, not a
+  ruling). That needs the owner's eyes on a real board; Claude must not settle either alone
+  ("no aesthetic decisions for the owner").
+- **One scheduling call:** 4d (the resize readout) in this sitting, or after the guides land?
+
+---
+
+## 4c · The references, re-read DIRECTLY (2026-09-02) — one earlier reading corrected
+
+The owner re-shared the six screenshots; this is from looking at them, not from notes.
+
+**THE DIAGONAL X — earlier guess was WRONG.** Claude guessed "an empty picture frame waiting
+for content" from a verbal description. The images say otherwise:
+- glyph image (1), ballet-shoe photo (4), handwritten note (6): **content present, selected,
+  X shown**
+- the two TEXT boxes (2, 3): selected, outlined, **no X**
+
+So the X marks **"this object is a placed image"** — Illustrator's linked-image affordance. It
+appears on selection and distinguishes a picture from a text box. **Not a mechanism, an identity
+cue.** Our cards already read as different by type, so it is NOT proposed — recorded as an
+aesthetic option for the aesthetics/frame phase, the owner's call there.
+
+**Confirmed directly, all previously noted second-hand:** the live magenta guide (image 5 — a
+thin horizontal line across the blue-wall photo, extending well past it) · the W/H readout
+(image 1: "W: 187.82 px H: 159.28 px") · corner AND edge handles · the rotate cursor at a corner
+(image 5).
+
+## 4d · Owner ruling on TIDY vs ALIGN (2026-09-02)
+
+**The owner:** *"I think it's better to just have the PowerPoint button… I still don't know
+exactly what reading order means, it feels like a complication, but feel free to push back."*
+
+**No pushback owed — the owner is right, and the reasoning is sharper than Claude's.** Reading
+order (the 40px banding in `tidyPatches`) exists ONLY because tidy builds a GRID, and a grid has
+ordered slots, so something must decide which card lands first. **Align buttons need no ordering
+at all**: "align left" makes every left edge match, and which card is "first" is meaningless.
+
+So the align/distribute set (`organize-phase-plan.md` §4e) is both **simpler to understand AND
+simpler to build** than extending tidy: no banding, no reading order, no square-root grid — just
+min/max/mean of the measured edges.
+
+**Ruled:** tidy stays as built (the owner likes what it does); it is NOT extended. Align/distribute
+is the one to build next. Stage 4's guides are unaffected — they are hand-guided, not button-driven.

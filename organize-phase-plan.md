@@ -211,6 +211,31 @@ proven one, and the button already exists as a component. **Proof:** the four ga
 select bits on `/bits` → archive → they leave the list → they appear in `/archive` → take one back
 out → it returns.
 
+## 4e · ALIGN & DISTRIBUTE BUTTONS (owner-raised 2026-09-02, not yet planned)
+
+**The owner:** *"usually what I see, like for example PowerPoint, they have like a range vertical,
+range horizontal, center — you know what I mean, you press those buttons so we don't have to guess."*
+
+**It is a THIRD thing, and the board has neither of its siblings covering it:**
+| | what it does | who drives |
+|---|---|---|
+| **tidy up** (built) | rearranges a selection into a uniform grid | the button decides everything |
+| **snap guides** (stage 4, next) | helps YOUR HAND land straight while dragging one card | the hand |
+| **align / distribute** (MISSING) | takes cards already placed and makes an edge or centre match — no grid, no dragging | the button, but non-destructively |
+
+**Why it is cheap:** the maths is far simpler than snapping (min / max / mean of the measured
+edges), it reuses the geometry ledger that already exists, and it records as ONE undo entry
+exactly the way `recordTidy` already does. The likely set: align left · centre (vertical axis) ·
+right · top · middle · bottom, plus distribute-evenly horizontally and vertically.
+
+**Open questions for when it is planned:** where the controls live (the selected-bar only shows
+for a SINGLE card today — this needs the multi-select toolbar); whether "centre" means the
+selection's own bounding box or the average; whether locked cards are anchors or excluded.
+
+**Sequencing note:** it shares the ledger and the undo shape with stage 4, so it is cheapest
+built right AFTER the guides while that code is open — but it is genuinely independent, and
+nothing in stage 4 depends on it.
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.
