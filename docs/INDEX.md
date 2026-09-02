@@ -282,6 +282,9 @@ INDEX.md ................ this file — where everything is
 ### `teaching-the-user.md` — 🟠 what a person must learn, and how (2026-09-02)
 **Contains:** the three things a person MUST understand (everything else discoverable) · must-teach vs can-discover · **the moments and what teaches at each** (hints, tooltips, structural teaching, F-9's door) · the vocabulary users meet vs ours-only · **what the design teaches without words** · the opens. The user-facing counterpart to the specs.
 
+### `verification-procedure.md` — how the spec gets checked (2026-09-02)
+**Contains:** the three passes (TRACE · ABSENCE · CONTRADICTION), the five verdicts, the output format, and the rule that an **independent agent** runs it — never the spec's author. **The DRAFT banner comes off only when Pass 1 has zero UNSOURCED and Pass 2 zero MISSING.**
+
 ### `ruling-register.md` — ⭐ THE PARALLEL CHECK: every ruling, numbered (2026-09-02)
 **Contains:** all 61 composition rulings extracted from the trail, grouped A–K, each with its spec location. **Re-run this check after any spec change — a ruling with no spec home is a defect.** Built at the owner's ask for a systematic verification instrument rather than ad-hoc checking.
 
