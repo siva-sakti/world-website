@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/require-user";
 import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
 import { archiveBit } from "@/lib/db/resting";
-import { uploadObject, removeObjects } from "@/lib/storage";
+import { uploadObject, removeObjects, linkThumbPath } from "@/lib/storage";
 import { getBoardCards } from "@/lib/db/boards";
 import { anchorNearContent, pointForIndex } from "./placement-anchor";
 import { setSource } from "@/lib/db/sources";
@@ -27,7 +27,7 @@ async function fetchLinkSubstance(
   if (meta?.image) {
     const img = await fetchImageBlob(meta.image);
     if (img) {
-      const path = `thumbs/${bitId}.jpg`;
+      const path = linkThumbPath(bitId);
       try {
         await uploadObject(supabase, { path, body: img.bytes.buffer as ArrayBuffer, contentType: img.contentType });
         thumbPath = path;

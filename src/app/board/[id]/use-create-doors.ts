@@ -10,7 +10,7 @@ import {
   callInBit,
   abortBitCreate,
 } from "@/lib/db/bits";
-import { uploadObject, removeObjects } from "@/lib/storage";
+import { uploadObject, removeObjects, imagePaths, pdfPaths, audioPath, audioPathsAllExts } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
 import { importAudio } from "@/lib/media-audio";
 import { importPdf } from "@/lib/media-pdf";
@@ -187,8 +187,7 @@ export function useCreateDoors(deps: {
           { placementId, bitId, type: "image", kind: "bit", x: wx, y: wy, w, h, z, imageUrl: localUrl },
         ]);
         selectOne(placementId);
-        const storagePath = `images/${bitId}.jpg`;
-        const thumbPath = `thumbs/${bitId}.jpg`;
+        const { full: storagePath, thumb: thumbPath } = imagePaths(bitId);
         // The two uploads are independent — send them together, not one-then-two.
         await Promise.all([
           uploadObject(supabase, { path: storagePath, body: img.blob, contentType: "image/jpeg" }),
@@ -207,7 +206,8 @@ export function useCreateDoors(deps: {
         // The uploads may have landed before the row insert failed — remove them or
         // they're orphans forever (paths are deterministic from bitId; removing a
         // never-uploaded path is a no-op; cleanup failure must not mask the error).
-        removeObjects(supabase, [`images/${bitId}.jpg`, `thumbs/${bitId}.jpg`]).catch(() => {});
+        const p = imagePaths(bitId);
+        removeObjects(supabase, [p.full, p.thumb]).catch(() => {});
         onErr(e);
       })
       .finally(() => {
@@ -236,7 +236,7 @@ export function useCreateDoors(deps: {
     selectOne(placementId);
     const chain = importAudio(file)
       .then(async (audio) => {
-        const storagePath = `audio/${bitId}.${audio.ext}`;
+        const storagePath = audioPath(bitId, audio.ext);
         await uploadObject(supabase, { path: storagePath, body: audio.blob, contentType: audio.mime });
         await createAudioBit(supabase, {
           bitId, placementId, boardId, storagePath,
@@ -254,7 +254,7 @@ export function useCreateDoors(deps: {
         // is a no-op).
         removeObjects(
           supabase,
-          ["m4a", "mp3", "mp4", "aac", "wav", "ogg", "oga", "opus", "webm", "flac"].map((x) => `audio/${bitId}.${x}`),
+          audioPathsAllExts(bitId),
         ).catch(() => {});
         onErr(e);
       });
@@ -289,8 +289,8 @@ export function useCreateDoors(deps: {
           { placementId, bitId, type: "pdf", kind: "bit", x: wx, y: wy, w, h, z, imageUrl: localUrl },
         ]);
         selectOne(placementId);
-        const storagePath = `pdfs/${bitId}.pdf`;
-        const thumbPath = pdf.thumb ? `thumbs/${bitId}.jpg` : undefined;
+        const { file: storagePath, thumb: pdfThumb } = pdfPaths(bitId);
+        const thumbPath = pdf.thumb ? pdfThumb : undefined;
         // The uploads are independent — the PDF plus (when present) its page-1 thumb.
         const uploads = [
           uploadObject(supabase, { path: storagePath, body: pdf.file, contentType: "application/pdf" }),
@@ -309,7 +309,8 @@ export function useCreateDoors(deps: {
       })
       .catch((e) => {
         setCards((cs) => cs.filter((c) => c.placementId !== placementId));
-        removeObjects(supabase, [`pdfs/${bitId}.pdf`, `thumbs/${bitId}.jpg`]).catch(() => {}); // orphan sweep
+        const pp = pdfPaths(bitId);
+        removeObjects(supabase, [pp.file, pp.thumb]).catch(() => {}); // orphan sweep
         onErr(e);
       });
     trackCreate(placementId, chain);

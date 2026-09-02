@@ -101,3 +101,45 @@ export async function removeObjects(
   const { error } = await supabase.storage.from(PRIVATE_BUCKET).remove(real);
   if (error) console.error("storage remove failed (continuing):", error);
 }
+
+// WHERE A BIT'S FILES LIVE — one definition, sixteen call sites.
+//
+// These four shapes were spelled out by hand in three files: the board's create doors,
+// the loose intake, and the server-side link capture. A path typed in one place and
+// swept in another is how orphaned objects happen — and the sweep already had a real
+// gap, because `audioPaths` below is the ONLY way to know every extension an audio
+// upload might have taken.
+//
+// The paths are DERIVED FROM THE BIT ID, deliberately: nothing has to be remembered
+// between upload and cleanup, and a retry after a failure mints a fresh id rather than
+// colliding. Removing a path that was never written is a no-op, which is what makes the
+// blunt sweeps safe.
+
+/** An image: the full object, plus its 600px thumbnail. */
+export function imagePaths(bitId: string): { full: string; thumb: string } {
+  return { full: `images/${bitId}.jpg`, thumb: `thumbs/${bitId}.jpg` };
+}
+
+/** A PDF: the original bytes, plus (when page 1 rendered) its thumbnail. */
+export function pdfPaths(bitId: string): { file: string; thumb: string } {
+  return { file: `pdfs/${bitId}.pdf`, thumb: `thumbs/${bitId}.jpg` };
+}
+
+/** A link's stored page-card image — a thumbnail with no original beside it. */
+export function linkThumbPath(bitId: string): string {
+  return `thumbs/${bitId}.jpg`;
+}
+
+/** The audio object, at a known extension. */
+export function audioPath(bitId: string, ext: string): string {
+  return `audio/${bitId}.${ext}`;
+}
+
+/** EVERY extension an audio upload could have used — the orphan sweep's input when the
+ *  real one is unknown (a failure before the extension was captured). Blunt on purpose:
+ *  removing paths that were never written costs nothing, and missing the one that WAS
+ *  written leaves a file behind forever. */
+export const AUDIO_EXTS = ["m4a", "mp3", "mp4", "aac", "wav", "ogg", "oga", "opus", "webm", "flac"];
+export function audioPathsAllExts(bitId: string): string[] {
+  return AUDIO_EXTS.map((ext) => audioPath(bitId, ext));
+}
