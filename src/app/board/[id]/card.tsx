@@ -96,6 +96,7 @@ export function Card({
   metaRefresh,
   onDragStart,
   onResizeStart,
+  measureRef,
   onDragMove,
   onDragEnd,
 }: {
@@ -125,6 +126,9 @@ export function Card({
   // card stays entirely with react-rnd until onDragEnd (so it never jumps/stutters).
   onDragStart?: () => void;
   onResizeStart?: () => void; // the board captures before-geometry from STATE here (rnd's callback carries none)
+  /** The geometry registry's ref-callback (use-geometry): seeds + observes this
+   *  card's true size. Stable per placementId — passed from the one call site. */
+  measureRef?: (el: HTMLElement | null) => void | (() => void);
   onDragMove?: (x: number, y: number) => void;
   onDragEnd?: (x: number, y: number) => void;
 }) {
@@ -203,7 +207,14 @@ export function Card({
       }}
     >
       <div
-        ref={innerRef}
+        ref={(el) => {
+          innerRef.current = el;
+          const cleanup = measureRef?.(el);
+          return () => {
+            innerRef.current = null;
+            cleanup?.();
+          };
+        }}
         data-pid={card.placementId}
         className={`compose-card-inner${
           isNote

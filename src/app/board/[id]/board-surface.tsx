@@ -22,6 +22,7 @@ import { useBoardActs } from "./use-board-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
 import { useMeaningActs } from "./use-meaning-acts";
+import { useGeometry } from "./use-geometry";
 import { UndoDevReadout } from "./undo-dev-readout";
 import { tidyPatches, backZ, groupDragPatches, nextZ as zAbove } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
@@ -74,6 +75,11 @@ export function BoardSurface({
   const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
   const router = useRouter();
+
+  // The geometry registry (D-135 phase 2): every card's true rendered size, one
+  // ledger — dark until the consumers switch (stage 3) and the guides land.
+  const { measure, sizeOf, read } = useGeometry();
+  void sizeOf; void read; // stage 3 switches the consumers onto these
 
   // Pan/zoom camera (incl. touch pinch) and rubber-band select.
   const { cam, camRef, setCam, screenToWorld, fitView, centerOn, fitOrToggleBack, zoomBy, zoomTo, pinchDown, pinchMove, pinchUp, scheduleSave, restoreView } =
@@ -636,6 +642,7 @@ export function BoardSurface({
                   ),
                 )
               }
+              measureRef={measure(c.placementId)}
               onDragStart={() => onCardDragStart(c.placementId)}
               onResizeStart={() =>
                 (resizeBefore.current = { bitId: c.bitId, x: c.x, y: c.y, w: c.w, h: c.h })
