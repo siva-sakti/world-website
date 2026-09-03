@@ -363,40 +363,57 @@ Run with the existing `node --test` setup — no new dependency.
 5. **Dates: see §E-1.** Settings are wanted eventually, but the timezone fix must not wait
    for a settings page.
 
-## Part E-1 · Dates — why they're wrong, and what to do *(owner asked)*
+## Part E-1 · Dates — RULED: the date follows the device *(owner, 2026-09-03)*
 
-**The bug, in your terms:** it is 6pm on Tuesday and you save a bit. The app files it under
-**Wednesday**. Your machine is on Pacific time (−7); the app formats every date in **UTC**,
-which is already tomorrow after 5pm your time.
+**The owner overruled Claude's first recommendation, correctly.** Claude proposed pinning the
+app to one fixed zone (`America/Los_Angeles`). The owner: *"we would be going to the server
+whatever time zone that people are in, like their phone or their website — it would be
+whatever time zone you were in, doesn't [that] make the most sense?"* **Yes. A pinned
+constant is wrong the moment you open the app on a phone in another city, and it makes a
+travel-shaped bug that nobody would think to look for.**
 
-**Why anyone would pin it to UTC — the failure that fix was avoiding.** Every page is
-rendered twice: once on the server so it arrives complete, then again in your browser. Both
-have to produce **the same text**, or React throws a hydration mismatch and the page can
-flicker or error. The server runs in UTC; your laptop doesn't. So "just use local time"
-produces two different answers for one moment, and the page breaks. Pinning both sides to
-UTC removed the breakage — and quietly made every evening date wrong by a day.
+### The bug being fixed
+It is 6pm Tuesday, you save a bit, and the app files it under **Wednesday**. The machine is
+on Pacific (−7); the app formats in **UTC**, already tomorrow after 5pm local.
 
-**The three ways out:**
+### Why UTC was pinned — the failure the new design must still avoid
+Every page renders twice: on the server so it arrives complete, then again in the browser.
+Both must produce **the same text** or React throws a hydration mismatch. The server runs in
+UTC and the visitor's device does not, so naive "use local time" gives two answers for one
+moment. Pinning both sides to UTC removed the breakage and made every evening date wrong.
 
-| | What it does | Cost |
-|---|---|---|
-| **(a) Pin to YOUR zone** instead of UTC | one constant changes; both sides still agree, so no flicker | wrong if you move and care |
-| **(b) Format in the browser only** | correct anywhere | dates arrive blank then pop in — flicker on every list |
-| **(c) A timezone preference** on a profile page | correct, no flicker, travels with you | a whole feature: page + column + it must be loaded before anything renders |
+### The ruled design — four small pieces
 
-> **Recommendation: (a) now, shaped so (c) drops in later with no rework.**
-> The zone stays **one constant in one file**. When a settings page exists, that constant
-> becomes a value read from your profile — every call site is already asking the same single
-> question, so nothing else changes. This is the answer to *"built so we won't have any
-> failures"*: the fragile version of (c) is one where each page fetches your zone itself and
-> renders before it arrives. One door means that can't happen.
+1. **One day-rule.** `dates.ts` gains a single "which calendar day is this moment, in this
+   zone" function. `fmt()` ("Sep 2") and `ago()` ("today" / "yesterday" / "12d ago") both
+   call it, so they **cannot disagree** — that is S6 fixed, not worked around.
+2. **The device is the truth.** A small `<Stamp>` client component formats using
+   `Intl.DateTimeFormat().resolvedOptions().timeZone` — the real zone of the real device,
+   phone or laptop, wherever it is — with `suppressHydrationWarning` so React permits the
+   server's first paint to differ. **This is the owner's answer, built.**
+3. **The server's first paint uses a good guess.** ✅ **Verified 2026-09-03 against Vercel's
+   own docs:** every deployment receives `x-vercel-ip-timezone`, the visitor's zone as an
+   IANA name (`America/Chicago`), **on by default, all plans, no configuration**. Absent
+   locally → fall back to UTC.
+4. **A preference later is an OVERRIDE, not a mechanism.** When a profile page exists, a
+   stored zone simply takes priority over step 2. Nothing else changes — every call site is
+   already asking one function the same question.
 
-**And S6 is fixed in the same pass:** `ago()` ("today"/"yesterday") and `fmt()` ("Sep 2")
-will compute the calendar day the *same way in the same zone*, so two screens can no longer
-disagree about which day a moment falls on.
+### Why this can't fail — the property worth naming
+**The guess in step 3 can be wrong at no cost.** IP geolocation is defeated by a VPN, and
+Vercel's docs note the header does not work behind a proxy. None of that matters: the guess
+only decides the *first paint*, and the device always wins on hydration. **A design where
+being wrong costs nothing is a different kind of safe from a design that tries not to be
+wrong** — and it is the direct answer to *"built so we won't have any failures or issues."*
 
-**⚪ Needs one word from you:** the zone. Your machine reports PDT (−0700) — if that's
-`America/Los_Angeles`, say so and it's done.
+The fragile version — the one to avoid — is each page fetching a zone for itself and
+rendering before it arrives. One door makes that impossible to write.
+
+**Only 5 call sites** exist (`bit/[id]/page.tsx` · `note/[id]/page.tsx` ·
+`board/[id]/timeline/page.tsx` · `desk-alive.tsx` server-side, `bits/note-row.tsx` client),
+so this is a contained change, not a sweep.
+
+**Note:** `America/Los_Angeles` is now only the **dev fallback**, never the app's answer.
 
 ## Part E-2 · Order, and what I need from you
 
@@ -406,7 +423,7 @@ disagree about which day a moment falls on.
 | 2 | Fix P1 + P2 by the B.5 redesign; the same tests go green | no |
 | 3 | Retry on reconnect (`online` event → one flush) — ruling 2 | no |
 | 4 | S4 field table · S7 `editingId` · S3 one guard key | no |
-| 5 | S5 one door for "which boards is this bit on" · S6 + E-1 dates, with tests | **the zone** |
+| 5 | S5 one door for "which boards is this bit on" · S6 + E-1 dates (device-follows), with tests | no *(ruled)* |
 | 6 | The copy rule (A.3) into `invariants.md` + its guard test | no |
 | 7 | Fix `docs/INDEX.md` — it still names the superseded composition spec as live | no |
 | 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
@@ -416,7 +433,7 @@ disagree about which day a moment falls on.
 
 Steps 1–7 are reversible, tested, and on the branch.
 
-**Open for you:** the timezone (E-1) · S8's height (a/b/c in Part C) · and step 8's migration
+**Open for you:** S8's height (a/b/c in Part C) · and step 8's migration
 when you're ready to run it.
 
 ### What this does not cover
