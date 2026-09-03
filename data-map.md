@@ -104,7 +104,7 @@ allowed when it probably shouldn't be, listed honestly. Every ✗/⚠ names its 
 | open (the recent trail) | ✓ records | ∅ | ∅ — and its trail row cascades away on destroy |
 | place things onto it | ✓ | ✗ loud (call-in checks the BOARD too) | ✗ loud |
 | archive / trash / restore / destroy | same grid as a bit, same mechanisms, same A1 fix | | |
-| duplicate | ✓ — **⚠ A2 open: copies invisible cards** (trashed/archived bits' seats ride along; fix queued) | ✗ (select requires live) | ✗ |
+| duplicate | ✓ — copies exactly what RENDERS (A2 fixed 2026-09-03: reads `board_cards`, so a bit resting-while-placed no longer rides along and can't materialise on the copy when restored) | ✗ (select requires live) | ✗ |
 
 **The honest pattern the grid exposes:** the *resting* acts (archive/trash/restore/destroy)
 are guarded at the database — the strongest layer — while the *meaning* acts (edit, tag,

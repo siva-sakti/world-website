@@ -38,7 +38,15 @@ export async function getBoard(
  * state like x/y/z, so a faithful copy keeps it — check-ruled). Not copied: the ★ (a copy isn't alive
  * until you say so) · departed legs · connectors (no create-UI exists yet — when arrows
  * arrive, duplicate must learn placement-id remapping). If the placements fail after the
- * board row lands, the half-copy is deleted (cascade takes its placements) — no litter. */
+ * board row lands, the half-copy is deleted (cascade takes its placements) — no litter.
+ *
+ * WHAT IT COPIES IS WHAT RENDERS (antagonist A2, fixed 2026-09-03). The copy list reads
+ * `board_cards` — the ONE render rule — not the raw placement table. The old raw read
+ * filtered `left_at` only, so a bit trashed or archived WHILE PLACED still had a present
+ * placement row and rode along invisibly: restore it months later and it materialised on a
+ * board the owner never put it on, with a fabricated arrival date. Reading the view means
+ * "copies every live card" is true by construction rather than by a second hand-written
+ * copy of the state rule that could drift from it. */
 export async function duplicateBoard(supabase: SupabaseClient, boardId: string): Promise<Board> {
   const { data: src, error: e1 } = await supabase
     .from("board")
@@ -60,10 +68,9 @@ export async function duplicateBoard(supabase: SupabaseClient, boardId: string):
   if (e2) throw e2;
   try {
     const { data: rows, error: e3 } = await supabase
-      .from("placement")
+      .from("board_cards") // the render rule — never the raw table (A2)
       .select("target_bit_id, target_board_id, x, y, width, height, z, display_size, locked_at")
-      .eq("board_id", boardId)
-      .is("left_at", null);
+      .eq("board_id", boardId);
     if (e3) throw e3;
     if (rows && rows.length) {
       const { error: e4 } = await supabase

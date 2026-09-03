@@ -1,0 +1,54 @@
+--- setup: one board, three bits placed on it ---
+INSERT 0 1
+INSERT 0 3
+INSERT 0 3
+--- two of them rest, WITHOUT their placements being touched (the real behaviour) ---
+UPDATE 1
+UPDATE 1
+--- the board still has THREE placement rows, all present (left_at is null) ---
+ raw_placements_still_present 
+------------------------------
+                            3
+(1 row)
+
+--- but only ONE card renders ---
+ cards_that_render 
+-------------------
+                 1
+(1 row)
+
+--- THE OLD (broken) COPY READ: raw table, left_at only → would copy 3 ---
+ old_read_would_copy 
+---------------------
+                   3
+(1 row)
+
+--- THE FIXED COPY READ: board_cards → copies 1 ---
+ fixed_read_copies 
+-------------------
+                 1
+(1 row)
+
+--- replay the real duplicate: insert the fixed read into a new board ---
+INSERT 0 1
+INSERT 0 1
+--- the copy holds exactly the one live card ---
+ copy_placements 
+-----------------
+               1
+(1 row)
+
+--- THE POINT: restoring the trashed bit must NOT make it appear on the copy ---
+UPDATE 1
+UPDATE 1
+ copy_cards_after_restore 
+--------------------------
+                        1
+(1 row)
+
+ original_cards_after_restore 
+------------------------------
+                            3
+(1 row)
+
+--- expected: copy 1 (untouched), original back to 3 (its own history intact) ---
