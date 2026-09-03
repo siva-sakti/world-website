@@ -68,6 +68,7 @@
 | what we said we'd do later | **`parked.md`** |
 | rules that must never break | **`invariants.md`** |
 | how the database/app actually works | **`SPEC.md`** |
+| what every action writes to the data — plain-language, owner's-eye | **`data-map.md`** (derived from the schema + `lib/db`; those govern) |
 | every path a user takes | **`user-flows.md`** |
 | words to describe the app to a person | **`vision-and-language.md`** (raw material — owner re-voices) |
 | how we work together | **`CLAUDE.md`** |
