@@ -451,6 +451,14 @@ Her words: *"a lot of the time something like Notion is trying to solve the fact
 
 ### 13.6 What the editor never does ⛔
 Auto-format your words into anything · auto-create bits from pasted content · write text you did not type *(the one exception: the date-time title at exit, §7)*.
+✅ **Pasting text from outside — RULED (owner, 2026-09-03):** it lands as **ordinary writing** ("its own little tiny paragraph"), never auto-minted as a bit; the quiet **"make this a bit"** affordance (F-5, the paste principle) waits on it for the day the keeping-impulse arrives. **No up-front teaching needed — the affordance waits; that IS the teaching.**
+
+## 22 · The guardrails *(gathered 2026-09-03, when the owner asked for them — every one already ruled)*
+*The owner, mid-design: "I'm getting unravelled about the vision here… I wanna make sure I have guardrails on what's the goal, what are we trying to promise."* The rails were already installed; collected here so a wobble can be answered by pointing:
+1. **Two surfaces, one job each.** Boards bring material together **in space**; compositions **in words**. A want that sounds spatial (floating, place-anywhere) belongs to the board — which exists and is built. ⭐ **The observed proof (2026-09-03): when the composition is loosened far enough — "maybe a bit could float?" — it re-invents the board.** The two surfaces are each other's guardrail.
+2. **Nothing floats in writing. Ever.** *(owner, 2026-09-02: "never — we are doing this never.")*
+3. **Typing is not collecting.** Every block gets an identity; no block enters the collection. A bit is a deliberate act (brought in, or promoted by "make this a bit").
+4. **The promise, one sentence: *everything you've collected is available inside your writing.*** Concrete and demonstrable — the claim no other tool can make, and the one the owner can always back up. *(And "bring a bit in line and type around it" is not the lesser version of convergence — it IS convergence.)*
 
 ---
 
