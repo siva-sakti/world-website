@@ -1,0 +1,74 @@
+=== JSON vs HTML search proof ===
+CREATE TABLE
+INSERT 0 4
+--- fixture rows ---
+ id |                       label                        
+----+----------------------------------------------------
+  1 | kitchen sink: heading + para + nested list + chip
+  2 | baseline: heading + one paragraph, nothing special
+  3 | list-only: flat bullet list, no chip
+  4 | two chips + a list nested two levels deep
+(4 rows)
+
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+--- PART 4: generated-column feasibility ---
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/json-search-proof.sql:251: NOTICE:  GENERATED COLUMN (html_search_text):        PASS
+DO
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/json-search-proof.sql:262: NOTICE:  GENERATED COLUMN (jsonb_text_only):          PASS
+DO
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/json-search-proof.sql:273: NOTICE:  GENERATED COLUMN (jsonb_text_and_labels):    PASS
+DO
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/json-search-proof.sql:284: NOTICE:  GENERATED COLUMN (jsonb_all_strings):        PASS
+DO
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/json-search-proof.sql:295: NOTICE:  GENERATED COLUMN (jsonb_all_strings_cte):    PASS
+DO
+--- PART 5: raw extracted text per row per approach ---
+ id |                       label                        |                                                                        html_stripped                                                                         |                                                          json_naive_text_only                                                          |                                                                 json_type_aware                                                                 |                                                                                             json_catch_everything                                                                                              
+----+----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 | kitchen sink: heading + para + nested list + chip  |  Weekend Notes  A quick summary of the trip.    Pack the headlamps for spelunking tomorrow    Buy snacks for the drive    Ask  @marmoset  about the permit.  |  about the permit. A quick summary of the trip. Ask  Buy snacks for the drive Pack the headlamps for spelunking tomorrow Weekend Notes |  about the permit. A quick summary of the trip. Ask  Buy snacks for the drive marmoset Pack the headlamps for spelunking tomorrow Weekend Notes |  about the permit. A quick summary of the trip. Ask  bulletList Buy snacks for the drive doc heading listItem marmoset mention Pack the headlamps for spelunking tomorrow paragraph text user-42 Weekend Notes
+  2 | baseline: heading + one paragraph, nothing special |  Reading List  Finished the second chapter today.                                                                                                            | Finished the second chapter today. Reading List                                                                                        | Finished the second chapter today. Reading List                                                                                                 | doc Finished the second chapter today. heading paragraph Reading List text
+  3 | list-only: flat bullet list, no chip               |  Errands for the week    Return the library books    Call the plumber about the leak    Water the plants                                                     | Call the plumber about the leak Errands for the week Return the library books Water the plants                                         | Call the plumber about the leak Errands for the week Return the library books Water the plants                                                  | bulletList Call the plumber about the leak doc Errands for the week listItem paragraph Return the library books text Water the plants
+  4 | two chips + a list nested two levels deep          |  Retro    Follow up with  @kestrel     double-check the deploy window      thank  @barnacle                                                                  | double-check the deploy window Follow up with  Retro thank                                                                             | barnacle double-check the deploy window Follow up with  kestrel Retro thank                                                                     | barnacle bulletList doc double-check the deploy window Follow up with  heading kestrel listItem mention paragraph Retro text thank  user-7 user-8
+(4 rows)
+
+--- PART 6: search for the nested-list-only word (spelunking) ---
+ id |                       label                        | html_hit | json_naive_hit | json_type_aware_hit | json_catch_all_hit 
+----+----------------------------------------------------+----------+----------------+---------------------+--------------------
+  1 | kitchen sink: heading + para + nested list + chip  | t        | t              | t                   | t
+  2 | baseline: heading + one paragraph, nothing special | f        | f              | f                   | f
+  3 | list-only: flat bullet list, no chip               | f        | f              | f                   | f
+  4 | two chips + a list nested two levels deep          | f        | f              | f                   | f
+(4 rows)
+
+--- PART 6: search for the chip-label-only word (marmoset) ---
+ id |                       label                        | html_hit | json_naive_hit | json_type_aware_hit | json_catch_all_hit 
+----+----------------------------------------------------+----------+----------------+---------------------+--------------------
+  1 | kitchen sink: heading + para + nested list + chip  | t        | f              | t                   | t
+  2 | baseline: heading + one paragraph, nothing special | f        | f              | f                   | f
+  3 | list-only: flat bullet list, no chip               | f        | f              | f                   | f
+  4 | two chips + a list nested two levels deep          | f        | f              | f                   | f
+(4 rows)
+
+--- PART 6: same two searches against row 4 (kestrel / barnacle / deploy) ---
+ id |                   label                   | html_kestrel | json_naive_kestrel | json_type_aware_kestrel | html_deploy | json_naive_deploy 
+----+-------------------------------------------+--------------+--------------------+-------------------------+-------------+-------------------
+  4 | two chips + a list nested two levels deep | t            | f                  | t                       | t           | t
+(1 row)
+
+--- PART 7: false-positive check — searching the literal word "mention" ---
+ id |                       label                       | html_hit | json_type_aware_hit | json_catch_all_hit 
+----+---------------------------------------------------+----------+---------------------+--------------------
+  1 | kitchen sink: heading + para + nested list + chip | f        | f                   | t
+  4 | two chips + a list nested two levels deep         | f        | f                   | t
+(2 rows)
+
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+=== done ===

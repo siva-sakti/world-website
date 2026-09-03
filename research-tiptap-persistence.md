@@ -51,3 +51,62 @@ A related issue (#3218, custom attributes reverting to defaults) was **closed as
 
 ## ⏳ Still open — the one thing that decides it
 **Can Postgres full-text search a JSON document as well as it searches the HTML string today?** That is a **test**, not research, and its result belongs here when it runs. *(Draft + run instructions being prepared.)*
+
+---
+
+# ✅ THE TEST — RUN 2026-09-03, raw output committed
+
+**Run it yourself:** `./verification/run-json-search-native.sh` · proof `verification/json-search-proof.sql` · output `verification/json-search-proofs.out`. Local Postgres 17.10, throwaway db, self-contained.
+
+**The question:** can Postgres full-text search a ProseMirror JSON document as well as the HTML string it searches today?
+
+## Result 1 — ✅ generated columns work, all four approaches
+```
+GENERATED COLUMN (html_search_text):        PASS
+GENERATED COLUMN (jsonb_text_only):         PASS
+GENERATED COLUMN (jsonb_text_and_labels):   PASS
+GENERATED COLUMN (jsonb_all_strings):       PASS
+GENERATED COLUMN (jsonb_all_strings_cte):   PASS
+```
+The search index can stay a **database-maintained generated column** exactly as `bit.search_tsv` is today — no app-written duplicate, no drift. *(`jsonb_path_query_array` etc. are catalogued genuinely immutable in PG 17.10.)*
+
+## Result 2 — ✅ nested text is found by everything
+`spelunking`, inside a doubly-nested list item, is found by HTML and by all four JSON approaches. **Depth is a non-issue.**
+
+## Result 3 — ⭐ THE DISCRIMINATOR: text living in a chip's *attribute*
+```
+--- search for the chip-label-only word (marmoset) ---
+ id | html_hit | json_naive_hit | json_type_aware_hit | json_catch_all_hit
+----+----------+----------------+---------------------+--------------------
+  1 | t        | f              | t                   | t
+```
+**HTML gets it FREE** — a generic tag-strip catches whatever `renderHTML()` puts between the tags. **The naive JSON walk (`$.**.text`) MISSES it** — a chip's label lives in `attrs`, not in a text node.
+
+## Result 4 — and grab-everything creates false positives
+```
+--- searching the literal word "mention" ---
+ id | html_hit | json_type_aware_hit | json_catch_all_hit
+----+----------+---------------------+--------------------
+  1 | f        | f                   | t     ← false positive
+  4 | f        | f                   | t     ← false positive
+```
+Indexing every string pulls in **node type names and ids** (`doc`, `paragraph`, `mention`, `user-42`). Searching "mention" would return documents that merely *contain* a chip.
+
+## ⭐ The verdict
+**Type-aware extraction — `text` nodes plus a named list of attribute keys that carry visible words — matches HTML exactly on every test: finds nested text, finds chip labels, no false positives.**
+
+**And the honest cost, which HTML does not have:** that list must be **maintained by hand**. Today it is one entry (`label`). Every future inline node whose visible words live in an attribute must be added, **or those words silently stop being findable.**
+
+## The real trade — both sides have a quiet failure
+| | what it gets free | how it fails quietly |
+|---|---|---|
+| **HTML** *(today)* | search, completely automatic | **reading it back needs the exact schema** — an extension change makes unknown tags *silently vanish* (tiptap's own docs, quoted above). **Content loss.** |
+| **JSON** | reading back is exact and lossless | a new attribute-carrying node not added to the list is **not findable**. **A search gap.** |
+
+🔵 **Claude's read: JSON, and now for a reason that is tested rather than asserted.** Both failures are quiet, but they are not equal — **HTML's loses writing irreversibly; JSON's only hides it from search, is detectable (search a chip label, see nothing), and is fixable afterwards by adding the key and regenerating the column.**
+⚠ **Not yet ruled by the owner.**
+
+## What this test did NOT cover
+- Real documents may use **marks with attributes**, not just nodes; the fixture used one `mention` node shape. The full inventory must come from the app's tiptap extension config.
+- Supabase's project Postgres major version was not confirmed to match 17 — check `supabase/config.toml` before relying on this there.
+- ⚠ **A quirk found by testing, in no documentation read:** Postgres's `.**` recursive wildcard returns each matching value **twice**; `string_agg(DISTINCT …)` is required.
