@@ -482,9 +482,22 @@ export function BoardSurface({
     label: string,
     compute: (measured: ReturnType<typeof read>) => Patch[],
   ) {
-    const chosen = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked);
+    // cardsRef, NOT `cards`: a click handler closes over the render it was made in, and
+    // pressing two align buttons in a row must read the positions the FIRST one just
+    // wrote. The ref is re-pointed every render, so it cannot be a stale snapshot.
+    // (Owner-reported, 2026-09-02: "if I align top and then press bottom, the second one
+    // doesn't work — have to click first".)
+    const chosen = (cardsRef.current ?? cards).filter(
+      (c) => selectedIds.has(c.placementId) && !c.locked,
+    );
     const patches = compute(read(chosen));
-    if (!patches.length) return; // already aligned, or too few cards — nothing to undo
+    if (!patches.length) {
+      // A button that does nothing is indistinguishable from a broken one. This is
+      // REACHABLE and correct: align three same-height cards to the top and their
+      // bottoms are already aligned, so "bottom" has nothing to do. Say so.
+      if (chosen.length >= 2) flashNote("already lined up");
+      return;
+    }
     const befores = new Map(chosen.map((c) => [c.bitId, { x: c.x, y: c.y }]));
     for (const p of patches) patchCard(p.placementId, p.bitId, { x: p.x, y: p.y });
     arrange.recordPlacements(label, patches, befores);
