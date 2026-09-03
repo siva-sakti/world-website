@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { signedUrls } from "@/lib/storage";
 import { pagedRows } from "@/lib/db/paged";
+import { EXPORTED_TABLES } from "@/lib/db/exported-tables";
 
 export const dynamic = "force-dynamic";
 
@@ -9,23 +10,10 @@ export const dynamic = "force-dynamic";
 // record kind as JSON, plus a signed URL per stored file so the images can be
 // pulled too. RLS scopes it to the owner. (A single zip that bundles the image
 // bytes is the next refinement; this already lets you download all your data.)
-// KEEP IN LOCKSTEP WITH THE SCHEMA (I-G1's completeness floor): any migration
-// that adds a table must add it here the same session — source and reference
-// were each missed once; this list is the third place that bug bit.
-const TABLES = [
-  "shelf_group",
-  "board",
-  "bit",
-  "placement",
-  "tag_application",
-  "connector",
-  "reference",
-  "tag",
-  "category",
-  "subtype_word",
-  "source",
-  "dormant",
-] as const;
+// The table list lives in lib/db/exported-tables.ts, where a test can import it:
+// `exported-tables.test.mjs` reads the migration directory and asserts set-equality,
+// because the comment that used to guard this list failed four times (source,
+// reference, and `opening`). Add a table to the schema and the suite goes red.
 
 export async function GET() {
   const supabase = await createClient();
@@ -39,7 +27,7 @@ export async function GET() {
   // gives the pagination a stable spine (unordered pages can repeat/drop rows).
   const tables: Record<string, Record<string, unknown>[]> = {};
   try {
-    for (const t of TABLES) {
+    for (const t of EXPORTED_TABLES) {
       tables[t] = await pagedRows<Record<string, unknown>>((from, to) =>
         supabase.from(t).select("*").order("id").range(from, to),
       );

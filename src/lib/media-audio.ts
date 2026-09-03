@@ -35,7 +35,10 @@ export type ImportedAudio = {
   durationSec: number | null; // read via loadedmetadata; null when unreadable
 };
 
-function looksAudio(file: File): boolean {
+/** Is this an audio file? EXPORTED because the board's drop-router needs the same
+ *  answer this importer will give — they used to be two hand-typed copies of the
+ *  regex, so adding a format here would have silently misrouted that format there. */
+export function looksAudio(file: File): boolean {
   return file.type.startsWith("audio/") || AUDIO_EXT.test(file.name);
 }
 

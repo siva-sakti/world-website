@@ -12,8 +12,8 @@ import {
 } from "@/lib/db/bits";
 import { uploadObject, removeObjects, imagePaths, pdfPaths, audioPath } from "@/lib/storage";
 import { importImage, isHeic } from "@/lib/media";
-import { importAudio } from "@/lib/media-audio";
-import { importPdf } from "@/lib/media-pdf";
+import { importAudio, looksAudio } from "@/lib/media-audio";
+import { importPdf, looksPdf } from "@/lib/media-pdf";
 import { looksLikeUrl } from "@/lib/page-meta";
 import { textToParagraphs } from "@/lib/html";
 import { captureLink } from "@/app/bits/actions";
@@ -223,8 +223,6 @@ export function useCreateDoors(deps: {
   // Straight from the one size table — declaring 300/56 here again is exactly how the
   // server's copy and this one drifted apart in the first place.
   const { w: AUDIO_W, h: AUDIO_H } = defaultCardSize("audio", "bit");
-  const AUDIO_FILE = /\.(m4a|mp3|mp4|aac|wav|ogg|oga|opus|webm|flac)$/i;
-  const isAudioFile = (f: File) => f.type.startsWith("audio/") || AUDIO_FILE.test(f.name);
 
   // Voice memo → an audio card. The original bytes are stored as-is (no transform,
   // no thumbnail); the optimistic card plays immediately from a local object URL.
@@ -266,7 +264,6 @@ export function useCreateDoors(deps: {
 
   const PDF_W = 240; // an unrenderable pdf card's default width (portrait sheet)
   const PDF_H = 300; //  ... and height, when there is no page-1 thumbnail to size to
-  const isPdfFile = (f: File) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
 
   // PDF → a card showing its first page. The original bytes store as-is (for the
   // viewer); a 600px page-1 JPEG stores as the thumbnail (like an image's). The card
@@ -324,8 +321,8 @@ export function useCreateDoors(deps: {
   // Route a dropped/pasted file to the right door (audio → recording, pdf → PDF,
   // else image).
   function placeDroppedFile(file: File, wx: number, wy: number, zOverride?: number) {
-    if (isAudioFile(file)) importAudioFile(file, wx, wy, zOverride);
-    else if (isPdfFile(file)) importPdfFile(file, wx, wy, zOverride);
+    if (looksAudio(file)) importAudioFile(file, wx, wy, zOverride);
+    else if (looksPdf(file)) importPdfFile(file, wx, wy, zOverride);
     else importImageFile(file, wx, wy, zOverride);
   }
 
@@ -383,7 +380,7 @@ export function useCreateDoors(deps: {
       const t = e.target as HTMLElement | null;
       if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
       const all = Array.from(e.clipboardData?.files ?? []);
-      const media = all.filter((f) => f.type.startsWith("image/") || isAudioFile(f) || isPdfFile(f));
+      const media = all.filter((f) => f.type.startsWith("image/") || looksAudio(f) || looksPdf(f));
       if (media.length) {
         const p = findClearSpot(320, 260);
         placeFiles(media, p.x, p.y);

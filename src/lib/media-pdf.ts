@@ -31,7 +31,9 @@ export type ImportedPdf = {
   byteSize: number;
 };
 
-function looksPdf(file: File): boolean {
+/** Is this a PDF? EXPORTED for the same reason as looksAudio — router and validator
+ *  must agree, and they were separately typed copies. */
+export function looksPdf(file: File): boolean {
   return file.type === "application/pdf" || /\.pdf$/i.test(file.name);
 }
 
