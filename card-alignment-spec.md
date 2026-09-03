@@ -292,3 +292,38 @@ promises an alignment and then drops the card somewhere else is worse than no li
 
 Nothing now blocks ①: it is pure functions over the ledger, locked cards are excluded exactly as
 tidy already excludes them, and it never touches the drag path.
+
+---
+
+## 12 · WHERE IT STANDS (2026-09-02, owner-verified)
+
+**Shipped and confirmed working by the owner:**
+- ✅ **Align & distribute** — "line up" (left · centre · right · top · middle · bottom) and
+  "even gaps" (across · down). *Two bugs found by the owner and fixed: the buttons read a stale
+  snapshot of card positions, so a second press calculated from where cards used to be ("have to
+  click first" was the tell); and a legitimate no-op was silent, which is indistinguishable from
+  broken — it now says "already lined up".*
+- ✅ **The guides** — magenta lines during a drag, card lands aligned on release.
+  *Owner: "the lines are coming up!"* Two of my own wiring bugs first: mounted OUTSIDE the world
+  layer while positioned in world coordinates (drawn off in the void, and my own comment claimed
+  otherwise), and a z-index below the cards, which paint over anything low on a used board.
+
+**Owner's verdict: *"they are not perfect… but I wonder if we get to the other things and refine
+this later? It seems functional enough for right now."* → REFINEMENT DEFERRED, deliberately.**
+What "not perfect" means is not yet specified — worth capturing the next time she uses it, because
+in two weeks neither of us will remember.
+
+**Outstanding, in the order it would be picked up:**
+1. **The feel-tune** (§7) — the exact magenta against the paper ground, and how strong the pull is
+   (~6 screen px was a starting guess, never tuned). Both are one-line changes.
+2. **The resting-box refinement** (§10.4) — ruled by the owner, NOT implemented. Predicted symptom:
+   *bottom* alignment of the dragged card sits a little out and settles differently once deselected;
+   left/right/centre are already exact. **If that is what "not perfect" means, this is the fix** —
+   worth checking before it is engineered.
+3. **Step ③ group drags** — the guides currently serve single-card drags; a group drag does not yet
+   snap. Nothing is broken, it simply does not participate.
+4. **Step ④ the background grid** — the owner's toggle, per board, off by default. Not started.
+   §2.4 already records that it must be drawn in SCREEN space; the world layer is a 0×0 box.
+
+**The limit that is not a bug and will not change here:** the card does not stick to the line while
+you drag — the line shows live, the card settles on release. That waits for the ruled input engine.
