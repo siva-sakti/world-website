@@ -827,3 +827,20 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 - ✅ Audio/pdf chip fallback confirmed against the board fact: on a board an audio bit IS the player (the block form, literally "how it looks on a board"); the chip adds the name form — caption → filename.
 - 🔵 **Bring-in grammar (leans, standing):** `[[` mid-sentence → chip · drawer DRAG → block between blocks · `/` menu → block. **The toggle is the safety valve under all three** — no door is a commitment (kinder than Notion's unflippable @-vs-/ choice).
 - **Schema-blocking set, final:** §21.5 format (Claude's, at the session) · **file-registry vs walk-the-docs for the orphan sweep** (NEW — surfaced 2026-09-03, Claude's, at the session) · the tie CHECK written extensibly for parked board/source gathering (mechanical) · board symmetry (the owner's pending word). Everything else open is UI and trails the build safely.
+
+
+## 30 · What can be brought in — the definitive list *(owner, 2026-09-03: "we have to know specifically")*
+The app has exactly **five nameable kinds of thing**; the list is closed, not open-ended:
+| thing | in the writing? | ruling |
+|---|---|---|
+| **a bit** (any type) | ✅ | the core |
+| **another composition** | ✅ | ruled §21.4; owner reconfirmed 2026-09-03 ("by name" — its title chip) |
+| **a whole board** | ✅ **RULED IN 2026-09-03** | owner: "maybe they want to gather a whole board and reference it — that should be OK." Was parked (A15's reverse direction); re-entry recorded in `parked.md`. Looks are already covered by the general rule: chip = its title · **block = its doorway card** (how it looks on a board, literally) |
+| **a source** | ⚪ | owner asked what it means (answered: citing the WELL, not one bucket — "as [Maria's newsletter] keeps arguing…" → chip to the source, peek to its everything-from-it page); her call pending |
+| **a tag** | ⚪ 🔵 lean: not now | a tag-chip points at a search-result, not a thing; the pull is its surface; add-later needs no rework |
+**Schema consequence:** the tie's CHECK is now load-bearing carpentry — *exactly one of: bit · board · composition* (+ source if ruled in).
+
+### 30b · Board symmetry — ✅ RULED (owner, 2026-09-03)
+*"I think we want to remember the journey — we would capture that metadata for a composition, and the board would be capturing the other side too."* **A composition on a board acts exactly like a bit:** the journey remembered (arrived · left · returned), returns REVIVE the old record (I-L1, proven machinery). **Precision kept:** the metadata is ONE record read from two sides — the board's timeline from one, the composition's page from the other. Never stored twice (derive-don't-duplicate).
+**Format decision (§21.5): delegated** — *"sounds good for you to decide when it's time."* Claude decides at the storage session, evidence on the table (standing lean: JSON).
+**⚪ Still awaiting the owner: the duplication-law stamp (§28b) · source in-or-out · the §29 red-pen marks (truncation feel · glyphs · thumb+caption · table's weak chip).**
