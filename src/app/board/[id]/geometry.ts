@@ -45,37 +45,56 @@ function lines1D(lo: number, size: number): number[] {
 
 /** Nearest edge/center alignment of `dragged` against `others`, within
  *  `threshold` (WORLD px — the caller divides screen px by the camera scale).
- *  Axes are independent: you can snap in x while free in y. Nearest candidate
- *  wins; a tie keeps the first (stable). No candidate → position unchanged,
- *  no guide.
+ *  Axes are independent: you can snap in x while free in y. The PHYSICALLY
+ *  NEAREST card wins (see `better`); a tie is decided by the tighter
+ *  alignment, then by array order — stable either way. No candidate →
+ *  position unchanged, no guide.
  *
  *  `extend` is how far the guide overshoots both boxes, in WORLD px. The caller passes
  *  a screen-px constant ÷ the camera scale, so the overshoot looks the same at every
  *  zoom — a fixed world value shrinks to a few screen px when zoomed out, exactly where
  *  seeing what you are aligning to matters most. Defaults to the original 24 so the
  *  committed tests still describe the same thing. */
+type Best = { delta: number; at: number; other: Box; dist: number };
+
+/** Straight-line distance between two boxes' centres — how the winner is chosen. */
+function centreDist(a: Box, b: Box): number {
+  return Math.hypot(a.x + a.w / 2 - (b.x + b.w / 2), a.y + a.h / 2 - (b.y + b.h / 2));
+}
+
+/** PROXIMITY FIRST, then tidiness. Every candidate here is already within the threshold,
+ *  so they are all "aligned" as far as the eye is concerned — once snapped, 1px-off and
+ *  5px-off give identical results. Letting a 4px difference in tidiness beat "this card is
+ *  right next to you" picks the wrong winner and throws a long guide line across the board
+ *  to something you were not thinking about. (Owner, 2026-09-02: it should snap "to the
+ *  closest things it is to when you drag it".) Distance decides; delta breaks ties. */
+function better(candidate: Best, current: Best | null): boolean {
+  if (!current) return true;
+  if (candidate.dist !== current.dist) return candidate.dist < current.dist;
+  return Math.abs(candidate.delta) < Math.abs(current.delta);
+}
+
 export function snapTo(dragged: Box, others: Box[], threshold: number, extend = EXTEND): SnapResult {
-  let bestX: { delta: number; at: number; other: Box } | null = null;
-  let bestY: { delta: number; at: number; other: Box } | null = null;
+  let bestX: Best | null = null;
+  let bestY: Best | null = null;
 
   const dx = lines1D(dragged.x, dragged.w);
   const dy = lines1D(dragged.y, dragged.h);
 
   for (const o of others) {
+    const dist = centreDist(dragged, o); // once per card, not per candidate line
     for (const ox of lines1D(o.x, o.w)) {
       for (const dxl of dx) {
         const delta = ox - dxl;
-        if (Math.abs(delta) <= threshold && (!bestX || Math.abs(delta) < Math.abs(bestX.delta))) {
-          bestX = { delta, at: ox, other: o };
-        }
+        const c = { delta, at: ox, other: o, dist };
+        if (Math.abs(delta) <= threshold && better(c, bestX)) bestX = c;
       }
     }
     for (const oy of lines1D(o.y, o.h)) {
       for (const dyl of dy) {
         const delta = oy - dyl;
-        if (Math.abs(delta) <= threshold && (!bestY || Math.abs(delta) < Math.abs(bestY.delta))) {
-          bestY = { delta, at: oy, other: o };
-        }
+        const c = { delta, at: oy, other: o, dist };
+        if (Math.abs(delta) <= threshold && better(c, bestY)) bestY = c;
       }
     }
   }

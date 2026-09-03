@@ -61,3 +61,25 @@ test("snap: no neighbours → identity", () => {
   const r = snapTo(box(104, 300, 100, 80), [], 6);
   assert.deepEqual([r.x, r.y, r.vGuide, r.hGuide], [104, 300, null, null]);
 });
+
+// PROXIMITY beats tidiness (owner, 2026-09-02: it should snap "to the closest things it
+// is to when you drag it"). Everything within the threshold already looks aligned once
+// snapped, so a slightly-better delta must not drag a guide across the board.
+
+test("snap: the NEAR card wins over a better-aligned FAR one", () => {
+  const dragged = box(100, 100, 50, 50);
+  const near = box(104, 160, 50, 50); // 4px off, sitting right below
+  const far = box(101, 3000, 50, 50); // 1px off — tidier, but miles away
+  const r = snapTo(dragged, [far, near], 6);
+  assert.equal(r.x, 104, "it lines up with the neighbour you are actually beside");
+  assert.ok(r.vGuide.to < 1000, "and the guide does not stretch off to the distant card");
+});
+
+test("snap: at equal distance, the tighter alignment breaks the tie", () => {
+  const dragged = box(100, 100, 50, 50);
+  // both centres are exactly 200 away, one on each side
+  const left = box(97, -100, 50, 50);
+  const right = box(101, 300, 50, 50);
+  const r = snapTo(dragged, [left, right], 6);
+  assert.equal(r.x, 101, "1px off beats 3px off when neither is nearer");
+});
