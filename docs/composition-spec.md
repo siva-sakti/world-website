@@ -9,6 +9,8 @@
 >
 > **Claude's failure mode, named so it can be guarded rather than trusted away:** fluent generation of plausible detail, which is indistinguishable from correct detail to the author. On 2026-09-02 this produced three inventions written as settled (the recursion guard · the silent-bit-hood forbidden-list · the drawer's focus requirement) and one "discovery" of a schema guard that already existed. **The guard is citation, never care.**
 >
+> **A new variant, caught 2026-09-02 — *generation to fill a rhetorical slot*.** Asked to speak positively about Notion, Claude produced: *"it's why Notion is the tool it is — people run a wiki, a task tracker, a CRM and a journal in one app because the architecture doesn't care what you're making."* **The owner asked for a confidence interval; it is ~30% and mostly wrong.** What makes Notion a CRM or tracker is its **databases** (collections · properties · filters · table/board/calendar views) — a separate system on top of blocks. **Airtable settles it:** an excellent CRM and tracker with no block model at all. *(The defensible version, ~80%: blocks are why everything **nests and rearranges freely**, and why databases and prose can mix anywhere.)* **The lesson: a requested tone is a slot Claude will fill with plausible causation. Praise must be cited exactly like criticism.**
+>
 > **Before this stops being a draft:** a line-by-line verification pass against the conversation trail, not a spot-check.
 > **This supersedes `composition-technical-spec.md`** when complete; that file and `composition-base-spec.md` retire to trail-status. Nothing here is invented: every ruling carries its provenance, and anything unruled is marked ⚪ inline rather than smoothed over.
 
