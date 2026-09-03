@@ -1,3 +1,36 @@
+# Rotation — plan (v3 pending; v2 shipped and is BROKEN in use)
+
+> ## ⚠ v2 SHIPPED AND FAILS IN THE HAND (owner, 2026-09-03: *"after I do my initial
+> rotation, I can't un-rotate… it feels like the thing is not working… I think your plan
+> actually needs to be accommodating a different set of things"*). She was right that this
+> is a PLAN failure, not only an execution slip. **Three defects, all diagnosed by reading
+> the libraries, not guessing. Do not patch: re-plan (§V3 at the bottom), owner rules the
+> one open design question, then build.**
+>
+> **D1 — the handle also starts a card DRAG (proven).** The handle stops propagation on
+> `pointerdown`. **`react-draggable` binds `mousedown`/`touchstart` and never uses pointer
+> events** (80 × `onMouseDown`, 0 × `pointerdown` in its source) — separate event streams,
+> so stopping one does nothing to the other. Pressing the handle therefore rotates AND drags
+> at once. Worse, the rotation math captures the card's centre at grab-time while the drag
+> is *moving that centre*, so the angle runs away from the hand. This is the "not working".
+> **Fix: `cancel=".compose-rotate-handle"` on the `<Rnd>` — verified forwarded to Draggable
+> (`react-rnd/lib/index.es5.js:457`)**, plus `onMouseDown`/`onTouchStart` stoppers.
+>
+> **D2 — the angle is ABSOLUTE where it must be RELATIVE.** v2 sets the card's angle to the
+> pointer's direction from centre. With the handle pinned at the upright top-centre,
+> grabbing a 45° card and moving one pixel snaps it to ~0°. **Fix: grab-delta —
+> `new = angleAtGrab + (pointerAngleNow − pointerAngleAtGrab)`.** No jump, ever.
+>
+> **D3 — the thing v2 never modelled, and the owner named it: a rotated rectangle's
+> bounding box is BIGGER than the upright one.** Everything v2 anchored to the upright box
+> is wrong once tilted — the card's corners rise *above* the box and sit exactly where the
+> fixed `-26px` handle lives (*"I'm hitting the height of that button with the card"*), and
+> the selection ring **no longer contains the card at all**.
+>
+> **D4 — no way back to upright.** v2 explicitly cut reset "to keep the gesture surface
+> small". Wrong call: un-rotating is the *first* thing wanted after rotating, and undo is
+> per-visit and gets consumed by later acts. A real straighten affordance is required.
+
 # Rotation — plan (v2, rewritten after the antagonist round)
 
 **Status:** v1 scoped → **antagonist returned 4 must-fix defects** → owner ideated the
@@ -138,3 +171,54 @@ change. No coalescing window needed — one gesture is naturally one act.
 3. `card.tsx`: handle + transform + edit-straightens + the CSS ring move.
 4. Undo + the §5 exclusions.
 5. Gates + browser proof; the owner's feel-tune (handle look, 15° snap, ring behaviour).
+
+---
+
+# §V3 — the revised design (awaiting the owner's ruling on one question)
+
+## What changes, and why each change exists
+
+| # | change | which defect it answers |
+|---|---|---|
+| 1 | **`cancel=".compose-rotate-handle"` on the `<Rnd>`**, plus `onMouseDown`/`onTouchStart` stoppers on the handle | D1 — the drag can never start from the handle, on the event stream that actually matters |
+| 2 | **Grab-delta math.** Record the card's angle AND the pointer's angle at grab; during the gesture apply the *difference* | D2 — no jump on grab, whatever the current angle |
+| 3 | **The handle ORBITS with the card** — it rides off the card's *rotated* top edge instead of a fixed point above the upright box | D3 — it can never be covered by a corner, and it always reads as belonging to this card. Implemented with a zero-size anchor at the card's centre that carries the same rotation, so the handle's position follows the angle in CSS with no per-frame JS |
+| 4 | **The selection ring tilts with the content** | D3 — a selection ring must *contain* the thing. Anchored to the upright box it visibly fails to at any real angle |
+| 5 | **A straighten affordance, two ways:** double-click the handle → 0°, and a **"straighten"** button that appears in the selected-card bar whenever a card is rotated | D4 — one discoverable, one fast; neither depends on undo |
+| 6 | Recentre the live-drag maths on every frame rather than trusting a grab-time centre | D1's second half — belt and braces even once the drag can't start |
+
+**Reversal on the record (v2 → v3):** v2 kept the ring on the upright box so it would agree
+with the resize dots. That was the wrong constraint. **Containment beats agreement** — a ring
+that doesn't contain its card is simply wrong, whereas dots that sit at the upright corners
+are merely plain. Changed deliberately, not drifted.
+
+## The one open question — the owner's call
+
+Resize dots **cannot** rotate: `re-resizable` computes its drag in unrotated screen space, so
+a tilted dot would resize along the wrong axis (the v1 antagonist proved this). So once the
+ring tilts, there are exactly two coherent options:
+
+- **(A) Keep the dots, upright.** Resize keeps working at every angle. Cost: at strong tilts
+  the four dots visibly sit off the tilted card's corners. At the light mood-board tilts the
+  references actually use, it reads fine. **← Claude's lean**
+- **(C) Hide the dots while rotated.** Always visually coherent — tilt, ring and card agree.
+  Cost: to resize a tilted card you press **straighten**, resize, re-tilt. Real friction,
+  and it makes rotation feel like a "finishing" move.
+
+Everything else in §V3 is settled and doesn't depend on this answer.
+
+## What stays exactly as it is (v2 got these right, verified in use)
+
+Per-board storage · the tilt on the inner content (never the Rnd root) · **editing
+straightens** (the owner's ruling — it works) · rotation excluded from snap guides and
+align/distribute · undo recording one act per gesture · duplicate-board carrying the tilt ·
+the geometry ledger being untouched by transforms.
+
+## Proof this time — the gap that let a broken feature ship
+
+v2 passed typecheck, 141 tests, lint and build, and was still unusable. **All four gates are
+blind to gesture behaviour**, and no test drove the handle. So v3 owes, before it is called
+done: a test over the pure grab-delta maths (angle-at-grab + pointer-delta → expected angle,
+including the wrap past ±180°), and an explicit **owner hand-check of the four things that
+broke**: grab does not drag · grab does not jump · the handle stays reachable at 45° and
+135° · straighten returns to upright.
