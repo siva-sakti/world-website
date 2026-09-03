@@ -603,12 +603,16 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 **Not an invention — the house pattern.** `placement` and `opening` already do exactly this (bit-or-board, exactly one, enforced by CHECK).
 
 ### 21.4 Composition-into-composition ✅ ALLOWED
-✅ **RULED (owner, 2026-09-02).** ⚠ **And it already works by accident** *(verified in code 2026-09-02: `gather-picker.tsx` applies no kind filter, and `reference.to_bit_id` accepts any bit — a note IS a bit today)*. **Nobody decided this; the ruling makes it deliberate**, and the new tie table must keep permitting it on purpose.
+✅ **RULED (owner, 2026-09-02)** — **on its own merits.** ⚠ **Owner's correction to Claude's framing:** *"the double brackets might historically be one way, but I'm thinking about the ideal / what we want it to be today."* Claude had argued partly from *"it already works"*; **that it works today is an accident of how notes were filed, not evidence about what is right.** The ruling stands because the capability is good.
+*(For the record, the accident is real — verified in code 2026-09-02: `gather-picker.tsx` applies no kind filter and `reference.to_bit_id` accepts any bit, so a composition can already be gathered into a composition. Nobody decided that. The new tie table must permit it **on purpose**.)*
+⚪ **And the gesture itself is open** — `[[` need not stay the way you point at something just because it started there.
 
 ### 21.5 How the writing is stored — 🔵 recommendation, not yet ruled
 **The three options, and what Notion actually does** *(owner asked)*:
 - **Notion:** every paragraph, heading and bullet is **its own database row** with a parent pointer and a position. A page is a tree of hundreds of records assembled at load. That is how it links to one paragraph, comments on one line, syncs a block across pages. **The cost is enormous** — page load assembles hundreds of rows; reordering rewrites position keys.
 - ⭐ **Why we do not need it — the owner's own ruling bought us out.** Block-rows exist so anything can point at *any block from anywhere*. §20.5c ruled links point at **whole compositions, not headings inside them**. **That single ruling is the exact requirement that forces Notion's architecture, and it was declined.**
+- **Why it works FOR NOTION anyway** *(owner asked: "people put their whole lives on Notion — how does it load quickly?")*: they load **one page's tree**, never the whole database; they **sharded Postgres** (public engineering write-up, ~2021) so a workspace sits on one shard; the client **caches every record it has seen** and syncs incrementally. Block counts run to the billions. ⚠ **And it WAS slow** — Notion carried a years-long reputation for sluggish pages and a painful mobile app. That was the architecture's bill, paid down with enormous engineering effort.
+- ⭐ **The block model buys exactly two things, and this project has declined BOTH:** (1) point at or comment on any single paragraph from anywhere — **declined §20.5c**; (2) **multiplayer** — two people typing in different paragraphs must not collide, which block granularity makes nearly free — **declined at the founding (one resident, no collaboration, ever)**. Buying the complexity would return nothing.
 - ⚠ **And note what does NOT need blocks:** folding a section · dragging a heading with its section · the table of contents. All are **editor behaviour**, not filing.
 
 **What the feature list actually demands** — only three lines have teeth:
