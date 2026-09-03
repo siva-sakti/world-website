@@ -1,4 +1,12 @@
-# Code quality pass — the plan
+# The board code-quality pass — the record
+
+**What this was (owner's framing, 2026-09-03):** *"essentially my pass with you where we finished
+board"* — the sitting that took the board from working-but-messy to a sound floor, before the
+feature wave. Named for the board because that is where the weight fell (the remove acts, the card,
+the create doors, the surface itself), though the doors it produced are app-wide.
+
+**What it is NOT:** the top-to-bottom senior review that comes next. That one asks *what could be
+built better* across the whole app; this one fixed what was already known to be wrong.
 
 **Status: 🟢 in progress.** Written 2026-09-02. Feeds the two file-size splits queued in
 `PROGRESS.md` (D-140) and clears the ground for the frame build + geometry stage 4.
