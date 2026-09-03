@@ -35,6 +35,7 @@ import { useMeaningActs } from "./use-meaning-acts";
 import { useGeometry } from "./use-geometry";
 import { UndoDevReadout } from "./undo-dev-readout";
 import { tidyPatches, backZ, groupDragPatches, nextZ as zAbove, alignPatches, distributePatches } from "./board-arrange";
+import { snapTo, type Box } from "./geometry";
 import type { Patch, AlignEdge, Axis } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
 
@@ -267,12 +268,108 @@ export function BoardSurface({
     });
   }
 
+  // ---- CARD ALIGNMENT: the guides (card-alignment-spec.md §2.2) ----
+  //
+  // Thin magenta lines while you drag, and the card lands on the alignment when you let
+  // go. It does NOT stick to the line mid-drag: react-rnd ignores position changes while
+  // dragging, so magnetic pull waits for the ruled input engine. Said up front, not
+  // discovered later.
+  //
+  // The overlay is PERMANENTLY MOUNTED and shown/hidden by mutating style — never by
+  // React state. A single-card drag causes zero re-renders today and that must hold, or
+  // dragging gets slower because of a decoration.
+  const vGuideRef = useRef<HTMLDivElement>(null);
+  const hGuideRef = useRef<HTMLDivElement>(null);
+  const SNAP_PX = 6; // screen px — divided by the zoom, so the feel is the same at 0.2x and 3x
+  const OVERSHOOT_PX = 24; // how far the line runs past both cards, also screen px
+  // Built ONCE at drag start: nothing else moves during a drag, so rebuilding per frame
+  // is wasted work. Excludes the dragged card (it would align to itself) AND the rest of
+  // the selection (followers hold a CONSTANT offset, so one within range would snap on
+  // every frame and drift the whole group).
+  const dragSnap = useRef<{ others: Box[]; moved: boolean; alt: boolean } | null>(null);
+
+  function hideGuides() {
+    if (vGuideRef.current) vGuideRef.current.style.display = "none";
+    if (hGuideRef.current) hGuideRef.current.style.display = "none";
+  }
+
+  /** The live snap for a card at (x, y), or null when nothing should happen.
+   *  Null when: no drag is in flight · the pointer has not actually MOVED (react-rnd
+   *  fires drag-stop on a plain click, and a click must never relocate a card) · Alt is
+   *  held to refuse. */
+  function snapFor(c: CardVM, x: number, y: number) {
+    const st = dragSnap.current;
+    if (!st || !st.moved || st.alt || !st.others.length) return null;
+    const scale = camRef.current.scale; // the REF: no re-render happens during a drag
+    const m = sizeOf(c.placementId);
+    const box: Box = { x, y, w: m?.w ?? c.w, h: m?.h ?? c.h };
+    return snapTo(box, st.others, SNAP_PX / scale, OVERSHOOT_PX / scale);
+  }
+
+  function drawGuides(r: ReturnType<typeof snapFor>) {
+    const scale = camRef.current.scale;
+    const thin = 1 / scale; // one screen px, whatever the zoom
+    const v = vGuideRef.current;
+    const h = hGuideRef.current;
+    if (v) {
+      if (r?.vGuide) {
+        v.style.display = "block";
+        v.style.left = `${r.vGuide.at - thin / 2}px`;
+        v.style.top = `${r.vGuide.from}px`;
+        v.style.width = `${thin}px`;
+        v.style.height = `${r.vGuide.to - r.vGuide.from}px`;
+      } else v.style.display = "none";
+    }
+    if (h) {
+      if (r?.hGuide) {
+        h.style.display = "block";
+        h.style.left = `${r.hGuide.from}px`;
+        h.style.top = `${r.hGuide.at - thin / 2}px`;
+        h.style.width = `${r.hGuide.to - r.hGuide.from}px`;
+        h.style.height = `${thin}px`;
+      } else h.style.display = "none";
+    }
+  }
+
+  /** Where the card should actually land. Card calls this in its drag-stop, BEFORE it
+   *  reports the move — so the saved position and the undo entry record the same
+   *  (snapped) truth rather than disagreeing. */
+  function snapDrop(c: CardVM, x: number, y: number, e: MouseEvent | TouchEvent) {
+    const st = dragSnap.current;
+    if (st) st.alt = "altKey" in e ? e.altKey : false; // a touch release carries no Alt
+    const r = snapFor(c, x, y);
+    hideGuides();
+    return r ? { x: r.x, y: r.y } : { x, y };
+  }
+
   // ---- move-together (multi-select drag) ----
   // Record every selected card's start position, then on drag move ONLY the OTHER
   // selected cards (the dragged card stays entirely with react-rnd until stop, else
   // its controlled position fights the internal drag and it stutters — review). On
   // stop, persist each moved card through the settled-create door (keyed per card).
   function onCardDragStart(placementId: string) {
+    // The snap's candidates: every OTHER card that is not part of this gesture, at its
+    // measured size, culled to what is roughly on screen (a neighbour 8000px away would
+    // otherwise win and draw a guide to nothing).
+    const view = boardRef.current?.getBoundingClientRect();
+    const tl = view ? screenToWorld(view.left, view.top) : null;
+    const br = view ? screenToWorld(view.left + view.width, view.top + view.height) : null;
+    const PAD = 400; // world px of slack, so a card just off-screen can still align
+    dragSnap.current = {
+      moved: false,
+      alt: false,
+      others: cards
+        .filter((c) => c.placementId !== placementId && !selectedIds.has(c.placementId))
+        .map((c) => {
+          const m = sizeOf(c.placementId);
+          return { x: c.x, y: c.y, w: m?.w ?? c.w, h: m?.h ?? c.h };
+        })
+        .filter(
+          (b) =>
+            !tl || !br ||
+            (b.x + b.w > tl.x - PAD && b.x < br.x + PAD && b.y + b.h > tl.y - PAD && b.y < br.y + PAD),
+        ),
+    };
     if (selectedIds.size > 1 && selectedIds.has(placementId)) {
       const m = new Map<string, { x: number; y: number }>();
       // locked cards never join a group drag (the one skip point — move/end gate on starts.has()).
@@ -294,6 +391,11 @@ export function BoardSurface({
   // and missed the readers: starts.has(placementId) was always false, and multi-select
   // drag silently moved only the grabbed card (senior review, 2026-09-01).
   function onCardDragMove(placementId: string, x: number, y: number) {
+    const me = cards.find((c) => c.placementId === placementId);
+    if (dragSnap.current && me) {
+      dragSnap.current.moved = true; // a real drag, not a click
+      drawGuides(snapFor(me, x, y));
+    }
     const starts = dragStart.current;
     const dragged = cards.find((c) => c.placementId === placementId);
     if (!starts || !dragged || !starts.has(dragged.bitId)) return;
@@ -311,6 +413,8 @@ export function BoardSurface({
     });
   }
   function onCardDragEnd(placementId: string, x: number, y: number) {
+    hideGuides();
+    dragSnap.current = null;
     const starts = dragStart.current;
     dragStart.current = null;
     const dragged = cards.find((c) => c.placementId === placementId);
@@ -483,6 +587,8 @@ export function BoardSurface({
 
   // An interrupted gesture (OS gesture, alert, tab switch) must strand no state.
   function onBoardPointerCancel(e: React.PointerEvent) {
+    hideGuides(); // touchcancel fires no drag-stop; the line must not strand on screen
+    dragSnap.current = null;
     pinchUp(e);
     marquee.cancel();
     pan.current = null;
@@ -649,10 +755,16 @@ export function BoardSurface({
                 (resizeBefore.current = { bitId: c.bitId, x: c.x, y: c.y, w: c.w, h: c.h })
               }
               onDragMove={(x, y) => onCardDragMove(c.placementId, x, y)}
+              snapDrop={(x, y, e) => snapDrop(c, x, y, e)}
               onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}
             />
           ))}
         </div>
+        {/* The guides. Permanently mounted and driven by style mutation — deriving their
+            visibility from React state would re-render the board on every drag frame.
+            They live in the world layer, so they pan and zoom with the board for free. */}
+        <div ref={vGuideRef} className="snap-guide" />
+        <div ref={hGuideRef} className="snap-guide" />
         {marquee.marqueeBox && (
           <div
             className="marquee-box"

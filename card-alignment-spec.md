@@ -265,7 +265,20 @@ promises an alignment and then drops the card somewhere else is worse than no li
   precedent rather than a new rule to learn. Distribute: same — locked cards are not endpoints.
 - **10.2 The grid toggle's scope — RULED: per board.**
 - **10.3 The grid's first paint** — still open, but only reachable once the grid is built (step ④).
-- **10.4 The selection-chrome problem — RULED: align the RESTING box.**
+- **10.4 The selection-chrome problem — RULED: align the RESTING box. ⚠ NOT YET IMPLEMENTED.**
+  Step ② ships using the MEASURED box, and this is stated rather than glossed. The ledger
+  observes one element per card (`.compose-card-inner`), and the selection controls live inside
+  it, so a resting measurement needs either a second observed element or a chrome-height read —
+  a real change to the geometry registry, which four other consumers depend on. Deliberately not
+  bundled into the guides.
+  **What it means in practice:** only the dragged card is inflated, only VERTICALLY (the controls
+  are full-width, so widths are unaffected), and only its middle and bottom lines — its top edge
+  is the anchor and is exact. So left/right/centre alignment is already correct; bottom alignment
+  of a dragged card can sit a few tens of px out and settles differently once deselected.
+  **Deliberately left for the owner to feel before it is engineered** — the honest reason being
+  that nobody has yet seen how much it matters, and building the correction first would be
+  guessing at its size.
+  The ruling and the reasoning, kept:
   *"The resting box, I guess that's actually what you see."* Exactly the reason. "Chrome" was
   Claude's jargon for the controls that appear AROUND a card's content when you select it — a title
   field above, the "from …" source picker below (`card.tsx`: both are gated on `selected`). Neither

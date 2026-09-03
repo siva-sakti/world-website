@@ -111,6 +111,16 @@ body {
   color: #8a8378;
   padding-right: 2px;
 }
+/* CARD ALIGNMENT — the guide lines. Magenta, from the owner's reference screenshots;
+   the exact value is hers to tune on a real board. Positioned and sized entirely by
+   style mutation during a drag (see board-surface), so nothing here sets geometry. */
+.snap-guide {
+  position: absolute;
+  display: none;
+  background: #e83e8c;
+  pointer-events: none;
+  z-index: 6;
+}
 .marquee-box {
   position: absolute;
   z-index: 4;

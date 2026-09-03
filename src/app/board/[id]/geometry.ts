@@ -37,7 +37,7 @@ export type SnapResult = {
   hGuide: Guide | null; // horizontal line (a y alignment)
 };
 
-const EXTEND = 24; // world px the guide overshoots both boxes — the reference look
+const EXTEND = 24; // DEFAULT overshoot, world px — see the `extend` parameter below
 
 function lines1D(lo: number, size: number): number[] {
   return [lo, lo + size / 2, lo + size]; // edge · center · edge
@@ -47,8 +47,14 @@ function lines1D(lo: number, size: number): number[] {
  *  `threshold` (WORLD px — the caller divides screen px by the camera scale).
  *  Axes are independent: you can snap in x while free in y. Nearest candidate
  *  wins; a tie keeps the first (stable). No candidate → position unchanged,
- *  no guide. */
-export function snapTo(dragged: Box, others: Box[], threshold: number): SnapResult {
+ *  no guide.
+ *
+ *  `extend` is how far the guide overshoots both boxes, in WORLD px. The caller passes
+ *  a screen-px constant ÷ the camera scale, so the overshoot looks the same at every
+ *  zoom — a fixed world value shrinks to a few screen px when zoomed out, exactly where
+ *  seeing what you are aligning to matters most. Defaults to the original 24 so the
+ *  committed tests still describe the same thing. */
+export function snapTo(dragged: Box, others: Box[], threshold: number, extend = EXTEND): SnapResult {
   let bestX: { delta: number; at: number; other: Box } | null = null;
   let bestY: { delta: number; at: number; other: Box } | null = null;
 
@@ -82,15 +88,15 @@ export function snapTo(dragged: Box, others: Box[], threshold: number): SnapResu
     vGuide: bestX
       ? {
           at: bestX.at,
-          from: Math.min(y, bestX.other.y) - EXTEND,
-          to: Math.max(y + dragged.h, bestX.other.y + bestX.other.h) + EXTEND,
+          from: Math.min(y, bestX.other.y) - extend,
+          to: Math.max(y + dragged.h, bestX.other.y + bestX.other.h) + extend,
         }
       : null,
     hGuide: bestY
       ? {
           at: bestY.at,
-          from: Math.min(x, bestY.other.x) - EXTEND,
-          to: Math.max(x + dragged.w, bestY.other.x + bestY.other.w) + EXTEND,
+          from: Math.min(x, bestY.other.x) - extend,
+          to: Math.max(x + dragged.w, bestY.other.x + bestY.other.w) + extend,
         }
       : null,
   };

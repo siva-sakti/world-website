@@ -76,6 +76,7 @@ export function Card({
   measureRef,
   onDragMove,
   onDragEnd,
+  snapDrop,
 }: {
   card: CardVM;
   selected: boolean;
@@ -107,6 +108,11 @@ export function Card({
    *  card's true size. Stable per placementId — passed from the one call site. */
   measureRef?: (el: HTMLElement | null) => void | (() => void);
   onDragMove?: (x: number, y: number) => void;
+  /** CARD ALIGNMENT: where the card should actually land. Called at drag-stop BEFORE the
+   *  move is reported, so the saved position and the undo entry record the same snapped
+   *  truth instead of disagreeing. The event comes with it because Alt refuses the snap
+   *  and only the event knows whether Alt was held. */
+  snapDrop?: (x: number, y: number, e: MouseEvent | TouchEvent) => { x: number; y: number };
   onDragEnd?: (x: number, y: number) => void;
 }) {
   // Two-step: a fresh click selects (shows the resize frame); clicking an
@@ -182,9 +188,12 @@ export function Card({
       className={`compose-card${selected ? " is-selected" : ""}`}
       onDragStart={() => onDragStart?.()}
       onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
-      onDragStop={(_e, d) => {
-        onChange({ x: d.x, y: d.y }, "move");
-        onDragEnd?.(d.x, d.y);
+      onDragStop={(e, d) => {
+        // The snap lands FIRST, and BOTH consumers get the same coords — forwarding the
+        // raw drop to onDragEnd would desynchronise a group drag by the snap distance.
+        const at = snapDrop ? snapDrop(d.x, d.y, e as MouseEvent | TouchEvent) : { x: d.x, y: d.y };
+        onChange({ x: at.x, y: at.y }, "move");
+        onDragEnd?.(at.x, at.y);
       }}
       onResizeStart={() => onResizeStart?.()}
       onResizeStop={(_e, _dir, ref, _delta, pos) => {
