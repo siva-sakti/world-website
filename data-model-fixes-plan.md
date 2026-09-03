@@ -1,6 +1,53 @@
 # Data-model fixes — plan
 
-**Status:** written 2026-09-03 → **awaiting antagonist review** → owner's go → build.
+> # ⛔ VERDICT: DO NOT BUILD AS WRITTEN (antagonist, 2026-09-03)
+> The review ran every claim against a real PG17 built from the full migration chain, and
+> **the plan's central premise is false.** Six must-fix findings; §§0/1/2 and §4 need
+> re-planning, not editing. **v2 of this plan is owed before any code.** The findings, in
+> the order they matter:
+>
+> - **M1 · §0 is FALSE.** "A bulk upsert is impossible because the indexes are partial" —
+>   the PostgREST half is right, but the conclusion isn't: **D-134's own fix was to swap
+>   partial indexes for plain ones** (`NULLS DISTINCT` makes them equivalent here), proven
+>   on a live DB. I cited D-134 as authority for the opposite of what it says. **And the
+>   better fix exists**: a dedupe-first `merge_tags` RPC (`delete` colliding rows →
+>   `update tag_id` → `delete tag`), one atomic round trip, **which preserves `created_at`
+>   for free — so §2 dissolves entirely.**
+> - **M2 · §1's fix does not close the data-loss item.** Proven: paging fixes truncation
+>   only; a concurrent `applyTag` *during* the paged read is still destroyed by the CASCADE,
+>   silently. Only `select … for update` on the tag row inside the RPC closes it (proven
+>   with two live sessions).
+> - **M3 · The loop I proposed keeping runs in the BROWSER** (`tag-manager.tsx:48` is a
+>   client component). A 1200-application merge = 1200 sequential fetches from the tab;
+>   close it midway and you get a half-merge. This codebase already wrote that lesson down
+>   (`actions.ts:191-195`, `GATHER_CAP = 200`).
+> - **M4 · §4's mechanism cannot be compiled.** There is no *negative* `WHEN` list, and the
+>   drift-proof whole-row form is rejected outright: *"BEFORE trigger's WHEN condition
+>   cannot reference NEW generated columns."* It must be a hand-written positive list, it is
+>   **two** triggers not one, and `state` must be excluded deliberately or the fix
+>   re-introduces the very bump it removes.
+> - **M5 · §6's warning cannot ride the `error` field.** Both callers treat `error` as total
+>   failure, so the copy would exist while the UI reports failure and never paints it —
+>   strictly worse than today. Needs a signature change, with call sites shown first.
+> - **M6 · §1's order key was malformed** (`"a, b"` is one string, not two keys) **and not a
+>   total order.** Use `.order("id")`.
+>
+> **The finding that touches ALREADY-SHIPPED work (W5):** `duplicateBoard` reads
+> `board_cards` **unpaged** (`boards.ts:70-73`). The A2 fix is correct about *which* rows to
+> copy and still silently copies short past 1000 cards. `getBoardCards` (`:109-113`) is
+> unpaged too — a big board simply renders short. I named four unpaged reads; there are
+> about twelve, and I missed the two that matter most.
+>
+> **Two errors of my own worth naming:** I wrote that I had checked `data-map`, `parked`,
+> `invariants`, SPEC and the D-log for the accounts landmine — and omitted
+> **`accounts-stub.md`**, which is the one document that exists for exactly that list (W9).
+> And I over-conceded the proof as impossible locally: `max_rows` is set in
+> `supabase/config.toml:18` and the Supabase CLI is installed, so the truncation **is**
+> locally reproducible (W10). No cloud check is owed.
+>
+> Full findings incl. W1-W10 and the verified-correct list: the review, folded into v2.
+
+**Status:** written 2026-09-03 → **antagonist: DO NOT BUILD (see above)** → v2 owed → owner's go → build.
 Source: the antagonist model review (2026-09-03). Its two A-class holes are already
 **fixed and proven** (A1 the trash/archive crossfire; A2 duplicate-board copying invisible
 cards). This plan covers **everything that remains**, and nothing else.
