@@ -1,0 +1,57 @@
+--- 1. the column exists, nullable, double precision ---
+ column_name |    data_type     | is_nullable 
+-------------+------------------+-------------
+ angle       | double precision | YES
+(1 row)
+
+--- 2. THE RLS TRAP: security_invoker must have SURVIVED the view replace ---
+   relname   | security_invoker 
+-------------+------------------
+ board_cards | true
+(1 row)
+
+--- 2b. and it survived on EVERY view, not just this one ---
+ views_with_invoker | views_total 
+--------------------+-------------
+                 11 |          11
+(1 row)
+
+--- 3. existing cards are upright by default (no backfill needed) ---
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ defaults_to_upright 
+---------------------
+ t
+(1 row)
+
+--- 4. any real angle stores, including negative and fractional ---
+UPDATE 1
+ angle  
+--------
+ -12.75
+(1 row)
+
+--- 5. the view EXPOSES it (the read-back path the plan calls defect 3) ---
+ angle_via_view 
+----------------
+         -12.75
+(1 row)
+
+--- 6. PER-BOARD: the same bit on a second board is independent ---
+INSERT 0 1
+INSERT 0 1
+               board_id               | angle  
+--------------------------------------+--------
+ 00000000-0000-0000-0000-0000000000c1 | -12.75
+ 00000000-0000-0000-0000-0000000000c4 |       
+(2 rows)
+
+--- expected: one board tilted -12.75, the other null (upright) — same bit ---
+--- 7. the render rule still holds: trash the bit, neither card renders ---
+UPDATE 1
+ cards_after_trash 
+-------------------
+                 0
+(1 row)
+

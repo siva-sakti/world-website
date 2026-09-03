@@ -175,6 +175,21 @@ export function useArrangeActs(deps: {
     );
   }
 
+  /** One finished rotate gesture (rotation-plan §6). Mirrors recordResize's shape:
+   *  recorded on handle-RELEASE, never per frame, so one gesture is one act — no
+   *  coalescing window is needed (unlike nudges, which arrive as a burst of keystrokes).
+   *  `angle` is legal on locked rows at the DB (the lock filter is x/y-scoped) and the
+   *  handle is hidden while locked, so this needs no forced-door special case. */
+  function recordRotate(bitId: string, before: number, after: number) {
+    if (before === after) return; // a handle touch that never turned is not an act
+    const applyAngle = async (deg: number) => {
+      const cur = cardsRef.current?.find((c) => c.bitId === bitId);
+      if (!cur) throw new Error("that card no longer exists on this board");
+      patchCard(cur.placementId, cur.bitId, { angle: deg });
+    };
+    record("rotate card", [bitId], () => applyAngle(before), () => applyAngle(after));
+  }
+
   /** Send-to-back (deliberate z). Click-to-front stays raw — a reflex. */
   function recordSendToBack(bitId: string, fromZ: number, toZ: number) {
     const applyZ = async (z: number) => {
@@ -195,5 +210,5 @@ export function useArrangeActs(deps: {
       () => doToggle(bitId, on));
   }
 
-  return { recordMove, recordGroupMove, recordResize, noteNudge, closeNudgeWindow, recordTidy, recordPlacements, recordSendToBack, recordLock };
+  return { recordMove, recordGroupMove, recordResize, recordRotate, noteNudge, closeNudgeWindow, recordTidy, recordPlacements, recordSendToBack, recordLock };
 }

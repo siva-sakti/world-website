@@ -77,6 +77,7 @@ export function Card({
   onDragMove,
   onDragEnd,
   snapDrop,
+  onRotateEnd,
 }: {
   card: CardVM;
   selected: boolean;
@@ -114,10 +115,17 @@ export function Card({
    *  and only the event knows whether Alt was held. */
   snapDrop?: (x: number, y: number, e: MouseEvent | TouchEvent) => { x: number; y: number };
   onDragEnd?: (x: number, y: number) => void;
+  /** A finished rotate gesture — the board records it as ONE undo act (§6). */
+  onRotateEnd?: (before: number, after: number) => void;
 }) {
   // Two-step: a fresh click selects (shows the resize frame); clicking an
   // already-selected text card enters edit mode.
   const wasSelected = useRef(false);
+  // ROTATION (rotation-plan §1): the live angle during a handle drag. null = not
+  // rotating, so the card shows its stored angle. Kept in state (not a ref) because
+  // the tilt must repaint each frame; the drag is rare and short, unlike a card drag.
+  const [liveAngle, setLiveAngle] = useState<number | null>(null);
+  const rotateFrom = useRef(0); // the angle when this gesture began — the undo `before`
   // Coarse pointer (touch) → the fat resize dots. Read after mount: handles only
   // render once selected (client state), so there's no hydration risk.
   const [coarse, setCoarse] = useState(false);
@@ -125,6 +133,52 @@ export function Card({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time device capability read
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
   }, []);
+  // ---- rotation (rotation-plan §1, §3) ----
+  const liveRef = useRef<number | null>(null); // the value; state below only repaints
+  /** Degrees in (-180, 180] — small, signed, with 0 meaning upright. */
+  const normDeg = (d: number) => {
+    const m = ((d % 360) + 360) % 360;
+    return m > 180 ? m - 360 : m;
+  };
+  const angle = liveAngle ?? card.angle ?? 0;
+  const rotated = angle !== 0;
+  // THE OWNER'S RULING: editing straightens the content — you work on it level, and it
+  // re-tilts when you leave. Also removes a tilted caret, tilted selection highlights and
+  // tilted spell-check underlines, none of which any browser draws well.
+  const tilt = rotated && !editing ? angle : 0;
+
+  /** Drag the top-centre handle to spin the card about its own middle. The angle comes
+   *  from atan2 in SCREEN space, which is scale-invariant — no camera math needed. The
+   *  centre is read from the inner element's bounding rect, and a CSS rotation about the
+   *  centre leaves that centre fixed, so the reading stays true mid-gesture. */
+  function onRotateHandleDown(e: React.PointerEvent) {
+    e.stopPropagation(); // never let this start a card drag or a board pan
+    e.preventDefault();
+    const el = innerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    rotateFrom.current = card.angle ?? 0;
+    const move = (ev: PointerEvent) => {
+      const deg = (Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90;
+      const v = normDeg(ev.shiftKey ? Math.round(deg / 15) * 15 : deg);
+      liveRef.current = v;
+      setLiveAngle(v);
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      const after = liveRef.current;
+      liveRef.current = null;
+      setLiveAngle(null);
+      // The board persists AND records; a gesture that never turned is not an act.
+      if (after !== null && after !== rotateFrom.current) onRotateEnd?.(rotateFrom.current, after);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
+
   const isNote = card.kind === "note";
   const isText = card.type === "text" && !isNote; // a note renders as a doorway, not editable text
   // An <audio> player sizes like TEXT, not like an image: width-resizable, height
@@ -185,7 +239,7 @@ export function Card({
       minWidth={70}
       minHeight={28}
       style={{ zIndex: card.z }}
-      className={`compose-card${selected ? " is-selected" : ""}`}
+      className={`compose-card${selected ? " is-selected" : ""}${tilt ? " is-rotated" : ""}`}
       onDragStart={() => onDragStart?.()}
       onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
       onDragStop={(e, d) => {
@@ -206,9 +260,20 @@ export function Card({
         );
       }}
     >
+      {/* The rotate handle — top-centre, OUTSIDE the rotated inner div so it stays put
+          instead of orbiting the card. Same visibility gate as the resize dots. */}
+      {selected && !editing && !card.locked && (
+        <div
+          className="compose-rotate-handle"
+          onPointerDown={onRotateHandleDown}
+          title="Drag to rotate — hold Shift for 15° steps"
+          aria-label="Rotate this card"
+        />
+      )}
       <div
         ref={setInner}
         data-pid={card.placementId}
+        style={tilt ? { transform: `rotate(${tilt}deg)` } : undefined}
         className={`compose-card-inner${
           isNote
             ? " is-note"

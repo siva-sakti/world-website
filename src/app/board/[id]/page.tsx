@@ -65,6 +65,7 @@ export default async function BoardPage({
           fileUrl,
           content: meta.get(r.target_bit_id!)?.content ?? undefined,
           locked: Boolean(r.locked_at),
+          angle: r.angle ?? undefined,
           url: type === "link" ? (r.url ?? undefined) : undefined,
           label: type === "link" ? (r.label ?? undefined) : undefined,
           sourceName: r.source_name ?? undefined,

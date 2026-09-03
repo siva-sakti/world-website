@@ -5,7 +5,11 @@ import { updatePlacement, updateBitBody, updateBitContent } from "@/lib/db/bits"
 import { reconcileReferences, extractRefIds } from "@/lib/db/references";
 import type { CardVM } from "./card-vm";
 
-type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number };
+// NOTE (rotation, 2026-09-03): this list and schedule()'s copy below are a HARD-CODED
+// pair — a CardVM key absent from both is silently dropped on its way to the database
+// (the act works for the session, then vanishes on reload, with no error anywhere).
+// Any future placement field must be added in BOTH places, and in bits.ts's `Pos`.
+type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number; angle?: number };
 
 // Debounced persistence for the board: coalesce a card's rapid moves/keystrokes
 // into one write per ~350ms, per card — and make a move wait for the card's
@@ -56,6 +60,7 @@ export function usePersistence(
     if (patch.w !== undefined) cur.placement.width = patch.w;
     if (patch.h !== undefined) cur.placement.height = patch.h;
     if (patch.z !== undefined) cur.placement.z = patch.z;
+    if (patch.angle !== undefined) cur.placement.angle = patch.angle;
     if (patch.body !== undefined) cur.body = patch.body;
     pending.current.set(placementId, cur);
     const existing = timers.current.get(placementId);

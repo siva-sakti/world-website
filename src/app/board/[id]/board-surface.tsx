@@ -307,6 +307,7 @@ export function BoardSurface({
   function snapFor(c: CardVM, x: number, y: number) {
     const st = dragSnap.current;
     if (!st || !st.moved || st.alt || !st.others.length) return null;
+    if (c.angle) return null; // the dragged card is rotated → it opts out too (§5)
     const scale = camRef.current.scale; // the REF: no re-render happens during a drag
     const m = sizeOf(c.placementId);
     const box: Box = { x, y, w: m?.w ?? c.w, h: m?.h ?? c.h };
@@ -366,7 +367,10 @@ export function BoardSurface({
       moved: false,
       alt: false,
       others: cards
-        .filter((c) => c.placementId !== placementId && !selectedIds.has(c.placementId))
+        // `!c.angle`: a rotated card opts OUT of alignment (rotation-plan §5, owner-ruled)
+        // — its stored box is not what the eye sees, so it would draw a guide to an edge
+        // that isn't there. Both directions: see snapFor for the dragged card.
+        .filter((c) => c.placementId !== placementId && !selectedIds.has(c.placementId) && !c.angle)
         .map((c) => {
           const m = sizeOf(c.placementId);
           return { x: c.x, y: c.y, w: m?.w ?? c.w, h: m?.h ?? c.h };
@@ -495,7 +499,7 @@ export function BoardSurface({
     // (Owner-reported, 2026-09-02: "if I align top and then press bottom, the second one
     // doesn't work — have to click first".)
     const chosen = (cardsRef.current ?? cards).filter(
-      (c) => selectedIds.has(c.placementId) && !c.locked,
+      (c) => selectedIds.has(c.placementId) && !c.locked && !c.angle,
     );
     const patches = compute(read(chosen));
     if (!patches.length) {
@@ -683,7 +687,14 @@ export function BoardSurface({
     }
   }
 
-  const alignableCount = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked).length;
+  // Locked AND rotated cards are excluded by the align acts, so the buttons must count the
+  // same way (rotation-plan §5 — a rotated card opts out of alignment exactly as a locked
+  // one does; its stored rectangle is no longer what the eye sees, so aligning its edges
+  // would line up something invisible). Tidy is deliberately NOT filtered: it arranges into
+  // a grid rather than aligning edges, and a tilted card sits in its slot perfectly well.
+  const alignableCount = cards.filter(
+    (c) => selectedIds.has(c.placementId) && !c.locked && !c.angle,
+  ).length;
   const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
 
   return (
@@ -813,6 +824,12 @@ export function BoardSurface({
                 }
                 // "grow" (auto-widen) and "write" (body) route RAW — reflexes and flow.
                 patchCard(c.placementId, c.bitId, patch);
+              }}
+              onRotateEnd={(before, after) => {
+                // One finished spin: persist through the normal save path, and record ONE
+                // undo act. Both here (not in card.tsx) so the card stays presentational.
+                patchCard(c.placementId, c.bitId, { angle: after });
+                arrange.recordRotate(c.bitId, before, after);
               }}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
               onSourceAct={(prev, next) => meaning.recordSourceChange(c.bitId, prev, next)}

@@ -106,6 +106,7 @@ export type BoardCard = {
   target_visibility: Visibility | null;
   source_id: string | null; // the source row's id (the view exposes it beside the name)
   locked_at: string | null; // locked = position frozen (B+)
+  angle: number | null; // degrees; null = upright. Per-BOARD arrangement, like x/y/z
   source_name: string | null; // "from …" — the bit's source travels with it (P8)
   source_url: string | null; // the source's optional clickable link
 };

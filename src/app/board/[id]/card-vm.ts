@@ -35,6 +35,10 @@ export type CardVM = {
   fileUrl?: string; // audio (resolved storage URL for the <audio> player)
   content?: string; // owner words: a text bit's optional title (D-087) / a media caption (§2b)
   locked?: boolean; // position frozen (B+): drag/resize/nudge/tidy skip it
+  /** Degrees; undefined/0 = upright. PRESENTATION ONLY: the tilt is a CSS transform on the
+   *  inner content, so w/h and every measurement stay in unrotated space (rotation-plan §1).
+   *  A rotated card opts OUT of alignment, exactly as a locked one does (§5). */
+  angle?: number;
   url?: string; // a LINK bit's substance — the card's open-↗ target
   label?: string; // a link bit's computed face (caption → read-once title → url) for the title strip
   sourceName?: string; // "from …" — the bit's source (travels with it, P8)

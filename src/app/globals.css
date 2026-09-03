@@ -422,6 +422,52 @@ body {
   outline-offset: 1px;
   border-color: transparent;
 }
+/* ROTATION (rotation-plan §3). The tilt is a transform on the INNER content, so the
+   selection ring — normally drawn on that same inner div — would tilt with it while the
+   resize dots (rendered by the library on the UPRIGHT root) stayed square: visibly
+   detached corners. So on a rotated card the ring moves to the upright box, where it
+   agrees with the dots. The card's own paper border stays with the content and tilts,
+   which is right: that edge belongs to the thing, the ring belongs to the selection UI. */
+.compose-card.is-rotated.is-selected .compose-card-inner {
+  outline: none;
+  border-color: #e7e1d5;
+}
+.compose-card.is-rotated.is-selected {
+  outline: 2px solid #365a8c;
+  outline-offset: 1px;
+}
+/* The rotate handle: top-centre, clear of the four corner resize dots (the
+   Figma/Canva/PowerPoint convention). Sits outside the rotated content so it holds
+   its place rather than orbiting. */
+.compose-rotate-handle {
+  position: absolute;
+  left: 50%;
+  top: -26px;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border-radius: 50%;
+  background: #fffdfa;
+  border: 1px solid #365a8c;
+  cursor: grab;
+  touch-action: none; /* the pointer drag owns the gesture; no scroll-steal */
+  z-index: 2;
+}
+.compose-rotate-handle::after {
+  /* a short stem down to the card, so the handle reads as attached to it */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 8px;
+  margin-left: -0.5px;
+  background: #365a8c;
+  opacity: 0.5;
+}
+.compose-rotate-handle:active {
+  cursor: grabbing;
+}
 /* Media card (§2b / expand-to-edit): the image/ink fills the whole card at its
    resting footprint; the caption + source float in a panel BELOW the card (see
    .compose-media-meta) so they NEVER compress the content — content is sacred.
