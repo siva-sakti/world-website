@@ -251,7 +251,7 @@ are first-pass observations only — what already exists, what a thing would tou
 The owner's own framing question: *"I don't know if this should happen before or after we
 straighten out compositions."* Claude's read is in §4g.
 
-### 1 · Duplicate a bit
+### 1 · Duplicate a bit — **now specified: `duplicate-a-bit-spec.md`** (5 questions open, one of them blocking)
 *"You're on a board, you want that same bit — you just want a copy of it… we have to think about
 nuances there, like how is that identified now… I thought we were also saying, well, it's not the
 same exact one that's on a board, right, it's a COPY of a bit."*
