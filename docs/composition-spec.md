@@ -671,6 +671,8 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 - Export: no special handling beyond including the files — *(owner: "wouldn't export just be taking what the user is viewing")*. Concern dropped.
 
 ### 23.2 The floater — composing while looking at a board *(🔵 Claude's analysis, for the owner's rulings)*
+⚠ **STATUS NOTE (2026-09-03, later that day):** the owner opened her reply to this section with *"No — I don't think it should gather, it should be more like a hovering thing"* and pivoted to a NEW feature (the hover layer, §26) **without reading the rest of this section** (her words). So the proposal below is **neither confirmed nor vetoed** — re-present it when the board-side posture is actually built.
+
 **The gesture to define: dragging a card from the board into the floater GATHERS — it never moves.** The bit lands in the writing at the insertion point; the card stays placed exactly where it was (gather is a tie, not a relocation). ⚠ If unspecified, drag-as-move gets built and a board rearranges itself while you write. *(Already ruled nearby: no drawer in the floater — "the board itself is the drawer in that posture.")*
 
 **Hole 1 — the same composition open twice** (its page + the floater): two editors autosaving one document silently overwrite each other. Was already the frame-handoff debt; the floater makes it live. 🔵 Simplest guard: **one live editor at a time** — the second opening is read-only with a "writing elsewhere — take over?" door.
@@ -679,5 +681,70 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 **The synergy to build on purpose:** "make this a bit" in the floater offers **"…and place it on this board"** — the reverse flow (scene 5, writing→board) becoming one act via the existing call-in machinery.
 ⚪ Small: is the floater's open state remembered per board? (The hide-toggle was ruled stored — same question, smaller.)
 
-### 23.3 Where the owner left off (lunch, 2026-09-03)
-Her model, holding: **the composition works like Notion's editor** — linear blocks, paste anything (images included, resizable), everything pasted/typed is WRITING; "make this a bit" is the deliberate opt-in that makes material. **Waiting on her:** the six scenes (esp. scene 4 — window or copy — and scene 5 — the reverse flow) · pasted image = writing, confirm? · does a gathered thing get a visible origin tell?
+### 23.3 ~~Where the owner left off (lunch)~~ — superseded by §24–§26, written when she returned
+
+
+## 24 · The composing model — SETTLED *(owner, 2026-09-03: "the notion surface is the way I wanna do it")*
+
+### 24.1 The ruling
+The composition is a **Notion-style linear editor**: every unit is a full-width block in a vertical flow, dragged up/down only. **Everything typed or pasted — text AND images — is WRITING, never automatically a bit.** *(Owner: "when we compose… it's going to be like a block line thing and of course they can resize… and if they want, they can also make it a bit — but when they're in the compose we don't assume they want bits.")* A bit exists on this surface only by a deliberate act: **brought in** (gather) or **promoted** ("make this a bit", F-5).
+
+### 24.2 Identity vs collection *(the distinction that unlocked it)*
+A Notion block has an id from birth (client-side, verified — research doc §10) — but Notion has **no collection of blocks**: addressable ≠ collected. Here, every block gets an **identity** (needed for reorder/links); **no block enters the collection**. "Bit" keeps meaning *deliberately kept material*. Write 2,000 words → the collection is unchanged.
+
+### 24.3 Pasted images — ✅ writing, and the file mechanics *(🔵 Claude's analysis of the trap, accepted direction)*
+A pasted image is a block of writing (resizable, left/centre/right), NOT a bit. Its **file** still needs a home → **composition-owned files**: same bucket + downscale/thumbnail code as bits, no bit row — the document references the path. Lifecycle: **reconcile-on-save** (the chips' own mechanism — compare the doc's image list to stored files) · **never delete eagerly** (undo must restore) — orphans go by deferred sweep. ⛔ **Rejected: pasted images as hidden bits** — reintroduces things-are-bits-without-deciding + a leaky hidden state. **Promotion moves the file into bit ownership** (else destroying the composition orphans a bit's image on three boards).
+
+### 24.4 Promotion and the flatness law
+- **Ruled (foundations): only compositions weave — a bit never gathers** (no outgoing ties). ⚠ Today's build still lets a plain bit's page use `[[`; **that door closes at the split.**
+- **Incoming is untouched:** any bit can be gathered *into* any composition. So a promoted paragraph = an **ordinary text bit** — gatherable elsewhere, placeable on boards. *(Owner asked "does that mess up anywhere?" — no.)*
+- ⚪ **The one edge, needs a ruling:** promoting a paragraph that **contains a chip**. Flatness forbids the new bit carrying the tie. 🔵 Lean: **the chip flattens to its plain text in the new bit** — the sentence reads, the tie stays behind. (The existing destroyed-chip degrade rule, applied at birth.)
+
+### 24.5 The presence split it produces
+| on the surface | nature | can drift? | editable here? |
+|---|---|---|---|
+| typed / pasted (text, images, your tables) | **yours — writing** | never | fully |
+| gathered (chip or block) | **a tie to material** | yes — edits elsewhere show here | ⚪ **the window-or-copy question — OPEN** |
+⚪ Also open: does a gathered thing get a small **origin tell**, or stay visually identical to your own content? (Two identical-looking images, one can drift — the seam is real.)
+
+### 24.6 The scenes *(run 2026-09-03; the model's test fixtures)*
+S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → drawer → weave) ✓ **the promise working** · S-C3 six pasted screenshots → all writing; one promoted later ✓ · **S-C4 the typo in a gathered quote → ⚪ window-or-copy, unanswered** · **S-C5 essay wants to become a board → laborious (promote × N); F-4 piece-as-board's re-entry case; "either order" is a core principle, so the roughness matters** · S-C6 the inline table → formatting; promote when wanted ✓ · S-C7 quoting your own earlier piece → whole-composition tie or plain paste; a *passage* can't be pulled — escape: make the section its own composition; feel it in practice.
+
+## 25 · The moves — the practical inventory *(laid out 2026-09-03 at the owner's ask: "what are the moves, what do we limit, what flexibility might they want — literally")*
+**Markers: ✅ ruled · 🔨 built today · ⚪ open · ⛔ limited on purpose.**
+- **Write:** type/Enter/Shift+Enter 🔨 · bold·italic·quote·lists 🔨 · headings ✅(🔨 unstyled) · checklist ✅ planned · a table you make = writing ✅ · `/` menu (typed `/` only, never re-fires on paste/undo) ✅ · collapsible sections ✅ wanted (⚪ heading-is-the-unit, Claude's lean, vs separate toggles)
+- **Move writing:** cut/copy/paste the main path ✅ · drag block up/down ✅ · heading carries its section ✅ · folded+backspace → unfold first ✅ · undo ~15 ✅
+- **Bring in:** `[[` → chip 🔨 · the drawer ✅ planned · block form ✅ ruled ⛔ not built · outside text → paragraph + waiting "make this a bit" ✅ · **paste an image → writing ✅ (§24.3)** · gather a board/source ⚪ parked
+- **Act on a brought-in thing:** chip click → peek ✅ · block click → selects ✅ · resize/align ✅ · presence stored per-tie ✅ (§23.1) · delete → tie dropped on save 🔨 · **edit it here ⚪ window-or-copy**
+- **Get around / meta:** contents (nav only) ✅ · links to headings ✅ · lock ✅ · tag/place/trash inherited ✅
+- **⛔ On purpose:** nothing floats (content) · typing never mints bits · no columns/page-nesting (hierarchy is Notion's move; the web here is tags+gather) · no auto-anything (sole exception: the exit-minted title) · no `[[` in the title · no built side-by-side
+- **Flexibility they WILL ask for** — decide before they ask: "fix the typo right here" (⚪ window-or-copy) · "collapse this block to a chip" (⚪ per-spot chip↔block toggle — 🔵 lean yes) · "colors/highlights/callouts" (⚪ where formatting stops — callouts cut once, make it a ruled line) · "two columns just here" (answer = the board; the refusal must feel good) · "turn this list into a board" (F-4, parked)
+
+## 26 · THE HOVER LAYER — bits propped above the writing *(the owner's feature, 2026-09-03 — fully ruled in one sitting)*
+
+### 26.1 What it is *(the owner's own description)*
+On the composition page, **summon a bit — one or several — and it hovers above the page as a small movable window while you compose underneath.** *"If people want to bring up a bit or a couple of bits and refresh them without the whole board… like a cork-board set-up."* Two layers: **the linear page** (the piece) and **a viewing layer** on top (the owner's desk furniture). *"It wouldn't be like a board surface — it'd be two surfaces almost… and that view can be hidden."*
+
+### 26.2 Why it's legal under the guardrails (§22)
+- **"Nothing floats in writing — ever"** banned floating *content* — part of the piece. These windows are **not in the piece**: a reader never sees them, export never includes them.
+- **"Spatial belongs to boards"** survives because of what position *means*: on a board, position IS the thinking; here it is **parking** — meaningless, private, furniture.
+- Lineage: **the peek, grown up** (summonable without a chip, persistent, movable). **Distinct from F-6** (board-peek): boards are ⛔ excluded here (owner: too small; the board-side posture §23.2 covers that want).
+
+### 26.3 The rulings *(each in the owner's words, 2026-09-03)*
+| question | ruling |
+|---|---|
+| what's remembered | ✅ **positions too** — the full geometry, per composition ("I think 3") |
+| editing from a window | ⛔ **viewing only** — "we shouldn't let people edit bits from this display; they have to go into the specific page or onto the board" |
+| stick to screen or text | ✅ **screen-fixed** — "it would stay put while you scroll" *(text-anchored = margin notes, a different feature, not this)* |
+| what can be summoned | ✅ **bits only** — "a board would be too small… and we have the other way [composing while on a board]" |
+| the door | ✅ **the drawer** — "the natural door is the drawer" |
+| drawer drag vs prop | 🔵 **lean (Claude's, answering her "how do we distinguish"):** **drag = into the writing** (an insert needs a position; the drag carries it) · **a pin button = prop up** (a window needs none). No modes. |
+| a pinned bit is trashed | ✅ **the window just disappears** — 🔵 mechanic: the row is *hidden, not deleted* → restore brings the window back; destroy cascades the row |
+| hide-all | ✅ one toggle for the whole layer, **remembered** |
+| a cap | ✅ **none** — "as long as we can manage it on our side" (trivial: tiny rows) |
+
+### 26.4 Claude's smaller calls *(🔵 unless marked)*
+Not in the composition's undo (not the piece) · exists on the composition **page only** — never inside the board-side floater · summoning an already-open bit **focuses** its window (one row per bit per composition) · off-screen positions **clamp** into view · content is **stale until refresh** if edited elsewhere (the app's last-arrival norm) · long text scrolls inside its window · every window carries **"open →"** to the real page · collapse form ⚪ (pill in place vs an edge strip — pure design, undecided).
+
+### 26.5 Storage, sequencing, name
+**One new table** — owner · composition_id · bit_id · x · y · w · h · collapsed — unique(composition, bit), FK-cascade on destroy, owner-only RLS. **Anchored on the composition table, so it BUILDS ONLY AFTER THE SPLIT** *(the owner called this: "it relates to storage, which is why we have to hash it out first")*. **Orthogonal to §21.5** (HTML-vs-JSON) — the layer deliberately lives outside the document. **Build order: last** — step 6 of: ① the split → ② editor core → ③ bring-in (picker-reaches-everything · block form · presence-on-tie) → ④ make-this-a-bit + pasted images → ⑤ postures → ⑥ the hover layer. ⚪ **Needs a name from the owner** (user-facing; owner writes the voice).
