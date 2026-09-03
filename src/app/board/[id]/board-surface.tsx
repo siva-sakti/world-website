@@ -545,6 +545,13 @@ export function BoardSurface({
     if (duplicatingBit) return;
     setDuplicatingBit(true);
     try {
+      // FLUSH FIRST. Body keystrokes ride a 350ms debounce, and duplicateBit reads the
+      // ROW — so typing a sentence and duplicating inside that window would copy the text
+      // as it was BEFORE the sentence, while the screen shows both cards identical. You
+      // would only find out on reload. duplicateThis (the board copy) has always done
+      // this; this door shipped without it.
+      await flushAll();
+      await pendingCreates(); // a card made seconds ago must have its row before it is read
       const res = await duplicateBitAction(c.bitId, { boardId, x: c.x + 24, y: c.y + 24 });
       if (res.error || !res.bitId || !res.placementId) {
         onErr(new Error(res.error ?? "Couldn't duplicate that."));
@@ -671,6 +678,7 @@ export function BoardSurface({
     }
   }
 
+  const alignableCount = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked).length;
   const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
 
   return (
@@ -681,6 +689,11 @@ export function BoardSurface({
         selectMode={selectMode}
         onToggleSelect={() => { if (selectMode) clearSelection(); setSelectMode((m) => !m); }}
         selectedCount={selectedIds.size}
+        // The align acts EXCLUDE locked cards, so their buttons must count the same way:
+        // "2 selected, 1 locked" would otherwise offer a button that silently does nothing,
+        // and "3 selected, 1 locked" would offer even-gaps and then say "already lined up",
+        // which is a lie — they aren't, there just aren't three free cards to spread.
+        alignableCount={alignableCount}
         onBulkUnplace={bulkUnplace}
         onBulkTrash={bulkTrash}
         onTidy={tidySelected}
@@ -716,6 +729,7 @@ export function BoardSurface({
           onToggleLock={() => toggleLock(selectedBit)}
           onSendToBack={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
           onDuplicate={() => void duplicateSelected(selectedBit)}
+          duplicating={duplicatingBit}
           onUnplace={() => unplaceSelected(selectedBit.placementId)}
           onTrash={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
         />

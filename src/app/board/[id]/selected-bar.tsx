@@ -21,6 +21,7 @@ export function SelectedBar({
   onToggleLock,
   onSendToBack,
   onDuplicate,
+  duplicating,
   onUnplace,
   onTrash,
 }: {
@@ -34,6 +35,9 @@ export function SelectedBar({
   onSendToBack: () => void;
   /** Make a real COPY — its own bit, its own file — beside this one. */
   onDuplicate: () => void;
+  /** In flight. Copying a large file takes seconds; a button that looks dead is worse
+   *  than a slow one. */
+  duplicating: boolean;
   onUnplace: () => void;
   onTrash: () => void;
 }) {
@@ -74,9 +78,10 @@ export function SelectedBar({
         <button
           className="compose-btn subtle"
           onClick={onDuplicate}
+          disabled={duplicating}
           title="Make a copy — its own bit, with its own file; changing or trashing one leaves the other alone"
         >
-          duplicate this bit
+          {duplicating ? "duplicating…" : "duplicate this bit"}
         </button>
         <button
           className="compose-btn subtle"

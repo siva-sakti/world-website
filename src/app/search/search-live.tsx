@@ -79,7 +79,14 @@ export function SearchLive({
     setErr(null);
     try {
       const res = await makeBoardFromBits(results.map((r) => r.id), activeTag?.word ?? null);
-      if (res.error) setErr(res.error);
+      // NAVIGATE ONLY WHEN IT ALL LANDED. Setting a message and pushing in the same tick
+      // unmounts this component before the message paints — so a partial failure ("2 of
+      // those couldn't be placed") was written and instantly thrown away, dropping you on
+      // a board with things missing and no word about it. On failure we stay put and say so.
+      if (res.error) {
+        setErr(res.error);
+        return;
+      }
       if (res.boardId) router.push(`/board/${res.boardId}`);
     } catch {
       setErr("Couldn't make that board — try again.");

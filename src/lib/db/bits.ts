@@ -494,7 +494,7 @@ export async function getBitMeta(
  *  untouched, and the destroy path never has to learn about any of this.
  *
  *  WHAT COMES ACROSS: type · kind · body · strokes · content · url · captured_title · the
- *  media facts · source · subtype word · TAGS (ruled).
+ *  media facts · source · subtype word · shelf folder · TAGS (ruled).
  *  WHAT DOES NOT: the star (a star means "alive for me right now"; a fresh copy has not
  *  earned it) · gather references (those point at the ORIGINAL from inside your writing) ·
  *  travel (it has been nowhere) · trash/archive state (a copy is born live) · `face`, which
@@ -507,8 +507,8 @@ export async function getBitMeta(
 export async function duplicateBit(supabase: SupabaseClient, bitId: string): Promise<Bit> {
   const { data: orig, error: readErr } = await supabase
     .from("bit").select("*").eq("id", bitId).is("deleted_at", null).single();
-  if (readErr) throw readErr;
-  if (!orig) throw new Error("that no longer exists — reload");
+  // .single() rejects on 0 rows, so a trashed-elsewhere original lands here, not below.
+  if (readErr) throw new Error("that no longer exists — reload");
 
   const newId = crypto.randomUUID();
   const src = orig as Bit;
@@ -550,6 +550,11 @@ export async function duplicateBit(supabase: SupabaseClient, bitId: string): Pro
         file_name: src.file_name,
         source_id: src.source_id,
         subtype_word_id: src.subtype_word_id,
+        // The shelf FOLDER comes across. It was silently dropped until review: a bit filed
+        // in a folder produced a copy filed nowhere, with no ruling behind it — and
+        // duplicateBoard has always carried its own group_id, so the two duplicate doors
+        // disagreed. Filed with its original is the answer that needs no explanation.
+        group_id: src.group_id,
       })
       .select("*")
       .single();
@@ -557,8 +562,9 @@ export async function duplicateBit(supabase: SupabaseClient, bitId: string): Pro
 
     // The tags come across (ruled). A failure here leaves a real, usable copy that is
     // simply untagged — worth surfacing, never worth destroying the copy over.
-    const { data: applied } = await supabase
+    const { data: applied, error: tagReadErr } = await supabase
       .from("tag_application").select("tag_id").eq("target_bit_id", bitId);
+    if (tagReadErr) console.error("duplicateBit: couldn't read the original's tags:", tagReadErr);
     if (applied?.length) {
       const { error: tagErr } = await supabase
         .from("tag_application")
@@ -570,4 +576,44 @@ export async function duplicateBit(supabase: SupabaseClient, bitId: string): Pro
     if (copied.length) await removeObjects(supabase, copied).catch(() => {}); // no half-thing
     throw e;
   }
+}
+
+/** PLACE MANY BITS ON A BRAND-NEW BOARD — two round trips, not two per bit.
+ *
+ *  `callInBit` is insert-OR-REVIVE: it checks the board and bit are live, then handles a
+ *  collision with a departed placement row. On a board created moments ago **none of that
+ *  can happen** — there is no prior placement to collide with and the board's liveness is
+ *  not in question. Looping it was ~2 round trips per bit; "make a board from these" over
+ *  a busy tag meant hundreds of sequential trips and a request that could outlive itself,
+ *  leaving a half-filled board the owner was never told about.
+ *
+ *  So: ONE liveness check over all the ids, then ONE insert. Bits that are trashed or
+ *  archived are returned as `skipped` rather than silently dropped — the caller says so.
+ *
+ *  Only safe for a board with no placements yet. Anything else must keep using callInBit. */
+export async function placeManyOnNewBoard(
+  supabase: SupabaseClient,
+  boardId: string,
+  entries: { bitId: string; x: number; y: number }[],
+): Promise<{ placed: number; skipped: string[] }> {
+  if (!entries.length) return { placed: 0, skipped: [] };
+  const ids = entries.map((e) => e.bitId);
+  const { data: live, error: liveErr } = await supabase
+    .from("bit").select("id").in("id", ids).eq("state", "live");
+  if (liveErr) throw liveErr;
+  const liveIds = new Set((live ?? []).map((b) => b.id as string));
+  const ok = entries.filter((e) => liveIds.has(e.bitId));
+  const skipped = ids.filter((id) => !liveIds.has(id));
+  if (!ok.length) return { placed: 0, skipped };
+  const { error } = await supabase.from("placement").insert(
+    ok.map((e, i) => ({
+      board_id: boardId,
+      target_bit_id: e.bitId,
+      x: e.x,
+      y: e.y,
+      z: i, // arrival order becomes stacking order — later things sit on top
+    })),
+  );
+  if (error) throw error;
+  return { placed: ok.length, skipped };
 }

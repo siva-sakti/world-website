@@ -10,6 +10,7 @@ export function BoardToolbar({
   selectMode,
   onToggleSelect,
   selectedCount,
+  alignableCount,
   onBulkUnplace,
   onBulkTrash,
   onTidy,
@@ -40,6 +41,9 @@ export function BoardToolbar({
   selectMode: boolean;
   onToggleSelect: () => void;
   selectedCount: number;
+  /** How many of the selection can actually be aligned — locked cards are excluded by
+   *  the acts, so the BUTTONS must count the same way or they offer a no-op. */
+  alignableCount: number;
   onBulkUnplace: () => void;
   onBulkTrash: () => void;
   onTidy: () => void;
@@ -104,6 +108,7 @@ export function BoardToolbar({
               The compact alternative is real alignment ICONS (a line with bars flush to it) —
               that is a visual decision for the design pass, not one to invent here.
               Distribute needs three: with two there is no gap between them to even out. */}
+          {alignableCount > 1 && (
           <span className="compose-align" role="group" aria-label="Line the selected cards up">
             <span className="compose-align-label">line up</span>
             <button className="compose-btn subtle" onClick={() => onAlign("left")} title="Line up their left edges">left</button>
@@ -113,7 +118,8 @@ export function BoardToolbar({
             <button className="compose-btn subtle" onClick={() => onAlign("vmiddle")} title="Line up their middles, top to bottom">middle</button>
             <button className="compose-btn subtle" onClick={() => onAlign("bottom")} title="Line up their bottom edges">bottom</button>
           </span>
-          {selectedCount > 2 && (
+          )}
+          {alignableCount > 2 && (
             <span className="compose-align" role="group" aria-label="Even out the gaps">
               <span className="compose-align-label">even gaps</span>
               <button className="compose-btn subtle" onClick={() => onDistribute("h")} title="Even out the gaps, left to right">across</button>

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/require-user";
-import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate, duplicateBit } from "@/lib/db/bits";
+import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate, duplicateBit, placeManyOnNewBoard } from "@/lib/db/bits";
 import { archiveBit } from "@/lib/db/resting";
 import { uploadObject, removeObjects, linkThumbPath } from "@/lib/storage";
 import { getBoardCards, createBoard } from "@/lib/db/boards";
@@ -154,9 +154,19 @@ export async function duplicateBitAction(
     let placementId: string | undefined;
     if (place) {
       placementId = randomUUID();
-      await callInBit(supabase, {
-        bitId: copy.id, boardId: place.boardId, placementId, x: place.x, y: place.y,
-      });
+      try {
+        await callInBit(supabase, {
+          bitId: copy.id, boardId: place.boardId, placementId, x: place.x, y: place.y,
+        });
+      } catch (e) {
+        // The COPY already exists — its row and its files landed. Destroying it here would
+        // throw away something that succeeded; saying "couldn't duplicate" would be a lie
+        // and would invite a retry that makes ANOTHER copy. So: tell the truth about where
+        // it went. It is a loose bit, which is exactly what a bit on no board is.
+        console.error("duplicateBitAction: the copy was made but could not be placed:", e);
+        revalidatePath("/bits");
+        return { bitId: copy.id, error: "The copy was made, but it couldn't land on this board — you'll find it in your bits." };
+      }
       revalidatePath(`/board/${place.boardId}`);
     }
     revalidatePath("/bits");
@@ -208,30 +218,23 @@ export async function makeBoardFromBits(
   const supabase = await createClient();
   await requireUser(supabase);
   const board = await createBoard(supabase, title);
-  let failed = 0;
-  let firstMsg = "";
-  for (let i = 0; i < bitIds.length; i++) {
-    const { x, y } = gridPointForIndex(i, bitIds.length);
-    try {
-      await callInBit(supabase, { bitId: bitIds[i], boardId: board.id, placementId: randomUUID(), x, y });
-    } catch (e) {
-      failed++;
-      if (!firstMsg) firstMsg = e instanceof Error ? e.message : "";
-      console.error("makeBoardFromBits: a bit failed:", e);
-    }
-  }
+  // Two round trips for the whole batch (placeManyOnNewBoard), not two PER BIT. The loop
+  // this replaced could outlive its own request on a busy tag and leave a half-filled
+  // board with the owner told only that it "failed".
+  const { placed, skipped } = await placeManyOnNewBoard(
+    supabase,
+    board.id,
+    bitIds.map((bitId, i) => ({ bitId, ...gridPointForIndex(i, bitIds.length) })),
+  );
   revalidatePath("/");
   revalidatePath("/bits");
   revalidatePath(`/board/${board.id}`);
-  if (failed === bitIds.length) {
-    return {
-      boardId: board.id,
-      error: firstMsg === "TRASHED_BIT"
-        ? "Those are in the trash — the board was made, but it's empty."
-        : "The board was made, but nothing could be placed on it.",
-    };
+  if (!placed) {
+    return { boardId: board.id, error: "The board was made, but nothing could be placed on it — those may be in the trash." };
   }
-  if (failed) return { boardId: board.id, error: `The board was made — ${failed} of those couldn't be placed on it.` };
+  if (skipped.length) {
+    return { boardId: board.id, error: `The board was made — ${skipped.length} of those couldn't be placed (in the trash or archived).` };
+  }
   return { boardId: board.id };
 }
 
@@ -304,9 +307,10 @@ export async function captureLink(
  *  independent, so one failure must not abandon the rest, and the owner is told whether
  *  it was all of them or some.
  *
- *  No confirm here, by owner ruling (2026-09-02) — archive is reversible, unlike trash.
- *  NOTE the asymmetry that leaves: the SINGLE archive button (archive-controls.tsx:45)
- *  does ask. Flagged to the owner, deliberate, not an oversight.
+ *  Asks first, through the ONE archive confirm (app/archive/archive-confirm) that the
+ *  single ArchiveButton also uses — so "does archiving ask?" is answered in one file.
+ *  (This comment used to describe an asymmetry between the two doors; the shared door
+ *  removed it, and the comment outlived the fact.)
  *
  *  Revalidates /bits (the bit leaves the live list — listAllBits filters state='live')
  *  and /archive (where it now appears), the same pair archiveItemAction uses. */
