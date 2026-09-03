@@ -552,7 +552,24 @@ export function BoardSurface({
       }
       // Paint it locally rather than reloading the board — the copy carries the same
       // renderable facts, only its identity and position differ.
-      const copy: CardVM = { ...c, bitId: res.bitId, placementId: res.placementId, x: c.x + 24, y: c.y + 24, z: nextZ() };
+      // Spread the original for its RENDERABLE facts, then override everything that
+      // belongs to the original rather than to the copy:
+      //  · locked — the lock is THIS card's position on THIS board. callInBit does not
+      //    lock the new placement, so inheriting it would make the screen disagree with
+      //    the database until a reload: a card that looks frozen and isn't.
+      //  · imageUrl / fileUrl — the original's signed object. The copy has its OWN file
+      //    now (the owner's ruling), so it gets its own urls back from the action.
+      const copy: CardVM = {
+        ...c,
+        bitId: res.bitId,
+        placementId: res.placementId,
+        x: c.x + 24,
+        y: c.y + 24,
+        z: nextZ(),
+        locked: false,
+        imageUrl: res.imageUrl,
+        fileUrl: res.fileUrl,
+      };
       setCards((cs) => [...cs, copy]);
       selectOne(res.placementId);
       setLooseRefresh((n) => n + 1);

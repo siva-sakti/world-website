@@ -9,6 +9,8 @@ import { archiveBit } from "@/lib/db/resting";
 import { uploadObject, removeObjects, linkThumbPath } from "@/lib/storage";
 import { getBoardCards, createBoard } from "@/lib/db/boards";
 import { anchorNearContent, pointForIndex, gridPointForIndex } from "./placement-anchor";
+import { resolveCardMedia } from "@/app/board/[id]/card-defaults";
+import { isCardType } from "@/app/board/[id]/card-vm";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, fetchImageBlob, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
@@ -144,7 +146,7 @@ export async function trashFromInbox(formData: FormData) {
 export async function duplicateBitAction(
   bitId: string,
   place?: { boardId: string; x: number; y: number },
-): Promise<{ bitId?: string; placementId?: string; error?: string }> {
+): Promise<{ bitId?: string; placementId?: string; imageUrl?: string; fileUrl?: string; error?: string }> {
   const supabase = await createClient();
   await requireUser(supabase);
   try {
@@ -159,7 +161,17 @@ export async function duplicateBitAction(
     }
     revalidatePath("/bits");
     revalidatePath("/");
-    return { bitId: copy.id, placementId };
+    // The COPY'S OWN signed urls. The board paints the new card immediately, and without
+    // these it would show the ORIGINAL's object — right pixels, wrong file, and blank if
+    // the original is destroyed before a reload.
+    const media = isCardType(copy.type)
+      ? await resolveCardMedia(supabase, {
+          type: copy.type,
+          thumb_path: copy.thumb_path,
+          storage_path: copy.storage_path,
+        })
+      : {};
+    return { bitId: copy.id, placementId, ...media };
   } catch (e) {
     console.error("duplicateBitAction:", e);
     return { error: "Couldn't duplicate that — try again." };
