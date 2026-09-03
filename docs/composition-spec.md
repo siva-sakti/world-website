@@ -793,3 +793,23 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 ### 28c · Board symmetry *(owner, leaning: "when this goes on a board it should act like a bit")*
 🔵 Claude's recommendation: take it as the principle — **on a board, a composition behaves exactly as a bit does**, which implies it inherits the arrival-record + revive-on-return machinery bits already have (proven, run-1d). One behavior for everything placeable. ⚪ Awaiting the owner's word (her first instinct was no-history; symmetry says keep it because bits do).
 ✅ **"Done" state: RULED OUT** (owner, 2026-09-03: "I don't think there has to be a done state") — the gradient stays felt, never stored.
+
+
+## 29 · The chip, per type — the goal-state table *(working doc, 2026-09-03; the owner: "consider each case, slowly")*
+**The anchor is the owner's general rule:** *"the BLOCK is however that bit looks on a board; the CHIP is its collapsed form — its filename or title."* This table defines the collapsed form per type. **Statuses: 🟢 settled (ruled/built) · 🔵 Claude's lean · ⚪ fork, hers.**
+**The chip's four jobs (why restraint IS the function):** weave without stopping · the tie itself (backlink/graph structure even unclicked) · a door back · compression — the chip is the NAME, the block is the CONTENT. Click: tap → peek · **pin on the peek → a hover window (§26 — one viewing family)** · "open →" lives inside the peek, never on bare click 🔵.
+
+| type | the chip shows | status + notes |
+|---|---|---|
+| **text** | your title, else first words of the body | 🟢 built · ⚪ **truncation cap needed** (nothing enforces one today; lean ~40ch + …) |
+| **image** | tiny thumbnail at line height | 🟢 owner-blessed, built · ⚪ captioned image: thumb alone (🔵 lean; caption lives in the peek) vs thumb+caption |
+| **drawing** | the doodle itself, line-height, ink-ratio width | 🟢 built; wide doodles squint, the peek carries them — settled |
+| **audio** | caption → else **filename** (schema fact: uncaptioned audio has NO face — deliberate) | 🔵 + ♪ glyph · ⛔ never an inline player (the player is the block) |
+| **pdf** | caption → else filename | 🔵 + 📄 glyph |
+| **link** | caption → captured title → URL | 🟢 face ruled (D-129) · ⚠ design deliberately against confusion with ordinary web hyperlinks (the pill already separates; 🔵 tiny 🔗) |
+| **table** *(future type)* | caption/title → else 🔵 ⊞ + first header cells truncated | **an unnamed table is a weak chip and that is accepted** — the block is a table's natural form; the chip is its travel costume. No titling nags (deliberateness) |
+| *(composition)* | its title — guaranteed (minted on exit) | 🟢 by construction |
+
+**Cross-cutting forks (⚪ the owner's):** glyphs on non-text chips, yes/no · the truncation feel · thumb-alone vs thumb+caption.
+**Gaps surfaced by this pass:** no truncation exists today · **the `[[` picker cannot offer audio/pdf/link bits at all** (verified: it filters text-with-face + image/drawing only) — reach is part of the claim.
+**`[[` itself: kept.** The Obsidian-familiar gesture survives as the claim ("type `[[` and pull anything you have into the sentence") — costume theirs, machinery ours. The heritage rationale (inline-tagging resonance) is retired; the standing rationale is that mid-sentence weaving needs a keyboard door.
