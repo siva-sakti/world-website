@@ -29,5 +29,8 @@ export function usePersistence(
   onErr: (e: unknown) => void,
 ) {
   const state = useRef(newQueueState());
+  // The five maps are board-lifetime mutable state, never read for rendering, and useRef
+  // hands back the SAME object on every pass (a StrictMode double-render included).
+  // eslint-disable-next-line react-hooks/refs -- board-lifetime state, not render input
   return makeWriteQueue(state.current, supabase, setCards, onErr, defaultWriteDoors);
 }
