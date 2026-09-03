@@ -166,3 +166,102 @@ ledger being unaffected (CSS transforms don't change `offsetWidth`/`ResizeObserv
   sound and shipped. It got the *interaction* wrong in four ways (§1), and the four green
   gates could not see it. The owner found all of it in about a minute of use.
 - **The lesson worth keeping:** gates prove a build; only a hand proves a gesture.
+
+---
+
+# §V4 — STOP. The structural miss, found by the owner 2026-09-03
+
+**Symptom:** *"I have a card previously rotated… I'm not able to rotate it back, and I'm also
+not even really able to click out to click onto any other card. I'm kind of stuck."*
+
+**Immediate unstick for the owner:** press **Escape** (twice if the card is in edit mode) —
+`use-board-keys` clears the selection. A selected tilted card also shows a **straighten**
+button in its bar. Neither of these is the fix; they are the way out.
+
+## 1 · The miss, stated plainly
+
+Every version of this plan — v1, v2, v3 — modelled **where the tilt is DRAWN** and never
+**where the card is CLICKABLE.** Those are different rectangles, and rotation is precisely the
+feature that pulls them apart.
+
+Rotating `.compose-card-inner` does not change the Rnd root's box, the geometry ledger, the
+marquee maths, or z-order. But the rotated content **overflows its own box and stays fully
+hit-testable**. So a tilted card's corners now sit over its neighbours and over empty board,
+and clicks that *look* like they land on another card — or on blank space to deselect — land
+on the tilted card instead and re-select it. **That is the "stuck": near a tilted card, every
+click is that card.** The bigger the card and the stronger the tilt, the larger the dead zone.
+
+v3's §8 named "hit-testing stays axis-aligned" as a *cosmetic* limit ("a few pixels at light
+tilts"). That was wrong in kind, not degree: it is not a rounding error at the edges, it is a
+**growing region where the board stops responding to what the eye sees**.
+
+## 2 · What is reachable, per state (the matrix the owner asked for)
+
+`○` reachable · `△` reachable but wrong-feeling · `✗` blocked · **bold = the failures**
+
+| you want to… | card upright | card tilted, unselected | tilted, selected | tilted, editing |
+|---|---|---|---|---|
+| select this card by clicking it | ○ | ○ | ○ | ○ |
+| **click a neighbour under the tilt's overflow** | ○ | **✗ hits this card** | **✗** | **✗** |
+| **click empty board to deselect** | ○ | **✗ if inside the overflow** | **✗** | **✗** |
+| Escape to deselect | ○ | ○ | ○ | ○ (twice) |
+| find the rotate handle | ○ | n/a (hidden) | △ **orbits — at 150° it is below the card, where nothing suggests looking** | ✗ hidden |
+| straighten | n/a | ✗ (bar needs selection) | ○ button | ✗ |
+| resize | ○ | n/a | △ dots upright, off the visual corners | ✗ |
+| marquee-select across it | ○ | △ tests the upright box, not the tilt | △ | △ |
+| read it while editing | ○ | n/a | n/a | ○ (straightens — this part works) |
+
+**Three failures, one cause.** The first two are the overflow. The third is that an orbiting
+handle is findable at 20° and unfindable at 150°.
+
+## 3 · Why this cannot be patched at this layer
+
+The hit area is the Rnd root's rectangle. To make clicks match the picture, one of these must
+be true, and only the last is honest:
+
+- **(a) Shrink what's clickable to the tilted shape** — impossible in CSS on an unrotated
+  box; would need per-card hit polygons the board doesn't have.
+- **(b) Grow the root to the tilted bounding box** — the root's size IS the card's stored
+  `w/h`, read by the ledger, tidy, fit, marquee, resize and persistence. Changing it to a
+  rotation-derived box corrupts every one of them. Rejected outright.
+- **(c) Rotate the root instead** — react-draggable overwrites its transform every frame
+  (v1's proven death).
+- **(d) Own the input layer** — hit-test against real geometry we control, which is exactly
+  what the committed next phase (`board-actions-technical-audit.md`, D-135: *own the input*)
+  exists to do. Rotation is the first feature that genuinely **requires** it.
+
+## 4 · What it needs to be a functional product (the owner's second question)
+
+Four properties. Today's build has one.
+
+1. **What you see is what you click.** ✗ — the overflow breaks it.
+2. **You can always get out.** ○ — Escape + straighten (added in v3).
+3. **The control is findable at any angle.** ✗ — orbiting hides it at large angles.
+4. **Neighbours stay reachable.** ✗ — same overflow.
+
+## 5 · The fork — the owner's call, and Claude will not build until she rules
+
+- **(A) Ship a deliberately SMALL rotation now.** Cap the angle at ±20°, which is the tilt the
+  reference mood-boards actually use. At 20° a 400×300 card overflows its box by ~50px at the
+  corners — real but small, and the handle stays near the top where it is findable. Property 1
+  becomes "true enough at the only angles allowed". Honest, shippable today, and it forecloses
+  nothing.
+- **(B) Park rotation until the input engine.** Keep the column, the storage and the straighten
+  button; hide the handle. Nothing is lost, nothing is half-true, and rotation returns as a
+  first-class feature the moment we own hit-testing. This is what an engineer with no schedule
+  pressure would do.
+- **(C) Ship it as-is and live with the dead zones.** Not recommended, recorded for completeness.
+
+**Claude's recommendation: (B), with (A) as the compromise if the owner wants the feeling now.**
+The reasoning: property 1 is not a polish item, it is what makes a canvas trustworthy, and
+three failed plans in a row is the signal that the layer is wrong rather than the details.
+The input engine was already the committed next phase; rotation is now its clearest
+justification rather than a detour from it.
+
+## 6 · The process lesson (worth more than the feature)
+
+v1 died on a rendering assumption. v2 shipped on four green gates and failed in the hand. v3
+fixed four real defects and still failed, because all three plans modelled the same layer — how
+it LOOKS — and never modelled how it is REACHED. **The owner found in a minute what three
+adversarial reviews missed, because she was the only one clicking.** The gates, the antagonist,
+and the unit tests all had a blind spot with the same shape: none of them touch the board.
