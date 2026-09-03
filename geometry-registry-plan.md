@@ -167,9 +167,16 @@ px), easy to drift past, ⌘/Ctrl refuses, edges + centers only.
 
 **Settled by the references:** guide color = magenta (`#e83e8c`-family against the paper
 ground; exact value at build) · gesture-only · full-length lines. **Bundled (owner offered,
-default yes):** the live W×H readout during a resize. **Observed, NOT proposed:** rotation —
-ruled out v1 long ago; recorded as artist-practice evidence for the aesthetics phase's
-re-entry question, the owner's call then.
+default yes):** the live W×H readout during a resize. **SUPERSEDED — rotation is now RULED
+IN (`organize-phase-plan.md` §4g item 2, 2026-09-02):** what this section called "not
+proposed" was the re-entry condition being named, not a permanent no. The owner's call landed
+the next day: *"I do think rotation matters now that we're getting more visual spatial… if we
+do alignment, I think we should just let alignment happen… if they've done certain things with
+the cards then it can no longer align."* **The ruling that dissolves the conflict with THIS
+plan: a rotated card opts OUT of alignment**, the same rule locked cards already follow — so
+`snapTo` never has to reason about rotated boxes, and rotation can be built before or after
+stage 4 without either being reworked. Rotation itself is not scheduled into a build order yet
+(a separate question from whether it's ruled in) — see `organize-phase-plan.md` §4g.
 
 ## 5 · Stages & proof
 
