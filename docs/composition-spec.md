@@ -820,3 +820,10 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 **The claim test passed:** mentions and embeds are the two grades of "available inside your writing" — kill chips and you can interleave but never CITE ("as [♪ morning memo] says"). Inline mentions are table stakes (Apple Notes links · Notion @ · Google Docs @). Text-chip = title-else-opening-words is Apple Notes' own convention — familiar by construction.
 **Faces for audio/pdf: chip-side, not schema-side** — the deliberate no-face ruling (audio migration) stands; the chip's collapsed form falls back caption → filename per the owner's general rule, in the component only.
 **The user's lesson is one gesture:** collapse a block → the chip; expand a chip → the block. The toggle IS the teaching.
+
+
+### 29c · Stamped: chips AND blocks, both in *(owner, 2026-09-03: "OK fine let's build inline… let's also have the block mentions… might as well build it and architect it in our schema")*
+- ✅ Inline mentions (chips) + embeds (blocks) both live in the architecture from day one.
+- ✅ Audio/pdf chip fallback confirmed against the board fact: on a board an audio bit IS the player (the block form, literally "how it looks on a board"); the chip adds the name form — caption → filename.
+- 🔵 **Bring-in grammar (leans, standing):** `[[` mid-sentence → chip · drawer DRAG → block between blocks · `/` menu → block. **The toggle is the safety valve under all three** — no door is a commitment (kinder than Notion's unflippable @-vs-/ choice).
+- **Schema-blocking set, final:** §21.5 format (Claude's, at the session) · **file-registry vs walk-the-docs for the orphan sweep** (NEW — surfaced 2026-09-03, Claude's, at the session) · the tie CHECK written extensibly for parked board/source gathering (mechanical) · board symmetry (the owner's pending word). Everything else open is UI and trails the build safely.
