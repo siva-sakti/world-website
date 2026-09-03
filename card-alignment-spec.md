@@ -33,14 +33,14 @@ to the largest card, in reading order (rows banded at 40px, left-to-right within
 **Owner ruled 2026-09-02: stays exactly as built, not extended** — align buttons cover what she
 actually wanted from it, without needing a reading order at all.
 
-### 2.2 · Alignment guides — maths built + tested, UNWIRED
+### 2.2 · Alignment guides — ✅ BUILT AND SHIPPED (2026-09-02; see §12)
 While you drag **one** card, **at most ONE** thin magenta line per axis appears — the nearest
 alignment of an edge or centre of it to an edge or centre of another card, within a small
 distance. (`SnapResult` carries one guide per axis; "wherever" was wrong in the first draft.) On release the card lands exactly
 on that alignment. Lines vanish on release. Each card offers 3 lines per axis: **near edge ·
 centre · far edge**. Axes are decided independently. Nearest candidate wins; ties keep the first.
 
-### 2.3 · Align & distribute — NOT BUILT
+### 2.3 · Align & distribute — ✅ BUILT AND SHIPPED (2026-09-02; see §12)
 Buttons acting on a selection of 2+ cards.
 **Align:** left · horizontal centre · right · top · vertical middle · bottom.
 **Distribute:** horizontally · vertically — equal gaps between adjacent cards.
@@ -194,10 +194,9 @@ the caption rule in §5 reads right.
 
 ---
 
-## 8 · THE TECHNICAL PLAN — to be independently checked before code
+## 8 · THE TECHNICAL PLAN — ⚠️ HISTORICAL. Written before the build and left as written, so the plan can be compared with what shipped. **§12 is the live status; this section is not.**
 
-**8.1 · What exists.** `snapTo(dragged, others, threshold)` in `geometry.ts` — pure, 7 tests,
-**no caller**. The size ledger (`use-geometry`) gives live true sizes. `card.tsx:184` reports live
+**8.1 · What existed AT PLANNING TIME.** `snapTo(dragged, others, threshold)` in `geometry.ts` — pure, 7 tests, **no caller**. *(It has callers now — `board-surface.tsx` computes it per drag frame and at the drop.)* The size ledger (`use-geometry`) gives live true sizes. `card.tsx:184` reports live
 drag coords; `card.tsx:185-188` reports the drop.
 
 **8.2 · The ordering constraint.** `card.tsx:186` writes the RAW drop (`onChange({x,y},"move")`)

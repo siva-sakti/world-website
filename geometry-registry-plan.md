@@ -201,7 +201,10 @@ The maths shipped with stages 1–3 and has **no consumer**: `snapTo` in `geomet
 and covered by 7 tests, and nothing calls it. This section is the WIRING plan — the part that
 was never written.
 
-### What exists vs what is missing
+### What existed vs what was missing — ⚠️ AS OF THE PLANNING MOMENT (2026-09-02).
+**Stage 4 has since SHIPPED**: the overlay exists (`board-surface.tsx`), `snapTo` has callers, and
+the guides draw and snap. Live status lives in `card-alignment-spec.md` §12. The table below is
+kept as the plan's starting picture, not as a description of today.
 
 | Piece | State |
 |---|---|

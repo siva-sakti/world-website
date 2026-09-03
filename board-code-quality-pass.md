@@ -1,5 +1,11 @@
 # The board code-quality pass — the record
 
+> ⚠️ **LINE COUNTS IN THIS DOCUMENT ARE HISTORICAL.** They record what a file measured at the
+> moment a section was written, and the board has been built on heavily since. As of 2026-09-03:
+> `board-surface.tsx` 905 · `use-create-doors.ts` 503 · `lib/db/bits.ts` 631.
+> A count inside a section describes that section's moment. Do not read them as current — this
+> document had THREE different figures for `board-surface.tsx` before this banner was added.
+
 **What this was (owner's framing, 2026-09-03):** *"essentially my pass with you where we finished
 board"* — the sitting that took the board from working-but-messy to a sound floor, before the
 feature wave. Named for the board because that is where the weight fell (the remove acts, the card,
