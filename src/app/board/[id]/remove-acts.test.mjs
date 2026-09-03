@@ -21,7 +21,10 @@ function card(bitId, extra = {}) {
 
 /** A whole fake board. `acts` is the module under test, wired to spies. */
 function makeBoard(initial, opts = {}) {
-  const log = { unplaced: [], trashed: [], restored: [], calledIn: [], locked: [], forgot: [], errors: [], looseRefreshes: 0, confirms: [] };
+  const log = {
+    unplaced: [], trashed: [], restored: [], archived: [], unarchived: [], calledIn: [], locked: [],
+    forgot: [], errors: [], looseRefreshes: 0, confirms: [], archiveConfirms: [],
+  };
   let cards = [...initial];
   const cardsRef = { get current() { return cards; } };
   const tracked = [];
@@ -64,6 +67,11 @@ function makeBoard(initial, opts = {}) {
         log.trashed.push(bitId);
       },
       restoreBit: async (_s, bitId) => { log.restored.push(bitId); },
+      archiveBit: async (_s, bitId) => {
+        if (fail.on && bitId === fail.on) throw new Error("network down");
+        log.archived.push(bitId);
+      },
+      unarchiveBit: async (_s, bitId) => { log.unarchived.push(bitId); },
       callInBit: async (_s, args) => { log.calledIn.push(args.bitId); return { id: args.placementId }; },
       setPlacementLock: async (_s, pid, on) => { log.locked.push([pid, on]); },
       getBitBoards: async () => opts.boards ?? [{ id: "board-1", title: "b" }],
@@ -71,6 +79,7 @@ function makeBoard(initial, opts = {}) {
       // /bit/[id] and /write. This records what was ASKED, not how it was worded — the
       // wording has its own tests in trash-message.test.mjs.
       confirmTrash: async (args) => { log.confirms.push(args); return opts.confirm !== false; },
+      confirmArchive: async (args) => { log.archiveConfirms.push(args); return opts.confirm !== false; },
     },
   });
 
@@ -217,6 +226,84 @@ test("trash many: an empty selection asks nothing and records nothing", async ()
   assert.deepEqual(b.log.confirms, []);
   assert.equal(b.entries.length, 0);
   assert.deepEqual(b.bits(), ["a"]);
+});
+
+// ---- archive: the third kind, joined 2026-09-03 (board-territory parity with trash) ----
+
+test("archive one: asks first, sets the bit aside, labels singular", async () => {
+  const b = makeBoard([card("a")]);
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  assert.equal(b.log.archiveConfirms.length, 1, "a destructive-feeling act always asks");
+  assert.deepEqual(b.log.archived, ["a"]);
+  assert.equal(b.entries[0].label, "archive card");
+  assert.equal(b.log.looseRefreshes, 0, "an archived bit is NOT loose — the column must not repaint");
+});
+
+test("archive one: declining the confirm does nothing at all", async () => {
+  const b = makeBoard([card("a")], { confirm: false });
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  assert.deepEqual(b.bits(), ["a"], "the card stays");
+  assert.deepEqual(b.log.archived, []);
+  assert.equal(b.entries.length, 0, "nothing happened, so nothing is remembered");
+});
+
+test("archive one: the confirm is TOLD how many boards the card is on", async () => {
+  const b = makeBoard([card("a")], {
+    boards: [{ id: "board-1", title: "x" }, { id: "board-2", title: "y" }],
+  });
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  assert.deepEqual(b.log.archiveConfirms[0], { noun: "card", onBoards: 2 }, "archiving hides it from every board it's on");
+});
+
+test("archive one: UNDO un-archives the bit globally, then repaints the card", async () => {
+  const b = makeBoard([card("a")]);
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  await b.entries[0].undo();
+  assert.deepEqual(b.log.unarchived, ["a"]);
+  assert.deepEqual(b.bits(), ["a"]);
+});
+
+test("archive one: REDO re-archives WITHOUT asking again", async () => {
+  const b = makeBoard([card("a")]);
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  await b.entries[0].undo();
+  const asksBefore = b.log.archiveConfirms.length;
+  await b.entries[0].redo();
+  assert.equal(b.log.archiveConfirms.length, asksBefore, "redo must not re-ask");
+  assert.deepEqual(b.bits(), []);
+});
+
+test("archive many: one entry, plural label, every bit archived — confirmArchive has no `shared` field", async () => {
+  const b = makeBoard([card("a"), card("b")], { selectedIds: new Set(["p-a", "p-b"]) });
+  await b.acts.bulkArchive();
+  await b.flush();
+  assert.deepEqual(b.log.archiveConfirms[0], { count: 2, noun: "card" }, "asked ONCE, for the whole gesture — no getBitBoards fan-out needed");
+  assert.deepEqual(b.log.archived.sort(), ["a", "b"]);
+  assert.equal(b.entries.length, 1);
+  assert.equal(b.entries[0].label, "archive 2 cards");
+});
+
+test("archive many: an empty selection asks nothing and records nothing", async () => {
+  const b = makeBoard([card("a")], { selectedIds: new Set() });
+  await b.acts.bulkArchive();
+  await b.flush();
+  assert.deepEqual(b.log.archiveConfirms, []);
+  assert.equal(b.entries.length, 0);
+  assert.deepEqual(b.bits(), ["a"]);
+});
+
+test("a failed ARCHIVE write puts the card back too (the same rollback path as trash)", async () => {
+  const b = makeBoard([card("a")], { failOn: "a" });
+  await b.acts.archiveSelected("p-a", "a");
+  await b.flush();
+  assert.deepEqual(b.bits(), ["a"], "rolled back");
+  assert.equal(b.entries[0].failed, true, "nothing happened → no memory");
+  assert.equal(b.log.errors.length, 1);
 });
 
 // ---- failure and rollback: the paths reading alone can't prove ----

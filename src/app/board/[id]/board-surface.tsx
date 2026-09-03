@@ -12,6 +12,7 @@ import {
   callInBit,
   getBitBoards,
 } from "@/lib/db/bits";
+import { archiveBit, unarchiveBit } from "@/lib/db/resting";
 import { MediaError } from "@/lib/media";
 import { Card } from "./card";
 import type { CardVM } from "./card-vm";
@@ -22,6 +23,7 @@ import { registerSave } from "@/lib/save-guard";
 import { duplicateBoard } from "@/lib/db/boards";
 import { confirm } from "@/components/confirm";
 import { confirmTrash } from "@/app/trash/trash-confirm";
+import { confirmArchive } from "@/app/archive/archive-confirm";
 import { duplicateBitAction } from "@/app/bits/actions";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
@@ -245,14 +247,17 @@ export function BoardSurface({
   // fires only because removeActs is no longer named `use*` (2026-09-02 rename — it is
   // not a hook); useArrangeActs and useMeaningActs take the same ref and aren't flagged.
   // eslint-disable-next-line react-hooks/refs -- see above
-  const { unplaceSelected, trashSelected, bulkUnplace, bulkTrash } = removeActs({
+  const { unplaceSelected, trashSelected, archiveSelected, bulkUnplace, bulkTrash, bulkArchive } = removeActs({
     supabase, boardId, cards, cardsRef, record, fail, trackCreate, reconcileId, chain,
     selectedIds, setCards, clearSelection,
     setEditingId, settled, flushNow, trackRemove, forget, setLooseRefresh, onErr,
     // The db doors + confirm, passed IN (see RemoveDoors): the acts module has no
     // React in it, so injecting these is what lets a test drive all four gestures
     // with fakes. This is the production wiring.
-    doors: { unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards, confirmTrash },
+    doors: {
+      unplaceBit, trashBit, restoreBit, callInBit, setPlacementLock, getBitBoards,
+      confirmTrash, archiveBit, unarchiveBit, confirmArchive,
+    },
   });
 
   function select(placementId: string, bitId: string, additive: boolean) {
@@ -696,6 +701,7 @@ export function BoardSurface({
         alignableCount={alignableCount}
         onBulkUnplace={bulkUnplace}
         onBulkTrash={bulkTrash}
+        onBulkArchive={bulkArchive}
         onTidy={tidySelected}
         onAlign={alignSelected}
         onDistribute={distributeSelected}
@@ -732,6 +738,7 @@ export function BoardSurface({
           duplicating={duplicatingBit}
           onUnplace={() => unplaceSelected(selectedBit.placementId)}
           onTrash={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
+          onArchive={() => archiveSelected(selectedBit.placementId, selectedBit.bitId)}
         />
       )}
       <div

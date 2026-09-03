@@ -24,6 +24,7 @@ export function SelectedBar({
   duplicating,
   onUnplace,
   onTrash,
+  onArchive,
 }: {
   card: CardVM;
   /** Bumped when an undo/redo reverses a tag act, so the bar repaints itself. */
@@ -40,6 +41,7 @@ export function SelectedBar({
   duplicating: boolean;
   onUnplace: () => void;
   onTrash: () => void;
+  onArchive: () => void;
 }) {
   return (
     <div className="selected-bar">
@@ -89,6 +91,13 @@ export function SelectedBar({
           title="Take this card off THIS board — it lives on (its other boards, and loose in your bits)"
         >
           remove from this board
+        </button>
+        <button
+          className="compose-btn subtle"
+          onClick={onArchive}
+          title="Set this card aside in your archive — hidden everywhere, restorable"
+        >
+          archive
         </button>
         <button
           className="compose-btn subtle"

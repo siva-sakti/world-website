@@ -13,6 +13,7 @@ export function BoardToolbar({
   alignableCount,
   onBulkUnplace,
   onBulkTrash,
+  onBulkArchive,
   onTidy,
   onAlign,
   onDistribute,
@@ -46,6 +47,7 @@ export function BoardToolbar({
   alignableCount: number;
   onBulkUnplace: () => void;
   onBulkTrash: () => void;
+  onBulkArchive: () => void;
   onTidy: () => void;
   onAlign: (edge: AlignEdge) => void;
   onDistribute: (axis: Axis) => void; // arrange the selection in a neat grid (owner-approved tidy-up)
@@ -128,6 +130,9 @@ export function BoardToolbar({
           )}
           <button className="compose-btn subtle" onClick={onBulkUnplace} title="Remove all selected cards from this board">
             remove from board
+          </button>
+          <button className="compose-btn subtle" onClick={onBulkArchive} title="Archive all selected cards">
+            archive
           </button>
           <button className="compose-btn subtle" onClick={onBulkTrash} title="Trash all selected cards">
             trash

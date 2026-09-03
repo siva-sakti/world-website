@@ -20,6 +20,8 @@ export type RemoveDoors = {
   unplaceBit: (s: SupabaseClient, placementId: string) => Promise<void>;
   trashBit: (s: SupabaseClient, bitId: string) => Promise<void>;
   restoreBit: (s: SupabaseClient, bitId: string) => Promise<void>;
+  archiveBit: (s: SupabaseClient, bitId: string) => Promise<void>;
+  unarchiveBit: (s: SupabaseClient, bitId: string) => Promise<void>;
   callInBit: (
     s: SupabaseClient,
     args: {
@@ -33,6 +35,9 @@ export type RemoveDoors = {
    *  /bits, /bit/[id] and /write. Injected rather than imported so this module stays
    *  loadable by the test runner, and so a test can answer yes/no without a dialog. */
   confirmTrash: (args: { count?: number; noun?: string; onBoards?: number; shared?: number }) => Promise<boolean>;
+  /** Ask before archiving — the one archive confirm (app/archive/archive-confirm),
+   *  shared with /bits and /bit/[id]. Same injection reasoning as confirmTrash. */
+  confirmArchive: (args: { count?: number; noun?: string; onBoards?: number }) => Promise<boolean>;
 };
 
 // The board's REMOVE acts (I-W1: two distinct, labeled acts), singular and in bulk:
@@ -195,11 +200,42 @@ export function removeActs(deps: {
     }
   }
 
-  // ---- ONE gesture, four doors ----
-  // These four acts (un-place / trash, one card / many) used to be four hand-written
+  /** Undo of an archive = un-archive the bit globally, then the card back on screen.
+   *  Same shape as restoreOne: archive and trash both hide a bit from every board via
+   *  the SAME board_cards view filter (b.state = 'live'), so no placement recreation is
+   *  needed either way — the placement row was never touched. Kept as its own function
+   *  rather than folded into restoreOne: this module's tested history is worth more than
+   *  the few lines a merge would save. */
+  async function unarchiveOne(snap: CardVM): Promise<void> {
+    await doors.unarchiveBit(supabase, snap.bitId);
+    setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
+  }
+
+  /** Redo of an archive = archive again, resolved against the CURRENT card. Same flush
+   *  gate as trashOne — a typed tail must land before the bit freezes. */
+  async function archiveOne(snap: CardVM): Promise<void> {
+    const cur = cardsRef.current?.find((c) => c.bitId === snap.bitId);
+    setCards((cs) => cs.filter((c) => c.bitId !== snap.bitId));
+    try {
+      if (cur) {
+        const id = await settled(cur.placementId);
+        if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
+      }
+      await doors.archiveBit(supabase, snap.bitId);
+      if (cur) forget(cur.placementId);
+    } catch (e) {
+      if (cur) setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, cur]));
+      throw e;
+    }
+  }
+
+  // ---- ONE gesture, three kinds ----
+  // These acts (un-place / trash / archive, one card / many) used to be four hand-written
   // copies of the same shape: the same flush gate, the same J1 landed bookkeeping, the
   // same failure carve, the same "one entry for the whole gesture" scaffold. The trash
-  // legs were character-identical apart from variable names.
+  // legs were character-identical apart from variable names. Archive joined later
+  // (2026-09-03) as a THIRD kind through the same removeGesture/removeLeg machinery —
+  // it collapses the same way trash's single/bulk pair did, at n = 1.
   //
   // The insight that collapses them: SINGULAR IS BULK WITH ONE CARD. Every difference
   // that looked real resolves at n = 1 (the loose-refresh dance fires once; the
@@ -210,7 +246,7 @@ export function removeActs(deps: {
   // doors count different things and say different things, and that is copy — the
   // owner's to write, not mine to standardise (see act-rules.ts).
 
-  type RemoveKind = "unplace" | "trash";
+  type RemoveKind = "unplace" | "trash" | "archive";
 
   /** One card's DB write. Every remove goes through the settled door (a write fired
    *  while the card's create is in flight matches 0 rows and silently loses the act),
@@ -220,8 +256,27 @@ export function removeActs(deps: {
     const id = await settled(card.placementId);
     if (!(await flushNow(id))) throw new Error(FLUSH_REFUSED);
     if (kind === "unplace") await doors.unplaceBit(supabase, id);
-    else await doors.trashBit(supabase, card.bitId);
+    else if (kind === "trash") await doors.trashBit(supabase, card.bitId);
+    else await doors.archiveBit(supabase, card.bitId);
     forget(card.placementId);
+  }
+
+  function labelFor(kind: RemoveKind, n: number): string {
+    if (kind === "unplace") return countLabel("remove", n, "from board");
+    if (kind === "trash") return countLabel("trash", n);
+    return countLabel("archive", n);
+  }
+
+  function undoLegFor(kind: RemoveKind, c: CardVM): () => Promise<void> {
+    if (kind === "unplace") return () => reviveOne(c);
+    if (kind === "trash") return () => restoreOne(c);
+    return () => unarchiveOne(c);
+  }
+
+  function redoLegFor(kind: RemoveKind, c: CardVM): () => Promise<void> {
+    if (kind === "unplace") return () => unplaceOne(c.bitId);
+    if (kind === "trash") return () => trashOne(c);
+    return () => archiveOne(c);
   }
 
   /** Remove these cards — optimistically on screen, then one independent write each.
@@ -246,17 +301,15 @@ export function removeActs(deps: {
 
     // ONE entry for the whole gesture (plan §5), both reverses under the survivor rule.
     const entry = record(
-      kind === "unplace"
-        ? countLabel("remove", snaps.length, "from board")
-        : countLabel("trash", snaps.length),
+      labelFor(kind, snaps.length),
       snaps.map((c) => c.bitId),
-      () => runLegs(live().map((c) => () => (kind === "unplace" ? reviveOne(c) : restoreOne(c)))),
-      () => runLegs(live().map((c) => () => (kind === "unplace" ? unplaceOne(c.bitId) : trashOne(c)))),
+      () => runLegs(live().map((c) => undoLegFor(kind, c))),
+      () => runLegs(live().map((c) => redoLegFor(kind, c))),
     );
 
     // The loose column repaints on the FIRST landed leg (so genuinely-loose bits show
     // even if a later leg fails) and once more when all have settled (so late legs
-    // aren't invisible). Un-place only: a trashed bit isn't loose, it's gone.
+    // aren't invisible). Un-place only: a trashed/archived bit isn't loose, it's gone.
     let landed = 0;
     let settledCount = 0;
     let failedLegs = 0;
@@ -288,7 +341,7 @@ export function removeActs(deps: {
     entry.settled = Promise.allSettled(legs);
   }
 
-  // ---- the four doors ----
+  // ---- the doors ----
 
   /** Take the card off THIS board only; the bit lives on (its travel keeps the leg).
    *  (Evaporate retired — D-138: an empty card removes like any other, and records.) */
@@ -322,5 +375,25 @@ export function removeActs(deps: {
     removeGesture("trash", chosen);
   }
 
-  return { unplaceSelected, trashSelected, bulkUnplace, bulkTrash };
+  /** Archive the whole bit — set aside, restorable from the archive. Same "onBoards"
+   *  honesty as trash: archiving something placed elsewhere hides it there too, since
+   *  archived bits fail the SAME board_cards `state = 'live'` filter trashed ones do. */
+  async function archiveSelected(placementId: string, bitId: string) {
+    let boards = 1;
+    try { boards = (await doors.getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
+    if (!(await doors.confirmArchive({ noun: "card", onBoards: boards }))) return;
+    removeGesture("archive", cards.filter((c) => c.bitId === bitId));
+  }
+
+  /** confirmArchive has no `shared` field (archive-message.ts: onBoards is single-only) —
+   *  unlike bulkTrash, no getBitBoards fan-out is needed for the bulk confirm. */
+  async function bulkArchive() {
+    const chosen = cards.filter((c) => selectedIds.has(c.placementId));
+    if (chosen.length === 0) { clearSelection(); setEditingId(null); return; }
+    const bitIds = [...new Set(chosen.map((c) => c.bitId))];
+    if (!(await doors.confirmArchive({ count: bitIds.length, noun: "card" }))) return;
+    removeGesture("archive", chosen);
+  }
+
+  return { unplaceSelected, trashSelected, archiveSelected, bulkUnplace, bulkTrash, bulkArchive };
 }
