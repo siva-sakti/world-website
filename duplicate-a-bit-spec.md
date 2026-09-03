@@ -94,14 +94,46 @@ else in the spec changes.
 
 ---
 
-## 6 · The five questions, gathered
+## 6 · The questions — RULED (owner, 2026-09-02)
 
-1. **Does the copy carry the source** ("from …")? *Claude leans yes* — it is part of what the thing
-   is, like its tags.
-2. **The file: share it (C, with destroy made safe), or copy the bytes (B)?** *Claude recommends C*,
-   and will not touch destroy without the owner's word.
-3. **Duplicate from outside a board too?** *Claude recommends not in v1.*
-4. **Duplicate a whole selection, or one card?** *Claude recommends one.*
-5. **What is it called?** *Claude leans "duplicate".*
+**Q2 · The file — RULED: THE COPY GETS ITS OWN. (Option B, not C.)**
+*"I think copy is exactly this, a copy… with somehow a different bit id, right?"*
 
-Only **2** blocks the build; the rest have safe defaults.
+**The owner's argument beat Claude's, and the reason is worth keeping.** Claude recommended
+sharing the file with a guard added to destroy, on the grounds that it is instant and costs no
+storage — a TECHNICAL argument. The owner's is a MODEL argument: if two bits point at one file
+they are not two things. There is an invisible thread between them, and deleting one blanks the
+other. We mint a separate bit precisely BECAUSE a bit is one thing; sharing the file quietly
+re-attaches what we just separated. Sharing gives you something that looks like a copy and is not.
+
+So: **new bit id, new file, no shared state.** Trash one and the other is untouched.
+**Bonus: the destroy path is never touched** — the most dangerous code in the app stays as it is,
+and §3's whole hazard disappears rather than being managed.
+*Cost, accepted eyes-open:* storage doubles per copy, and a large PDF takes a moment to copy.
+
+**Q3 · Outside a board — RULED: YES.** *"I think you should be able to duplicate outside a board
+too."* So `/bits` and a bit's own page get it. A duplicate made off a board is **loose** — it has
+no position because there is no board to have one on, which is exactly what loose means.
+
+**Q4 · One or many — RULED: ONE.** *"Duplicate this bit."* Singular. ("A whole selection" was
+Claude's jargon for the board's multi-select; the question was whether the act copies every
+selected card. It copies the one you are on. Bulk can follow if it is ever wanted.)
+
+**Q5 · The word — RULED: "duplicate this bit".** And note it is *bit*, not *card*, on purpose:
+duplicating makes a **new bit**, not a second card of the same one. The word says what happens.
+
+**Q1 · The source — still open**, and the smallest of them. Does the copy carry its "from …"?
+*Claude leans yes* — the source travels with a bit, like its tags. Safe to default to yes.
+
+## 7 · What follows from the rulings
+
+- **The copy's file is its own**, at its own `images/<newBitId>.jpg` — so the derived-path
+  convention holds, the orphan sweep keeps working, and §5 case 5 (a path containing someone
+  else's id) disappears.
+- **Copying is server-side**: read the original object, write it under the new bit's path. For
+  image and pdf that is two objects (full + thumb); audio is one; text and drawing have none.
+- **A failed file copy must not leave a half-bit.** If the bytes cannot be copied, the new bit is
+  not created — the same all-or-nothing shape the intake doors already use.
+- **Off-board duplication lands loose**, so `/bits` shows it immediately.
+- **On-board duplication** lands beside the original, selected, and records one undo entry whose
+  reverse un-places AND trashes the copy.
