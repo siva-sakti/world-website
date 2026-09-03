@@ -775,3 +775,21 @@ tags · folder · alive · archive(state) · trash-as-freeze · openings · crea
 
 ### 27.5 ⚪ "Done" — asked, not invented
 No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deliberately none** — the gradient stays felt, not stored. The owner says the word if wrong (it would be a column).
+
+
+## 28 · The walk — one bit through a composition, every branch *(owner-asked 2026-09-03: "the paths a bit can take… a sequential logical step-through")*
+*(✅ ruled · 🔨 shipped · ⚪ open · 🔵 lean. The narrative form of safety-gate 2 — no blank cells unmarked.)*
+
+**Step 1 — pulled in** (`[[`/drawer): a tie born on save 🔨 · appears as a chip ✅ · **the bit untouched** — still on its boards, still tagged; gather removes it from nowhere ✅ · its page shows "pulled into" 🔨.
+**Step 2 — living there:** chip↔block ✅ · resize/align on the tie, per piece ✅ · moved up/down = doc position only ✅ · gathered twice in one piece = ONE tie, two chips 🔨 · chip peeks, block selects ✅.
+**Step 3 — editing:** (a) writing around it → bit feels nothing ✅ · (b) edit-while-it-lives-elsewhere → **the pop-up** ("edits everywhere / make a copy") ✅ owner's flow · (c) copy → the one law (IS comes: content·file·source·tags·folder; SITS never; + one "here" tie, swapped in place); ⚠ noticed consequence: **the copy is a real bit and joins the collection** — correct by the law, flagged for eyes-open · (d) bit edited elsewhere → **the piece changes untouched** — the window's honest price ✅.
+**Step 4 — removal, writing side:** delete chip/block → tie dropped on save; bit untouched; re-gather freely 🔨 · composition trashed → all frozen, backlink hidden not gone, restore = all back ✅ · destroyed → ties cascade; bit lives on ✅.
+**Step 5 — the bit's fate while gathered:** trashed → chip keeps stored text, peek says gone 🔨, **block display ⚪** · destroyed → tie cascades, **chip degrades to plain text** 🔨, block 🔵 lean: collapses to the same text (one degrade rule) · archived → ⚪ match archived-on-boards. **The three blanks are one family: what a block shows per dead-or-resting state — one sitting closes all three.**
+**Step 6 — onward:** second piece → second tie, independent presence ✅ · the composition on a board → a doorway; **gathered bits do not leak onto the board** ✅ · piece into piece → the piece's chip, no cascade ✅ flatness · the pull → the bit appears; the piece only if IT carries the tag ✅.
+
+### 28b · The duplication law *(proposed 2026-09-03, shipped code verified to obey it — awaiting the owner's stamp)*
+**The copy always gets what the bit IS (content · file · source · tags · folder) and never where it SITS (no placements, no ties). The door adds exactly one "here":** bits list → nothing (loose) · a board → one placement on THIS board (+24px, shipped 🔨) · a composition → one tie into THIS piece (§24.5b, unbuilt). Three doors, one law; they differ only in where you were standing.
+
+### 28c · Board symmetry *(owner, leaning: "when this goes on a board it should act like a bit")*
+🔵 Claude's recommendation: take it as the principle — **on a board, a composition behaves exactly as a bit does**, which implies it inherits the arrival-record + revive-on-return machinery bits already have (proven, run-1d). One behavior for everything placeable. ⚪ Awaiting the owner's word (her first instinct was no-history; symmetry says keep it because bits do).
+✅ **"Done" state: RULED OUT** (owner, 2026-09-03: "I don't think there has to be a done state") — the gradient stays felt, never stored.
