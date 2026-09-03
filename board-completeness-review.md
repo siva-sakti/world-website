@@ -173,3 +173,33 @@ from a tag or selection · the drawer's new default scope.
 **The structural fact that shapes all of this:** every bug found today was in the WIRING, not the
 logic — and the test suite covers pure functions only, so it caught none of them. Any verdict that
 leans on "the tests pass" is leaning on the wrong thing.
+
+---
+
+## 4 · THE TRIAGE (four audits in, 2026-09-03)
+
+### 4a · SUBSTANTIVE — logic and structure. These change how the board is built.
+
+| # | Finding | Why it is substantive |
+|---|---|---|
+| **S1** | **`board-surface.tsx` is 905 lines doing 7 jobs** — state+wiring · the whole snap subsystem · group-drag · align plumbing · lock/rotate/duplicate acts · the pointer machine · the JSX. | **This is the structural root.** It is also *why* `remove-acts` needs a 19-field dependency object and `use-create-doors` an 18-field one — neither can be reasoned about without the god-object open beside it. Four clean seams named: `use-snap-guides` · `use-card-drag` · `use-board-pointer` · `use-alignment-acts`. |
+| **S2** | **The optimistic seam has no rule.** Every bug today was one shape: a fact true in one place, not carried to its siblings. | Fixing instances will not stop it. The CardVM-spread pattern (duplicate) and the flush-before-read pattern both need a *stated rule*, not another patch. |
+| **S3** | **"Which key do I guard by" is inconsistent** — `restore()` guards by `placementId`, its five siblings by `bitId`. A call-in reconcile renames a placementId, so the odd one out can miss and put **two cards on screen for one bit**. | A named mechanism producing a corrupt screen, not a hypothetical. |
+| **S4** | **Placement fields live in three hand-kept lists** (`PlacementPatch`, `schedule`'s mapping, `Pos`). A field missing from them is silently dropped. | **This already happened**: `angle` was accepted by the type and never written. The mechanism is proven, not theoretical. |
+| **S5** | **Three definitions of "which boards is this bit on."** `getBitBoards` lacks the board-state filter its two siblings have — so the trash confirm can say "on 2 boards" when one is trashed. | The confirm for a destructive act is stating something false. |
+| **S6** | **Dates disagree with themselves.** `ago` counts elapsed 24h periods in the viewer's frame; `fmt` uses UTC calendar day. The same bit reads "today" on home and yesterday's date on the timeline. Separately, `arrived_at` is server-clock and `left_at` client-clock **on the same row** — a skewed device can record leaving before arriving. | Two different answers to "what day is this", and a row that can contradict itself. |
+| **S7** | **`editingId` strands on an undo/redo reverse.** The forward acts clear it; the reverses do not. Redo a trash on a card you were editing and the keyboard goes dead until Escape. | The create door already guards this exact class; the reverses were missed. |
+| **S8** | **`placement.height` for text and audio is stored and permanently false.** The card renders `height: auto`; resize deliberately never writes it back. The geometry ledger exists to route around it. | A column that has never described the thing it names, still copied by `duplicateBoard`, still the fallback when a card is unmeasured. |
+| **S9** | **84% of the board has no automated test**, and the untested layer is exactly where every bug lived. One capability has all three kinds of evidence. | This is the gap between "it's clean" and "we checked". |
+
+### 4b · MINOR — real, small, no design consequence
+Dead exports (`isBusy`/`version`; `display_size` stored, constrained, copied, never read) · stale comments asserting false facts (`DEFAULT_W = 240` "matches the render-layer default" — it is 400; `card.tsx:327` claims react-rnd suppresses click after a drag — **verified false, 0 occurrences**) · an unused `placementId` parameter on two remove doors · `looseRefresh` bumped on a path where nothing became loose · one unreachable branch · stale line references in `frame-plan.md`.
+
+### 4c · FEATURE GAPS — not logic. The owner's call, and each is a decision not a bug.
+The pen ignores touch entirely (full overlay, palette, eraser — no stroke recorded, nothing says why) · select mode kills panning and double-tap-create for a mouse · **notes are the outlier on a board**: no title, no source picker, and their source is fetched into the card and never rendered · the `[[` picker silently drops audio, pdf and link while the drawer's gather door accepts them · no bulk lock/duplicate/send-to-back/tag · no way to make a note from a board · no lightbox for an image, no way to read a PDF from its card.
+
+### 4d · ALREADY SOUND — worth knowing, because a verdict needs both halves
+The pure-maths layer (geometry · arrangement · camera · act-rules · undo-stack — no React, no DB, all tested) · the per-row write chain · `board_cards` as the one render rule, read by all four consumers instead of re-derived · `setResting` as a genuine single door with one 0-row assert covering nine paths · generated columns for every computed fact · `placement_bit_once` making a duplicate placement physically impossible · `card-vm.ts` and `card-defaults.ts` as correctly-shaped small files · **`remove-acts.ts`'s collapse, called "the best refactor in the codebase"**.
+
+### 4e · Fixed during the audit
+Duplicate losing size/tilt/stacking on reload · `angle` accepted and silently dropped · title/caption less durable than every other word (no retry, and outside flushNow's contract) · a click able to move a card · three self-contradicting documents.
