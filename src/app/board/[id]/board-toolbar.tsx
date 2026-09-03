@@ -97,23 +97,29 @@ export function BoardToolbar({
           <button className="compose-btn subtle" onClick={onTidy} title="Arrange the selected cards in a neat grid">
             tidy up
           </button>
-          {/* CARD ALIGNMENT — line the selection up without rearranging it. Distribute needs
-              three: with two there is no gap between them to even out. Locked cards are
-              excluded by the board, exactly as they are from tidy. */}
-          <span className="compose-align" role="group" aria-label="Align the selected cards">
-            <button className="compose-btn subtle" onClick={() => onAlign("left")} title="Line up their left edges">⇤</button>
-            <button className="compose-btn subtle" onClick={() => onAlign("hcenter")} title="Line up their centres, side to side">⇹</button>
-            <button className="compose-btn subtle" onClick={() => onAlign("right")} title="Line up their right edges">⇥</button>
-            <button className="compose-btn subtle" onClick={() => onAlign("top")} title="Line up their top edges">⤒</button>
-            <button className="compose-btn subtle" onClick={() => onAlign("vmiddle")} title="Line up their middles, top to bottom">⇳</button>
-            <button className="compose-btn subtle" onClick={() => onAlign("bottom")} title="Line up their bottom edges">⤓</button>
-            {selectedCount > 2 && (
-              <>
-                <button className="compose-btn subtle" onClick={() => onDistribute("h")} title="Even out the gaps, left to right">↔</button>
-                <button className="compose-btn subtle" onClick={() => onDistribute("v")} title="Even out the gaps, top to bottom">↕</button>
-              </>
-            )}
+          {/* CARD ALIGNMENT. WORDS, not glyphs: the first cut used arrows (⇤ ⇹ ⇥ …) with the
+              meaning hidden in tooltips, and the owner's verdict was "I'm honestly confused by
+              what buttons do what". A control you must hover to decode is not labelled. Words
+              also match this toolbar's existing buttons (tidy up · remove from board · trash).
+              The compact alternative is real alignment ICONS (a line with bars flush to it) —
+              that is a visual decision for the design pass, not one to invent here.
+              Distribute needs three: with two there is no gap between them to even out. */}
+          <span className="compose-align" role="group" aria-label="Line the selected cards up">
+            <span className="compose-align-label">line up</span>
+            <button className="compose-btn subtle" onClick={() => onAlign("left")} title="Line up their left edges">left</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("hcenter")} title="Line up their centres, side to side">centre</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("right")} title="Line up their right edges">right</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("top")} title="Line up their top edges">top</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("vmiddle")} title="Line up their middles, top to bottom">middle</button>
+            <button className="compose-btn subtle" onClick={() => onAlign("bottom")} title="Line up their bottom edges">bottom</button>
           </span>
+          {selectedCount > 2 && (
+            <span className="compose-align" role="group" aria-label="Even out the gaps">
+              <span className="compose-align-label">even gaps</span>
+              <button className="compose-btn subtle" onClick={() => onDistribute("h")} title="Even out the gaps, left to right">across</button>
+              <button className="compose-btn subtle" onClick={() => onDistribute("v")} title="Even out the gaps, top to bottom">down</button>
+            </span>
+          )}
           <button className="compose-btn subtle" onClick={onBulkUnplace} title="Remove all selected cards from this board">
             remove from board
           </button>

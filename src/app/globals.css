@@ -102,9 +102,14 @@ body {
   border-right: 1px solid #e6e2da;
 }
 .compose-align .compose-btn {
-  padding: 2px 5px;
-  font-size: 14px;
-  line-height: 1;
+  padding: 2px 4px;
+}
+/* Names the group so the buttons beside it read as "line up: left / centre / right"
+   rather than as six unrelated verbs. */
+.compose-align-label {
+  font-size: 11px;
+  color: #8a8378;
+  padding-right: 2px;
 }
 .marquee-box {
   position: absolute;
