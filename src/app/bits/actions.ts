@@ -7,8 +7,8 @@ import { requireUser } from "@/lib/supabase/require-user";
 import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
 import { archiveBit } from "@/lib/db/resting";
 import { uploadObject, removeObjects, linkThumbPath } from "@/lib/storage";
-import { getBoardCards } from "@/lib/db/boards";
-import { anchorNearContent, pointForIndex } from "./placement-anchor";
+import { getBoardCards, createBoard } from "@/lib/db/boards";
+import { anchorNearContent, pointForIndex, gridPointForIndex } from "./placement-anchor";
 import { setSource } from "@/lib/db/sources";
 import { applyTag } from "@/lib/db/tags";
 import { fetchPageMeta, fetchImageBlob, normalizeUrl, looksLikeUrl } from "@/lib/page-meta";
@@ -132,6 +132,63 @@ export async function trashFromInbox(formData: FormData) {
  * doesn't pile. Best-effort: a trashed bit/board is reported, the rest still land. callInBit revives
  * a row the bit lived on before, never a duplicate (I-L1) — and each bit needs a FRESH placement id
  * (a reused one collides on the PK and would throw for every bit after the first). */
+/** The most cards one "make a board from these" will gather. Each placement is its own
+ *  round trip, so this is a real limit, not a taste: past a couple of hundred the request
+ *  would outlive itself and leave a half-filled board. Stated to the owner rather than
+ *  silently truncating. */
+const GATHER_CAP = 200; // NOT exported: a "use server" file may only export async functions
+
+/** MAKE A BOARD FROM THESE — gather a set of bits onto a brand-new board.
+ *
+ *  Owner's ask: *"from a tag or from multi-select... an option to make this a board, and
+ *  then it would just gather everything into a board and you'd have to arrange it."*
+ *
+ *  Lands them in a GRID, not the send-to-board cascade: that cascade steps down-right per
+ *  arrival, which is right for sending three things to a board you cannot see and wrong for
+ *  gathering forty (a 1,600px diagonal) — and the owner expects to arrange what lands.
+ *
+ *  IF EVERY PLACEMENT FAILS the empty board is KEPT, deliberately: deleting a board she
+ *  just asked for is more surprising than an empty one she can trash, and the error says
+ *  what happened. NOT UNDOABLE — board creation sits outside the board-scoped undo stack;
+ *  the reversal is trashing the board. */
+export async function makeBoardFromBits(
+  bitIds: string[],
+  title: string | null,
+): Promise<{ boardId?: string; error?: string }> {
+  if (!bitIds.length) return { error: "Nothing to gather." };
+  if (bitIds.length > GATHER_CAP) {
+    return { error: `That's ${bitIds.length} things — more than a board can take at once (${GATHER_CAP}). Narrow it down first.` };
+  }
+  const supabase = await createClient();
+  await requireUser(supabase);
+  const board = await createBoard(supabase, title);
+  let failed = 0;
+  let firstMsg = "";
+  for (let i = 0; i < bitIds.length; i++) {
+    const { x, y } = gridPointForIndex(i, bitIds.length);
+    try {
+      await callInBit(supabase, { bitId: bitIds[i], boardId: board.id, placementId: randomUUID(), x, y });
+    } catch (e) {
+      failed++;
+      if (!firstMsg) firstMsg = e instanceof Error ? e.message : "";
+      console.error("makeBoardFromBits: a bit failed:", e);
+    }
+  }
+  revalidatePath("/");
+  revalidatePath("/bits");
+  revalidatePath(`/board/${board.id}`);
+  if (failed === bitIds.length) {
+    return {
+      boardId: board.id,
+      error: firstMsg === "TRASHED_BIT"
+        ? "Those are in the trash — the board was made, but it's empty."
+        : "The board was made, but nothing could be placed on it.",
+    };
+  }
+  if (failed) return { boardId: board.id, error: `The board was made — ${failed} of those couldn't be placed on it.` };
+  return { boardId: board.id };
+}
+
 export async function placeBitsOnBoard(bitIds: string[], boardId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   await requireUser(supabase);

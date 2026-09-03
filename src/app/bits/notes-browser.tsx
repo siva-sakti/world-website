@@ -7,9 +7,11 @@ import type { PanelBit } from "@/lib/db/inbox";
 import { parseQuery, isEmptyQuery, compileMatcher } from "@/lib/search-query";
 import { NoteCard } from "./note-card";
 import { NoteRow } from "./note-row";
-import { placeBitsOnBoard, trashBits, archiveBits } from "./actions";
+import { placeBitsOnBoard, trashBits, archiveBits, makeBoardFromBits } from "./actions";
 import { confirmArchive } from "@/app/archive/archive-confirm";
 import { confirmTrash } from "@/app/trash/trash-confirm";
+import { confirm } from "@/components/confirm";
+import { useRouter } from "next/navigation";
 import { SearchablePicker } from "@/components/searchable-picker";
 import type { ShelfGroup } from "@/lib/db/shelf";
 
@@ -35,6 +37,7 @@ export function NotesBrowser({
 }) {
   const [view, setView] = useState<View>(initialView);
   const [q, setQ] = useState("");
+  const router = useRouter();
   const [kind, setKind] = useState<Kind | null>(null);
   const [sort, setSort] = useState<Sort>("new");
   const [layout, setLayout] = useState<"cards" | "list">("cards");
@@ -104,6 +107,33 @@ export function NotesBrowser({
       exitSelect(); // the archived bits drop from the live list (revalidate)
     } catch {
       setBulkErr("Couldn't archive those — try again.");
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  /** Gather the selection onto a NEW board and go there. Not undoable — board creation
+   *  sits outside the board's undo stack — so it asks above a handful, where "did I mean
+   *  all of those?" is a fair question. */
+  async function bulkMakeBoard() {
+    if (bulkPending || selectedIds.size === 0) return;
+    const n = selectedIds.size;
+    if (
+      n > 30 &&
+      !(await confirm({
+        message: `Make a board from ${n} things? They all land on it at once.`,
+        confirmLabel: "Make it",
+      }))
+    )
+      return;
+    setBulkPending(true);
+    setBulkErr(null);
+    try {
+      const res = await makeBoardFromBits([...selectedIds], null);
+      if (res.error) setBulkErr(res.error);
+      if (res.boardId) router.push(`/board/${res.boardId}`); // you asked for it — go and see it
+    } catch {
+      setBulkErr("Couldn't make that board — try again.");
     } finally {
       setBulkPending(false);
     }
@@ -296,6 +326,14 @@ export function NotesBrowser({
             disabled={bulkPending || selectedIds.size === 0}
             title="send the selected bits to a board"
           />
+          <button
+            onClick={() => void bulkMakeBoard()}
+            disabled={bulkPending || selectedIds.size === 0}
+            className="text-neutral-500 underline underline-offset-2 hover:text-neutral-800 disabled:text-neutral-300 disabled:no-underline"
+            title="Gather the selected bits onto a new board"
+          >
+            make a board
+          </button>
           <button
             onClick={() => void bulkArchive()}
             disabled={bulkPending || selectedIds.size === 0}

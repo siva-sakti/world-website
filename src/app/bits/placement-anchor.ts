@@ -31,3 +31,28 @@ export function anchorNearContent(cards: PlacedCard[]): Point {
 export function pointForIndex(anchor: Point, i: number): Point {
   return { x: anchor.x + i * CASCADE, y: anchor.y + i * CASCADE };
 }
+
+// A GRID for gathering, as opposed to the cascade above.
+//
+// The cascade exists for SENDING a few things to a board you are not looking at — it steps
+// down-right so two arrivals don't stack. Gathering is a different act: "make a board from
+// these" can bring forty things at once, and forty cascaded cards is a 1,600px diagonal
+// (three hundred is a 12,000px one). The owner expects to arrange what lands — but a
+// diagonal is a worse thing to arrange FROM than a grid.
+//
+// Square-ish, because there is no reading order to honour here: nothing has a position yet,
+// so nothing can be scrambled. Cell size is a plain default — real sizes are only known
+// once the cards render, and this is a landing spot, not a layout.
+
+const CELL_W = 280;
+const CELL_H = 240;
+const ORIGIN = { x: 40, y: 40 };
+
+/** Where the i-th of `total` gathered cards lands. */
+export function gridPointForIndex(i: number, total: number): Point {
+  const cols = Math.max(1, Math.ceil(Math.sqrt(total)));
+  return {
+    x: ORIGIN.x + (i % cols) * CELL_W,
+    y: ORIGIN.y + Math.floor(i / cols) * CELL_H,
+  };
+}

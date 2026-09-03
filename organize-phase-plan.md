@@ -334,6 +334,41 @@ assumes a card's edges ARE its bounding box. Build alignment first and rotation 
 alignment gets revisited. Build rotation first and alignment is designed knowing about it. Neither
 is wrong; it should be a choice rather than an accident.
 
+## 4h · MAKE A BOARD FROM A TAG OR A SELECTION — plan (2026-09-02)
+
+**Owner:** *"from a tag or from multi-select — both of those options — and an option to make
+this a board, and then it would just gather everything into a board and you'd have to arrange it."*
+
+**What exists already:** `createBoard(title)` · `placeBitsOnBoard(ids, boardId)` (per-bit failure
+handling, trashed-bit messages, revalidation) · `/bits` has multi-select with a bulk bar · the pull
+(`/search?tag=`) shows everything with a tag but has **no selection at all**.
+
+### The two doors
+1. **From a selection** — `/bits`, beside the existing "send to…". Straightforward.
+2. **From a tag** — the pull has no selection, so the button acts on **what is currently on
+   screen**: "make a board from these". That also means a typed word or a kind filter narrows it,
+   which is the least surprising reading of a button that says *these*.
+
+### EDGE CASES, thought through before building
+
+| # | Case | Decision |
+|---|---|---|
+| 1 | **The cascade is wrong for this.** `pointForIndex` steps 40px down-right per card — designed for sending 1-3 things to an existing board. Gathering 40 makes a 1,600px diagonal; 300 makes a 12,000px one. | **Land them in a GRID**, not a diagonal. New pure function + tests. The owner expects to arrange, but a diagonal is worse than a grid to arrange FROM. |
+| 2 | **How many is too many?** `placeBitsOnBoard` awaits each insert in sequence — 300 bits is 300 round trips and would likely outlive the request. | **Confirm above 30. Hard cap 200**, with an honest message. Defaults, easily changed. |
+| 3 | **Every leg fails → an empty board exists.** | **Keep it.** Deleting a board the owner just asked for is more surprising than an empty one she can trash. Say what happened. |
+| 4 | **Some legs fail** (trashed since the page loaded). | Already handled inside `placeBitsOnBoard` — its message surfaces. |
+| 5 | **Nothing selected / no results.** | The button is not offered. |
+| 6 | **Notes as well as bits.** | Included — a note IS a bit and places like one. |
+| 7 | **Boards in the results.** | Cannot happen; `/search` never lists boards. |
+| 8 | **A bit already on other boards.** | Fine — a bit lives on many boards; this adds one more. |
+| 9 | **Undo.** | **Not undoable** — board creation is outside the board-scoped undo stack. Reversal is trashing the board. Not confirmed for that reason alone; it is additive and reversible. |
+| 10 | **Where you land.** | On the new board. You asked for it; you want to see it. |
+
+### Defaults chosen (owner can overturn any of them)
+- **The board's name:** from a tag → **the tag's word**; from a selection → **untitled**.
+- **From the pull, it takes what you can SEE** (all active filters), not everything with the tag.
+- **No confirm under 30**, a plain confirm above it.
+
 ## 5 · The item loop (the workflow — owner-defined, 2026-08-21)
 For EVERY queue item, in order, no skipping:
 1. **Pull** the next item from this doc.

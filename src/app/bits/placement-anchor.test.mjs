@@ -2,7 +2,7 @@
 // runner. Run directly (from the repo root):  node 'src/app/bits/placement-anchor.test.mjs'
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { anchorNearContent, pointForIndex } from "./placement-anchor.ts";
+import { anchorNearContent, pointForIndex, gridPointForIndex } from "./placement-anchor.ts";
 
 test("empty board → near-origin default", () => {
   assert.deepEqual(anchorNearContent([]), { x: 40, y: 40 });
@@ -44,4 +44,24 @@ test("pointForIndex cascades distinct points down-right; i=0 is the anchor itsel
   // no two arrivals share a point
   const pts = [0, 1, 2, 3, 4].map((i) => JSON.stringify(pointForIndex(a, i)));
   assert.equal(new Set(pts).size, pts.length);
+});
+
+// ---- gridPointForIndex: the landing grid for "make a board from these" ----
+
+test("gathering lays out a square-ish grid, not a diagonal", () => {
+  // 9 cards -> 3 columns
+  assert.deepEqual(gridPointForIndex(0, 9), { x: 40, y: 40 });
+  assert.deepEqual(gridPointForIndex(2, 9), { x: 40 + 2 * 280, y: 40 }, "third card ends the first row");
+  assert.deepEqual(gridPointForIndex(3, 9), { x: 40, y: 40 + 240 }, "fourth wraps to a new row");
+});
+
+test("the grid stays compact where the cascade would run away", () => {
+  // 40 cards: the old cascade would put the last at x = 40*40 = 1600 AND y = 1600.
+  const last = gridPointForIndex(39, 40);
+  assert.ok(last.x < 2000 && last.y < 2000, "a grid stays reachable; a diagonal does not");
+  assert.ok(last.y < 39 * 40, "and it is far shorter than the cascade's drop");
+});
+
+test("a single card lands at the origin, not off in a corner", () => {
+  assert.deepEqual(gridPointForIndex(0, 1), { x: 40, y: 40 });
 });
