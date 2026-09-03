@@ -1,0 +1,46 @@
+--- setup: one live text bit ---
+INSERT 0 1
+--- device 1 trashes it (the app patch: deleted_at set + archived_at cleared) ---
+UPDATE 1
+--- device 2, stale page, archives it — MUST BE REFUSED by the CHECK ---
+psql:/Users/gargoodevi/Documents/world-website/verification/trash-archive-crossfire.sql:14: ERROR:  new row for relation "bit" violates check constraint "bit_trashed_archived_exclusive"
+DETAIL:  Failing row contains (00000000-0000-0000-0000-000000000001, text, null, null, crossfire target, null, null, null, null, null, null, null, null, null, null, public, 2026-09-03 12:58:27.084652-07, 2026-09-03 12:58:27.069764-07, 2026-09-03 12:58:27.085957-07, crossfire target, null, 00000000-0000-0000-0000-0000000000aa, null, null, bit, 2026-09-03 12:58:27.085957-07, trashed, 'crossfir':1 'target':2).
+--- (the app layer additionally guards with deleted_at IS NULL: 0 rows, loud refusal) ---
+UPDATE 0
+--- restore from trash → state must be LIVE, never archived ---
+UPDATE 1
+ state_after_restore 
+---------------------
+ live
+(1 row)
+
+--- legitimate paths all still work: archive a live thing ---
+UPDATE 1
+ archived_ok 
+-------------
+ archived
+(1 row)
+
+--- trash an ARCHIVED thing (trash wins: one UPDATE sets+clears) — allowed ---
+UPDATE 1
+ trashed_ok | archive_cleared 
+------------+-----------------
+ trashed    | t
+(1 row)
+
+--- the repair half: a pre-existing both-set row gets cleaned by the migration UPDATEs ---
+                         note                         
+------------------------------------------------------
+ migration chain applied with repair-before-check: OK
+(1 row)
+
+--- same CHECK on board ---
+INSERT 0 1
+UPDATE 1
+psql:/Users/gargoodevi/Documents/world-website/verification/trash-archive-crossfire.sql:39: ERROR:  new row for relation "board" violates check constraint "board_trashed_archived_exclusive"
+DETAIL:  Failing row contains (00000000-0000-0000-0000-00000000000b, crossfire board, private, 2026-09-03 12:58:27.087964-07, 2026-09-03 12:58:27.087507-07, 2026-09-03 12:58:27.088134-07, 'board':2 'crossfir':1, 00000000-0000-0000-0000-0000000000aa, null, null, 2026-09-03 12:58:27.088134-07, trashed, null, null, null, null, null).
+ board_state_still 
+-------------------
+ trashed
+(1 row)
+

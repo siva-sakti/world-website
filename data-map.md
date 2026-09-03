@@ -21,7 +21,10 @@ is wrong — fix it, not them.
 
 **The one derived state:** a bit/board's `state` (live · archived · trashed) is COMPUTED by
 the database from `deleted_at`/`archived_at` — never stored separately, so it can't drift.
-Trash beats archive: trashing an archived thing clears `archived_at` (one resting place).
+Trash beats archive: trashing an archived thing clears `archived_at` (one resting place) —
+and since the A1 fix (2026-09-03) the reverse crossfire is closed: archiving a TRASHED thing
+refuses loudly (app guard) and is physically impossible (the `trashed_archived_exclusive`
+CHECK — migration `20260903000003`, proven locally, **queued for the owner's cloud paste**).
 
 ## 2 · A bit — every action, and what it writes
 
@@ -69,7 +72,49 @@ Trash beats archive: trashing an archived thing clears `archived_at` (one restin
 | "where you were" | `opening.opened_at` | what you last looked at (distinct from edited — the whole point of the separate table) |
 | /archive · /trash | `archived_at` · `deleted_at` | when it was put away |
 
-## 6 · What is deliberately NOT recorded (honesty section)
+## 6 · The state × action grid (owner-asked, 2026-09-03: "these are the possible actions…
+## which we allow, and how we handle it" — no blank cells allowed)
+
+How to read a cell: **✓** allowed · **✗ loud** refused with a message · **✗ DB** physically
+impossible (a database rule) · **∅** unreachable (no surface offers it) · **⚠** a gap —
+allowed when it probably shouldn't be, listed honestly. Every ✗/⚠ names its layer, because
+"the button is hidden" and "the database refuses" are very different strengths.
+
+### Acting on a BIT, by the bit's state
+
+| action | live | archived | trashed |
+|---|---|---|---|
+| edit words/caption | ✓ | ∅ page 404s — **⚠ DB itself would accept** a stale editor's write | same ⚠ — words land on the frozen bit, survive restore (arguably merciful; unruled) |
+| tag / untag / set source | ✓ | **⚠ no guard at any layer** (stale surface succeeds silently) | same ⚠ |
+| pin / unpin | ✓ | ✗ DB (archived ≠ alive CHECK) — loud but an ugly raw error | **⚠ silently pins an invisible thing** |
+| place on a board (call-in) | ✓ | ✗ loud — the call-in door checks liveness | ✗ loud, same door |
+| remove from one board | ✓ | ∅ (no card renders) | ∅ |
+| archive | ✓ (clears the star) | ✓ = no-op-ish | **✗ loud + ✗ DB — TODAY'S FIX (A1)**: refuses "reload"; the CHECK makes both-states impossible |
+| un-archive | ∅ | ✓ → live (star stays gone) | ✗ loud — it already left the archive (today's fix) |
+| trash | ✓ | ✓ — trash wins, archive cleared in the same write | ✓ = no-op-ish |
+| restore | ∅ | ∅ | ✓ → **live**, never to archive (proven today) |
+| destroy | ✗ DB (guard: must be trashed) | ✗ DB | ✓ — the one erase; takes placements + files |
+| duplicate | ✓ (fresh clock, free-standing) | **✓ — 🔵 unruled**: an archived original births a LIVE copy | ✗ loud (refuses) |
+
+### Acting on a BOARD, by the board's state
+
+| action | live | archived | trashed |
+|---|---|---|---|
+| rename / describe / group | ✓ | ∅ page-gated — ⚠ DB would accept | same ⚠ |
+| open (the recent trail) | ✓ records | ∅ | ∅ — and its trail row cascades away on destroy |
+| place things onto it | ✓ | ✗ loud (call-in checks the BOARD too) | ✗ loud |
+| archive / trash / restore / destroy | same grid as a bit, same mechanisms, same A1 fix | | |
+| duplicate | ✓ — **⚠ A2 open: copies invisible cards** (trashed/archived bits' seats ride along; fix queued) | ✗ (select requires live) | ✗ |
+
+**The honest pattern the grid exposes:** the *resting* acts (archive/trash/restore/destroy)
+are guarded at the database — the strongest layer — while the *meaning* acts (edit, tag,
+source, pin) mostly rely on pages being unreachable, which a stale page defeats. None of the
+⚠ cells loses data (most are "a write lands on a frozen thing and survives restore"), but
+they're now ON the record instead of blank. Owner rulings queued: the archived-original
+duplicate (🔵), and whether stale meaning-writes onto resting things should refuse or stay
+merciful.
+
+## 7 · What is deliberately NOT recorded (honesty section)
 
 - **No per-move history.** A card's position is one current value; drag it ten times, only
   the last x/y exists. Undo's memory is per-visit and in-memory only — never stored.

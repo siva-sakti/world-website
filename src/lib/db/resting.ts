@@ -33,7 +33,19 @@ export async function setResting(
   // written + proven and queued for the owner's cloud paste. Un-archiving does NOT
   // resurrect the star (the value was nulled here — deliberate).
   if (column === "archived_at" && on) patch.pinned_at = null;
-  const { data, error } = await supabase.from(thing).update(patch).eq("id", id).select("id");
+  let q = supabase.from(thing).update(patch).eq("id", id);
+  // THE CROSSFIRE GUARD (antagonist A1, owner-ruled 2026-09-03: "we should be able to get
+  // trashed and then you can't archive it"): archive acts refuse a TRASHED row. Without
+  // this, archive-from-a-stale-page after a trash on another device wrote BOTH timestamps
+  // — the thing showed nowhere in the archive, and restore-from-trash then dropped it
+  // into the archive instead of back to live (proven on a throwaway DB). The guard makes
+  // the 0-row assert below fire instead — "reload", the house behavior. Applies to
+  // un-archive too: a trashed thing already LEFT the archive (trash cleared archived_at),
+  // so un-archiving it from a stale page is equally an act on a thing that's gone.
+  // The DB CHECK twin (bit/board_trashed_archived_exclusive) makes the bad state
+  // physically impossible; this guard makes the refusal LOUD.
+  if (column === "archived_at") q = q.is("deleted_at", null);
+  const { data, error } = await q.select("id");
   if (error) throw error;
   if (!data?.length) throw new Error(goneMessage(column, on));
 }
