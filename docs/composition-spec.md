@@ -704,8 +704,13 @@ A pasted image is a block of writing (resizable, left/centre/right), NOT a bit. 
 | on the surface | nature | can drift? | editable here? |
 |---|---|---|---|
 | typed / pasted (text, images, your tables) | **yours — writing** | never | fully |
-| gathered (chip or block) | **a tie to material** | yes — edits elsewhere show here | ⚪ **the window-or-copy question — OPEN** |
-⚪ Also open: does a gathered thing get a small **origin tell**, or stay visually identical to your own content? (Two identical-looking images, one can drift — the seam is real.)
+| gathered (chip or block) | **a tie to material** | yes — edits elsewhere show here | ✅ **RULED: a block is a WINDOW** (see below) |
+⚪ Also open: does a gathered thing get a small **origin tell**, or stay visually identical to your own content? (Two identical-looking images, one can drift — the seam is real; sharpened by the copy-door below.)
+
+### 24.5b ✅ Window-or-copy — RULED (owner, 2026-09-03), plus the copy-door
+**A block is a WINDOW** — you look *through* the writing at the bit itself; the document stores the tie, never the text. The owner, seeing the S-C4 scene: *"if you're bringing a bit in as a block but you're trimming it for this piece — it would trim everywhere. That's the problem."*
+**And the owner's third door, for the person who wants to edit: "bring the bit in as a COPY — it would create a new bit; it wouldn't be linked to the original."** Mints a **new bit** (the owner's word: **unlinked**), tied into the piece; the original untouched everywhere it lives. Better than paste-the-text (Claude's earlier escape) because the edited thing stays **material** — placeable, gatherable. **Machinery exists:** the duplicate-a-bit feature (shipped 2026-09-03, other window) — this door = *duplicate + gather* in one gesture.
+⚪ **The follow-on: where does the copy get edited?** (a) 🔵 **lean, v1** — every block edits on its bit's page: one rule, one extra click · (b) copy-blocks edit in place, shared ones don't — demands a visible tell · (c) everything edits in place through the window, with a "make your own copy first" offer exactly when the bit lives elsewhere — deluxe, technically hairiest (an editor inside an editor). Decide at build.
 
 ### 24.6 The scenes *(run 2026-09-03; the model's test fixtures)*
 S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → drawer → weave) ✓ **the promise working** · S-C3 six pasted screenshots → all writing; one promoted later ✓ · **S-C4 the typo in a gathered quote → ⚪ window-or-copy, unanswered** · **S-C5 essay wants to become a board → laborious (promote × N); F-4 piece-as-board's re-entry case; "either order" is a core principle, so the roughness matters** · S-C6 the inline table → formatting; promote when wanted ✓ · S-C7 quoting your own earlier piece → whole-composition tie or plain paste; a *passage* can't be pulled — escape: make the section its own composition; feel it in practice.
