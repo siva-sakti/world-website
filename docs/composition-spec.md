@@ -665,7 +665,7 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 ### 23.1 ✅ Presence is stored ON THE TIE — the owner's analogy, made exact
 *(Owner: "similar to how a bit can be on multiple boards and each time its position and its size is stored differently — if it gets pulled into a composition it needs to be stored the analogous same way.")*
 - `placement` stores how a bit sits on **that board**: x · y · w · h · z.
-- The reference row must store how the bit sits in **that composition**: **form (chip | block)** · when block: **its size there** · **left / centre / right**. No x/y — the writing's flow decides where.
+- ⚠ **CORRECTED 2026-09-03 (a defect the owner's "how do we keep it straight" question exposed):** this section originally put presence **on the tie** — but one bit can appear TWICE in one piece (a chip in the intro, a block in the middle), and one tie row cannot hold two costumes. **Presence (form chip|block · size · left/centre/right) lives on the OCCURRENCE — the node in the document.** The tie row stays the dedup'd membership fact (one per pair, shipped). The owner's placement analogy holds one level finer: on boards the unit is per-board; in writing it is per-appearance. No x/y anywhere — the flow decides where.
 - Same bit → three surfaces → three independent presences, each on its own tie. Resizing one never touches another *(owner: "of course independent")*.
 - **The narrow-place rule:** the stored size is a **maximum**; display caps at the container's width. Nothing stored twice.
 - Export: no special handling beyond including the files — *(owner: "wouldn't export just be taking what the user is viewing")*. Concern dropped.
@@ -813,3 +813,10 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 **Cross-cutting forks (⚪ the owner's):** glyphs on non-text chips, yes/no · the truncation feel · thumb-alone vs thumb+caption.
 **Gaps surfaced by this pass:** no truncation exists today · **the `[[` picker cannot offer audio/pdf/link bits at all** (verified: it filters text-with-face + image/drawing only) — reach is part of the claim.
 **`[[` itself: kept.** The Obsidian-familiar gesture survives as the claim ("type `[[` and pull anything you have into the sentence") — costume theirs, machinery ours. The heritage rationale (inline-tagging resonance) is retired; the standing rationale is that mid-sentence weaving needs a keyboard door.
+
+
+### 29b · Chips AND blocks — how it stays straight and safe *(2026-09-03)*
+**One thread underneath, many costumes above:** the TIE table stores the fact once (this piece includes this bit — dedup'd, shipped) · the DOCUMENT stores each occurrence + its costume (form/size/alignment in the node) · **reconcile-on-save** keeps them agreeing (shipped mechanism, unchanged) · identical behavior per form (peek/pin/open · the degrade family · last-occurrence-deleted → tie drops).
+**The claim test passed:** mentions and embeds are the two grades of "available inside your writing" — kill chips and you can interleave but never CITE ("as [♪ morning memo] says"). Inline mentions are table stakes (Apple Notes links · Notion @ · Google Docs @). Text-chip = title-else-opening-words is Apple Notes' own convention — familiar by construction.
+**Faces for audio/pdf: chip-side, not schema-side** — the deliberate no-face ruling (audio migration) stands; the chip's collapsed form falls back caption → filename per the owner's general rule, in the component only.
+**The user's lesson is one gesture:** collapse a block → the chip; expand a chip → the block. The toggle IS the teaching.
