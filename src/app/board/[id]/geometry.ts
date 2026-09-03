@@ -1,8 +1,9 @@
 // PURE board geometry — no React, no DOM (geometry-registry-plan.md §2; the
-// board-arrange/camera-storage precedent). Two jobs:
+// board-arrange/camera-storage precedent). Three jobs:
 //   1. box unions (what fitView frames),
 //   2. the snap-guide math: given the dragged card's live box and everyone
-//      else's, find the nearest edge/center alignment within a threshold.
+//      else's, find the nearest edge/center alignment within a threshold,
+//   3. the rotate-drag math (rotateAngle, at the bottom).
 //
 // DESIGN FROM THE OWNER'S REFERENCES (plan §4b): snapping is a WHISPER — one
 // small threshold, nearest candidate wins, both axes independent, and the
@@ -119,4 +120,39 @@ export function snapTo(dragged: Box, others: Box[], threshold: number, extend = 
         }
       : null,
   };
+}
+
+/** Degrees folded into (-180, 180] — small, signed, 0 = upright.
+ *  Deliberately NOT the `((d % 360) + 360) % 360` idiom: adding 360 to a value that
+ *  already sits in range rounds it (0.1 comes back as 0.10000000000002274), which
+ *  would break rotateAngle's no-move-no-change guarantee for a fractional angle.
+ *  A bare `%` is exact, and neither branch fires on an in-range value. */
+function normDeg(d: number): number {
+  const m = d % 360;
+  if (m > 180) return m - 360;
+  if (m <= -180) return m + 360;
+  return m;
+}
+
+/** The angle a rotate-drag should produce (rotation-plan v3 §2.2). All degrees.
+ *  startAngle    — the card's angle when the handle was grabbed
+ *  grabPointer   — atan2 angle of the pointer at grab, about the card's centre
+ *  nowPointer    — atan2 angle of the pointer now
+ *  snap          — hold Shift → 15° steps
+ *
+ *  RELATIVE, not absolute: the card turns by however far the pointer has swept since
+ *  the grab, so grabbing a 45° card and twitching one pixel leaves it at ~45° instead
+ *  of snapping to the handle's own direction. The sweep is normalised BEFORE it is
+ *  applied, so crossing the ±180 seam reads as a 1° step, never a 359° spin.
+ *  Snapping is applied to the RESULT, so the card lands on exact multiples of 15
+ *  (a 15° grid is closed under ±360, so it does not matter that normalising follows).
+ *  Returns a value in (-180, 180]. */
+export function rotateAngle(
+  startAngle: number,
+  grabPointer: number,
+  nowPointer: number,
+  snap: boolean,
+): number {
+  const total = startAngle + normDeg(nowPointer - grabPointer);
+  return normDeg(snap ? Math.round(total / 15) * 15 : total);
 }

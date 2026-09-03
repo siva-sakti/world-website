@@ -546,6 +546,14 @@ export function BoardSurface({
     });
   }
 
+  // A FINISHED SPIN, from any of its three doors: the handle's drag, the handle's
+  // double-click reset, or the straighten button. Persists through the normal save path
+  // and records ONE undo act. Here rather than in card.tsx so the card stays presentational.
+  function rotateCard(c: CardVM, before: number, after: number) {
+    patchCard(c.placementId, c.bitId, { angle: after });
+    arrange.recordRotate(c.bitId, before, after);
+  }
+
   // DUPLICATE THIS BIT — a real copy (its own id, its own file), landing beside the
   // original so it reads as a second thing rather than a replacement. Server-side, because
   // copying the stored file is: the bytes never travel through the browser.
@@ -744,6 +752,7 @@ export function BoardSurface({
           onTagRemove={(tag) => meaning.recordTagRemove(selectedBit.bitId, tag)}
           onOpen={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
           onToggleLock={() => toggleLock(selectedBit)}
+          onStraighten={() => rotateCard(selectedBit, selectedBit.angle ?? 0, 0)}
           onSendToBack={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
           onDuplicate={() => void duplicateSelected(selectedBit)}
           duplicating={duplicatingBit}
@@ -825,12 +834,7 @@ export function BoardSurface({
                 // "grow" (auto-widen) and "write" (body) route RAW — reflexes and flow.
                 patchCard(c.placementId, c.bitId, patch);
               }}
-              onRotateEnd={(before, after) => {
-                // One finished spin: persist through the normal save path, and record ONE
-                // undo act. Both here (not in card.tsx) so the card stays presentational.
-                patchCard(c.placementId, c.bitId, { angle: after });
-                arrange.recordRotate(c.bitId, before, after);
-              }}
+              onRotateEnd={(before, after) => rotateCard(c, before, after)}
               onContentSave={(v) => saveContent(c.placementId, c.bitId, v)}
               onSourceAct={(prev, next) => meaning.recordSourceChange(c.bitId, prev, next)}
               metaRefresh={metaSignalFor(c.bitId)}

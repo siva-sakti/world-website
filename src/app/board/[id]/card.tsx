@@ -7,6 +7,7 @@ import { TextBit } from "./text-bit";
 import { DoodleBit } from "./doodle-bit";
 import { SourcePicker } from "./source-picker";
 import { hostOf } from "@/lib/page-meta";
+import { rotateAngle } from "./geometry";
 import type { Source } from "@/lib/db/sources";
 import type { CardVM } from "./card-vm";
 
@@ -133,13 +134,8 @@ export function Card({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time device capability read
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
   }, []);
-  // ---- rotation (rotation-plan §1, §3) ----
+  // ---- rotation (rotation-plan v3 §2) ----
   const liveRef = useRef<number | null>(null); // the value; state below only repaints
-  /** Degrees in (-180, 180] — small, signed, with 0 meaning upright. */
-  const normDeg = (d: number) => {
-    const m = ((d % 360) + 360) % 360;
-    return m > 180 ? m - 360 : m;
-  };
   const angle = liveAngle ?? card.angle ?? 0;
   const rotated = angle !== 0;
   // THE OWNER'S RULING: editing straightens the content — you work on it level, and it
@@ -147,22 +143,30 @@ export function Card({
   // tilted spell-check underlines, none of which any browser draws well.
   const tilt = rotated && !editing ? angle : 0;
 
-  /** Drag the top-centre handle to spin the card about its own middle. The angle comes
-   *  from atan2 in SCREEN space, which is scale-invariant — no camera math needed. The
-   *  centre is read from the inner element's bounding rect, and a CSS rotation about the
-   *  centre leaves that centre fixed, so the reading stays true mid-gesture. */
+  /** The pointer's bearing from the card's centre, in degrees. SCREEN space, so it is
+   *  scale-invariant — no camera math. Read fresh EVERY frame instead of captured at
+   *  grab: rotating a rectangle about its own centre leaves that centre exactly where
+   *  the bounding rect had it, so re-reading costs nothing while the card merely turns,
+   *  and it keeps the gesture true if anything else shifts the card mid-drag (a window
+   *  resize, a camera change) instead of skewing every remaining frame. */
+  function pointerBearing(ev: { clientX: number; clientY: number }): number | null {
+    const r = innerRef.current?.getBoundingClientRect();
+    if (!r) return null;
+    return (Math.atan2(ev.clientY - (r.top + r.height / 2), ev.clientX - (r.left + r.width / 2)) * 180) / Math.PI;
+  }
+
+  /** Drag the top-centre handle to spin the card about its own middle. The turn is
+   *  RELATIVE to the bearing at grab (rotateAngle), so the card continues from where it
+   *  already sat instead of snapping to the handle's own direction. */
   function onRotateHandleDown(e: React.PointerEvent) {
-    e.stopPropagation(); // never let this start a card drag or a board pan
-    e.preventDefault();
-    const el = innerRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
+    e.stopPropagation(); // the board's pan listens on pointerdown; keep it out of this
+    const grab = pointerBearing(e.nativeEvent);
+    if (grab === null) return;
     rotateFrom.current = card.angle ?? 0;
     const move = (ev: PointerEvent) => {
-      const deg = (Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90;
-      const v = normDeg(ev.shiftKey ? Math.round(deg / 15) * 15 : deg);
+      const now = pointerBearing(ev);
+      if (now === null) return;
+      const v = rotateAngle(rotateFrom.current, grab, now, ev.shiftKey);
       liveRef.current = v;
       setLiveAngle(v);
     };
@@ -238,8 +242,13 @@ export function Card({
       scale={scale}
       minWidth={70}
       minHeight={28}
+      // A press on the rotate handle must never ALSO start a card drag — with the card
+      // sliding away under the gesture, the rotation measures from a moving centre and
+      // the whole thing feels broken. react-rnd forwards `cancel` to react-draggable,
+      // which refuses to begin a drag whose target matches this selector.
+      cancel=".compose-rotate-handle"
       style={{ zIndex: card.z }}
-      className={`compose-card${selected ? " is-selected" : ""}${tilt ? " is-rotated" : ""}`}
+      className={`compose-card${selected ? " is-selected" : ""}`}
       onDragStart={() => onDragStart?.()}
       onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
       onDragStop={(e, d) => {
@@ -260,15 +269,37 @@ export function Card({
         );
       }}
     >
-      {/* The rotate handle — top-centre, OUTSIDE the rotated inner div so it stays put
-          instead of orbiting the card. Same visibility gate as the resize dots. */}
+      {/* The rotate handle — top-centre, same visibility gate as the resize dots. The
+          ANCHOR is the card's own box carrying the card's own tilt, so the handle orbits
+          with the card for free: at 45° it rides the rotated top edge instead of hiding
+          under a corner that has risen above the upright box. */}
       {selected && !editing && !card.locked && (
         <div
-          className="compose-rotate-handle"
-          onPointerDown={onRotateHandleDown}
-          title="Drag to rotate — hold Shift for 15° steps"
-          aria-label="Rotate this card"
-        />
+          className="compose-rotate-anchor"
+          style={tilt ? { transform: `rotate(${tilt}deg)` } : undefined}
+        >
+          <div
+            className="compose-rotate-handle"
+            onPointerDown={onRotateHandleDown}
+            // react-draggable binds mousedown/touchstart and never pointer events, so
+            // stopping the pointerdown above does nothing to it — that was v2's bug. These
+            // stop the streams that actually reach it, and `cancel` on the Rnd refuses the
+            // press independently; two guards because this is the defect that shipped.
+            // preventDefault on mousedown kills the text-selection default without
+            // touching click/dblclick — the double-click reset below still fires.
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onTouchStart={(e) => e.stopPropagation()} // React binds touchstart passively; CSS touch-action owns the scroll
+            onDoubleClick={() => {
+              const current = card.angle ?? 0;
+              if (current !== 0) onRotateEnd?.(current, 0); // straight again, as one undo act
+            }}
+            title="Drag to rotate — hold Shift for 15° steps, double-click to straighten"
+            aria-label="Rotate this card"
+          />
+        </div>
       )}
       <div
         ref={setInner}

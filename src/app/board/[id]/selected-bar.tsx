@@ -19,6 +19,7 @@ export function SelectedBar({
   onTagRemove,
   onOpen,
   onToggleLock,
+  onStraighten,
   onSendToBack,
   onDuplicate,
   duplicating,
@@ -33,6 +34,10 @@ export function SelectedBar({
   onTagRemove: (tag: Tag) => void;
   onOpen: () => void;
   onToggleLock: () => void;
+  /** Back to upright. The button shows only while this card is tilted — the second way
+   *  back from a rotate (double-clicking the handle is the first), because undo is
+   *  per-visit and gets consumed by whatever you did after. */
+  onStraighten: () => void;
   onSendToBack: () => void;
   /** Make a real COPY — its own bit, its own file — beside this one. */
   onDuplicate: () => void;
@@ -70,6 +75,17 @@ export function SelectedBar({
         >
           {card.locked ? "🔓 unlock" : "🔒 lock"}
         </button>
+        {/* Only while it is actually tilted — and never on a locked card, which is the
+            same gate the rotate handle itself uses. */}
+        {!!card.angle && !card.locked && (
+          <button
+            className="compose-btn subtle"
+            onClick={onStraighten}
+            title="Put this card back upright"
+          >
+            straighten
+          </button>
+        )}
         <button
           className="compose-btn subtle"
           onClick={onSendToBack}

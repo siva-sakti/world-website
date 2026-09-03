@@ -422,23 +422,28 @@ body {
   outline-offset: 1px;
   border-color: transparent;
 }
-/* ROTATION (rotation-plan §3). The tilt is a transform on the INNER content, so the
-   selection ring — normally drawn on that same inner div — would tilt with it while the
-   resize dots (rendered by the library on the UPRIGHT root) stayed square: visibly
-   detached corners. So on a rotated card the ring moves to the upright box, where it
-   agrees with the dots. The card's own paper border stays with the content and tilts,
-   which is right: that edge belongs to the thing, the ring belongs to the selection UI. */
-.compose-card.is-rotated.is-selected .compose-card-inner {
-  outline: none;
-  border-color: #e7e1d5;
-}
-.compose-card.is-rotated.is-selected {
-  outline: 2px solid #365a8c;
-  outline-offset: 1px;
+/* ROTATION (rotation-plan v3 §2.3, §2.4). The tilt is a transform on the INNER content,
+   and the ring above is drawn on that same inner div — so the ring tilts with the card
+   and keeps containing it. That is deliberate: v2 pinned the ring to the upright box to
+   agree with the resize dots, and at any real angle the ring stopped enclosing the card.
+
+   The resize dots DO stay upright, and that disagreement is accepted: re-resizable
+   computes a resize in unrotated screen space, so a tilted dot would stretch the card
+   along the wrong axis. Upright dots keep resize working at every angle; the cost is
+   cosmetic — at a strong tilt they sit off the card's corners.
+
+   The ANCHOR is a zero-cost copy of the card's box (inset: 0 on the absolutely
+   positioned Rnd root) carrying the same rotation, so the handle orbits with the card
+   and needs no per-frame JS. Its pointer-events: none is load-bearing: it covers the
+   whole card, and without it every click on the card would land on the anchor. */
+.compose-rotate-anchor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
 }
 /* The rotate handle: top-centre, clear of the four corner resize dots (the
-   Figma/Canva/PowerPoint convention). Sits outside the rotated content so it holds
-   its place rather than orbiting. */
+   Figma/Canva/PowerPoint convention). */
 .compose-rotate-handle {
   position: absolute;
   left: 50%;
@@ -446,12 +451,12 @@ body {
   width: 22px;
   height: 22px;
   margin-left: -11px;
+  pointer-events: auto; /* the anchor around it opts the whole card box out */
   border-radius: 50%;
   background: #fffdfa;
   border: 1px solid #365a8c;
   cursor: grab;
   touch-action: none; /* the pointer drag owns the gesture; no scroll-steal */
-  z-index: 2;
 }
 .compose-rotate-handle::after {
   /* a short stem down to the card, so the handle reads as attached to it */
