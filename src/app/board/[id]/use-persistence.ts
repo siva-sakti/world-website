@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { updatePlacement, updateBitBody, updateBitContent } from "@/lib/db/bits";
@@ -28,9 +28,9 @@ export function usePersistence(
   setCards: Dispatch<SetStateAction<CardVM[]>>,
   onErr: (e: unknown) => void,
 ) {
-  const state = useRef(newQueueState());
-  // The five maps are board-lifetime mutable state, never read for rendering, and useRef
-  // hands back the SAME object on every pass (a StrictMode double-render included).
-  // eslint-disable-next-line react-hooks/refs -- board-lifetime state, not render input
-  return makeWriteQueue(state.current, supabase, setCards, onErr, defaultWriteDoors);
+  // useState's LAZY initialiser, not useRef: it builds the maps once (a ref rebuilds and
+  // discards them every render) and it is the shape the lint rule is written for, so this
+  // needs no suppression. The setter is deliberately unused — the object never changes.
+  const [state] = useState(newQueueState);
+  return makeWriteQueue(state, supabase, setCards, onErr, defaultWriteDoors);
 }

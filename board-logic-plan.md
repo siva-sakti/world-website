@@ -23,6 +23,83 @@ than I first credited** — see A.1.
 
 ---
 
+## Part 0 · THE LEDGER — everything found, and where it stands
+
+**One list, so nothing gets lost.** Every item found in this pass, including the small ones.
+Update the status column in the same session anything moves. *(Findings live in
+`board-completeness-review.md`; approaches live in Parts B–C below.)*
+
+**✅ done · ⏳ in flight · ⬜ queued · ⚪ owner's call · 📋 decision, not a defect**
+
+### The logic findings
+
+| | What | Status |
+|---|---|---|
+| **P3** | the save queue can't be tested — welded to React | ✅ **done** — `write-queue.ts`, 9 tests, 149 → 158 |
+| **P2** | a failed save can overwrite one that succeeded | ✅ **PROVEN FAILING** — wire traffic `[1, 2, 1]` |
+| **P1** | a failed title/caption is dropped — **⚠ narrower than Claude described**, see below | ✅ **PROVEN FAILING** (corrected) |
+| **P5** | 🆕 **`trackCreate` deletes by key with no identity guard** — a second create for the same card (un-place → undo revives the id) lets the first one's cleanup evict the second; `settled()` then returns early and the write hits a row that doesn't exist → **act silently lost**. `chains` was hardened against this exact shape in two places; `creates` was not. | ⬜ step 2 |
+| **P6** | 🆕 `flush()` drops its debounce timer from the map but never `clearTimeout`s it, so a stray timer re-fires a restored patch — contradicting `restorePending`'s own stated policy of never re-arming | ⬜ step 2 |
+| **S4/P4** | placement fields in 3 hand-kept lists — a new field silently doesn't save | ⬜ step 4 |
+| **S7** | `editingId` strands on an undo/redo reverse — keyboard goes dead | ⬜ step 4 |
+| **S3** | `restore()` guards by a different key than its 5 siblings — can show 2 cards for 1 bit | ⬜ step 4 |
+| **S5** | 3 definitions of "which boards is this bit on"; the trash confirm can lie | ⬜ step 5 |
+| **S6** | `ago()` and `fmt()` disagree about what day it is | ⬜ step 5 |
+| **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
+| **S8** | `placement.height` stored and permanently false for text + audio | ⚪ **your call** — I recommend stop writing it |
+| **S2** | the optimistic seam has no stated rule | ⬜ after step 5, drawn from the real cases |
+| **S1** | `board-surface.tsx` does 7 jobs | ⬜ step 10 *(ruled: after tests)* |
+| **S9** | 88% of lines have no test | ⬜ the whole plan |
+
+> **⚠ P1 was wrong as I first described it, and the test is what caught me.**
+> I reported it as *"a failed title is always dropped."* It isn't. `restorePending`'s first
+> branch stores the captured object **whole** — `content` included at runtime, even though
+> the parameter type omits it — so a failed title with nothing else queued **is** retried
+> today. The drop happens **only in the merge branch**: fail a title write, then nudge the
+> card while it's in flight, and `content` is silently discarded. Narrower than I said, but
+> real, and the harder one to notice by reading.
+>
+> **This is the argument for tests-before-fix, made by accident.** Writing the reproduction
+> didn't just prove the bug — it corrected my account of it. Had I gone straight to the fix,
+> I'd have "fixed" a bug whose shape I had wrong. A ninth test now pins the boundary (with
+> nothing else queued the title *is* retried) so nobody can fix it by accident later.
+
+### The small ones — real, easy to forget, that's why they're here
+
+| | What | Status |
+|---|---|---|
+| m1 | dead exports: `isBusy` / `version`; `display_size` stored + constrained + copied, never read | ⬜ |
+| m2 | a comment claims react-rnd suppresses a click after a drag — **verified false** | ⬜ |
+| m3 | a comment claims `DEFAULT_W = 240` matches the renderer — it is 400 | ⬜ |
+| m4 | an unused `placementId` parameter on two remove doors | ⬜ |
+| m5 | `looseRefresh` bumped on a path where nothing became loose | ⬜ |
+| m6 | one unreachable branch | ⬜ |
+| m7 | stale line references in `frame-plan.md` | ⬜ |
+
+### Rules to write down, with the test that enforces each
+
+| | What | Status |
+|---|---|---|
+| r1 | **I-G5** — every date shows in the reader's own zone | ✅ written · ⬜ its boundary test |
+| r2 | **the copy rule** — a copy inherits what the bit HAS, never what POINTS AT it | ⬜ step 6 |
+| r3 | retry when the connection returns | ⬜ step 3 |
+| r4 | `docs/INDEX.md` named a superseded spec as live | ✅ fixed |
+
+### Examined vs unexamined
+
+| | What | Status |
+|---|---|---|
+| e1 | Group E — the bit pages, ~2,900 lines nobody has read this pass | ⬜ step 11 *(ruled: yes)* |
+| e2 | `card.tsx` (574) + `use-create-doors.ts` (503) — audited by agents, not read by me | ⬜ fold into step 10 |
+
+### 📋 Feature gaps — decisions, not defects. Yours, and parked here so they aren't lost
+the pen ignores touch entirely · select mode kills panning for a mouse · notes on a board
+have no title or source picker · the `[[` picker silently drops audio/pdf/link while the
+drawer accepts them · no bulk lock/duplicate/send-to-back/tag · no way to make a note from a
+board · no lightbox for an image, no way to read a PDF from its card.
+
+---
+
 ## Part A · Copying, and what it means once compositions exist
 
 ### A.1 · The thing you were actually right about
