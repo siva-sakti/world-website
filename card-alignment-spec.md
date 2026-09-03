@@ -177,7 +177,11 @@ are silent; it never replaces them.
   release. react-rnd ignores position changes mid-drag (traced through its source). Magnetic pull
   requires the ruled input-engine work; this is not it.
 - **No live equal-gap guides** (the "spacing hints" some tools show). Distribute is a button.
-- **No rotation.** Ruled out of v1; the references show it in use, recorded for the aesthetics phase.
+- **Rotation is a separate feature, not this one.** This spec's alignment/guides work does not
+  rotate a card — that's `rotation-plan.md`. The two are linked by one ruling
+  (`organize-phase-plan.md` §4g, 2026-09-02): **a rotated card opts OUT of alignment**, the same
+  rule locked cards already follow, so `snapTo` never has to reason about rotated boxes and the
+  two features can land in either order without either being reworked.
 - **No ruler guides** (§2.5).
 
 ---
