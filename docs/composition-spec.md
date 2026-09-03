@@ -748,3 +748,25 @@ Not in the composition's undo (not the piece) · exists on the composition **pag
 
 ### 26.5 Storage, sequencing, name
 **One new table** — owner · composition_id · bit_id · x · y · w · h · collapsed — unique(composition, bit), FK-cascade on destroy, owner-only RLS. **Anchored on the composition table, so it BUILDS ONLY AFTER THE SPLIT** *(the owner called this: "it relates to storage, which is why we have to hash it out first")*. **Orthogonal to §21.5** (HTML-vs-JSON) — the layer deliberately lives outside the document. **Build order: last** — step 6 of: ① the split → ② editor core → ③ bring-in (picker-reaches-everything · block form · presence-on-tie) → ④ make-this-a-bit + pasted images → ⑤ postures → ⑥ the hover layer. ⚪ **Needs a name from the owner** (user-facing; owner writes the voice).
+
+
+## 27 · The cross-cutting pass — composition × every dimension × the lifecycle *(run 2026-09-03 at the owner's ask; the no-blank-cells gate)*
+
+### 27.1 Caught by the pass (schema)
+1. **The SUBTITLE column** — ruled in §6b, absent from §21.2's carries-list; would have been silently dropped at build. **Added: title · subtitle · the writing · …**
+2. **`board_cards` grows a third leg** — bit-or-board becomes bit-or-board-or-composition; liveness rules ride along (trashed doorway hides, restores back; archived matches archived bits).
+3. **Composition-owned files: trash keeps, DESTROY sweeps** — the destroy trigger for the orphan sweep, previously unnamed.
+4. ⚪ **Travel:** 🔵 lean — **surfaces don't travel** (no `composition_travel`), matching boards. Needs the owner's nod.
+
+### 27.2 Inherited clean (verified against §21.2–§21.3 + existing patterns)
+tags · folder · alive · archive(state) · trash-as-freeze · openings · created/updated · search · the lock column · destroy cascades the ties · a chip pointing at a destroyed composition degrades to plain text (the bits mechanism, unchanged).
+
+### 27.3 Visibility — parked on the owner's word
+*(Owner, 2026-09-03: "we have not figured out security/storage/privacy yet — there's some default for now, but we will have to change it in the future.")* **Default `private` (matching boards) as a placeholder; the privacy session owns the real answer** — including public-composition-gathering-private-bits (the AND-composition question, deferred with the layer).
+
+### 27.4 App-level opens, complete list
+**Rulings needed:** window-or-copy ⭐ (the storage gate, §24.5) · a BLOCK whose bit is *trashed* (chips ruled; blocks ⚪ — blank vs tombstone) · origin tell · chip-flattening at promotion (§24.4 lean) · collapse form (§26.4) · the global date format (§6b).
+**Work, no decisions:** the pull / home / find / graph each grow a composition leg · archived-target display matches bits.
+
+### 27.5 ⚪ "Done" — asked, not invented
+No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deliberately none** — the gradient stays felt, not stored. The owner says the word if wrong (it would be a column).
