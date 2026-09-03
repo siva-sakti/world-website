@@ -45,6 +45,9 @@ export default async function BitPage({
   // Boards it's NOT already on — the "place on a board…" door (board-side placement
   // stays too; both directions, the owner's ruling). callInBit revives a departed
   // leg rather than duplicating, so this is safe even for a board it once left.
+  // A LIVE leg is one with no departure stamp — the same rows the history came from, so
+  // "which boards is it on" and "since when" are one read, not two.
+  const activeLegs = travel.filter((t) => !t.left_at);
   const otherBoards = allBoards
     .filter((bd) => !boards.some((cur) => cur.id === bd.id))
     .map((bd) => ({ id: bd.id, title: bd.title }));
@@ -233,48 +236,42 @@ export default async function BitPage({
         </section>
       )}
 
-      {/* Boards it's on now */}
+      {/* WHERE IT IS NOW — the boards it is actively on, each with when it arrived.
+          Merged from two sections that overlapped: "on these boards" listed the current
+          boards WITHOUT dates, and "where it's been" listed every leg ever WITH dates.
+          One list now (owner, 2026-09-02: "just say which boards it is actively on and
+          dates of its travel"). A live leg is one with no departure stamp, so the dates
+          come from the same rows — no second query.
+          The list hides when the bit is on no board ("don't display if it is not actively
+          on a board"), but the place-on-a-board control stays: hiding that too would leave
+          a loose bit with no way onto a board from its own page. */}
       <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">on these boards</h2>
-        {boards.length === 0 ? (
-          <p className="text-sm text-neutral-500">Not on any board right now.</p>
-        ) : (
-          <ul className="space-y-1 text-sm">
-            {boards.map((bd) => (
-              <li key={bd.id}>
-                <Link href={`/board/${bd.id}`} className="underline underline-offset-4 hover:no-underline">
-                  {boardLabel(bd.title)}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        {activeLegs.length > 0 && (
+          <>
+            <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">on these boards</h2>
+            <ul className="space-y-1 text-sm text-neutral-600">
+              {activeLegs.map((t) => (
+                <li key={t.board_id}>
+                  <Link
+                    href={`/board/${t.board_id}`}
+                    className="text-neutral-800 underline underline-offset-4 hover:no-underline"
+                  >
+                    {boardLabel(t.board_title)}
+                  </Link>
+                  {" · arrived "}
+                  {fmt(t.arrived_at)}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
         {otherBoards.length > 0 && (
-          <div className="mt-3 text-sm">
+          <div className={activeLegs.length > 0 ? "mt-3 text-sm" : "text-sm"}>
             <PlaceOnBoard bitId={b.id} boards={otherBoards} />
           </div>
         )}
       </section>
 
-      {/* Where it's been — the bit's board history (arrived/left), boards clickable. */}
-      <section className="mt-8">
-        <h2 className="mb-2 text-xs uppercase tracking-wide text-neutral-400">where it&rsquo;s been</h2>
-        <ul className="space-y-1 text-sm text-neutral-600">
-          {travel.map((t, i) => (
-            <li key={i}>
-              <Link
-                href={`/board/${t.board_id}`}
-                className="text-neutral-800 underline underline-offset-4 hover:no-underline"
-              >
-                {boardLabel(t.board_title)}
-              </Link>
-              {" · arrived "}
-              {fmt(t.arrived_at)}
-              {t.left_at ? ` · left ${fmt(t.left_at)}` : " · here now"}
-            </li>
-          ))}
-        </ul>
-      </section>
     </main>
   );
 }
