@@ -267,12 +267,13 @@ INDEX.md ................ this file — where everything is
 
 **IF the task is THE COMPOSITION FEATURE (building, planning, or specifying) →**
 1. **START:** `composition-definition.md` — the concept. *(⚠ lags the newest stamps; see its banner.)*
-2. **THE LIVE SPEC:** `composition-technical-spec.md` — data · invariants · behaviors · UI states · acceptance · **§6 the open register.**
+2. ⭐ **THE LIVE SPEC: `composition-spec.md`** — the full specification, written section by section with the owner (§24 the composing model · §24.5b window-or-copy · §25 the move inventory · §26 the hover layer). **Banner-marked DRAFT — read it, do not build from it yet.** It states outright that it **supersedes `composition-technical-spec.md`**.
+   *(⚠ `composition-technical-spec.md` was named "THE LIVE SPEC" here until 2026-09-03 and is now the SUPERSEDED consolidation — a board session was misled by this line. Consult it only for what `composition-spec.md` has not yet covered.)*
 3. Capabilities: `composition-surface-spec.md`. Shelf: `future-features.md` (F-1…F-9).
 4. **⚠ `composition-base-spec.md` is a PALIMPSEST** — historical trail with internal contradictions. **Never build from a single section of it.** Read `aerial-review-findings.md` first if you must consult it.
 
 **IF the task is CONNECTION / REFERENCES / LINKS →**
-`composition-technical-spec.md` §1.2 (the relations) → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2·S5·S12·S13. **The direction principle and flatness are settled — do not re-litigate them without the owner.**
+`composition-spec.md` §23.1 (presence is stored ON THE TIE) + `composition-technical-spec.md` §1.2 (the relations, superseded-but-uncovered) → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2·S5·S12·S13. **The direction principle and flatness are settled — do not re-litigate them without the owner.**
 
 **IF the task is TABLES / TYPED FIELDS / TRACKERS →**
 `tables-and-structured-data.md` → `research-structured-data.md`. **The engine is parked; a table is formatting.**

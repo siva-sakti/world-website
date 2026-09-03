@@ -343,26 +343,81 @@ Run with the existing `node --test` setup — no new dependency.
 
 ---
 
-## Part E · Order, and what I need from you
+## Part E-0 · The owner's rulings, 2026-09-03 — fold these into everything above
+
+1. **The ~150-line ceiling is guidance, not a rule.** *"I hope maybe it's OK to have over
+   150 line ceiling, but I wanna make sure each file is constructed very intentionally and
+   intelligently."* → **A file is judged by whether it does ONE job well, not by its line
+   count.** This changes the argument for splitting `board-surface.tsx`: not "917 > 150" but
+   "it does seven jobs, which is why its neighbours need 18- and 19-field dependency objects
+   to reach it." `bits.ts` at 631 gets re-judged the same way — by its job count, not its
+   size. `remove-acts.ts` is 399 lines and is the *best* file on the board; that is the proof
+   the ceiling was never the point.
+2. **Retry when the connection returns — yes.** Standard, and cheap: listen for the
+   browser's `online` event and flush once. It is not a timer, so it cannot become the
+   request storm the current design deliberately avoids.
+3. **The split happens after the tests.** Confirmed.
+4. **Group E — the bit pages — gets examined too.** *"as long as we're moving methodically,
+   logically, slowly and comprehensively."* Added to the order below as its own step, after
+   the board work, because it is ~2,900 lines nobody has read this pass.
+5. **Dates: see §E-1.** Settings are wanted eventually, but the timezone fix must not wait
+   for a settings page.
+
+## Part E-1 · Dates — why they're wrong, and what to do *(owner asked)*
+
+**The bug, in your terms:** it is 6pm on Tuesday and you save a bit. The app files it under
+**Wednesday**. Your machine is on Pacific time (−7); the app formats every date in **UTC**,
+which is already tomorrow after 5pm your time.
+
+**Why anyone would pin it to UTC — the failure that fix was avoiding.** Every page is
+rendered twice: once on the server so it arrives complete, then again in your browser. Both
+have to produce **the same text**, or React throws a hydration mismatch and the page can
+flicker or error. The server runs in UTC; your laptop doesn't. So "just use local time"
+produces two different answers for one moment, and the page breaks. Pinning both sides to
+UTC removed the breakage — and quietly made every evening date wrong by a day.
+
+**The three ways out:**
+
+| | What it does | Cost |
+|---|---|---|
+| **(a) Pin to YOUR zone** instead of UTC | one constant changes; both sides still agree, so no flicker | wrong if you move and care |
+| **(b) Format in the browser only** | correct anywhere | dates arrive blank then pop in — flicker on every list |
+| **(c) A timezone preference** on a profile page | correct, no flicker, travels with you | a whole feature: page + column + it must be loaded before anything renders |
+
+> **Recommendation: (a) now, shaped so (c) drops in later with no rework.**
+> The zone stays **one constant in one file**. When a settings page exists, that constant
+> becomes a value read from your profile — every call site is already asking the same single
+> question, so nothing else changes. This is the answer to *"built so we won't have any
+> failures"*: the fragile version of (c) is one where each page fetches your zone itself and
+> renders before it arrives. One door means that can't happen.
+
+**And S6 is fixed in the same pass:** `ago()` ("today"/"yesterday") and `fmt()` ("Sep 2")
+will compute the calendar day the *same way in the same zone*, so two screens can no longer
+disagree about which day a moment falls on.
+
+**⚪ Needs one word from you:** the zone. Your machine reports PDT (−0700) — if that's
+`America/Los_Angeles`, say so and it's done.
+
+## Part E-2 · Order, and what I need from you
 
 | | | Needs you? |
 |---|---|---|
-| 1 | S4 field table · S7 `editingId` · S3 one guard key | no |
-| 2 | Extract the queue (B.3), **write D.1 tests first and watch P1/P2 fail** | no |
-| 3 | Fix P1 + P2 by the B.2 redesign; watch the tests turn green | no |
-| 4 | S5 one door · S6 one day-rule, with D.3 tests | no |
-| 5 | A.3 into `invariants.md` + the D.2 guard test | no |
-| 5b | fix `docs/INDEX.md` — it still names the superseded spec as "THE LIVE SPEC" | no |
-| 6 | S6b migration — written and proven locally | **you run it** |
-| 7 | S8 height decision | **your call** (I recommend b) |
-| 8 | S1 seams, on top of the tests | **your call on timing** |
+| 1 | **Lift the save queue out of React + write the failing tests** — running now | no |
+| 2 | Fix P1 + P2 by the B.5 redesign; the same tests go green | no |
+| 3 | Retry on reconnect (`online` event → one flush) — ruling 2 | no |
+| 4 | S4 field table · S7 `editingId` · S3 one guard key | no |
+| 5 | S5 one door for "which boards is this bit on" · S6 + E-1 dates, with tests | **the zone** |
+| 6 | The copy rule (A.3) into `invariants.md` + its guard test | no |
+| 7 | Fix `docs/INDEX.md` — it still names the superseded composition spec as live | no |
+| 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
+| 9 | S8 height decision | **your call** (I recommend b) |
+| 10 | S1 — split `board-surface.tsx` by its seven jobs, on top of the tests | no *(ruled: after tests)* |
+| 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |
 
-Steps 1–5 are reversible, tested, and on the branch. **Step 2 is deliberately
-tests-before-fix**: I want to show you the failures before the repair, because otherwise
-"it's fixed" is just my word for it — which is exactly the gap you're trying to close.
+Steps 1–7 are reversible, tested, and on the branch.
 
-**Two decisions I'd like before step 6:** S8's height (a/b/c above), and whether S1's
-split happens in this pass or is its own sitting.
+**Open for you:** the timezone (E-1) · S8's height (a/b/c in Part C) · and step 8's migration
+when you're ready to run it.
 
 ### What this does not cover
 The feature gaps in review §4c (touch pen · notes on a board · the `[[` picker dropping
