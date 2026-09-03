@@ -1,8 +1,12 @@
 # Rotation — plan (v2, rewritten after the antagonist round)
 
 **Status:** v1 scoped → **antagonist returned 4 must-fix defects** → owner ideated the
-edit-straightens ruling → **v2 rewritten from the CODE, every wiring point verified by
-reading it (2026-09-03)** → building. Ruled IN 2026-09-02 (`organize-phase-plan.md` §4g).
+edit-straightens ruling → v2 rewritten from the CODE, every wiring point verified by reading
+it → **✅ BUILT + migration pasted to cloud + owner-confirmed working on localhost
+("cool it's functional now", 2026-09-03). Owner's feel-tune still owed** (handle size and
+position · does the spin track the hand · Shift-15° · whether the upright selection ring
+around a tilted card reads right). Ruled IN 2026-09-02 (`organize-phase-plan.md` §4g).
+**Not on `main` yet — pushing there deploys, which is the owner's call.**
 
 **What v1 got wrong, kept on the record:** it proposed rotating the card's OUTER box with
 CSS. `react-draggable` writes `transform: translate(...)` onto that same node every frame
