@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, Placement, Drawing } from "@/lib/types";
-import { removeObjects } from "@/lib/storage";
+import { removeObjects, copyPathsFor } from "@/lib/storage";
 import { setResting } from "./resting";
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
@@ -523,11 +523,12 @@ export async function duplicateBit(supabase: SupabaseClient, bitId: string): Pro
   };
 
   try {
-    const ext = src.storage_path?.split(".").pop() ?? "";
-    const storage_path = src.storage_path
-      ? await copyTo(src.storage_path, `${src.storage_path.split("/")[0]}/${newId}.${ext}`)
-      : null;
-    const thumb_path = src.thumb_path ? await copyTo(src.thumb_path, `thumbs/${newId}.jpg`) : null;
+    // Through the door (copyPathsFor), NOT string-surgery on the original's path: the
+    // copy's files are derived from ITS id and its type, so they can never inherit the
+    // original's id or drift if the path shapes change. Covered by tests, per type.
+    const to = copyPathsFor(src.type, newId, src);
+    const storage_path = to.storage ? await copyTo(src.storage_path, to.storage) : null;
+    const thumb_path = to.thumb ? await copyTo(src.thumb_path, to.thumb) : null;
 
     const { data, error } = await supabase
       .from("bit")

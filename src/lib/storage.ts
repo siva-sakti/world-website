@@ -134,3 +134,40 @@ export function linkThumbPath(bitId: string): string {
 export function audioPath(bitId: string, ext: string): string {
   return `audio/${bitId}.${ext}`;
 }
+
+/** WHERE A COPY'S FILES GO — derived from the copy's OWN id and its type, never by
+ *  string-surgery on the original's path.
+ *
+ *  Written after catching the alternative in review: `duplicateBit` first built these by
+ *  hand (`src.storage_path.split("/")[0] + "/" + newId + "." + ext`), which produced the
+ *  right answer today and would have quietly kept following the OLD convention if the
+ *  path shapes above ever changed. It also re-created, hours later, exactly the
+ *  duplication the path helpers were introduced to remove.
+ *
+ *  Audio is the one that must consult the original: its extension is whatever the file
+ *  actually was (m4a · mp3 · wav …), so it is read off the source path rather than
+ *  guessed. Everything else is a fixed shape per type. */
+export function copyPathsFor(
+  type: string,
+  newId: string,
+  src: { storage_path?: string | null; thumb_path?: string | null },
+): { storage: string | null; thumb: string | null } {
+  switch (type) {
+    case "image": {
+      const p = imagePaths(newId);
+      return { storage: p.full, thumb: src.thumb_path ? p.thumb : null };
+    }
+    case "pdf": {
+      const p = pdfPaths(newId);
+      return { storage: p.file, thumb: src.thumb_path ? p.thumb : null };
+    }
+    case "audio": {
+      const ext = src.storage_path?.split("/").pop()?.split(".").slice(1).join(".") ?? "";
+      return { storage: ext ? audioPath(newId, ext) : null, thumb: null };
+    }
+    case "link":
+      return { storage: null, thumb: src.thumb_path ? linkThumbPath(newId) : null };
+    default:
+      return { storage: null, thumb: null }; // text · drawing carry no file
+  }
+}
