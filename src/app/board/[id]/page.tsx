@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBoard, getBoardCards } from "@/lib/db/boards";
@@ -80,6 +81,15 @@ export default async function BoardPage({
       <header className="flex shrink-0 flex-wrap items-baseline justify-between gap-4">
         <span className="w-8 shrink-0" aria-hidden="true"></span>
         <BoardTitle boardId={board.id} title={board.title} />
+        {/* The way IN to the timeline. Without it the page exists and nothing points at
+            it — a route you can only reach by typing the URL is not a feature. */}
+        <Link
+          href={`/board/${board.id}/timeline`}
+          className="shrink-0 text-xs text-neutral-400 underline underline-offset-4 hover:text-neutral-700 hover:no-underline"
+          title="See what arrived on this board, and when"
+        >
+          timeline
+        </Link>
       </header>
       <div className="shrink-0">
         <BoardDescription boardId={board.id} initial={board.description ?? ""} />
