@@ -21,7 +21,7 @@ export function usePersistence(
   onErr: (e: unknown) => void,
 ) {
   const pending = useRef(
-    new Map<string, { bitId: string; placement: PlacementPatch; body?: string }>(),
+    new Map<string, { bitId: string; placement: PlacementPatch; body?: string; content?: string }>(),
   );
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const creates = useRef(new Map<string, Promise<unknown>>());
@@ -62,6 +62,7 @@ export function usePersistence(
     if (patch.z !== undefined) cur.placement.z = patch.z;
     if (patch.angle !== undefined) cur.placement.angle = patch.angle;
     if (patch.body !== undefined) cur.body = patch.body;
+    if (patch.content !== undefined) cur.content = patch.content;
     pending.current.set(placementId, cur);
     const existing = timers.current.get(placementId);
     if (existing) clearTimeout(existing);
@@ -95,6 +96,12 @@ export function usePersistence(
       .then(async () => {
         if (Object.keys(p.placement).length)
           await updatePlacement(supabase, realId, p.placement);
+        // The TITLE / CAPTION joins the queue (2026-09-03). It used to be written
+        // directly, outside `pending`, which cost it two things every other write has:
+        // a failed title was reported and then DROPPED, with no retry, while the banner
+        // said "your work is still here" — and flushNow's "the words landed" promise,
+        // which every remove act gates on, did not cover it at all.
+        if (p.content !== undefined) await updateBitContent(supabase, p.bitId, p.content);
         if (p.body !== undefined) {
           await updateBitBody(supabase, p.bitId, p.body);
           bodyLanded = true; // the WORDS are safe from here (hunt #7 carve)
@@ -180,17 +187,18 @@ export function usePersistence(
     schedule(placementId, bitId, patch);
   }
 
+  /** A card's title or caption. Goes through the SAME queue as positions and the body:
+   *  one debounce, one write chain, one retry policy. It used to write directly, which
+   *  quietly made these words less durable than every other word on the board — a failed
+   *  write was surfaced and then dropped, where a failed body write is put back and
+   *  retried by flushAll. Queuing it also brings it under flushNow, so "the words landed"
+   *  now actually means all of them before a card is removed or a page is opened. */
   function saveContent(placementId: string, bitId: string, value: string) {
+    const content = value.trim();
     setCards((cs) =>
-      cs.map((c) => (c.placementId === placementId ? { ...c, content: value.trim() || undefined } : c)),
+      cs.map((c) => (c.placementId === placementId ? { ...c, content: content || undefined } : c)),
     );
-    // Through the door: a title typed on a fresh optimistic card must wait for the
-    // bit row to exist, or the update matches 0 rows and the title vanishes.
-    settled(placementId)
-      .then((id) => chain(id, () => updateBitContent(supabase, bitId, value))) // ordered (health check S4):
-      // four doors now hit saveContent (blur · unmount-commit · page-hide · the offer) —
-      // unchained, two writes could reorder on the wire and an older caption win.
-      .catch(onErr);
+    schedule(placementId, bitId, { content });
   }
 
   /** Write EVERY waiting change now — leaving the board, or the page going away.

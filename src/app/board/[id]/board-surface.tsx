@@ -293,7 +293,7 @@ export function BoardSurface({
   // is wasted work. Excludes the dragged card (it would align to itself) AND the rest of
   // the selection (followers hold a CONSTANT offset, so one within range would snap on
   // every frame and drift the whole group).
-  const dragSnap = useRef<{ others: Box[]; moved: boolean; alt: boolean } | null>(null);
+  const dragSnap = useRef<{ others: Box[]; moved: boolean; alt: boolean; fromX: number; fromY: number } | null>(null);
 
   function hideGuides() {
     if (vGuideRef.current) vGuideRef.current.style.display = "none";
@@ -363,9 +363,12 @@ export function BoardSurface({
     const tl = view ? screenToWorld(view.left, view.top) : null;
     const br = view ? screenToWorld(view.left + view.width, view.top + view.height) : null;
     const PAD = 400; // world px of slack, so a card just off-screen can still align
+    const from = cards.find((c) => c.placementId === placementId);
     dragSnap.current = {
       moved: false,
       alt: false,
+      fromX: from?.x ?? 0,
+      fromY: from?.y ?? 0,
       others: cards
         // `!c.angle`: a rotated card opts OUT of alignment (rotation-plan §5, owner-ruled)
         // — its stored box is not what the eye sees, so it would draw a guide to an edge
@@ -404,7 +407,16 @@ export function BoardSurface({
   function onCardDragMove(placementId: string, x: number, y: number) {
     const me = cards.find((c) => c.placementId === placementId);
     if (dragSnap.current && me) {
-      dragSnap.current.moved = true; // a real drag, not a click
+      // A REAL drag, not a twitch. `moved` used to flip on the first drag event with no
+      // threshold at all — while the pan handler and the marquee both demand 4px. So a
+      // 1px wobble during a click on a card near a neighbour snapped it away AND recorded
+      // a "move card" undo entry, for a gesture the owner experienced as a click. Same
+      // threshold as its two siblings now.
+      const st = dragSnap.current;
+      if (!st.moved) {
+        if (Math.hypot(x - st.fromX, y - st.fromY) < 4) return;
+        st.moved = true;
+      }
       drawGuides(snapFor(me, x, y));
     }
     const starts = dragStart.current;
