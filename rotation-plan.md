@@ -1,7 +1,14 @@
 # Rotation — plan
 
-**Status:** scoped (2026-09-03, owner delegated: "you can probably scope it all") → **awaiting
-antagonist review** → build. Ruled IN 2026-09-02 (`organize-phase-plan.md` §4g item 2, re-opening
+**Status:** scoped → **antagonist returned 4 must-fix defects (2026-09-03: the outer-box CSS
+rotate is overwritten by the drag library — rotate the INNER content instead; the angle would
+neither persist nor read back — 4 unlisted wiring points; resize-while-rotated breaks in
+screen space) → ⏸ PAUSED for owner ideation before the rewrite.** The owner's direction so
+far, recorded not yet ruled: at rest the card shows its tilt; clicking IN to edit presents
+the content STRAIGHT (tilt suspended while editing, back on exit) — which also kills the
+tilted-caret/selection ugliness. Named edges to think through: upright-hitbox vs tilted
+content at the corners; the select→edit click grammar's "straighten pop." Do not rewrite or
+build until the owner says go. Ruled IN 2026-09-02 (`organize-phase-plan.md` §4g item 2, re-opening
 the old v1 cut): *"I do think rotation matters now that we're getting more visual spatial… if we
 do alignment, I think we should just let alignment happen… if they've done certain things with
 the cards then it can no longer align."* **The one mechanism that ruling already settled:** a
