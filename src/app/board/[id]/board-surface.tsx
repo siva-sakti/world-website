@@ -772,12 +772,15 @@ export function BoardSurface({
               onDragEnd={(x, y) => onCardDragEnd(c.placementId, x, y)}
             />
           ))}
+          {/* The guides — INSIDE the world layer, which is the whole point: they are
+              positioned in WORLD coordinates, so the board's pan/zoom transform carries
+              them for free. Mounted outside it first, and they were invisible — placed at
+              world coordinates inside a screen-space box, i.e. somewhere off in the void.
+              Permanently mounted and driven by style mutation: deriving their visibility
+              from React state would re-render the board on every frame of a drag. */}
+          <div ref={vGuideRef} className="snap-guide" />
+          <div ref={hGuideRef} className="snap-guide" />
         </div>
-        {/* The guides. Permanently mounted and driven by style mutation — deriving their
-            visibility from React state would re-render the board on every drag frame.
-            They live in the world layer, so they pan and zoom with the board for free. */}
-        <div ref={vGuideRef} className="snap-guide" />
-        <div ref={hGuideRef} className="snap-guide" />
         {marquee.marqueeBox && (
           <div
             className="marquee-box"

@@ -119,7 +119,10 @@ body {
   display: none;
   background: #e83e8c;
   pointer-events: none;
-  z-index: 6;
+  /* ABOVE every card. A card's z comes from nextZ() and climbs without limit as you
+     bring things to front, so any small number here would eventually be painted over —
+     the guide must be readable across whatever it is aligning to. */
+  z-index: 2147483000;
 }
 .marquee-box {
   position: absolute;
