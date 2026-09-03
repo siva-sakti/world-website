@@ -67,3 +67,65 @@ The quoted enum contains **32** values: bookmark · breadcrumb · bulleted_list_
 - **Anything current.** The newest source here is 2023.
 
 **Where the live decision is:** `docs/composition-spec.md` §21.5 — and **none of it depends on this file.** This is a reference point the owner asked to have in her pocket, nothing more.
+
+---
+
+# PART 2 — the deep read (2026-09-03, owner: *"double-check, triple-verify every claim"*)
+
+Source for this whole section unless marked: **[Exploring Notion's data model](https://www.notion.com/blog/data-model-behind-notion)**, notion.com/blog, Jake Teton-Landis, **18 May 2021**. Quotes byte-verified against the live page.
+
+## 10 · Every block is identified from birth — ON THE DEVICE, before saving
+> *"each block is uniquely identifiable by its ID… We use randomly-generated UUIDs (UUID v4) for IDs in Notion."*
+> *"the client defines all the initial attributes of the block, generating a new unique ID, setting the appropriate block type"*
+
+⭐ **Answers the owner's observation** (*"they're not necessarily identified… you're not creating it as a bit, but it can become that"*). **Identity is automatic and immediate** — the id exists the instant you press Enter, generated locally. **So the distinction she is feeling is not about identity; it is about AUTHORSHIP.** In Notion every line is silently a thing; in this project **a bit is something you deliberately made.** *(That framing is Claude's; the quotes above are Notion's.)*
+
+## 11 · A block's four attributes
+> *"Properties—a data structure containing custom attributes about a specific block."*
+> *"Content—an array (or ordered set) of block IDs representing the content inside this block"*
+
+Plus **Parent** (upward) and **Type**.
+
+## 12 · ⭐ Notion blocks CAN change type — the exact opposite of this project's hard line
+> *"Changing the type of a block doesn't change the block's properties or content—it only changes the type attribute."*
+
+**Direct, sourced contrast with D-121 — *a thing never changes type*.** Notion made type a mutable attribute; this project made it fixed at birth. **Both are deliberate; they are opposite.**
+
+## 13 · Ordering DOES exist in the data model — correcting §4 above
+> *"Each block defines the position and order in which its content blocks are rendered."*
+
+⚠ **Reconciling the two research passes:** §4 reported *no documented ordering field* — true **of the public API**. The data model **does** carry order: a parent's `Content` is an **ordered array of child ids**. Both findings stand; they describe different layers. *(The underlying structure — linked list vs array index — is NOT FOUND.)*
+
+## 14 · ⭐ WHY they chose it — IN NOTION'S OWN WORDS, so it need not be guessed
+> *"we wanted an atomic, graph-like data model to provide our users with the ability to customize how their information is moved, organized, and shared."*
+> *"Take cloud-based document editors, where pages are their smallest atomic unit. Information is locked inside of pages and files and folders"*
+
+⚠ **Claude's 2026-09-02 note said motives were unknowable and then guessed at them anyway. Both halves were wrong: the motive IS published, and it was one search away.** *(The guess — that they promoted the paragraph for want of a smaller unit — is directionally near this, which does not excuse asserting it unsourced.)*
+
+## 15 · Notion names the cost themselves
+> *"in the worst case, this API might need many trips to the database as it recursively crawls down the tree to chase down blocks and their record dependencies."*
+
+## 16 · The owner's observations, checked
+| her observation | verdict | evidence |
+|---|---|---|
+| "pressing Enter makes a block" | ✅ **CONFIRMED** | *"You press enter—this creates a new To-do block."* ⚠ found only in the **engineering blog's worked example** — the plain help pages never say it. `Shift+Enter` = *"a line break within a block of text"* ([shortcuts](https://www.notion.com/help/keyboard-shortcuts)) |
+| blocks copy · move · drag between pages | ✅ **CONFIRMED** | *"Every block in Notion (including lines of text) can be dragged and dropped around the page."* · *"Move to: Moves the block to another page"* ([basics](https://www.notion.com/help/writing-and-editing-basics)) |
+| "a table drops inline as a block" | ✅ **CONFIRMED, with a split** | a **simple table** is a plain block — *"if you want to display plain text visually without database functionalities"* ([tables](https://www.notion.com/help/tables)); a **database table** is a different block type (`child_database`). *"Table block objects are parent blocks for table row children"* (API) |
+| a pasted block's id | ❓ **NOT FOUND officially** | only an UNOFFICIAL 6-year-old Reddit answer claims a copy gets a new id and a *move* keeps it. **Not citable.** |
+
+## 17 · ⭐⭐ TEXT WRAPPING AROUND AN IMAGE — **CONFIRMED NOT SUPPORTED**
+**The question that matters most, because `docs/composition-spec.md` §7 already RULES text wrapping IN** (an image sits in the flow, left/right/centre, *"with text reflowing around it"*).
+
+**Evidence:**
+1. The word **"wrap" never appears** — raw-text checked, not summarised — on either [images, files and media](https://www.notion.com/help/images-files-and-media) or [columns, headings and dividers](https://www.notion.com/help/columns-headings-and-dividers).
+2. Documented image options are only: **align left/centre/right · resize by dragging · full screen · crop · mask**. No wrap.
+3. **Columns are the workaround, and are not the same thing** — text sits *beside* the image and does **not** continue beneath it. UNOFFICIAL: *"It's not true text wrapping, but if you drag the image to the side of the text, it will split the page into two."*
+4. **~6 years of requests, no official reply** — three r/Notion threads (2020 → 2023). UNOFFICIAL: *"Is there a way to have the text wrap around the image like you can in Microsoft Word?"* — answer: *"Nope."*
+
+⚠ **The researcher's own caveat, kept:** this rests on **documentation silence + consistent unrebutted community reports**, NOT on an explicit Notion denial.
+⚠ **And the tempting causal claim is NOT sourced:** that Notion cannot wrap *because* every block is a full-width row in a vertical stack. **Plausible, unverified, Claude's inference — do not cite it.**
+
+⭐ **What IS established, and it is enough:** **the owner has already ruled in a feature that Notion does not have.**
+
+## 18 · Notion's other engineering posts *(titles/URLs verified; contents UNREAD)*
+[Creating the Notion API](https://www.notion.com/blog/creating-the-notion-api) · [WASM SQLite in the browser](https://www.notion.com/blog/how-we-sped-up-notion-in-the-browser-with-wasm-sqlite) · [Notion offline](https://www.notion.com/blog/how-we-made-notion-available-offline) · [Sharding Postgres](https://www.notion.com/blog/sharding-postgres-at-notion) · [The Great Re-shard](https://www.notion.com/blog/the-great-re-shard) · [Notion's data lake](https://www.notion.com/blog/building-and-scaling-notions-data-lake)
