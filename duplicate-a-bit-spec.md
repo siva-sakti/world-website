@@ -137,3 +137,21 @@ duplicating makes a **new bit**, not a second card of the same one. The word say
 - **Off-board duplication lands loose**, so `/bits` shows it immediately.
 - **On-board duplication** lands beside the original, selected, and records one undo entry whose
   reverse un-places AND trashes the copy.
+
+## 8 · Three findings from checking the plan before building (2026-09-02)
+
+1. **The file copy is server-side and cheap.** Supabase Storage exposes `copy(from, to)` —
+   verified on the installed client. The bytes never travel through our function, so §6's accepted
+   cost ("a large PDF takes a moment") is much smaller than assumed. The owner's ruling gets
+   cheaper, not dearer.
+2. **CREATING a card is not undoable today** (`use-create-doors` records nothing), so **duplicate
+   will not be either.** Matching what the board already does beats inventing a new expectation for
+   one act — edge case 6's undo requirement is withdrawn. Reversal is trashing the copy, the same
+   as for any card you just made.
+3. **`face` is COMPUTED, never stored** (`init.sql:34`) — so it must NOT be copied. It derives
+   from the content, and the copy's own face will fall out correctly on its own.
+
+**Order of operations, so a failure never leaves a half-thing:** mint the new id → copy the files
+to paths derived from THAT id → insert the row → copy the tags. If the insert fails, sweep the
+copied files (the intake doors' pattern). If the file copy fails, no bit is created at all — a
+photo card with no photo is worse than no card.

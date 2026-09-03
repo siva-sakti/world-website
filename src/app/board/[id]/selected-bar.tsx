@@ -20,6 +20,7 @@ export function SelectedBar({
   onOpen,
   onToggleLock,
   onSendToBack,
+  onDuplicate,
   onUnplace,
   onTrash,
 }: {
@@ -31,6 +32,8 @@ export function SelectedBar({
   onOpen: () => void;
   onToggleLock: () => void;
   onSendToBack: () => void;
+  /** Make a real COPY — its own bit, its own file — beside this one. */
+  onDuplicate: () => void;
   onUnplace: () => void;
   onTrash: () => void;
 }) {
@@ -67,6 +70,13 @@ export function SelectedBar({
           title="Send this card behind everything else"
         >
           send to back
+        </button>
+        <button
+          className="compose-btn subtle"
+          onClick={onDuplicate}
+          title="Make a copy — its own bit, with its own file; changing or trashing one leaves the other alone"
+        >
+          duplicate this bit
         </button>
         <button
           className="compose-btn subtle"

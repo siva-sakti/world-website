@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/supabase/require-user";
-import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate } from "@/lib/db/bits";
+import { createLooseTextBit, createLinkBit, trashBit, callInBit, abortBitCreate, duplicateBit } from "@/lib/db/bits";
 import { archiveBit } from "@/lib/db/resting";
 import { uploadObject, removeObjects, linkThumbPath } from "@/lib/storage";
 import { getBoardCards, createBoard } from "@/lib/db/boards";
@@ -132,6 +132,40 @@ export async function trashFromInbox(formData: FormData) {
  * doesn't pile. Best-effort: a trashed bit/board is reported, the rest still land. callInBit revives
  * a row the bit lived on before, never a duplicate (I-L1) — and each bit needs a FRESH placement id
  * (a reused one collides on the PK and would throw for every bit after the first). */
+/** DUPLICATE THIS BIT — a real copy with its own id and its own file (see duplicateBit).
+ *
+ *  Two doors, both single (owner: "duplicate this bit", singular):
+ *   · from a BOARD — pass boardId/x/y and the copy lands beside the original
+ *   · from anywhere else — omit them and the copy is LOOSE, which is what loose means:
+ *     no board is showing it, so it has no position to have.
+ *
+ *  Not undoable, deliberately and consistently: creating a card is not either. The
+ *  reversal is trashing the copy, exactly as for anything else you just made. */
+export async function duplicateBitAction(
+  bitId: string,
+  place?: { boardId: string; x: number; y: number },
+): Promise<{ bitId?: string; placementId?: string; error?: string }> {
+  const supabase = await createClient();
+  await requireUser(supabase);
+  try {
+    const copy = await duplicateBit(supabase, bitId);
+    let placementId: string | undefined;
+    if (place) {
+      placementId = randomUUID();
+      await callInBit(supabase, {
+        bitId: copy.id, boardId: place.boardId, placementId, x: place.x, y: place.y,
+      });
+      revalidatePath(`/board/${place.boardId}`);
+    }
+    revalidatePath("/bits");
+    revalidatePath("/");
+    return { bitId: copy.id, placementId };
+  } catch (e) {
+    console.error("duplicateBitAction:", e);
+    return { error: "Couldn't duplicate that — try again." };
+  }
+}
+
 /** The most cards one "make a board from these" will gather. Each placement is its own
  *  round trip, so this is a real limit, not a taste: past a couple of hundred the request
  *  would outlive itself and leave a half-filled board. Stated to the owner rather than

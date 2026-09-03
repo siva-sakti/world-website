@@ -22,6 +22,7 @@ import { registerSave } from "@/lib/save-guard";
 import { duplicateBoard } from "@/lib/db/boards";
 import { confirm } from "@/components/confirm";
 import { confirmTrash } from "@/app/trash/trash-confirm";
+import { duplicateBitAction } from "@/app/bits/actions";
 import { usePersistence } from "./use-persistence";
 import { useCamera } from "./use-camera";
 import { useBoardKeys } from "./use-board-keys";
@@ -78,6 +79,7 @@ export function BoardSurface({
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
   const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
   const [duplicating, setDuplicating] = useState(false); // the ⧉ act is in flight
+  const [duplicatingBit, setDuplicatingBit] = useState(false); // a card's own copy is in flight
 
   const boardRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -535,6 +537,32 @@ export function BoardSurface({
     });
   }
 
+  // DUPLICATE THIS BIT — a real copy (its own id, its own file), landing beside the
+  // original so it reads as a second thing rather than a replacement. Server-side, because
+  // copying the stored file is: the bytes never travel through the browser.
+  // Not undoable, consistently: creating a card is not either — the reversal is trashing it.
+  async function duplicateSelected(c: CardVM) {
+    if (duplicatingBit) return;
+    setDuplicatingBit(true);
+    try {
+      const res = await duplicateBitAction(c.bitId, { boardId, x: c.x + 24, y: c.y + 24 });
+      if (res.error || !res.bitId || !res.placementId) {
+        onErr(new Error(res.error ?? "Couldn't duplicate that."));
+        return;
+      }
+      // Paint it locally rather than reloading the board — the copy carries the same
+      // renderable facts, only its identity and position differ.
+      const copy: CardVM = { ...c, bitId: res.bitId, placementId: res.placementId, x: c.x + 24, y: c.y + 24, z: nextZ() };
+      setCards((cs) => [...cs, copy]);
+      selectOne(res.placementId);
+      setLooseRefresh((n) => n + 1);
+    } catch (e) {
+      onErr(e);
+    } finally {
+      setDuplicatingBit(false);
+    }
+  }
+
   // Send the selected card behind everything (the demote valve — click-to-front stays, ruled).
   function sendToBack(placementId: string, bitId: string) {
     const c = cards.find((x) => x.placementId === placementId);
@@ -670,6 +698,7 @@ export function BoardSurface({
           onOpen={() => openSelected(selectedBit.placementId, selectedBit.bitId)}
           onToggleLock={() => toggleLock(selectedBit)}
           onSendToBack={() => sendToBack(selectedBit.placementId, selectedBit.bitId)}
+          onDuplicate={() => void duplicateSelected(selectedBit)}
           onUnplace={() => unplaceSelected(selectedBit.placementId)}
           onTrash={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
         />

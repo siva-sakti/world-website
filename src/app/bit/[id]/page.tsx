@@ -10,6 +10,7 @@ import { GroupPicker } from "@/components/shelf-controls";
 import { listGatheredInto } from "@/lib/db/references";
 import { BitTitle, BitTrash } from "./bit-controls";
 import { ArchiveButton } from "@/app/archive/archive-controls";
+import { DuplicateBit } from "./duplicate-button";
 import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
@@ -95,6 +96,7 @@ export default async function BitPage({
               trash. The bit page had only trash — a bit could be thrown away but never
               put away (owner, 2026-09-02). `noun` because "bit" is the right word here;
               the note page keeps the default. */}
+          <DuplicateBit bitId={b.id} />
           <ArchiveButton thing="bit" id={b.id} noun="bit" returnTo="/bits" />
           <BitTrash bitId={b.id} noun="bit" />
         </div>

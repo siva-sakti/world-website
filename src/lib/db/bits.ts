@@ -484,3 +484,89 @@ export async function getBitMeta(
     });
   return out;
 }
+
+/** DUPLICATE A BIT — a real copy, with its own identity and its own file.
+ *
+ *  Owner ruling (2026-09-02): *"copy is exactly this, a copy… with somehow a different bit
+ *  id, right?"* — chosen over sharing the original's stored file. Two bits pointing at one
+ *  file are not two things: destroying either would blank the other. We mint a separate bit
+ *  precisely BECAUSE a bit is one thing, so the file separates too. Trash one, the other is
+ *  untouched, and the destroy path never has to learn about any of this.
+ *
+ *  WHAT COMES ACROSS: type · kind · body · strokes · content · url · captured_title · the
+ *  media facts · source · subtype word · TAGS (ruled).
+ *  WHAT DOES NOT: the star (a star means "alive for me right now"; a fresh copy has not
+ *  earned it) · gather references (those point at the ORIGINAL from inside your writing) ·
+ *  travel (it has been nowhere) · trash/archive state (a copy is born live) · `face`, which
+ *  is COMPUTED and never stored — the copy's own falls out of its content.
+ *
+ *  ORDER MATTERS, so a failure never leaves a half-thing: mint the id → copy the files to
+ *  paths derived from IT → insert the row → copy the tags. A failed insert sweeps the files
+ *  it copied; a failed file copy creates no bit at all, because a photo card with no photo
+ *  is worse than no card. (Not undoable, deliberately: creating a card isn't either.) */
+export async function duplicateBit(supabase: SupabaseClient, bitId: string): Promise<Bit> {
+  const { data: orig, error: readErr } = await supabase
+    .from("bit").select("*").eq("id", bitId).is("deleted_at", null).single();
+  if (readErr) throw readErr;
+  if (!orig) throw new Error("that no longer exists — reload");
+
+  const newId = crypto.randomUUID();
+  const src = orig as Bit;
+  // Storage.copy is SERVER-SIDE — the bytes never travel through us.
+  const copied: string[] = [];
+  const copyTo = async (from: string | null, to: string): Promise<string | null> => {
+    if (!from) return null;
+    const { error } = await supabase.storage.from("private").copy(from, to);
+    if (error) throw error;
+    copied.push(to);
+    return to;
+  };
+
+  try {
+    const ext = src.storage_path?.split(".").pop() ?? "";
+    const storage_path = src.storage_path
+      ? await copyTo(src.storage_path, `${src.storage_path.split("/")[0]}/${newId}.${ext}`)
+      : null;
+    const thumb_path = src.thumb_path ? await copyTo(src.thumb_path, `thumbs/${newId}.jpg`) : null;
+
+    const { data, error } = await supabase
+      .from("bit")
+      .insert({
+        id: newId,
+        type: src.type,
+        kind: src.kind,
+        body: src.body,
+        strokes: src.strokes,
+        content: src.content,
+        url: src.url,
+        captured_title: src.captured_title,
+        storage_path,
+        thumb_path,
+        media_width: src.media_width,
+        media_height: src.media_height,
+        mime: src.mime,
+        byte_size: src.byte_size,
+        file_name: src.file_name,
+        source_id: src.source_id,
+        subtype_word_id: src.subtype_word_id,
+      })
+      .select("*")
+      .single();
+    if (error) throw error;
+
+    // The tags come across (ruled). A failure here leaves a real, usable copy that is
+    // simply untagged — worth surfacing, never worth destroying the copy over.
+    const { data: applied } = await supabase
+      .from("tag_application").select("tag_id").eq("target_bit_id", bitId);
+    if (applied?.length) {
+      const { error: tagErr } = await supabase
+        .from("tag_application")
+        .insert(applied.map((a) => ({ tag_id: a.tag_id as string, target_bit_id: newId })));
+      if (tagErr) console.error("duplicateBit: the copy landed but its tags did not:", tagErr);
+    }
+    return data as Bit;
+  } catch (e) {
+    if (copied.length) await removeObjects(supabase, copied).catch(() => {}); // no half-thing
+    throw e;
+  }
+}
