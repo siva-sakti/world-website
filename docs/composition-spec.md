@@ -598,7 +598,7 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 - **What settled it:** the whole composition feature is about to be built. Built on `bit` and moved later = the work done twice. **This is the cheapest moment the split will ever have.**
 
 ### 21.2 What it carries
-✅ Everything a bit has — title · the writing · folder · alive · archive · trash · visibility · search — **except `source`** *(owner: "doesn't have to have a source. I agree with you")*. A bit records where it came from; a composition came from the owner. **The first place the two genuinely differ, which is itself evidence they are different things.**
+✅ Everything a bit has — title · **subtitle** *(optional — owner, 2026-09-03: "most pieces have a title and subtitle… it doesn't have to be filled up"; ruled §6b, restored to this list by the §27 pass)* · the writing · folder · alive · archive · trash · visibility · search — **except `source`** *(owner: "doesn't have to have a source. I agree with you")*. A bit records where it came from; a composition came from the owner. **The first place the two genuinely differ, which is itself evidence they are different things.**
 
 ### 21.3 The four pointers *(owner asked: "what is that second column?")*
 Four tables name a bit and would each gain a second, exclusive slot — *this tag is on bit `abc` **or** composition `xyz`, exactly one*:
