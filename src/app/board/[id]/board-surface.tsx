@@ -569,7 +569,14 @@ export function BoardSurface({
       // this; this door shipped without it.
       await flushAll();
       await pendingCreates(); // a card made seconds ago must have its row before it is read
-      const res = await duplicateBitAction(c.bitId, { boardId, x: c.x + 24, y: c.y + 24 });
+      // Send the whole arrangement — size, stacking and tilt — not just the position. A
+      // copy that only carries x/y looks right (it is painted from the original) and then
+      // reverts on reload. Same class of bug as the inherited lock: ask what ELSE does not
+      // travel, not just the field that was reported.
+      const z = nextZ();
+      const res = await duplicateBitAction(c.bitId, {
+        boardId, x: c.x + 24, y: c.y + 24, width: c.w, height: c.h, z, angle: c.angle,
+      });
       if (res.error || !res.bitId || !res.placementId) {
         onErr(new Error(res.error ?? "Couldn't duplicate that."));
         return;
@@ -589,7 +596,7 @@ export function BoardSurface({
         placementId: res.placementId,
         x: c.x + 24,
         y: c.y + 24,
-        z: nextZ(),
+        z,
         locked: false,
         imageUrl: res.imageUrl,
         fileUrl: res.fileUrl,

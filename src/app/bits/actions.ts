@@ -145,7 +145,11 @@ export async function trashFromInbox(formData: FormData) {
  *  reversal is trashing the copy, exactly as for anything else you just made. */
 export async function duplicateBitAction(
   bitId: string,
-  place?: { boardId: string; x: number; y: number },
+  // The copy's whole ARRANGEMENT, not just where it sits. Passing only x/y left the
+  // placement row with a null size, z 0 and no angle — the screen looked right (it was
+  // painted from the original) and a reload snapped the copy back to its type's default
+  // size, upright, behind everything. The screen and the database disagreed.
+  place?: { boardId: string; x: number; y: number; width?: number; height?: number; z?: number; angle?: number },
 ): Promise<{ bitId?: string; placementId?: string; imageUrl?: string; fileUrl?: string; error?: string }> {
   const supabase = await createClient();
   await requireUser(supabase);
@@ -156,7 +160,9 @@ export async function duplicateBitAction(
       placementId = randomUUID();
       try {
         await callInBit(supabase, {
-          bitId: copy.id, boardId: place.boardId, placementId, x: place.x, y: place.y,
+          bitId: copy.id, boardId: place.boardId, placementId,
+          x: place.x, y: place.y,
+          width: place.width, height: place.height, z: place.z, angle: place.angle,
         });
       } catch (e) {
         // The COPY already exists — its row and its files landed. Destroying it here would

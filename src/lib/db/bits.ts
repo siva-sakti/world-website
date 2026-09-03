@@ -29,6 +29,9 @@ async function insertPlacement(
       width: args.width ?? null,
       height: args.height ?? null,
       z: args.z ?? 0,
+      // `angle` is part of Pos and was being ACCEPTED and then dropped here — a field a
+      // caller could pass in good faith and watch vanish. Written now; null = upright.
+      angle: args.angle ?? null,
     })
     .select("*")
     .single();
@@ -206,6 +209,9 @@ export async function callInBit(
     bitId: string; boardId: string; placementId: string;
     x: number; y: number; // always a whole position — no positionless card lands via call-in
     width?: number | null; height?: number | null; z?: number | null;
+    // A tilt can arrive with a call-in: duplicating a rotated card places the copy at the
+    // same angle. Absent for an ordinary drawer call-in, which lands a card upright.
+    angle?: number | null;
   },
 ): Promise<Placement> {
   // Liveness guard (I-D1): no write lands on a tombstone. A STALE surface (another
@@ -228,6 +234,9 @@ export async function callInBit(
     width: args.width ?? null,
     height: args.height ?? null,
     z: args.z ?? 0,
+    // The tilt travels with the rest of the arrangement. Absent (an ordinary drawer
+    // call-in) lands the card upright, which is what a fresh arrival should be.
+    angle: args.angle ?? null,
   };
   const ins = await supabase
     .from("placement")
