@@ -658,3 +658,26 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 
 ### 21.7 Deferred
 ⏸ **The migration** — moving existing notes across and rewriting pointers. *(Owner: "it's OK for the migration, I think about that a little bit later.")* Includes converting existing HTML bodies if §21.5 is adopted.
+
+
+## 23 · Per-surface presence, and composing beside the board *(2026-09-03; the floater worked through while the owner was at lunch)*
+
+### 23.1 ✅ Presence is stored ON THE TIE — the owner's analogy, made exact
+*(Owner: "similar to how a bit can be on multiple boards and each time its position and its size is stored differently — if it gets pulled into a composition it needs to be stored the analogous same way.")*
+- `placement` stores how a bit sits on **that board**: x · y · w · h · z.
+- The reference row must store how the bit sits in **that composition**: **form (chip | block)** · when block: **its size there** · **left / centre / right**. No x/y — the writing's flow decides where.
+- Same bit → three surfaces → three independent presences, each on its own tie. Resizing one never touches another *(owner: "of course independent")*.
+- **The narrow-place rule:** the stored size is a **maximum**; display caps at the container's width. Nothing stored twice.
+- Export: no special handling beyond including the files — *(owner: "wouldn't export just be taking what the user is viewing")*. Concern dropped.
+
+### 23.2 The floater — composing while looking at a board *(🔵 Claude's analysis, for the owner's rulings)*
+**The gesture to define: dragging a card from the board into the floater GATHERS — it never moves.** The bit lands in the writing at the insertion point; the card stays placed exactly where it was (gather is a tie, not a relocation). ⚠ If unspecified, drag-as-move gets built and a board rearranges itself while you write. *(Already ruled nearby: no drawer in the floater — "the board itself is the drawer in that posture.")*
+
+**Hole 1 — the same composition open twice** (its page + the floater): two editors autosaving one document silently overwrite each other. Was already the frame-handoff debt; the floater makes it live. 🔵 Simplest guard: **one live editor at a time** — the second opening is read-only with a "writing elsewhere — take over?" door.
+**Hole 2 — whose undo:** the board has its own undo (D-137); the composition has ~15 steps. **Cmd+Z follows FOCUS** — cursor in the floater undoes writing; focus on the board undoes arranging.
+**Hole 3 — narrow width:** the linear document reflows naturally; the one exception is a **table**, which scrolls sideways inside its own block.
+**The synergy to build on purpose:** "make this a bit" in the floater offers **"…and place it on this board"** — the reverse flow (scene 5, writing→board) becoming one act via the existing call-in machinery.
+⚪ Small: is the floater's open state remembered per board? (The hide-toggle was ruled stored — same question, smaller.)
+
+### 23.3 Where the owner left off (lunch, 2026-09-03)
+Her model, holding: **the composition works like Notion's editor** — linear blocks, paste anything (images included, resizable), everything pasted/typed is WRITING; "make this a bit" is the deliberate opt-in that makes material. **Waiting on her:** the six scenes (esp. scene 4 — window or copy — and scene 5 — the reverse flow) · pasted image = writing, confirm? · does a gathered thing get a visible origin tell?
