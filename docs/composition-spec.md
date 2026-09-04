@@ -17,6 +17,26 @@
 
 ---
 
+## Contents *(added 2026-09-04 at the owner's ask — the document had none)*
+**PART I · FOUNDATIONS** — §1 how to use this · §2 the concept · §3 the model, the laws, the vocabulary
+**PART II · THE FLOWS** — §4 birth · §5 opening · §6 writing & saving · §6b the parts · §7 the title · §8 the piece's own job · §9 pulling things in *(trigger · picker · chip · peek · block · drawer · edges)* · §10 on a board · §11 states · §12 cross-cutting *(search · backlinks · tags · visibility · folders · star · export · graph · the pull)* · §13 the editor *(the v1 blocks · text behaviour · the eight musts · toggles · callouts-out · frames · selection · what it never does)*
+**PART III · THE INTERFACE** *(🔵 Claude's draft — the owner's refinement pass pending)* — §14 the three frames · §15 empty/loading/error · §16 keyboard · §17 responsive *(+ the no-hover-only rule)* · §18 accessibility · §19 what this Part does not cover
+**LIVING WITH IT** — §20 headings · contents · the lock · undo · what drags · affordances · side-by-side
+**STORAGE & THE MODEL SETTLED** — §21 the storage ruling *(own table · what it carries · the pointers · the format)* · §22 the guardrails · §23 presence per occurrence + composing beside a board · §24 the composing model *(incl. §24.5b window-or-copy + the copy-door)* · §25 the move inventory · §26 **the hover layer** · §27 the cross-cutting pass · §28 the walk *(one bit through a composition)* + the duplication law + board symmetry · §29 the chip per type · §30 what can be brought in · §31 post-session rulings · §32 the Pass-4 fences + §13.9 columns · §33 the owner's four words · §34 the pointer stress-test
+
+## Where the REASONING lives *(this document states what is true; it does not argue — §1)*
+| for | read |
+|---|---|
+| **how the storage was decided** — surveys, rejected options, the adversary findings, the proofs | **`composition-storage-decisions.md`** *(+ `verification/composition-schema-draft.sql` and its committed proof output)* |
+| **what gets built when** | `composition-build-plan.md` |
+| **how any one piece gets built** | `docs/how-each-piece-gets-built.md` |
+| **every ruling, numbered** *(the list this spec is checked against)* | `docs/ruling-register.md` |
+| **how the checking is run** | `docs/verification-procedure.md` |
+| the concept in her voice · what a person must learn · the scenes · the shelf | `composition-definition.md` · `teaching-the-user.md` · `integration-scenes.md` · `future-features.md` |
+*(Vocabulary is its own workstream — `docs/vocabulary-workshop.md` — deliberately NOT a build input.)*
+
+---
+
 # PART I · FOUNDATIONS
 
 ## 1 · How to use this document

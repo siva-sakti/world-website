@@ -1,5 +1,9 @@
 # The convergent surfaces — the whole picture
 
+> # 📜 SUPERSEDED — DO NOT BUILD FROM THIS
+> **Superseded 2026-09-04 by `composition-spec.md`** (VERIFIED, D-146 — four verification passes run and folded). This is the convergence session's overview (2026-08-31), written *before* that spec existed. Read as history.
+> ⚠ **NOT yet merge-checked:** whether every still-current line here reached the verified spec has **not** been verified. A small "is anything lost?" pass is owed before this file is archived to `old/`. Until then: history only.
+
 > ## STATUS · written 2026-08-31, end of the convergence session · 🟡 NOTHING HERE IS RULED
 > **The one clean read** of where the convergence thinking stands — for the owner's morning. Every section points at the doc that holds its full detail and trail. When something below gets ruled, it graduates; until then this is the live synthesis.
 >

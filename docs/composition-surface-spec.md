@@ -1,5 +1,9 @@
 # The composition surface — preliminary spec
 
+> # 📜 SUPERSEDED — DO NOT BUILD FROM THIS
+> **Superseded 2026-09-04 by `composition-spec.md`** (VERIFIED, D-146 — four verification passes run and folded). This is preliminary thinking-spec (2026-08-31), written *before* that spec existed. Read as history.
+> ⚠ **NOT yet merge-checked:** whether every still-current line here reached the verified spec has **not** been verified. A small "is anything lost?" pass is owed before this file is archived to `old/`. Until then: history only.
+
 > ## STATUS · 2026-08-31 · 🟡 PRELIMINARY — a thinking spec, NOT a build plan
 > Written mid-discussion at the owner's ask (*"this is not like 'here's the specs and we're gonna do it'"*). **Nothing here is ruled.** It gathers the convergence thread from `product-concept-promise.md` (§2c-bis → §The joint) into one buildable-shaped picture, plus quick research, so the owner can react to a whole instead of fragments.
 > **Gates before this becomes real:** the owner's check-in (§8) → the naming session (every word here is a placeholder) → then a real plan through the item loop (`organize-phase-plan.md` §5), with step 2b first.

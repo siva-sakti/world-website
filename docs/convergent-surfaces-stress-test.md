@@ -1,5 +1,9 @@
 # Stress-test — the convergent-surfaces direction (independent review, 2026-09-01)
 
+> # 📜 SUPERSEDED — DO NOT BUILD FROM THIS
+> **Superseded 2026-09-04 by `composition-spec.md`** (VERIFIED, D-146 — four verification passes run and folded). This is a reviewer's stress-test (2026-08-31), written *before* that spec existed. Read as history.
+> ⚠ **NOT yet merge-checked:** whether every still-current line here reached the verified spec has **not** been verified. A small "is anything lost?" pass is owed before this file is archived to `old/`. Until then: history only.
+
 > ## STATUS · 🔵 AN INDEPENDENT REVIEWER'S FINDINGS — not rulings, not the owner's
 > Commissioned by the owner *"to think through how convergent surfaces in general come in, and then how the way we are approaching it works."* Briefed with the model, the goal (*maximum sensible surface area*), our five conclusions, and our own docs — and told **not to validate**. Heavily sourced; the reviewer **corrected itself twice mid-report** (noted inline), which is the behaviour we want.
 > **Read alongside** `convergent-surfaces-overview.md` (what it is testing).
