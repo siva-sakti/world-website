@@ -45,7 +45,7 @@ Dropped from the old note-rows: `source_id` (ruled out) · face machinery (title
 ## 4 · UI INVENTORY (station 3b-screens, paid) — screens touched + their states
 | screen | changes | empty/error/loading |
 |---|---|---|
-| the compositions list (today `/notes`) | lists surfaces(document); sorts; ⚪ route renamed post-naming | empty: invite line · errors surfaced (no silent-fail — the F3 class) |
+| the compositions list (⚠ corrected 2026-09-04: the list is HOME — `src/app/page.tsx` via `listNotes`; there is no `/notes` room, only a redirect in `next.config.ts` — the adversary's F4) | lists surfaces(document); sorts; ⚪ route renamed post-naming | empty: invite line · errors surfaced (no silent-fail — the F3 class) |
 | `/write` | unchanged door; births document-form | — |
 | the piece page (today `/note/[id]`) | + drawer w/ in-this-piece tab · archive read-only mode + revive tap · "pulled into" section | loading skeleton · save-error banner (exists) |
 | the board | + compose door · piece-cards (distinct) · hide toggle · **floater + panel** | floater save-status (⚪ mirror the page's) |

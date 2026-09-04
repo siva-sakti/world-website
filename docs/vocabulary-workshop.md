@@ -6,7 +6,7 @@
 
 ## 1 · The inventory — every word the app currently uses
 **Things (stored):** bit · board · **composition** *(the word under review; "note" RETIRED)* · source · tag · category · subtype word · shelf group *(shown as **folder**)* · placement · reference *(the tie)* · connector · opening.
-**Rooms & surfaces (computed):** home *(shown as **the desk**)* · **the inbox** → `/bits` *(the **loose** pile — every live bit no live board shows)* · the notes room → `/notes` *(renames with the composition)* · **the pull** *(tap a tag)* · search/**find** · the ledger · trash · archive · the graph · the board's **canvas**.
+**Rooms & surfaces (computed):** home *(shown as **the desk**)* · **the inbox** → `/bits` *(the **loose** pile — every live bit no live board shows)* · the compositions list — ⚠ **which IS home today** (`src/app/page.tsx`; `/notes` is only a redirect — corrected 2026-09-04, adversary F4) *(renames with the composition)* · **the pull** *(tap a tag)* · search/**find** · the ledger · trash · archive · the graph · the board's **canvas**.
 **Parts:** face *(a bit's computed headline)* · body *(the writing)* · content *(the owner's title/caption)* · **chip** ✅ *(owner-stamped)* · **peek** · **block** ⚠ *(confirmed defect — see §3.4)* · doorway · card.
 **Acts:** catch · **gather** *(under review)* · place · un-place · call in · trash · archive · restore · destroy · **alive** ★ · promote *("make this a bit")*.
 
