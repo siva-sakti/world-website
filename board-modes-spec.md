@@ -385,6 +385,13 @@ One value, `mode: "arrange" | "edit"`, replaces the `selectMode` boolean in `boa
 **Not touched:** the database · the save queue · undo · the geometry ledger · `board_cards`.
 **No migration. Nothing about your bits changes. Revertible in one commit.**
 
+**Coordination with the composition lane** *(agreed 2026-09-04)*: the one shared file is
+`text-bit.tsx`. That lane adds a `variant: 'card' | 'page'` prop (default `'card'`, so every
+existing mount is untouched) and exposes formatting-bar visibility as a **`showToolbar` prop**
+rather than internal state. **This build keys the bar's visibility off
+`variant === 'card' && <the mode gate>` through that prop — it does not own or move the bar
+logic.** Their prop lands first in its own small commit; the mode gate rebases onto it.
+
 ---
 
 ## 9 · What is still open — the complete list
