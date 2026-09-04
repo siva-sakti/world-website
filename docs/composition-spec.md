@@ -853,3 +853,13 @@ The app has exactly **five nameable kinds of thing**; the list is closed, not op
 - **A read-locked piece:** blocks aren't draggable or deletable; tap/peek still works — the lock freezes the writing, not the looking.
 - **Export is a snapshot:** a block is a live window on screen, but an export freezes what it showed at that moment. Said once, so nobody expects exports to update.
 - **Editing, the two-layer recap:** the costume (size · alignment · chip↔block) is free, per spot; the content is the WINDOW rule (§24.5b) — the pop-up when it lives elsewhere, free when it lives only here.
+
+
+### 30d · The other three targets, walked *(2026-09-03 — the owner caught that "closed" covered the list, not the lives)*
+**A gathered BOARD:** renamed → live everywhere ✓ · its cards shuffled → nothing changes in the piece (the block is a DOORWAY, not a view of contents) ✓ · dead-or-resting states → joins the one display family ⚪ · **loops (B holds the piece's doorway AND the piece gathers B) are allowed and harmless by construction — a doorway never opens itself, so nothing unfolds forever.** No rule needed.
+**A gathered COMPOSITION:** block form falls out of the general rule = the page-shaped doorway card (N3, built) ✓ · its writing edited → NO drift surface (chip=title, block=doorway; neither shows content) ✓ · states → the same family ⚪.
+**A gathered SOURCE — two catches:**
+1. **The MERGE (caught):** the source manager merges sources; a tie pointing at the absorbed one must **follow the merge to the survivor** 🔵 — a rule the merge machinery must perform, unnamed until now.
+2. **Sources are CHIP-ONLY, by the owner's own general rule:** the block is "how it looks on a board," and a source cannot sit on a board → no block form exists. Citing the well is always a mention. *(The same logic will govern tags if ever ruled in.)*
+Sources have no trash/archive (they die directly — smaller state family); renames free by id-reference (P9).
+**The one display family, now full width:** what a chip/block shows when its target (bit · board · composition · source) is trashed · archived · destroyed — one sitting closes the whole grid.
