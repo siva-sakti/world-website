@@ -67,7 +67,7 @@
 | F1 | `[[` opens a **search picker, two sections** (material · compositions) | ✓ §9.2 |
 | F2 | **Archived excluded from the picker** — ✅ genuinely ruled 2026-09-02 (*"no — it could add clutter"*) | ✓ §9.2.4 |
 | F3 | ~~Boards never appear in the picker~~ **SUPERSEDED (owner, 2026-09-03): the picker gains boards** | §31 |
-| F4 | **Born as a chip**; images/drawings born as **blocks** | ✓ §9.3 |
+| F4 | ~~Born-form follows the TYPE~~ **SUPERSEDED (owner, 2026-09-04): the DOOR decides — `[[` = chip always; a distinct gesture = the block door** | §9.3 |
 | F5 | The chip is an **atom**, shows the **live** face; the stored copy is a shadow for search/export | ✓ §9.4 |
 | F6 | **Peek** on tap; "show in place" converts to a block; reversible | ✓ §9.5, §9.6.4 |
 | F7 | Block is **preview-sized**; full only when small; images sized per instance, carrying bit-hood | ✓ §9.6 |

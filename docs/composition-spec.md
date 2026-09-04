@@ -241,12 +241,10 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 6. **No matches:** the picker shows an empty state and **offers nothing** — ⛔ it does not offer to create anything. *(Create-on-miss is ⚪, unbuilt: if ever built, it must ask which kind — bit or composition.)*
 7. **Selection:** Enter or click inserts at the caret and closes the picker. 🔵 The caret lands **immediately after** the inserted thing. *(Claude's implementation detail; unsourced.)*
 
-### 9.3 What gets inserted
-| target type | inserted as | why |
-|---|---|---|
-| text bit · link bit · PDF · audio | **a chip** | born small; the sentence stays a sentence |
-| **image · drawing** | **a block** | you pulled in a picture to see it |
-| a composition | **a chip**, styled distinctly from a bit-chip | it is a whole piece, not a scrap |
+### 9.3 What gets inserted — 📜 SUPERSEDED (owner, 2026-09-04): THE DOOR DECIDES, not the type
+✅ **The new rule:** **`[[` is the CHIP door — always inline, every type** (an image's chip is its tiny thumbnail, §29; a composition's chip is styled distinctly). **A DIFFERENT gesture is the BLOCK door** (the `/` insert menu on an empty line; exact shortcut chosen at build) — *owner: "there could be a shortcut to insert a block — it's gonna be different than the double brackets… we should make them different options."* **Mid-sentence there is no choice** — a block takes its own line, so `[[` mid-sentence yields a chip by physics, confirmed: *"if it's mid-sentence, yes, let's make it in the sentence."* **The flip (§9.5/9.6) still covers every wrong landing.** Teaching: distinct gestures + on-hover hints — *"we'd have to teach the users with on-screen hover stuff; hopefully intuitive."*
+**Why the door-rule became possible** *(it was Claude's lean once, corrected to defer to the type-rule — the ground then changed)*: every type NOW has a chip form (the §29 table), so brackets-always-chip works for everything; teachable in one sentence — *brackets put a NAME in your sentence; the insert menu puts the THING on the page.*
+*(The superseded type-rule, for the record: text/link/pdf/audio→chip · image/drawing→block · register F4 — its reasoning "you pulled in a picture to see it" survives as the block door's pitch, not as an automatic.)*
 
 ### 9.4 The chip
 1. **An atom**: one indivisible unit. Backspace deletes the whole chip, never characters of it. It cannot be edited in place.
@@ -539,7 +537,7 @@ Visual style — type, colour, spacing, the paper treatments — belongs to **th
 ## 20 · Living with a composition — navigation, reading, history *(owner-ruled 2026-09-02; previously unnamed)*
 
 ### 20.1 Headings and subheadings — structure that can be navigated
-Headings are not only formatting: they are **the document's structure**, and everything below depends on them. *(Owner: "headings and subheadings is a great idea.")* ⚪ how many levels — two is the current v1 cut; a table of contents may want three.
+Headings are not only formatting: they are **the document's structure**, and everything below depends on them. *(Owner: "headings and subheadings is a great idea.")* ✅ **Levels RULED (owner, 2026-09-04): two in v1; more later** — *"we can have various levels of headings — maybe we can put that in later, I want the basics to work well."* *(Closes the ⚪; and corrects the record: Claude claimed this edit a turn before making it.)*
 
 ### 20.2 A table of contents *(owner: "a great idea")*
 A composition can show its own contents — its headings, in order, as a navigable list. Clicking an entry jumps to it.
