@@ -247,7 +247,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 
 ### 9.6 The block
 1. Created by "show in place" from a peek; **images and drawings arrive as blocks directly** (§9.3).
-2. **The block is the bit as it appears on a board** (the rule above); the chip is its collapsed name. Sizing:
+2. **The block is the bit as it appears on a board** (the rule above); the chip is its collapsed name. ⚠ **PRECISION (2026-09-04, the owner's stress-test): the rule governs FORM, never DIMENSIONS** — an image renders as an image, a table as a table, a recording as its player. **The SIZE belongs to this composition**, stored per appearance (§23.1); a bit is a stamp on one board and a poster on another, so no board's dimensions are ever inherited. Sizing:
    - **image / drawing:** shown, **resized by dragging a corner**, and **repositionable within the text** — it stays **in the flow** (left · right · centre), 📜 ~~with text reflowing around it~~ **wrap CONFIRMED OUT (owner, 2026-09-03 — §33.1): alignment = an offset block with empty side-space; side-by-side = the columns block (§13.9)**. ⛔ **It NEVER floats freely over the text** — *(owner, 2026-09-02, when asked to choose between in-flow positioning and free floating: **"never — we are doing this never."**)* Free positioning is the board's nature and stays there. **This confirms the earlier ruling rather than reversing it: wrap yes, float no.**
    - **short text bit:** its content, whole
    - **long text bit:** its first lines, with an expand control
@@ -910,3 +910,13 @@ Created from the `/` menu ("columns", 2 or 3) · each column holds ordinary bloc
 2. ✅ **CONFIRMED (owner, 2026-09-03): the official package** (`@tiptap/static-renderer`).
 3. ✅ **APPROVED (owner, 2026-09-03, informed — tiptap explained): same-family `@tiptap/*` extensions pre-approved** ("it should be extensions of the stuff, right?"); custom code noted wherever no piece exists, verified at build.
 4. **The split ships with the migration in one enactment** (§32.1) — your data moves under the house method (backup → throwaway-proven → your go). Nod at build-plan checkpoint.
+
+
+## 34 · The pointer model, stress-tested *(owner, 2026-09-04: "are there any cases… are we solid on the way it's set up?")*
+**Verdict: solid — the window ruling (§24.5b) makes a format collision structurally impossible** (a composition stores a POINTER; the bit keeps its own content in its own format; rendering happens at display, exactly as on a board). Five things surfaced by the hunt, none architectural:
+1. ⚠ **BUILD REQUIREMENT — batched block loading.** 40 blocks must not be 40 round-trips. The board already solves this (one assembling query); the composition needs the same from the start. → stage ③.
+2. ⭐ **A "finished" piece is NOT frozen** — the window's price at its sharpest: edit a quote-bit in June and a March piece reads differently. Ruled deliberately, not a bug. **The escape already exists:** material that must never shift wants to be a **copy** (§24.5b's copy-door), not a window. Worth surfacing to the owner the day a piece matters enough to freeze.
+3. ✅ **FORM vs DIMENSIONS** — tightened at §9.6.2 this pass (the rule was already right; the sentence was loose).
+4. ⚑ **PRIVACY-SESSION NOTE — a public piece can have HOLES.** A public composition windowing a private bit renders it **absent** (I-P5, no placeholder, no leak) — correct, and it means gaps. Belongs to the deferred privacy session (§12.2b).
+5. ⚠ **BUILD REQUIREMENT — a block's loading + failure states.** §15 covers the peek (*"Couldn't load this"* + the door still works); **blocks are uncovered.** House rule: every fetch can fail. → stage ③.
+**Checked and already sound:** cycles (A⇄B allowed by the tie table, prevented from infinite render by §9.6.3's one-level rule) · a bit's board being trashed (bits outlive boards, I-L7) · the same bit twice (one tie, two occurrences) · destroyed/trashed/archived targets (§9.8's degrade family) · a stale cached label (display is live; the cache serves search/export only — §9.4.6/I-Ref8).
