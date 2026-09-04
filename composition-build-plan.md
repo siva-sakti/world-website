@@ -2,6 +2,23 @@
 > ⚠ **TERMINOLOGY, fixed after a confusion Claude caused (owner, 2026-09-04):** **"the schema change"** = the file that changes the database's SHAPE (always needed). **"the data move"** = carrying old notes across — **CANCELLED by the fresh-start ruling (§21.7)**. Claude had used "the migration" for both, which read as if the cancelled thing was still in the plan. Two words from now on.
 *(v2, 2026-09-03 — restructured after the owner's confidence challenge ("sensible technically, not neatly packaged") + a re-audit that caught three fall-throughs + registry verification of every extension. Originally written the same day, after: the spec verified banner-off (D-146) · the storage session proven (D-145) · §33's words 1–3 landed. House genre: spec → build plan → verification; every stage cites the spec and names its acceptance. The builder follows this and improvises nothing; a question the plan doesn't answer routes to the spec, then to the owner.)*
 
+## ⛔ STOP AND LOAD — what to read before touching each stage
+*(Owner-asked 2026-09-04: "have direct instructions — for storage, pause, load and read this document, with the exact file name." A pointer that says "see the storage doc" is not an instruction; this is.)*
+| before you build | **STOP. Read these files, in full, in this order** |
+|---|---|
+| **anything at all** | `docs/composition-spec.md` *(the truth — start at its Contents)* · `docs/how-each-piece-gets-built.md` *(the runbook you follow per piece)* · this file |
+| **stage ⓪ / ① — the schema change** | `composition-storage-decisions.md` *(every decision + why + what was rejected)* · `verification/composition-schema-draft.sql` *(the proven DDL)* · `verification/composition-draft-proofs.out` *(its raw green output)* · `verification/kind-seam-inventory.txt` *(the sweep checklist)* · `docs/composition-technical-spec.md` §1.3 *(the enactment order)* · `invariants.md` |
+| **stage ②a / ②b — the editor** | `docs/composition-spec.md` §13 + §20 + §32.3 *(the node registry)* · `docs/research-block-editors.md` |
+| **stage ③ — bring-in** | spec §9 + §29 + §30 + §34 · `src/lib/db/references.ts` *(the reconcile mechanism)* · `src/app/board/[id]/bitref.ts` *(the chip node)* |
+| **stage ④ — material's doors** | spec §24.3 + §32.2 · `src/lib/db/bit-copy-rule.ts` *(the copy law)* · `src/lib/storage.ts` |
+| **stage ⑤ — the postures** | spec §5 + §14 + §23.2 *(⚠ §23.2 is UNCONFIRMED — re-present it to the owner here)* |
+| **stage ⑥ — the hover layer** | spec §26 *(and it needs its name from the owner first)* |
+| **any naming question** | `lexicon.md` *(the authority)* · `docs/vocabulary-workshop.md` *(her workstream — NOT a build input)* |
+
+## ⭐ HOW TESTING WORKS HERE — the owner is the hands *(ruled 2026-09-04)*
+> *"You don't have to pretend to be anything. If you need tested any actions on the actual surface, just tell me what to do — I'll click through and tell you the result."*
+**So: Claude never simulates a click and never claims a surface works from reading code.** When something needs trying on the real app, Claude writes **numbered, literal steps** — where to click, what to type, what to look for — and **she reports what happened.** Her result is the evidence; "it should work" is not. *(Machine-checkable things — logic, the database, the build — Claude still proves itself, with raw output.)*
+
 ## The rules over the whole build
 - **The spec is the authority** (`docs/composition-spec.md`, VERIFIED); this plan sequences, never re-decides. Words → `lexicon.md` (new code-names enter it in the same pass — the S8/F10 debt lands at stage ①).
 - **Model-safety gates on every stage** (CLAUDE.md): invariants named · lifecycle traced · lowest-layer enforcement · derive-don't-duplicate · flow proven end-to-end.
@@ -47,7 +64,8 @@ She uses this app daily, so every stage states its own before/after. ⚠ **The d
 ## Stage ① · THE SPLIT — now ONE clean migration (fresh start, §21.7)
 1. New tables per the proven draft · `EXPORTED_TABLES` += composition, composition_file (test goes green).
 2. **The old note-rows deleted** (`kind='note'`): counted and REPORTED at the checkpoint · their tags/placements/references cascade per the existing destroy physics (K3's expendable ruling extended by §21.7) · then `kind` + its CHECK dropped — the bit table returns to pure material.
-3. The code sweep (`verification/kind-seam-inventory.txt` the checklist; `/note/[id]` → `/composition/[id]`; `/notes` redirects; search's kind filter becomes all·bits·compositions).
+3. **RETIRING THE OLD SURFACE CLEANLY** *(owner: "how do we cleanly move forward from the previous composition surface… I don't wanna have issues")* — **deleted, never left lying around:** the `/note/[id]` page and the `/notes` room are **removed, not commented out**; `/notes` redirects to the new room; **old note URLs correctly 404 — the things they named are gone** (her fresh-start ruling, §21.7), so a redirect would be a lie. Note-specific code paths deleted; `listNotes()` and the kind-checking removed. **The proof it is clean: after the sweep, a repo-wide grep for the retired words returns only history** (`old/`, the D-log) — *nothing live.* The seam inventory is the checklist; the grep is the receipt.
+4. The code sweep (`verification/kind-seam-inventory.txt` the checklist; `/note/[id]` → `/composition/[id]`; `/notes` redirects; search's kind filter becomes all·bits·compositions).
 4. **Prove:** the draft attack suite re-run against the REAL migration file · zero orphans · export completeness · the S-C scenes seeded FRESH in the new home and replayed.
 5. **⚑ CHECKPOINT — the owner's #4 nod:** backup shown → the delete-count shown ("N test notes will be removed — restorable from the backup") → throwaway run's raw output → her explicit go → cloud → deploy.
 **Accept:** *(+ the standing acceptance — the four floor rules above)* the tech-spec §5 provables minus migration-counts (moot) · the owner opens the app and bits/boards are exactly as they were; the compositions list starts empty and ready.

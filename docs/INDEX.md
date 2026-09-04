@@ -36,6 +36,11 @@
 - *a finding with sources* → a `research-*.md` — 🟢 findings don't expire with plans
 - *scratch, a list, a parallel attempt* → **a new doc is fine** — mark it 🟠 and index it
 
+### ⛔ HOW A SUPERSEDED DOC IS RETIRED HERE — three layers, in order *(owner, 2026-09-04: "a banner on the file itself, as well as in the index, as well as in the file name")*
+1. **A banner ON THE FILE** — first thing anyone opening it sees. ✅ done for the three below.
+2. **A row in this index** saying what superseded it. ✅ done.
+3. **Moved to `old/`** — the house convention (CLAUDE.md §10: *"anything superseded goes to `old/`, never edited again"*). ⏳ **NOT yet done for the three below, deliberately:** ⚠ the **merge-check is owed first** (is every still-current line in them carried into the verified spec?), and **9 other docs link to them** — moving without repointing breaks those links. **The order: merge-check → move to `old/` → repoint the 9.**
+
 ### Doc status right now — ✅ **the convergent-surfaces thread CONVERGED**: `composition-spec.md` is the verified authority (D-146); the three docs below are its predecessors and are superseded
 
 | doc | status |
