@@ -49,7 +49,31 @@ Worth stating plainly, because the owner remembered these as *"three new bit typ
 **zero schema work**, and they land in board text-cards, `/note/[id]` and `/write` at once.
 **Only the generic file bit needs a migration.** That makes the set much smaller than it sounds.
 
-### ⚑ One decision needed from the owner — before Build 2 ships
+### ✅ RULED (owner, 2026-09-03): a table is ITS OWN BIT TYPE — and in-text tables are now in question
+
+*"Yes, the table should be its own type of bit is what I thought. I don't even know if it
+makes sense to be able to bring it into a text bit. I thought it should be something, but it
+doesn't have to be."*
+
+**This inverts the plan above and overrides Claude's lean.** X4 stands in full: a table is a
+**thing on a board**, not primarily a formatting mode inside writing. And the owner is
+questioning whether the in-text half should exist at all — *"it doesn't have to be."*
+
+**What this changes:**
+- **Build 2 as written (table = tiptap formatting) is NO LONGER the first table build**, and may
+  not be a build at all. It is now ⚪ open, not planned.
+- The real table build is a **new bit type**: a `'table'` in the `bit.type` CHECK (a migration,
+  the same shape as Build 3's), its own editor, its own card renderer, its own intake.
+- **That makes it the LARGEST of the three, not the middle one** — it needs everything the file
+  bit needs *plus* a real editor. The build order below is re-cut accordingly.
+- ⚪ **Still genuinely open, and the owner's:** does a table inside writing exist too? Not needed
+  for the bit-type build, and deciding it late costs nothing now that the bit type leads.
+
+*(Superseded below: the old "⚑ decision needed" block and Claude's lean toward formatting-first.
+Kept visible rather than deleted, because the lean was wrong and the reason is instructive —
+Claude ranked by implementation size, the owner ranked by what the thing IS.)*
+
+### ~~⚑ One decision needed from the owner — before Build 2 ships~~ *(SETTLED above)*
 **Is a table also its own BIT TYPE?** Ruling X4 says yes (*"a table should be its own bit… in
 the boards a bit that can be a table"*); Build 2 delivers only the formatting half. It matters
 *before* rather than after, because **a table typed as writing is awkward to promote to a bit
@@ -70,8 +94,9 @@ follows the exact shape of `20260830000003_audio_type.sql`.**
 | | | needs the owner |
 |---|---|---|
 | 1 | **Checklist** — smallest, no schema, immediately useful | no |
-| 2 | **Table formatting** | ⚑ the X4 decision first |
-| 3 | **Generic file bit** — a migration (throwaway-proven, cloud apply owner-gated as always) | the cloud paste |
+| 2 | **Generic file bit** — a migration + intake + card *(pattern exists: `20260830000003_audio_type.sql`)* | the cloud paste |
+| 3 | **Table as a bit type** — a migration + **its own editor** + card + intake. The biggest of the three. | the cloud paste |
+| — | ~~table formatting inside writing~~ | ⚪ open — may not happen at all |
 
 **Build order is deliberately by size, not by want:** checklist proves the shared-editor path
 end-to-end at the smallest cost, so if anything about the extension approach is wrong we learn
