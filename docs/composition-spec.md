@@ -65,7 +65,7 @@ The app serves a **rhythm: diverge → converge → diverge**, never a one-way a
 ## 3 · The model
 
 **3.1 · The three things**
-- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**)* · ✅ **TABLE — RULED A BIT TYPE (owner, 2026-09-02):** *"a table should be its own bit — I'm gonna have in the boards a bit that can be a table."* **Both are true at once:** a table can be **formatting inside writing** (the editor) AND **its own bit** (a thing on a board, pullable into a composition). Not a fork — both. *(An earlier draft wrongly excluded the bit form; caught by verification.)*. **Flat: a bit never references anything.** *(the flatness call)*
+- **bit** — material. One thing you caught or made: text · image · drawing · voice recording · PDF · link *(candidates: **file** · **video**)* · ✅ **TABLE — RULED A BIT TYPE (owner, 2026-09-02):** *"a table should be its own bit — I'm gonna have in the boards a bit that can be a table."* **Both are true at once:** a table can be **formatting inside writing** (the editor) AND **its own bit** (a thing on a board, pullable into a composition). Not a fork — both. ⚠ **The bit-type half is NOT in this build** — it joins the file-bit build (X4; Pass-4 G19). *(An earlier draft wrongly excluded the bit form; caught by verification.)*. **Flat: a bit never references anything.** *(the flatness call)*
 - **board** — a spatial surface. Holds material by **placement** (a position).
 - **composition** — a linear surface. Holds material by **reference** (pulled into the writing).
 
@@ -182,7 +182,7 @@ Pasting · importing · the system · any automatic path. **No exceptions.**
 ## 6b · The composition's parts *(owner, 2026-09-02 — subtitle is NEW)*
 A composition has **a title · a subtitle · a body**, plus its decorations (tags · folder · dates · job facts), *"of course not all of it has to display."*
 - **subtitle** — optional; a line beneath the title. ⚪ its exact role (a standfirst? a note-to-self? shown where?) — newly introduced, not yet worked through.
-- Both title and subtitle are the owner's words; only the title is ever machine-minted (§7).
+- Both title and subtitle are the owner's words; only the title is ever machine-minted (§7). **Subtitle alone never births either** — derived from D1's rule (only body content births; Pass-4 G17).
 
 ## 7 · The title
 
@@ -214,8 +214,8 @@ A composition may carry: **a word-count target** · **a due date** · **who it's
 ### 9.2 The picker
 1. Two sections, in this order: **your material** (bits), then **your compositions**. Section headers always shown, even when one section is empty.
 2. 🔵 **Ordering within each section:** most recently touched first, before any query is typed. *(Claude's; unsourced.)*
-3. **Matching** follows the app's one search rule *(word-start matching; `lib/search-query`)*, applied to a bit's **face** and a composition's **title**. ✅ **RULED (owner, 2026-09-02): composition BODIES are searched** in the full search. *(The homepage's quick search stays titles-only — titles of compositions and boards; the full search reads everything.)*
-4. **Excluded, always:** trashed things · **archived things** *(owner-ruled)* · the composition being written (no self-reference) · **boards** *(direction principle — boards never appear)*.
+3. **Matching**: word-start, via **`lib/jump-match`** — the module the built picker actually uses (`gather-picker.tsx:10`; Pass-4 G15 corrected the `lib/search-query` citation — that grammar, with operators, belongs to the drawer/find, NOT the picker; the picker takes no operators). Applied to a bit's **face** and a composition's **title**. ✅ **RULED (owner, 2026-09-02): composition BODIES are searched** in the full search. *(The homepage's quick search stays titles-only — titles of compositions and boards; the full search reads everything.)*
+4. **Excluded, always:** trashed things · **archived things** *(owner-ruled)* · the composition being written (no self-reference). 📜 ~~boards never appear~~ **superseded (§3.4-amended/§30): boards and sources JOIN the picker** *(amended in place, Pass-4 G5)*.
 5. **Visual bits** (image, drawing) show a thumbnail in the row; others show their face.
 6. **No matches:** the picker shows an empty state and **offers nothing** — ⛔ it does not offer to create anything. *(Create-on-miss is ⚪, unbuilt: if ever built, it must ask which kind — bit or composition.)*
 7. **Selection:** Enter or click inserts at the caret and closes the picker. 🔵 The caret lands **immediately after** the inserted thing. *(Claude's implementation detail; unsourced.)*
@@ -247,7 +247,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 ### 9.6 The block
 1. Created by "show in place" from a peek; **images and drawings arrive as blocks directly** (§9.3).
 2. **The block is the bit as it appears on a board** (the rule above); the chip is its collapsed name. Sizing:
-   - **image / drawing:** shown, **resized by dragging a corner**, and **repositionable within the text** — it stays **in the flow** (left · right · centre), with text reflowing around it. ⛔ **It NEVER floats freely over the text** — *(owner, 2026-09-02, when asked to choose between in-flow positioning and free floating: **"never — we are doing this never."**)* Free positioning is the board's nature and stays there. **This confirms the earlier ruling rather than reversing it: wrap yes, float no.**
+   - **image / drawing:** shown, **resized by dragging a corner**, and **repositionable within the text** — it stays **in the flow** (left · right · centre), ⚑ ~~with text reflowing around it~~ *(the wrap half rides the §31.4 pending confirm, P1-D2/Pass-4 G3: if wrap is out, alignment = an offset block with empty side-space, and side-by-side = the columns block)*. ⛔ **It NEVER floats freely over the text** — *(owner, 2026-09-02, when asked to choose between in-flow positioning and free floating: **"never — we are doing this never."**)* Free positioning is the board's nature and stays there. **This confirms the earlier ruling rather than reversing it: wrap yes, float no.**
    - **short text bit:** its content, whole
    - **long text bit:** its first lines, with an expand control
    - **PDF · audio · anything else:** ⭐ **THE GENERAL RULE (owner, 2026-09-02): the BLOCK is however that bit looks ON A BOARD; the CHIP is its collapsed form — its filename or title.** One rule; no per-type decisions, and any future bit type is covered automatically.
@@ -266,7 +266,7 @@ Tapping anywhere else closes it. ⛔ The peek never edits the target.
 | case | behavior |
 |---|---|
 | the target is trashed after being pulled in | the chip **greys and freezes**; tapping says *"this is in your trash — bring it out to see it"* with a restore door. The writing is unchanged. |
-| the target is archived after being pulled in | the chip **greys but stays enterable**; tapping opens it, clearly marked archived |
+| the target is archived after being pulled in | the chip **greys but stays enterable** — 🔵 mechanism (Pass-4 G16): the tap still PEEKS (§9.4.3 stands, no direct navigation); the peek is marked archived and its "open →" door is the way in |
 | the target is destroyed (empty-trash) | the chip **degrades to plain text** of its stored face; the reference row is gone; the sentence still reads. *(Not a design decision — a consequence of the chip's stored text BEING its label, by construction since the Aug 2026 gather build.)* |
 | the composition itself is trashed | its chips elsewhere freeze (as above); its own content is untouched |
 | a chip is deleted from the body | the reference row is removed at the next save |
@@ -541,9 +541,9 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 > **Owner, once the word was clear:** *"oh, you don't mean dragging around anywhere — just dragging up and down? Oh, I think we should be able to do, right."* ✅ **Drag-to-reorder is IN.**
 
 **What that settles:**
-- ✅ **Dragging in a composition = reordering in the flow.** There is no free positioning here — that is the board's nature and stays there. Consistent with the ⛔ float ruling in §7.
+- ✅ **Dragging in a composition = reordering in the flow.** There is no free positioning here — that is the board's nature and stays there. Consistent with the ⛔ float ruling (§9.6.2/§13.2 — cite corrected, Pass-4 G20).
 - ✅ **The table of contents does NOT drag.** Navigation only. *(Owner, twice: "I don't think table of contents and heading dragging are the same feature at all"; "I don't think we need to have headline dragging at all [in the] table of contents.")*
-- 📜 **SUPERSEDED — the "edges test."** Claude proposed that only things with their own edges (image · table · pulled-in block) could drag, and text could not. **That was a correction to a misreading, and it is now void as a drag rule.** *Kept because the distinction it names is still true elsewhere:* things with edges are the ones that **resize and wrap** (§7); flow text does not. Same observation, wrong law.
+- 📜 **SUPERSEDED — the "edges test."** Claude proposed that only things with their own edges (image · table · pulled-in block) could drag, and text could not. **That was a correction to a misreading, and it is now void as a drag rule.** *Kept because the distinction it names is still true elsewhere:* things with edges are the ones that **resize and sit beside text** (§9.6.2); flow text does not. *(cite corrected, G20)* Same observation, wrong law.
 - ⚠ **§13.3 needs no re-scoping after all** — its *"hover drag-handle moves a block"* stands as written.
 
 ✅ **RESOLVED (owner, 2026-09-02): headings DO drag, and the section comes along.** *"Let's do what Notion does — you drag the headline and the section comes along, yes."* A heading **owns everything beneath it until the next heading of equal or higher level**; that span is what moves. *(The earlier "no headline dragging" remarks were about the table of contents, now confirmed.)*
@@ -719,7 +719,7 @@ S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → d
 **Markers: ✅ ruled · 🔨 built today · ⚪ open · ⛔ limited on purpose.**
 - **Write:** type/Enter/Shift+Enter 🔨 · bold·italic·quote·lists 🔨 · headings ✅(🔨 unstyled) · checklist ✅ planned · a table you make = writing ✅ · `/` menu (typed `/` only, never re-fires on paste/undo) ✅ · collapsible sections ✅ wanted (⚪ heading-is-the-unit, Claude's lean, vs separate toggles)
 - **Move writing:** cut/copy/paste the main path ✅ · drag block up/down ✅ · heading carries its section ✅ · folded+backspace → unfold first ✅ · undo ~15 ✅
-- **Bring in:** `[[` → chip 🔨 · the drawer ✅ planned · block form ✅ ruled ⛔ not built · outside text → paragraph + waiting "make this a bit" ✅ · **paste an image → writing ✅ (§24.3)** · gather a board/source ⚪ parked
+- **Bring in:** `[[` → chip 🔨 · the drawer — a bits-list panel is 🔨 built today; **what's new** is the tabs (bits · compositions · all) + "in this piece" *(precision, G20)* · block form ✅ ruled ⛔ not built · outside text → paragraph + waiting "make this a bit" ✅ · **paste an image → writing ✅ (§24.3)** · gather a board/source ⚪ parked
 - **Act on a brought-in thing:** chip click → peek ✅ · block click → selects ✅ · resize/align ✅ · presence stored per-tie ✅ (§23.1) · delete → tie dropped on save 🔨 · **edit it here ⚪ window-or-copy**
 - **Get around / meta:** contents (nav only) ✅ · links to headings ✅ · lock ✅ · tag/place/trash inherited ✅
 - **⛔ On purpose:** nothing floats (content) · typing never mints bits · ~~no columns~~ *(columns-block ruled IN, §31.4)* / no page-nesting (hierarchy is Notion's move; the web here is tags+gather) · no auto-anything (sole exception: the exit-minted title) · no `[[` in the title · no built side-by-side
@@ -738,7 +738,7 @@ On the composition page, **summon a bit — one or several — and it hovers abo
 ### 26.3 The rulings *(each in the owner's words, 2026-09-03)*
 | question | ruling |
 |---|---|
-| what's remembered | ✅ **positions too** — the full geometry, per composition ("I think 3") |
+| what's remembered | ✅ **positions too** — the full geometry, per composition (her pick of option 3 from the remembered-what menu: nothing / the set / **the set + positions**; "I think 3") |
 | editing from a window | ⛔ **viewing only** — "we shouldn't let people edit bits from this display; they have to go into the specific page or onto the board" |
 | stick to screen or text | ✅ **screen-fixed** — "it would stay put while you scroll" *(text-anchored = margin notes, a different feature, not this)* |
 | what can be summoned | ✅ **bits only** — "a board would be too small… and we have the other way [composing while on a board]" |
@@ -847,7 +847,7 @@ The app has exactly **five nameable kinds of thing**; the list is closed, not op
 
 
 ### 30c · Block-level cases *(2026-09-03; the owner: "what cases might I be missing")*
-- **One block per row, full width — the linear law.** The §25 ⛔ on columns HOLDS (side-by-side = the board's job). 🔵 The side-by-side-images want (a before/after pair) is served later by a **gallery block** — ONE block holding several images (the Medium/Substack convention, not a column system); v1 stays strict; zero rework.
+- **One block per row, full width — the linear law.** 📜 ~~the §25 columns-⛔ holds~~ **superseded — the COLUMNS BLOCK is ruled in (§31.4)**; side-by-side lives inside that one block, the flow stays one-block-per-row *(amended in place, Pass-4 G3)*. 🔵 The side-by-side-images want (a before/after pair) is served later by a **gallery block** — ONE block holding several images (the Medium/Substack convention, not a column system); v1 stays strict; zero rework.
 - 🔵 **Blocks live in the main flow only** — never inside a list item or a quote (that's nesting; hierarchy stays out). Chips go anywhere — they're text.
 - ⚪ **Copy a block → paste on a BOARD:** places the bit (new placement, same bit — 🔵 lean) vs mints a copy. The one still-open travel case.
 - **A read-locked piece:** blocks aren't draggable or deletable; tap/peek still works — the lock freezes the writing, not the looking.
@@ -883,3 +883,29 @@ Sources have no trash/archive (they die directly — smaller state family); rena
 5. ✅ **The export renderer APPROVED** (owner, 2026-09-03: "I'm fine with it as long as it's thought out and built well") — `@tiptap/static-renderer`, installed at enactment, export-route only. ⚑ *(Her wording also floated "rendering our own"; recorded as approval-of-the-recommendation — say the word if you meant the hand-built one instead; P1-note.)*
 6. ✅ **RULED (owner, 2026-09-03): pointing across pieces starts at SECTIONS — option (b).** A chip may target a composition OR a named heading inside one; the reader lands at that section. Chosen from the decision-support menu, stakes stated (upgradeable a→b→c, no rework; (c) addable if (b) leaves wanting). **Supersedes §20.5c's across-compositions-whole-only clause** — its objections aged out: headings carry stable ids anyway (the links ruling) and chip-only targets have precedent (sources, §30d). **The picker unfolds a piece's headings beneath it** (a heading is a *chosen name* — why picking one from outside works). **A dangling anchor degrades to the whole piece, gracefully.** ⛔ **Transclusion stays out** — content-inside-your-piece is the blocks-as-rows machine, declined; reuse = material, always.
    **Schema consequence: NONE.** The anchor is **occurrence-data** — it lives in the chip node's attrs in the document, exactly like presence (§23.1); the tie's FK stays whole-composition, so every cascade/dedup rule is untouched (two chips at different sections of one piece share one tie row). Zero DDL change; the draft stands as proven.
+
+## 32 · Pass-4 fences — the builder's answers *(2026-09-03; each 🔵 = Claude's logged call under translation rule 2 — technical, owner veto open. The four owner-words are §33.)*
+
+### 32.1 🔵 The split ships WITH the migration — one enactment, no interim (G1)
+Stage ① = the schema + the note-migration in one gated enactment (the tech-spec §1.3 order: copy → repoint → clean → drop `kind`), never a two-worlds interim where `/write` births one kind and the list shows two. "Migration deferred" deferred the *thinking* (now done: S12.6 fidelity proof + §1.3 order), not the coupling. The list's route rides the naming session; `/notes` redirects at enactment. ⚑ *Behavior-visible enough that the build plan's checkpoint asks the owner to nod at it (her data moves).*
+
+### 32.2 🔵 "Make this a bit," v1 mechanics (G2)
+Promotion mints the bit by the copy law (§28b/I-G6) and **nothing else changes**: the selection stays ordinary writing (ruled), **no tie is minted** (the body is the truth — a tie with no occurrence would be wiped by reconcile, I-Ref4), and **"made-from" is NOT stored in v1** — consistent with the owner's own "it wouldn't be linked" (§24.5b). The F-5 underline mark + made-from provenance stay ⚪ on the shelf. *(Unblocks stage ② — no special node type needed.)*
+
+### 32.3 🔵 The node registry — what the document may contain (G7)
+StarterKit's blocks + heading `{level, hid}` (`hid` = the stable id, §20.5c/§31.6) · toggle · columns (§13.9) · **ONE pulled-in node type, `ref`**, inline-or-block by attr: `{kind: bit|board|composition|source · id · label (the cache — the ONE word-carrying attr in the search extractor's list) · form: chip|block · anchor?: a heading's hid (composition targets only, §31.6 — occurrence-data) · size?/align? (block presence, §23.1)}`. One node, two costumes = the chip⇄block flip is an attr change (matches the one-gesture teaching, §29b). Reconcile derives the four tie columns from `kind`+`id`. **Any future word-carrying attr joins the extractor list or silently leaves search** (the S2 standing rule).
+
+### 32.4 🔵 Small answers (G8–G14, G18)
+**A board arrives as a chip** (a whole surface arrives small, like a composition; the doorway block is one flip away) (G8) · **a composition's display label** = title → else its opening words → else its date (the face rule, Apple-notes convention; kills the NULL-label gap while the exit-mint waits; "exit" = the save-guard moments: navigate away · close/dock the frame · tab hidden) (G9) · **peeks per kind** (G10): composition = title+subtitle+opening lines+open→+show-in-place · board = title+open→+show-in-place(doorway) · source = name+url+open→, NO show-in-place (chip-only, §30d) · **word count counts the owner's typed words only** — no chip labels, no block contents, no captions; folded text counts (it's hers) (G11) · **same-piece heading links are editor-level anchor links, never ties** (`reference2_not_self` is physics; the picker's no-self stands) (G13) · **the orphan sweep runs at composition-open**, per piece: registry rows whose path is absent from the body AND older than a 24h grace are deleted rows+bytes together (G14) · **what closes at the split** (G18): the bit editor loses the `[[` trigger; the ref extension stays installed read-only for legacy bodies until K3 cleans them; paste into a bit strips ref nodes/spans.
+
+### 32.5 The two fences still standing (by design)
+**Columns** — §13.9 below is the 🔵 builder-default; the owner's refinement pass owns the feel. **Toggle mechanism** — heading-as-the-collapsible-unit vs a separate toggle block stays ⚪ (§20.5's simplification vs §13.7's select-and-collapse); the builder implements §13.7 as written and the ⚪ narrows to "does the heading ALSO fold."
+
+### 13.9 · The columns block — 🔵 builder-default *(Pass-4 G4; owner's refinement pass owns the feel)*
+Created from the `/` menu ("columns", 2 or 3) · each column holds ordinary blocks (paragraphs · images · pulled-in blocks · lists); ⛔ no columns-inside-columns, no toggles inside columns (nesting stays out) · the divider drags; its ratio persists in the document (occurrence-data) · on phone, columns stack vertically in order · drag-reorder treats the whole columns block as ONE block · deleting the block releases nothing (its contents are writing; gathered things' ties drop on save as ever).
+
+## 33 · ⚑ THE FOUR OWNER-WORDS — everything still waiting on her, complete
+1. **Wrap: gone for good, yes?** (P1-D2 — your explicit word covered columns-in; wrap-out was my framing. One word.)
+2. **The export renderer:** the official package, confirmed? (Your wording also floated building our own.)
+3. **Editor packages, blanket approval:** checklist · table · toggle · drag-handle each need a same-family `@tiptap/*` extension (or small custom code where none exists — verified at build). Approve "same-family tiptap packages pre-approved, custom noted," or gate each one-by-one?
+4. **The split ships with the migration in one enactment** (§32.1) — your data moves under the house method (backup → throwaway-proven → your go). Nod at build-plan checkpoint.
