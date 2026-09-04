@@ -1,5 +1,14 @@
 # Lexicon — the precise words
 
+> ## ⚑ A NAMING PASS IS COMING — do not deepen these words *(owner, 2026-09-04)*
+> The owner is running a naming pass on the composition surface, and it is reaching further
+> than expected: **"inbox" is likely to change, and probably "bit" itself** — *"that's a
+> high-level overall app thing."* **Not ready to enact.** Recorded here so nobody schedules
+> a terminology sweep against words that are about to move, and so new work prefers a
+> door (`typeLabel`, `bitLabel`, `emptyMessage`) over a hard-coded noun — the difference
+> between a rename being one edit and being thirty. The words below remain authoritative
+> until the owner rules; this is a heads-up, not a change.
+
 **What this is:** the one place the project's terms are pinned down, so nobody (owner, Claude, a future window) uses a word two ways. Functional names for now — *beautiful* names can come later; this is about precision, not poetry. Companion to `agreements.md` (the ruled model). Written 2026-07-20.
 
 **The one distinction everything hangs on: STORED vs COMPUTED.** Nine kinds of thing — in three families, **things · acts · vocabulary** — are written to the database, alongside a dormant tenth and one **derived index** (`reference`, gather's ties — grown from writing, §6). Everything else you see — the pull, search, the graph, a bit's page, a bit's *face* — is *computed on the fly* from those nine. Never confuse a stored thing with a computed view of it.
