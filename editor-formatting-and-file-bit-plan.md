@@ -38,3 +38,42 @@
 - Any **renames** — the naming session is pending; current words stay.
 - The **typed-fields/tracker engine** — parked.
 - Subtype stamping on the checklist door — owner's vocabulary call, later.
+
+---
+
+## What is needed before any of this is built *(added 2026-09-03)*
+
+### Only ONE of the three is a new bit type
+Worth stating plainly, because the owner remembered these as *"three new bit types"*:
+**checklist and table are editor features** — tiptap extensions in the one shared editor,
+**zero schema work**, and they land in board text-cards, `/note/[id]` and `/write` at once.
+**Only the generic file bit needs a migration.** That makes the set much smaller than it sounds.
+
+### ⚑ One decision needed from the owner — before Build 2 ships
+**Is a table also its own BIT TYPE?** Ruling X4 says yes (*"a table should be its own bit… in
+the boards a bit that can be a table"*); Build 2 delivers only the formatting half. It matters
+*before* rather than after, because **a table typed as writing is awkward to promote to a bit
+later** — the same class of problem as everything this pass has been fixing. Three ways:
+(a) formatting only, and narrow X4 · (b) formatting now, a `'table'` bit type as its own build
+later · (c) both together. *(Claude's lean: **(b)** — formatting is small and useful on its own,
+and the bit-type half is a real build with a migration, a renderer and an intake.)*
+
+### ✅ Clear of the composition split — verified, not assumed
+The composition build drops `bit.kind` and sweeps ~30 kind-checking files
+(`verification/kind-seam-inventory.txt`). **None of these three builds deepen that seam:**
+`createFileBit` never writes `kind` (it takes the column default), and the two editor builds
+touch no columns at all. `'file'` goes into the `bit.type` CHECK, which the split does not
+touch. **So these can be built while the composition work is in design, and the migration
+follows the exact shape of `20260830000003_audio_type.sql`.**
+
+### The order, and what each costs
+| | | needs the owner |
+|---|---|---|
+| 1 | **Checklist** — smallest, no schema, immediately useful | no |
+| 2 | **Table formatting** | ⚑ the X4 decision first |
+| 3 | **Generic file bit** — a migration (throwaway-proven, cloud apply owner-gated as always) | the cloud paste |
+
+**Build order is deliberately by size, not by want:** checklist proves the shared-editor path
+end-to-end at the smallest cost, so if anything about the extension approach is wrong we learn
+it there rather than inside the table work.
+
