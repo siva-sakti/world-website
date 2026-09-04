@@ -491,6 +491,52 @@ collide:** they currently **nudge the selected card** (a placement write). ⚪ *
 pan OR nudge, not both.** 🔵 Lean: **arrows nudge when something is selected, pan when nothing
 is** — which is what you would expect either way.
 
+## 5b · DOES ARRANGE STAND ON ITS OWN? — and what you land in *(owner thinking aloud, 2026-09-04)*
+
+*"Arrange makes sense as a thing on its own if they can do all this… really thinking about how
+the user acts and caring about that makes the most sense, and also what makes sense on our
+back end."*
+
+### First, the checkable half: is arrange a complete place to be?
+
+Everything you can do there, listed so the question is answerable rather than felt:
+move · resize · **rotate** · align · distribute · tidy · lock · send to back · duplicate ·
+select one · select several · marquee · pan · zoom · fit-to-view · call a loose bit in ·
+**take something off this board** · make a new card *(hands you to edit)* · the pen · undo ·
+the board's own title, description and timeline.
+
+**That is a complete workspace for composing.** The only things missing are the four that
+change a *thing*: write · title · tag · trash. **Yes — arrange stands on its own.**
+
+### The argument for landing there, and it is a safety one
+
+**Arrange cannot change anything you have made.** Not one word, not one tag, nothing thrown
+away. So arriving in arrange means **you cannot damage anything by arriving** — a stray click,
+a cat on the keyboard, a mis-tap on a phone. Landing in edit means a stray click can put you in
+a text field with a cursor blinking in your own writing.
+
+That is the kind of argument that survives taste changing, which is why it beats *"which do you
+do more often."*
+
+### The back-end half the owner raised
+It is also **simpler for us in the same direction**: in arrange the entire bit-writing layer is
+inert. No debounced save is running, no `editingId`, no reference reconcile, no title queue.
+**The mode with the most gestures has the fewest live code paths** — and that is the mode a
+board sits in while you are not doing anything, which is most of the time.
+
+### And where the app is heading
+Writing is moving to the **composition** surface. As that lands, the board becomes **more**
+about arranging, not less. Landing in arrange is the answer that ages in the right direction.
+
+### 🔵 Recommendation
+**Land in arrange, always.** Not remembered per board — remembered state means opening a board
+and not knowing what it will do, which is the mode trap wearing a helpful hat.
+
+⚠ **The one real cost, named:** if you often arrive to *continue writing*, that is now one extra
+click every time. **Mitigation that keeps the safety:** double-clicking a card goes straight to
+edit **with that card open** — so "arrive and write" is one gesture, not a mode switch plus a
+click. ⚪ Worth a look in practice, and it is the thing to watch for in the first week.
+
 ## 6 · THE QUESTIONS — everything I need from you, in one batch
 
 *(Owner: "bring questions to me… if I missed anything that you already asked about, just bring
