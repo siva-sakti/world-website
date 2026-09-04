@@ -244,6 +244,14 @@ nothing in stage 4 depends on it.
 
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
+**Status swept 2026-09-03** *(the owner: "I just feel like there may be a couple other threads
+that we were on that got lost somewhere")*:
+**1 duplicate a bit ✅ built** · **2 rotation ✅ built** · **3 three new bit types — planned,
+table RULED as its own bit type** · **4 board from a composition's bits ⏸ needs compositions** ·
+**5 board timeline ✅ built** · **6 a bit's journey ⚠ NOT BUILT — the lost one, see below** ·
+**7 board from a tag/selection ✅ built** · **8 hide compositions ⏸ needs compositions.**
+Nothing else in this dump is unaccounted for.
+
 Given verbatim-in-substance, unsorted, at the owner's pace: *"I'll read what you said as questions,
 but I wanted to give you this briefly."* **Nothing here is planned or ordered yet.** Claude's notes
 are first-pass observations only — what already exists, what a thing would touch — not designs.
@@ -302,10 +310,25 @@ your board in a timeline view."*
 > **The data already exists.** Every placement carries `arrived_at` (and `left_at`). This is a VIEW
 > over rows we already write — no schema, no new writes.
 
-### 6 · A bit's journey
+### 6 · A bit's journey — ⚠ **THE ONE THAT GOT LOST** (found 2026-09-03)
 *"Similar thing but specifically for a bit — it's a journey, like where it went and what dates."*
 > **Also already stored**, and already read: `getBitTravel` exists in `lib/db/bits.ts`. This is a
 > surface over data the app has kept all along. Cheapest item in the dump.
+>
+> **STATUS: still not built, and it slipped past a session that built its twin.** The BOARD's
+> timeline shipped 2026-09-03 (`/board/[id]/timeline`); the bit never got its equivalent. The
+> bit's page shows only where it **is** — `page.tsx:55` filters travel to legs with no departure
+> and throws the rest away, even though `getBitTravel` returns `left_at` and the boards it has
+> LEFT. So the journey — *where it went*, which is the thing that was asked for — is fetched on
+> every page load and discarded.
+>
+> **Why it was missed, worth recording:** the owner asked for two views in one breath (#5 board,
+> #6 bit); #5 was built and #6 read as done because the bit page already showed *some* board
+> information. Adjacent-and-partly-present is how a thing goes missing without anyone dropping it.
+>
+> Still the cheapest item in the dump: no query, no migration — a second section on the bit's page,
+> or a `/bit/[id]/journey` route mirroring the board's. **⚑ Owner: this is one of the "couple of
+> threads that got lost."**
 
 ### 7 · Make a board from a tag, or from a multi-select
 *"From a tag, or from multi-select — both of those options — and an option to make this a board,
