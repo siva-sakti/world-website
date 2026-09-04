@@ -49,7 +49,13 @@ argument for the feature.
 not hypothetical and it is not designed away by wanting it not to happen — it is paid for with
 visibility (§5) and with `Escape` always meaning "back to arrange".
 
-## 2b · ⭐ THE CARD LOOKS DIFFERENT IN EACH MODE *(owner-ruled 2026-09-04)*
+## 2b · ~~THE CARD LOOKS DIFFERENT IN EACH MODE~~ — ⚠ NARROWED by §2c's resolution
+
+*(Kept for the reasoning. The instinct was right — arrange should be clean — but "every card
+is stripped in arrange, detailed in edit" was too broad. The owner narrowed it to: only the
+card you are actually working on shows its details. See §2c.)*
+
+### The original framing
 
 *"Every time you arrange, it's just gonna be a cleaned-out version of the card — no title, no
 tag. Every time you edit, they would see the details of it."*
@@ -87,29 +93,39 @@ image is the identity there — but this is the one place the rule might read as
 That single question settles the whole list below without case-by-case argument, which is
 what makes it a boundary rather than a preference.
 
-### ⚠ And the constraint the owner set, which is sharper than it looks
+### ✅ RESOLVED: how a card shows its details *(owner reasoned it out, 2026-09-04)*
 
-*"That would not change how it's arranged on the page… you'd be able to click in, but you
-wouldn't be able to move things around."*
+**First, a correction: Claude overstated the problem.** The draft warned that showing a card's
+details in edit mode would make "the board visibly reflow." **It would not.** Cards are
+absolutely positioned on the canvas (`card.tsx:241` sets `position={{x, y}}`), so a card
+growing **moves nothing else** — it can only overlap a neighbour. The owner rejected all three
+of Claude's workarounds (overlay · side panel · reserved space) and was right to: they were
+solving a problem that isn't there.
 
-**Edit mode must not re-lay-out the board.** Same cards, same places, same sizes. You are
-looking at the same arrangement — you simply cannot push it around, and you can work inside
-a card.
+**The owner's reasoning, and where it landed.** First idea — *"when you're editing, why don't
+we just always display the title and the tags"* — then the self-check that settled it:
 
-**This has a consequence Claude's §2b missed.** If a card in arrange is *stripped* (no title,
-no tags) and in edit *shows its details*, then a text card would **grow** when the details
-appear — auto-height — and the board would visibly reflow on every mode switch. That is
-exactly what the owner just ruled out.
+> *"Or is that kind of annoying? Because it makes sense that you want to see everything you're
+> NOT touching have it look like it's in its final mode… and only when you're editing do you
+> want to see, for that specific thing you're touching, the title and the tags."*
 
-So the details cannot simply be *added into* the card's box. Three ways out:
-- **(a) 🔵 the details overlay the card** — floating on top, the card's box unchanged. Layout
-  is untouched by construction, and it reads as "looking closer at this thing."
-- **(b) a side panel** — the details live off the card entirely. Zero layout risk; costs
-  screen and puts a thing's tags far from the thing.
-- **(c) the card reserves the space in both modes** — no reflow, but arrange stops being
-  visually clean, which was the whole point of §2b.
+**The ruling:** in edit mode, **every card still looks finished — except the one you are
+working on**, which shows its title and tags.
 
-**🔵 Lean: (a).** ⚪ **The owner's call** — it decides what edit mode *looks* like.
+**Why this is the right answer and not a compromise:**
+- The details are **where you need them, when you need them** — on the thing you're touching.
+- Everything else keeps looking like the board you made, so you're always seeing your work
+  rather than its machinery.
+- Only **one** card changes at a time, and it's the one you deliberately clicked. Nothing
+  surprises you.
+- **The board's arrangement genuinely never changes** — the constraint that started this.
+
+So the mode difference is smaller and better than the draft had it: **arrange and edit look the
+SAME.** Only the card you are currently inside looks different, and only while you're inside it.
+
+⚪ **One question left:** in ARRANGE mode, does the selected card show its details too? By this
+logic **no** — selecting to move is not touching the content. 🔵 Lean: no; arrange stays clean
+throughout. *(This is the last thing that would make arrange feel noisy, so it is worth a look.)*
 
 ### The boundary, act by act
 
@@ -133,26 +149,65 @@ Same cards, same positions, same sizes, same zoom, same scroll position. **Switc
 changes what you can do and what you see ON a card — never where anything is.** A mode switch
 should be visually calm: nothing jumps.
 
-## 3 · What each mode holds
+## 3 · THE FULL LIST — what is possible, and what is NOT, in each mode
 
-| | **ARRANGE** — the board as a space | **EDIT** — the card as a page |
+*(Owner's ask: "be very clear — what is possible in which mode, what is not possible." The
+right-hand column is the point: a blank there is a decision nobody made.)*
+
+### Touching a card
+| | ARRANGE | EDIT |
 |---|---|---|
-| a click on a card | selects it | opens it: title · tags · source · its words |
-| a drag on a card | moves it | *nothing — cards are anchored* |
-| resize · rotate | ✅ | ✗ |
-| **alignment guides + snapping** | ✅ **only here** | ✗ |
-| align · distribute · tidy buttons | ✅ | ✗ hidden, not greyed |
-| multi-select · marquee | ✅ *(owner: selecting several is an arrange thing)* | ✗ |
-| lock · send to back · duplicate | ✅ | ✗ |
-| typing into a card | ✗ | ✅ |
-| tags · title · source · caption | ✗ | ✅ |
-| trash · archive · remove | ✅ both — a destructive act belongs in both places | ✅ |
-| empty-space drag | marquee | pan |
-| pen / draw | its own mode, unchanged | — |
+| click a card | **selects** it | **enters** it — its title and tags appear on it |
+| drag a card | **moves** it | **nothing.** Cards are anchored |
+| resize · rotate handles | **shown** | **hidden** |
+| the degrees readout while turning | **shown** | n/a — no rotating here |
+| double-click a text card | *(nothing — it is already selected)* | **puts the cursor in the words** |
+| double-click a note/composition card | opens its page | opens its page |
+| type | **nothing** | **writes into the card you are in** |
 
-**The rule that makes it predictable:** *in arrange you can never accidentally type into a
-card; in edit you can never accidentally move one.* Each mode makes the other's whole class
-of accident impossible.
+### Several at once
+| | ARRANGE | EDIT |
+|---|---|---|
+| shift-click a second card | **adds to selection** | **no** — you are inside one thing |
+| drag empty space | **marquee** (select several) | **pans** |
+| align · distribute · tidy | **shown, and work** | **hidden** — not greyed |
+| the magenta snap guides | **shown while dragging** | n/a — no dragging |
+
+### The card's content and meaning
+| | ARRANGE | EDIT |
+|---|---|---|
+| title · caption | **not shown** | **shown and editable** on the card you are in |
+| tags | **not shown** | **shown and editable** on the card you are in |
+| source ("from…") | **not shown** | **shown and editable** |
+| a card's words | **shown, not editable** | **shown and editable** |
+
+### Putting things on and taking them off
+| | ARRANGE | EDIT |
+|---|---|---|
+| the loose-bits drawer / call a bit in | **yes** | **no** — placing is arranging |
+| double-tap empty space → new card | **yes**, and it **switches you to edit** on it | ⚪ **open** — see below |
+| remove from this board | **yes** | **no** |
+| lock · send to back · duplicate | **yes** | **no** |
+| **trash · archive** | **yes** | **yes** — the deliberate exception (§2c) |
+
+### Looking around
+| | ARRANGE | EDIT |
+|---|---|---|
+| pan · zoom · fit-to-view | **yes** | **yes** — looking is not an act on anything |
+| the board's title, description, timeline | **yes** | **yes** — they are the board's, not a card's |
+| the pen | its own mode, entered from either | same |
+
+### What is IDENTICAL in both
+**Every card in the same place, at the same size, at the same zoom and scroll.** The only
+visual difference in the whole app is the single card you are working on. **A mode switch must
+never move anything.**
+
+⚪ **Two open, both small:**
+1. **Double-tap on empty space in EDIT mode** — make a card and start writing (consistent with
+   edit being where writing happens), or refuse it (creating places something, which is
+   arranging)? 🔵 Lean: **allow it**, because the alternative is refusing to let you write on a
+   surface whose whole job is writing.
+2. **Does the selected card in ARRANGE show its details?** 🔵 Lean: **no** (§2c).
 
 ## 4 · What it changes for the alignment guides — the owner's question
 
