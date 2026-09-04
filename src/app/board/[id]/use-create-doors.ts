@@ -21,7 +21,7 @@ import { strokesBounds, normalizeDrawing } from "@/lib/stroke";
 import type { Drawing } from "@/lib/types";
 import type { PanelBit } from "@/lib/db/inbox";
 import type { CardVM } from "./card-vm";
-import { isCardType } from "./card-vm";
+import { isCardType, isFlexSized } from "./card-vm";
 import { defaultCardSize, resolveCardMedia } from "./card-defaults";
 import type { Camera } from "./use-camera";
 import { firstClearSpot } from "./board-arrange";
@@ -247,7 +247,9 @@ export function useCreateDoors(deps: {
           // duration (seconds, rounded) rides in media_width — audio has no real width
           mediaWidth: audio.durationSec != null ? Math.round(audio.durationSec) : undefined,
           mime: audio.mime, byteSize: audio.byteSize, fileName: audio.fileName,
-          x: wx, y: wy, width: AUDIO_W, height: AUDIO_H, z,
+          // No height stored (S8): an audio card is the player's own height. AUDIO_H
+          // is still the card's size on screen — it is just not a fact worth keeping.
+          x: wx, y: wy, width: AUDIO_W, z,
         });
         setWordsFor({ bitId, kind: "audio" });
       })
@@ -470,7 +472,10 @@ export function useCreateDoors(deps: {
       },
     ]);
     selectOne(placementId);
-    const p = callInBit(supabase, { bitId: bit.id, boardId, placementId, x: spot.x, y: spot.y, width, height, z })
+    const p = callInBit(supabase, {
+      bitId: bit.id, boardId, placementId, x: spot.x, y: spot.y, width, z,
+      height: isFlexSized(type) ? null : height, // S8 — text and audio have no true height
+    })
       .then((placement) => {
         if (placement.id !== placementId) {
           reconcileId(placementId, placement.id);

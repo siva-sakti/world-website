@@ -46,7 +46,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | **S5** | 3 definitions of "which boards is this bit on"; the trash confirm can lie | ✅ **FIXED** — one door (`lib/db/board-membership`), 3 callers, 5 tests |
 | **S6** | `ago()` and `fmt()` disagree about what day it is | ✅ **FIXED** — one day-rule, 7 tests, proven by reverting |
 | **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
-| **S8** | `placement.height` stored and permanently false for text + audio | ⚪ **RULED: stop storing it** (owner, 2026-09-03) — queued |
+| **S8** | `placement.height` stored and permanently false for text + audio | ✅ **FIXED** — one door `isFlexSized`, no height stored for text/audio, 4 tests |
 | **S2** | the optimistic seam has no stated rule | ⬜ after step 5, drawn from the real cases |
 | **S1** | `board-surface.tsx` does 7 jobs | ⬜ step 10 *(ruled: after tests)* |
 | **S9** | 88% of lines have no test | ⬜ the whole plan |
@@ -81,7 +81,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | | What | Status |
 |---|---|---|
 | r1 | **I-G5** — every date shows in the reader's own zone | ✅ **BUILT + its boundary test** (a stray formatter anywhere in `src/` fails the suite) |
-| r2 | **the copy rule** — a copy inherits what the bit HAS, never what POINTS AT it | ⬜ step 6 |
+| r2 | **the copy rule** — a copy inherits what the bit HAS, never what POINTS AT it | ✅ **I-G6 + a schema-reading guard test** (both drift directions proven) |
 | r3 | retry when the connection returns | ✅ **DONE** — `online` in `save-guard`, so every surface gets it, + 4 tests |
 | r4 | `docs/INDEX.md` named a superseded spec as live | ✅ fixed |
 
@@ -501,10 +501,10 @@ so this is a contained change, not a sweep.
 | 3 | ✅ Retry on reconnect — one listener in `save-guard`, covers every saving surface | no |
 | 4 | ✅ S4 field table · S7 `editingId` · S3 one guard key — all three proven by reverting | no |
 | 5 | ✅ S5 one door · S6 one day-rule · **E-1 dates now follow the device** (`Stamp` · `ZoneProvider` · `readerZone`) | no |
-| 6 | The copy rule (A.3) into `invariants.md` + its guard test | no |
-| 7 | Fix `docs/INDEX.md` — it still names the superseded composition spec as live | no |
+| 6 | ✅ The copy rule → **I-G6** + `lib/db/bit-copy-rule.ts` + its guard test | no |
+| 7 | ✅ Fixed `docs/INDEX.md` — it named the superseded composition spec as live | no |
 | 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
-| 9 | S8 — stop storing a height for text + audio *(ruled)* | no |
+| 9 | ✅ S8 — no height stored for text + audio | no |
 | 10 | S1 — split `board-surface.tsx` by its seven jobs, on top of the tests | no *(ruled: after tests)* |
 | 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |
 

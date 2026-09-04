@@ -19,6 +19,16 @@ export function isCardType(t: string | null | undefined): t is CardType {
   return t === "text" || t === "drawing" || t === "image" || t === "audio" || t === "pdf" || t === "link";
 }
 
+/** Types whose card HEIGHT follows their content, so there is nothing true to store:
+ *  a text card grows with its words; an audio card is the native player's own height.
+ *  The renderer sets `height: auto` for these and resize only ever writes their WIDTH
+ *  back — so a stored height has never described one (S8; owner-ruled 2026-09-03:
+ *  stop storing it). Readers fall back to `defaultCardSize`, which is a stated guess
+ *  rather than a stale number that looks like a measurement. */
+export function isFlexSized(type: CardType): boolean {
+  return type === "text" || type === "audio";
+}
+
 export type CardVM = {
   placementId: string;
   bitId: string;

@@ -9,7 +9,7 @@ import { SourcePicker } from "./source-picker";
 import { hostOf } from "@/lib/page-meta";
 import { rotateAngle } from "./geometry";
 import type { Source } from "@/lib/db/sources";
-import type { CardVM } from "./card-vm";
+import { isFlexSized, type CardVM } from "./card-vm";
 
 // The card's RENDERER. Its view-model (CardVM) lives in ./card-vm — ten modules need
 // that shape and only this one draws it.
@@ -187,9 +187,9 @@ export function Card({
   const isText = card.type === "text" && !isNote; // a note renders as a doorway, not editable text
   // An <audio> player sizes like TEXT, not like an image: width-resizable, height
   // follows the (fixed) player — NEVER aspect-locked/corner-scaled (that would stretch
-  // the controls). pdf will size the same way. `flexSized` = "width-flex, height-auto".
-  const isAudio = card.type === "audio";
-  const flexSized = isText || isAudio;
+  // the controls). `flexSized` = "width-flex, height-auto"; the list of which types
+  // those are lives in card-vm, because the STORAGE side needs the same answer (S8).
+  const flexSized = isFlexSized(card.type);
   // The doorway's face: the note's title (its `content`, else its first words) + a
   // faint preview of the body — read-only; clicking opens the note's page.
   const noteBody = isNote ? plainText(card.body) : "";
