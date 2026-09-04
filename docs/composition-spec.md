@@ -390,13 +390,13 @@ Returns everything carrying that word — bits, boards, and compositions, mixed 
 **In** *(the converged core; every source agrees — `research-block-editors.md`)*:
 paragraph · headings *(2 levels)* · bulleted list · numbered list · **checklist** · quote · divider · code · **table** · image · **toggle / collapsible section** *(owner-ruled IN — §13.7)* · **the pulled-in thing** (chip or block, §9)
 
-**Out of v1** ⛔: database blocks of any kind · synced blocks · columns · equations · embeds · **callouts** *(ruled out — §13.8)*
+**Out of v1** ⛔: database blocks of any kind · synced blocks · ~~columns~~ *(RULED IN 2026-09-03, §31.4 — joins the v1 set)* · equations · embeds · **callouts** *(ruled out — §13.8)*
 
 **Already installed but unexposed:** headings · lists · quote · divider · code ship inside the editor library today with **no UI to reach them** — much of v1 is surfacing, not building.
 
 ### 13.2 Text behavior the surface owes
 1. **Text alignment** (left · centre · right) — absent today; expected of any real text interface.
-2. **Text wraps around images** — anchored in the flow, book-page style. ⛔ **Never floating** *(owner-ruled: "wrap yes, float no" — floating is the board's nature)*.
+2. 📜 ~~Text wraps around images~~ **SUPERSEDED (owner 2026-09-03, §31.4): side-by-side is the COLUMNS BLOCK, not wrap** — text does not continue beneath. ⛔ **Never floating** stands untouched.
 3. **Word count** — always available (§8).
 4. ⚪ Indentation / nesting depth for lists.
 
@@ -722,7 +722,7 @@ S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → d
 - **Bring in:** `[[` → chip 🔨 · the drawer ✅ planned · block form ✅ ruled ⛔ not built · outside text → paragraph + waiting "make this a bit" ✅ · **paste an image → writing ✅ (§24.3)** · gather a board/source ⚪ parked
 - **Act on a brought-in thing:** chip click → peek ✅ · block click → selects ✅ · resize/align ✅ · presence stored per-tie ✅ (§23.1) · delete → tie dropped on save 🔨 · **edit it here ⚪ window-or-copy**
 - **Get around / meta:** contents (nav only) ✅ · links to headings ✅ · lock ✅ · tag/place/trash inherited ✅
-- **⛔ On purpose:** nothing floats (content) · typing never mints bits · no columns/page-nesting (hierarchy is Notion's move; the web here is tags+gather) · no auto-anything (sole exception: the exit-minted title) · no `[[` in the title · no built side-by-side
+- **⛔ On purpose:** nothing floats (content) · typing never mints bits · ~~no columns~~ *(columns-block ruled IN, §31.4)* / no page-nesting (hierarchy is Notion's move; the web here is tags+gather) · no auto-anything (sole exception: the exit-minted title) · no `[[` in the title · no built side-by-side
 - **Flexibility they WILL ask for** — decide before they ask: "fix the typo right here" (⚪ window-or-copy) · "collapse this block to a chip" (⚪ per-spot chip↔block toggle — 🔵 lean yes) · "colors/highlights/callouts" (⚪ where formatting stops — callouts cut once, make it a ruled line) · "two columns just here" (answer = the board; the refusal must feel good) · "turn this list into a board" (F-4, parked)
 
 ## 26 · THE HOVER LAYER — bits propped above the writing *(the owner's feature, 2026-09-03 — fully ruled in one sitting)*
@@ -878,6 +878,7 @@ Sources have no trash/archive (they die directly — smaller state family); rena
 ## 31 · Post-session rulings (owner, 2026-09-03 — answering the storage session's §Q)
 1. ✅ **Boards gatherable — the collision RESOLVED** (see the amended direction law, §3.4). The tie's `to_board_id` ships ungated.
 2. ✅ **Due date surfacing:** on the piece as metadata + **in the compositions list, sortable/filterable by date** — *"it displays as part of the metadata… they can sort it by date or filter by date."* Not on home; no reminders (the §8 ⛔ stands).
-3. ⚪→proposed **The lock: remembered per piece** (🔵 Claude's rec, awaiting the word) — a left-locked piece is how "finished" gets FELT without the done-state ruled out in §28c. One column at build if blessed.
-4. ⚪ **The columns block × wrap — ONE decision, surfaced as such:** the owner sketched resizable columns (image in one, text beside); that IS Notion's wrap-substitute. 🔵 Claude's rec: **columns block in, wrap out** — fits the linear-block model. ⚠ Reverses two standing rulings (§13.2.2 wrap-in · §13.1/§25 columns-out ⛔ via the boards test) — **needs the owner's explicit word, not a lean.**
-5. ⚪ **The export-renderer dependency** (`@tiptap/static-renderer` vs a hand-kept converter) — explained, awaiting approve/decline.
+3. ✅ **The lock: RULED — remembered per piece** (owner, 2026-09-03: "I think we should have a lock and it would be remembered, that makes sense to me"). `locked_at` joins the draft; a left-locked piece is the FELT finished without a done-state (§28c).
+4. ✅ **RULED (owner, 2026-09-03): the COLUMNS BLOCK is IN; wrap is OUT** ("I think columns block should be fine" — her own sketch: image in one column, text beside, resizable divider; text does NOT continue beneath). **Supersedes** §13.2.2's wrap-in · §13.1's columns-⛔ · the §25 no-columns limit (all edited this pass). **STANDS untouched:** float-never (E4's other half) · the boards test itself (callouts stay dead). The §30c gallery lean folds in (a gallery ≈ image columns).
+5. ✅ **The export renderer APPROVED** (owner, 2026-09-03: "I'm fine with it as long as it's thought out and built well") — `@tiptap/static-renderer`, installed at enactment, export-route only.
+6. ⚪ **REOPENED (owner, 2026-09-03): pointing at a paragraph INSIDE another piece** — "I think it should make sense… isn't that what Notion allows?" Reopens §20.5c's across-compositions-whole-only ruling. Menu delivered (chat, 2026-09-03); awaiting her pick: (a) keep whole-only · (b) anchor-to-HEADINGS · (c) anchor-to-any-block. **Transclusion (the paragraph's CONTENT appearing in your piece) stays out** — that is the blocks-as-rows machine, still declined.

@@ -38,6 +38,7 @@ create table composition (
   visibility  text not null default 'private',             -- BORN PRIVATE (§12.2b.2; model deferred, J6)
   deleted_at  timestamptz,                                 -- trash = freeze (§11.3)
   archived_at timestamptz,                                 -- read-only rest (§11.2)
+  locked_at   timestamptz,                                 -- the read-lock, REMEMBERED per piece (§31.3, owner-ruled 2026-09-03); null = writable; house stamp style
   created_at  timestamptz not null default now(),          -- client-suppliable (I-D4)
   updated_at  timestamptz not null default now(),
   state text generated always as (                         -- the resting pattern (D-127; I-T4)
