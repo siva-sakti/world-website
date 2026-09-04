@@ -48,3 +48,22 @@ test("the export lists nothing that the schema doesn't have", () => {
 test("no duplicates in the list", () => {
   assert.equal(new Set(EXPORTED_TABLES).size, EXPORTED_TABLES.length);
 });
+
+test("the cloud check's copy of the table list has not drifted from this one", () => {
+  // There is a SECOND hard-coded list, in scripts/test-port.mjs — the live-cloud
+  // integration check. It cannot import this module (it runs under plain node, with no
+  // TypeScript resolver), so it holds its own copy, and that copy had drifted: 9 entries
+  // against the real 13. `source`, `reference`, `opening` and `shelf_group` were never
+  // checked on the cloud, and the script printed "all 9 record kinds" as if complete.
+  //
+  // The comment above it said "keep in lockstep". That is the fourth time in this repo a
+  // lockstep comment has failed; this is the enforcement it should have had.
+  const script = readFileSync(
+    fileURLToPath(new URL("../../../scripts/test-port.mjs", import.meta.url)),
+    "utf8",
+  );
+  const line = script.match(/const EXPORT_TABLES = \[([^\]]*)\]/);
+  assert.ok(line, "EXPORT_TABLES not found in scripts/test-port.mjs — did it move?");
+  const inScript = [...line[1].matchAll(/"([a-z_]+)"/g)].map((m) => m[1]).sort();
+  assert.deepEqual(inScript, [...EXPORTED_TABLES].sort(), "the two export lists disagree");
+});

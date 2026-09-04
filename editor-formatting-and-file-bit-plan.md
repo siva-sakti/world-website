@@ -102,3 +102,60 @@ follows the exact shape of `20260830000003_audio_type.sql`.**
 end-to-end at the smallest cost, so if anything about the extension approach is wrong we learn
 it there rather than inside the table work.
 
+---
+
+## ⚠ WHAT A NEW BIT TYPE ACTUALLY COSTS *(antagonist review, 2026-09-03 — verdict: No)*
+
+The plan above said a new type is *"a migration + a renderer + an intake."* **That is wrong by
+about an order of magnitude.** An antagonist swept the codebase: **~35 files, ~60 sites.** The
+important part is not the number but WHY, and the why is a real finding:
+
+### Six unnamed type families, spelled out ~25 times
+
+Nowhere in the codebase are these named. Each site decides membership independently, so a new
+type must be classified **at every one of them**, and every site that forgets fails **silently**:
+
+| the family | who's in it | where it's re-decided |
+|---|---|---|
+| **thumbnailed** | image · pdf · link | `drawer.tsx` · `note-card.tsx` · `note-row.tsx` · `card.tsx` |
+| **file-backed** | image · audio · pdf | `bits.ts` · `card-defaults.ts` · `storage.ts` |
+| **flex-sized** (height follows content) | text · audio | `card-vm.ts` → 5 sites in `card.tsx` |
+| **visual** (offered by `[[`) | image · drawing | `gather-picker.tsx` · `bit-ref-view.tsx` · `text-bit.tsx` |
+| **wordless** (gets the "add a few words?" offer) | everything but text | `words-offer.tsx` · `board-surface.tsx` |
+| **carries no file** | text · drawing | `storage.ts` |
+
+**Only `flex-sized` has a name and a door** (`isFlexSized`, made one this pass). The other five
+are conditions retyped at each site. *That* is the cost, and naming them is the fix.
+
+### Three silent failures a new type hits today
+- **`card.tsx` and `bit/[id]/page.tsx` have NO default branch.** An unrendered type draws an
+  **empty bordered box** and an empty page body. No error, at any layer.
+- **`note-card.tsx` labels an unknown type "empty note"** — actively wrong, not merely blank.
+- 🔴 **`board_cards` selects substance columns by ALLOW-LIST** (`b.body, b.strokes, b.url, …`).
+  **A table whose cells live in a new column renders blank on every board**, because the view
+  never carries it. This is the single most important finding for the table build: **decide
+  where a table's cells live before anything else, and remember the view must be taught.**
+
+### Also found, and already acted on
+- ✅ **The type seam is now guarded** — `src/lib/bit-types.test.mjs` reads `bit_type_allowed`
+  out of the migrations and asserts `BitType`, `CardType`, `isCardType` and `copyPathsFor` all
+  agree with it. Proven both directions: adding a type to SQL alone fails 3 tests, to TS alone
+  fails 1. **Written before the new types, deliberately.**
+- ✅ **A live bug, unrelated to this plan:** `scripts/test-port.mjs` carried a second export-table
+  list that had drifted to 9 against the real 13 — `source`, `reference`, `opening` and
+  `shelf_group` were never checked on the cloud, while the script printed *"all 9 record kinds"*.
+  Fixed and guarded.
+- ⚑ **A pre-existing hole worth the owner knowing:** the `[[` picker offers only text, image and
+  drawing. **Audio, PDF and link have been invisible to it since they were added** — three type
+  additions, none noticed. A new type would be the fourth.
+
+### What must change in this plan before building
+1. **Decide where a table's cells live** — and that `board_cards` carries them. Nothing else about
+   the table build matters until this is answered.
+2. **Name the six families as doors**, the way `isFlexSized` was, so the new types are classified
+   once each instead of ~25 times.
+3. **Give `card.tsx`, `bit/[id]/page.tsx` and `note-card.tsx` a real default branch** — an unknown
+   type should say so, not draw an empty box.
+4. **Add the missing per-type pieces the sweep found:** an attack suite in `verification/`, a
+   `files/` prefix in `scripts/find-orphan-files.mjs`, and the `[[` picker's list.
+

@@ -201,13 +201,17 @@ try {
   (r.data?.length === 1) ? ok("restore returns the bit to the world instantly") : fail("restore failed");
 
   // --- increment 6: export reads every record kind as the owner (I-G1) ---
-  const EXPORT_TABLES = ["board", "bit", "placement", "tag_application", "connector", "tag", "category", "subtype_word", "dormant"];
+  // KEEP IN LOCKSTEP WITH src/lib/db/exported-tables.ts — asserted by
+  // exported-tables.test.mjs, which parses this line. It had drifted: this list said 9
+  // while the real set was 13, so `source`, `reference`, `opening` and `shelf_group` were
+  // never checked and the script still announced "all 9 record kinds" (found 2026-09-03).
+  const EXPORT_TABLES = ["shelf_group", "board", "bit", "placement", "tag_application", "connector", "reference", "tag", "category", "subtype_word", "source", "dormant", "opening"];
   let exportOk = true;
   for (const t of EXPORT_TABLES) {
     const e = await sb.from(t).select("id").limit(1);
     if (e.error) { exportOk = false; fail(`export read ${t}: ${e.error.message}`); }
   }
-  if (exportOk) ok("export can read all 9 record kinds as the owner (I-G1)");
+  if (exportOk) ok(`export can read all ${EXPORT_TABLES.length} record kinds as the owner (I-G1)`);
 
   // --- increment 7: THIS SESSION — the gather door, the picker's words, archive ---
   // (N4b + N5. Each assertion is about the DATA PATH, not the UI: the client-side
