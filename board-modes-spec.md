@@ -87,8 +87,15 @@ not to a frame, and not to anything floating above the board (a composition's fl
 taken from the code). Each row: what you are trying to do, in a person's words · what we call
 it · where it lives · how we are thinking about it — and **⚠ where it does not fit cleanly.**
 
-**The method for every row** *(owner)*: *what would a person want when arranging? What would a
-person want when editing? Those are the buttons we grey.*
+**The method for every row — use the frame directly, never a proxy.** For each action, ask
+*which activity is this part of: glancing at the whole, or working on a thing?* That is an
+identity question, and it answers immediately. **Do not translate it** into something easier to
+compute — *which table it writes*, *how many clicks it costs*, *whether someone might want it
+here*. Each of those was tried in earlier drafts and each gave a plausible wrong answer at the
+edges. The owner's frame gives the right one without argument.
+
+*(Owner: "if we straighten out your logic, you should be able to help me make the decisions."
+The straightened logic is the sentence above.)*
 
 ### 3a · Putting something on the board — **EDIT** *(owner corrected Claude, 2026-09-04)*
 
@@ -129,7 +136,7 @@ offers edit). Today it makes a card. That is a third behaviour that changes, add
 | *"tidy this mess"* | **tidy** | ✅ | 🔘 greyed | |
 | *"put this behind that"* | **send to back** | ✅ | 🔘 greyed | |
 | *"don't let me knock this"* | **lock · unlock** | ✅ | 🔘 greyed | |
-| *"I want another one of these here"* | **duplicate** | ✅ | ✅ | you duplicate to place another one — arranging — but while in the weeds you may want a variant too |
+| *"I want another one of these here"* | **duplicate** | ✅ | ✅ | straddles: by the line it grows the set (edit), but *"another one of these, here"* is a composing thought too. **Both** — see §3d for why that is safe |
 | *"move these five together"* | **select several** *(shift-click · marquee)* | ✅ | 🔘 greyed | edit is about one thing at a time |
 | *"snap it to that"* | **the guides** | ✅ *(while dragging)* | — | follows the drag |
 
@@ -142,9 +149,17 @@ offers edit). Today it makes a card. That is a third behaviour that changes, add
 | *"show me everything"* | **fit to view** | ✅ | ✅ | |
 | *"when did all this arrive?"* | **timeline** | ✅ | ✅ | a separate page; not affected by mode |
 
-### 3d · Taking things away *(owner-ruled: these belong in arrange)*
+### 3d · Taking things away — and duplicate: **BOTH** *(owner-ruled 2026-09-04)*
 
-> *"Trashing and archiving and removing from a board would make sense to me in the arrange mode."*
+> *"Trashing and archiving and removing from a board would make sense to me in the arrange
+> mode."* … *"The things I really want to think about are duplicating, trashing, archiving and
+> removing from a board — maybe they can be available in both modes, and it's not a big deal."*
+
+**Both, and here is why it is genuinely not a big deal.** The mode split exists for two things:
+to stop accidental edits, and to keep the glancing surface clean. **None of these four threatens
+either.** Each is one click, confirms before anything destructive, puts no cursor anywhere, and
+adds no chrome to a card. Having them in both modes costs nothing the mode was built to protect.
+If one feels wrong in practice, greying it is a single change.
 
 | what you're trying to do | what we call it | arrange | edit | how we're thinking about it |
 |---|---|---|---|---|
