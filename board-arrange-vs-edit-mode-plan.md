@@ -1,5 +1,73 @@
 # A board's two modes: ARRANGE vs EDIT — a draft for the owner
 
+> # 🔴 CONCEPTUAL REVIEW: **DO NOT BUILD THIS** *(2026-09-04)*
+>
+> The owner asked for a conceptual review before anything was built. It returned **No**, and
+> its load-bearing claims were **verified against the code and the documents** before this
+> banner was written — not relayed.
+>
+> **The central finding: this is not a split into two postures. It is ONE posture (arrange)
+> plus a remainder bucket (edit).** The tell is in this document's own thread sentences —
+> arrange's names an *activity* (§2d: *"the board as a picture"*), edit's names a *scope*
+> (*"one thing, up close"*). **A mode defined by its target absorbs anything you can do to one
+> card**, which is exactly why trash, tag, read and write all ended up inside it and why it
+> kept needing new rules.
+>
+> **And the killer, which inverts §5b's own argument:** writing is migrating to the composition
+> surface. §5b used that to argue *for* landing in arrange. But **if writing leaves the board,
+> EDIT's only justifying want leaves with it** — what remains is title · caption · tag ·
+> source · trash · read. You would be building a surface-wide mode to hold a handful of
+> per-card attribute edits. **The migration is an argument against the split, not for it.**
+>
+> **Three defects verified in this document:**
+> 1. 🔴 **It contradicts itself on trash.** §0a's ⭐ table — the one written *to go in the
+>    on-screen hints* — says **EDIT**. §2c, §3 and §6 say **BOTH, a deliberate exception**.
+>    Nothing reconciles them and the document never noticed.
+> 2. 🔴 **The mode has lost its tell.** §8 strikes through *"a mode you can be in without
+>    knowing"* citing §2b's visual difference — but **§2c removed it** (*"arrange and edit look
+>    the SAME"*). Edit-with-nothing-open is now pixel-identical to arrange, and the punishment
+>    for guessing wrong is §3's *"drag a card → **nothing**"*: a silent no-op on the most-used
+>    gesture. §8 was never updated. **The named failure mode is live and unmitigated.**
+> 3. 🔴 **Two committed documents already answer this question differently.**
+>    `docs/composition-spec.md` §4.2 (verified, gates a build): the compose door opens **a
+>    floater over the canvas — "the board stays visible and interactive behind it."**
+>    `board-actions-technical-audit.md` D-135 layer 6 commits to the same shape (a panel;
+>    view-state, not world-state). **If both ship, what mode is a board in while a floater is
+>    open over it?** They say interactive; this plan says anchored.
+>
+> **Also verified:** the **pen creates a `bit`** and so breaks §0c's *"arrange NEVER writes a
+> bit row, not once"* — waved through as *"its own mode"*, never argued. **Boards are
+> taggable**, and §0a (board → arrange) and §2c (tags → edit) give opposite answers with the
+> case in neither table. And this document's own test — *"if a want has to be ARGUED into its
+> mode, the split is wrong"* — is failed by roughly half the list.
+>
+> **One claim checked and found OVERSTATED:** the review calls connectors "built". They are
+> **schema-only — `boards.ts:39` says "no create-UI exists yet"**. The underlying point stands
+> though: `board-what-you-can-do.md` calls itself complete and does not mention arrows even as
+> a gap.
+>
+> ## ✅ WHAT TO BUILD INSTEAD — everything this feature was for, without the mode
+> The review's own observation: §2c already conceded *"arrange and edit look the SAME"* — the
+> whole visual difference is **one card**. That is not a mode, it is a **rule**:
+> 1. **The finished-card rule** — a card shows its title, tags and source **only while you are
+>    inside it**. One condition in `card.tsx`. This is §2b's entire value, shipped.
+> 2. **One click rule** — single click always selects; double-click always enters; Escape
+>    leaves. Kills the type-dependent branch that is the real defect today.
+> 3. **Selection-scoped chrome** — align/distribute/tidy show when something is selected and no
+>    card is open. Snap guides are already drag-only by construction.
+> 4. **§5's gesture answer as-is** — empty-drag pans, marquee takes the modifier. It never
+>    needed a mode. *(⚠ and shift+drag has no answer on a phone or the Daylight.)*
+> 5. **Tools stay tools** — the pen and arrows keep explicit tool states. A tool is not a mode
+>    of the surface.
+>
+> **If a mode is still wanted after living with that**, the review's read is that the thing
+> actually wanted is a **READ posture** — and that is a card-level affordance (a **peek**,
+> already proven on the composition surface, whose rule is *"the peek never edits the target"*),
+> not a surface-level mode.
+>
+> **Everything below is kept as the reasoning trail. It is not a build plan.**
+
+
 **Status: a DRAFT for the owner to react to.** Nothing built. Written 2026-09-04 at the
 owner's ask: *"I think there should be an arrange mode versus an edit mode… can you draft up
 what that feature would hold, and what it would change, for example with the alignment guide
