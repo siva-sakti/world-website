@@ -7,6 +7,53 @@ stuff… I think it would simplify things."*
 
 ---
 
+## 0 · The words, and what is actually tracked *(owner asked 2026-09-04: "what is a canvas, what is placement, what exactly are we tracking?")*
+
+**The definitions are `lexicon.md`'s, not this document's** — it is the naming authority and
+duplicating it is how two definitions of one word start. Pointing at them, with the part that
+matters here:
+
+| word | what it is | where it lives |
+|---|---|---|
+| **bit** | the thing itself — the words, the photo, the drawing | a `bit` row |
+| **board** | a surface things sit on | a `board` row |
+| **placement** | **one bit sitting on one board** — its position, size, stacking, tilt, lock, when it arrived, when it left | a `placement` row |
+| **card** | the visual box you see on screen. **Not stored** — it is a placement *rendered* | computed (`board_cards`) |
+| **canvas** | a board's **spatial rendering mode**. ⚠ Never a synonym for "board" | not stored at all |
+
+**So, to answer the question directly:** a placement is neither "the clicked-in card" nor "the
+clicked-out card." It is not a card at all. **A card is what a placement looks like.** The same
+placement is both of your two appearances — stripped in arrange, detailed while you are in it.
+Nothing about the *placement* changes when you click into it; only how it is drawn.
+
+### ⭐ THE MODE BOUNDARY IS THE PLACEMENT/BIT BOUNDARY
+
+This is the hard definition the earlier "objects vs content" framing was reaching for, and it
+is checkable against the schema rather than argued:
+
+> **Arrange mode writes `placement` rows. Edit mode writes `bit` rows.**
+
+Every act sorts itself, with nothing left to taste:
+
+| what a **placement** holds → **ARRANGE** | what a **bit** holds → **EDIT** |
+|---|---|
+| `x` `y` — move | `body` — the words |
+| `width` `height` — resize | `content` — title · caption |
+| `z` — send to back | `source_id` — where it came from |
+| **`angle` — rotate** | `subtype_word_id` |
+| `locked_at` — lock | *(and `tag_application` rows, which point at the bit)* |
+| the row existing / `left_at` — on or off this board | |
+
+**Rotation is settled by this, not by taste** *(the owner: "rotation should also be in the
+arrange mode… I don't know")*: `angle` is a **placement** column. Turning a card changes how it
+sits on THIS board and nothing about the thing itself — the same bit on another board is
+untilted. **Rotation is arrange.** So is the degrees readout.
+
+**And it exposes the one true exception.** `trash` and `archive` write `bit.deleted_at` /
+`bit.archived_at` — bit columns, so the rule says EDIT. But you will want to throw something
+away while tidying. **That is the only place the rule is deliberately broken**, and knowing it
+is the only one is worth more than a rule with no exceptions and no teeth.
+
 ## 1 · The one-sentence version
 
 **Arrange mode treats a card as an object; edit mode treats it as a page — and they LOOK
@@ -209,6 +256,54 @@ never move anything.**
    surface whose whole job is writing.
 2. **Does the selected card in ARRANGE show its details?** 🔵 Lean: **no** (§2c).
 
+## 3b · HOW IT WORKS, in technical detail *(owner asked to see the process walked through)*
+
+### What exists today, and what the mode actually costs
+
+**The owner's read is right:** *"edit mode is actually what we have built as a default right
+now."* Today's board is edit mode with arranging bolted onto it — a click selects, a second
+click on a text card starts typing, and the title/tags bar (`selected-bar.tsx`) appears for any
+single selection. The build is therefore mostly **subtraction**: take today's behaviour, call it
+edit, and remove from it the things that belong to arrange.
+
+**The state.** One value replaces the existing `selectMode` boolean:
+`const [mode, setMode] = useState<"arrange" | "edit">("arrange")`. It lives in
+`board-surface.tsx` beside `editingId`, and the two are different questions: **`mode` is what
+kind of surface this is; `editingId` is which card you are inside.** `editingId` is only ever
+non-null in edit mode.
+
+**Five places read it, and that is the whole change:**
+1. `card.tsx` — `disableDragging` becomes `mode === "edit" || locked`; the resize and rotate
+   handles gate on `mode === "arrange"`; the title/tag strip renders only when
+   `mode === "edit" && editingId === this card`.
+2. `use-board-pointer.ts` — already branches on `selectMode` for marquee-vs-pan; it branches on
+   `mode` instead. **No new code, a renamed condition.**
+3. `board-toolbar.tsx` — the mode control, and align/distribute/tidy hidden in edit.
+4. `use-card-drag.ts` — a drag can only start in arrange, so the snap guides are arrange-only
+   **by construction** rather than by a guard that has to be remembered.
+5. `selected-bar.tsx` — splits: the arrange acts (lock, send to back, straighten, duplicate,
+   remove) stay for arrange; tags/title/source move to the in-card strip for edit.
+
+**What is NOT touched:** the database, the save queue, undo, the geometry ledger, `board_cards`.
+**No migration. Nothing about your bits changes. Revertible in one commit** — which is why this
+is safe to build and look at rather than debate further.
+
+### The "would you like to edit?" offer *(owner, 2026-09-04)*
+
+*"You can't ever click in and edit something — it'll prompt 'would you like to edit'."*
+
+**Why it matters more than it sounds:** it is the answer to §8's failure mode. A mode you can be
+in without knowing is only dangerous when it silently does nothing. Here, the moment you try the
+thing this mode does not do, **the app tells you which mode you are in and offers the way out.**
+That converts the classic modal trap into a signpost.
+
+🔵 **Proposed shape:** double-clicking a card's text in arrange shows a small inline offer on
+that card — *"edit this?"* — one click away from switching to edit **with that card already
+open**. It does not steal the gesture the way a modal would, and it costs nothing if ignored.
+
+⚪ **Open:** does the same offer appear if you *type* on the keyboard with a card selected in
+arrange? 🔵 Lean: yes — typing at a selected card is unambiguous intent to write.
+
 ## 4 · What it changes for the alignment guides — the owner's question
 
 Today the guides are already safe in the narrow case: editing a card disables its dragging
@@ -241,13 +336,38 @@ whole reason the toggle exists. Options: space-bar + drag (the convention in spa
 two-finger drag on a trackpad · a hand tool. **This needs the owner's hand to judge, and it is
 the thing most likely to make the feature feel worse rather than better.**
 
-## 6 · Open — the owner's calls
-1. **Which mode do you land in when you open a board?** 🔵 lean: **Arrange** — you arrive to
-   look and move; writing is a thing you go *into*.
-2. **Does the pen stay its own mode, or become an arrange-mode tool?** 🔵 lean: leave it alone.
-3. **Does a note/composition card open its page in edit mode, or open inline?** Interacts with
-   the composition work — worth asking there, not deciding here.
-4. **Panning** (§5). The one that decides whether this feels good.
+## 6 · THE QUESTIONS — everything I need from you, in one batch
+
+*(Owner: "bring questions to me… if I missed anything that you already asked about, just bring
+it to me in the next batch." So this is the complete list, re-asked, not a delta.)*
+
+### 🔴 Blocking — I cannot build without these
+1. **Panning in arrange mode.** Empty-space drag draws a marquee there, so panning needs
+   another gesture. Space-bar + drag · two fingers on a trackpad · a hand tool. **This is the
+   one most likely to make arrange feel worse than what you have now**, and it needs your hands,
+   not my judgement.
+2. **Which mode do you land in when you open a board?** 🔵 Lean **arrange** — you arrive to look
+   and move; writing is something you go *into*. But you said edit is close to today's default,
+   so landing in arrange is the bigger change to how it feels.
+
+### 🟡 Shapes the feature, but I can build with the lean and you can overturn it
+3. **Does a selected card in ARRANGE show its details?** 🔵 Lean **no** — selecting to move is
+   not touching the content, and this is the last thing that could make arrange feel noisy.
+4. **Double-tap empty space in EDIT — make a card, or refuse?** 🔵 Lean **allow**; refusing means
+   refusing to let you write on a surface whose job is writing.
+5. **The "would you like to edit?" offer** — inline on the card (🔵 lean) or something else? And
+   does *typing* at a selected card trigger it too (🔵 lean yes)?
+6. **What is this mode called on screen?** "Arrange" and "Edit" are Claude's words. ⚠ You have a
+   **naming pass** running that may move "bit" and "inbox" — these two labels should probably
+   wait for it, or be decided inside it. *(You also said "view mode" once and "arrange" once —
+   worth settling which.)*
+
+### 🟢 Answered already — flagging so you can overturn, not asking again
+7. **Rotation is ARRANGE** — settled by §0: `angle` is a placement column, so turning a card
+   changes how it sits on *this* board and nothing about the thing.
+8. **Snapping + guides are ARRANGE** — a drag only exists there.
+9. **Trash/archive are in BOTH** — the one deliberate exception to §0's rule.
+10. **Only the card you are inside shows its details** — your own resolution.
 
 ## 7 · Cost, honestly
 **Small-to-medium, and it deletes more than it adds.** One mode value replacing `selectMode`;
