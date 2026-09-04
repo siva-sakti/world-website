@@ -46,7 +46,7 @@ Her leanings: ✅ *"I like pull or gather"* · ❌ *bring* (*"that's what you're
 *"Anything can be a block on the composition surface — it's just that some blocks are bits, or links to other compositions."* **Right:** a paragraph is a block, a heading is a block — so "block" cannot ALSO name a pulled-in thing. **What is actually distinct is provenance, not blockness:** its content lives elsewhere. ✅ **"chip" survives** (*"chip is kind of cute"*); the SHOWN form needs the precise word. *(Marked at the definition in `composition-spec.md` §3.3.)*
 
 ### 3.5 The smaller opens
-The list's route *(the piece is `/composition/[id]`; the ROOM is still `/notes`)* · **the inbox / "loose"** — is *loose* the right word for a bit no board shows? · **the desk** vs home · `/write`'s fate *(stays a room, or becomes "new ___" everywhere)* · the **direction words** (forward has none; backward reads "gathered into").
+The list's route *(the piece is `/composition/[id]`; the LIST is home — `/notes` is only a redirect)* · **the inbox / "loose"** — is *loose* the right word for a bit no board shows? · **the desk** vs home · `/write`'s fate *(stays a room, or becomes "new ___" everywhere)* · the **direction words** (forward has none; backward reads "gathered into").
 
 ## 4 · How this workstream runs
 Her window drives; nothing here blocks the build *(the build runs on concepts, which are settled)* · a word graduates only when SHE says it · graduation = `lexicon.md` in the same pass, tombstone for the retired word, then the code sweep · **the sweep costs rise with time** — a word used in 30 files is a bigger rename than one used in 3.
