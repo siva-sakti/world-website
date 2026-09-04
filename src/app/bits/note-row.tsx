@@ -7,7 +7,7 @@ import { trashFromInbox } from "./actions";
 import { PlaceOnBoard } from "./place-on-board";
 import { PinToggle, GroupPicker } from "@/components/shelf-controls";
 import type { ShelfGroup } from "@/lib/db/shelf";
-import { fmt } from "@/lib/dates";
+import { Stamp } from "@/components/stamp";
 
 // The list-view row (O2 extension): one line per bit — denser than the card,
 // same doors. Place-on stays loose-only (A20), trash everywhere.
@@ -34,7 +34,6 @@ export function NoteRow({
 }) {
   const title = item.face;
   const isLoose = item.boards.length === 0;
-  const date = fmt(item.created_at);
 
   return (
     <li
@@ -81,7 +80,7 @@ export function NoteRow({
           ))}
         </span>
       )}
-      <span className="notes-row-date">{date}</span>
+      <Stamp iso={item.created_at} className="notes-row-date" />
       <span className="notes-row-actions">
         <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
         <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />

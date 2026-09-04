@@ -15,7 +15,7 @@ import { signedUrl } from "@/lib/storage";
 import { normalizeDrawing, strokesBounds } from "@/lib/stroke";
 import { bitLabel, boardLabel } from "@/lib/labels";
 import { hostOf } from "@/lib/page-meta";
-import { fmt } from "@/lib/dates";
+import { Stamp, MadeAndEdited } from "@/components/stamp";
 import { DoodleBit } from "@/app/board/[id]/doodle-bit";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
@@ -46,9 +46,13 @@ export default async function BitPage({
   // Boards it's NOT already on — the "place on a board…" door (board-side placement
   // stays too; both directions, the owner's ruling). callInBit revives a departed
   // leg rather than duplicating, so this is safe even for a board it once left.
-  // A LIVE leg is one with no departure stamp — the same rows the history came from, so
-  // "which boards is it on" and "since when" are one read, not two.
-  const activeLegs = travel.filter((t) => !t.left_at);
+  // A LIVE leg is one with no departure stamp AND on a board that is still live. Travel
+  // carries no board state of its own, so this used to disagree with `getBitBoards` on
+  // this very page: a trashed board appeared under "on these boards" while the door above
+  // correctly left it out (S5, 2026-09-03). `boards` is the ONE definition of membership
+  // (lib/db/board-membership); travel supplies only the "since when".
+  const liveBoardIds = new Set(boards.map((bd) => bd.id));
+  const activeLegs = travel.filter((t) => !t.left_at && liveBoardIds.has(t.board_id));
   const otherBoards = allBoards
     .filter((bd) => !boards.some((cur) => cur.id === bd.id))
     .map((bd) => ({ id: bd.id, title: bd.title }));
@@ -106,8 +110,7 @@ export default async function BitPage({
       <p className="text-xs uppercase tracking-wide text-neutral-400">
         {b.type}
         <span className="ml-3 normal-case tracking-normal text-neutral-400">
-          {fmt(b.created_at)}
-          {fmt(b.updated_at) !== fmt(b.created_at) && ` · edited ${fmt(b.updated_at)}`}
+          <MadeAndEdited created={b.created_at} updated={b.updated_at} />
         </span>
       </p>
       {/* The note's own words — editable here, the same field the board card edits
@@ -231,7 +234,7 @@ export default async function BitPage({
                 <Link href={`/bit/${g.bitId}`} className="underline underline-offset-4 hover:no-underline">
                   {bitLabel(g.type, g.face)}
                 </Link>
-                <span className="text-xs text-neutral-400">{fmt(g.gatheredAt)}</span>
+                <Stamp iso={g.gatheredAt} className="text-xs text-neutral-400" />
               </li>
             ))}
           </ul>
@@ -261,7 +264,7 @@ export default async function BitPage({
                     {boardLabel(t.board_title)}
                   </Link>
                   {" · arrived "}
-                  {fmt(t.arrived_at)}
+                  <Stamp iso={t.arrived_at} />
                 </li>
               ))}
             </ul>

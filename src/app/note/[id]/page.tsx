@@ -5,7 +5,7 @@ import { getBit, getBitBoards } from "@/lib/db/bits";
 import { getBitSource } from "@/lib/db/sources";
 import { listBoards } from "@/lib/db/boards";
 import { listGatheredInto } from "@/lib/db/references";
-import { fmt } from "@/lib/dates";
+import { Stamp, MadeAndEdited } from "@/components/stamp";
 import { bitLabel, boardLabel } from "@/lib/labels";
 import { TagBar } from "@/app/board/[id]/tag-bar";
 import { SourcePicker } from "@/app/board/[id]/source-picker";
@@ -68,8 +68,7 @@ export default async function NotePage({
       {/* Quiet footer — the read-mostly facts + connections. */}
       <footer className="note-footer">
         <p className="note-footer-dates">
-          {fmt(b.created_at)}
-          {fmt(b.updated_at) !== fmt(b.created_at) && ` · edited ${fmt(b.updated_at)}`}
+          <MadeAndEdited created={b.created_at} updated={b.updated_at} />
         </p>
         <div className="mt-3">
           <SourcePicker bitId={b.id} initial={source} />
@@ -93,7 +92,7 @@ export default async function NotePage({
                   <Link href={`/bit/${g.bitId}`} className="underline underline-offset-4 hover:no-underline">
                     {bitLabel(g.type, g.face)}
                   </Link>
-                  <span className="text-xs text-neutral-400">{fmt(g.gatheredAt)}</span>
+                  <Stamp iso={g.gatheredAt} className="text-xs text-neutral-400" />
                 </li>
               ))}
             </ul>

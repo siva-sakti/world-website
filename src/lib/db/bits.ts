@@ -3,6 +3,7 @@ import type { Bit, Placement, Drawing } from "@/lib/types";
 import { removeObjects, copyPathsFor } from "@/lib/storage";
 import { setResting } from "./resting";
 import type { Pos } from "@/lib/placement-fields"; // the ONE placement field table
+import { MEMBERSHIP_SELECT, liveBoardOf, type BoardRef } from "./board-membership";
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
 // is the act of putting it on a board. Ids are client-supplied (crypto.randomUUID)
@@ -440,16 +441,14 @@ export async function getBitBoards(
   supabase: SupabaseClient,
   bitId: string,
 ): Promise<{ id: string; title: string | null }[]> {
-  // A placement links to board TWO ways (board_id = the board it's on;
-  // target_board_id = a board placed as a card). Name the FK so the embed isn't
-  // ambiguous — we want the board this bit sits on.
+  // ONE definition of membership, shared with the inbox (lib/db/board-membership).
+  // This used to omit the board-state filter its sibling had, so the TRASH CONFIRM
+  // could say "on 2 boards" with one of them in the trash (S5, fixed 2026-09-03).
   const { data, error } = await supabase
-    .from("placement").select("board:board!placement_board_id_fkey(id, title)")
+    .from("placement").select(MEMBERSHIP_SELECT)
     .eq("target_bit_id", bitId).is("left_at", null);
   if (error) throw error;
-  return (data ?? [])
-    .map((r) => r.board as unknown as { id: string; title: string | null })
-    .filter(Boolean);
+  return (data ?? []).map(liveBoardOf).filter((b): b is BoardRef => b !== null);
 }
 
 /** A bit's travel — every board it has visited, arrived/left (bit_travel view). */

@@ -3,10 +3,11 @@ import type { Bit } from "@/lib/types";
 import type { Source } from "@/lib/db/sources";
 import type { Tag } from "@/lib/db/tags";
 import { pagedRows, chunk } from "@/lib/db/paged";
+import { MEMBERSHIP_SELECT, liveBoardOf, type BoardRef } from "./board-membership";
 
 // A bit rendered for a browse surface: the bit + its "where from" (single) + its
 // tags (many) + the live boards it sits on (many). `boards` empty ⇔ LOOSE.
-export type BoardRef = { id: string; title: string | null };
+export type { BoardRef } from "./board-membership"; // one definition, not a second copy
 export type PanelBit = Bit & { source: Source | null; tags: Tag[]; boards: BoardRef[] };
 
 // listAllBits — EVERY live bit + source + tags + its live board memberships. The
@@ -33,21 +34,21 @@ export async function listAllBits(supabase: SupabaseClient): Promise<PanelBit[]>
   if (bits.length === 0) return [];
   const ids = bits.map((b) => b.id);
 
-  // Board memberships (the render rule). Name the FK so the embed isn't ambiguous
-  // (a placement links board two ways); we want the board it SITS ON.
+  // Board memberships — the ONE definition (lib/db/board-membership), shared with
+  // getBitBoards so the two can never drift apart again.
   const boardsByBit = new Map<string, BoardRef[]>();
   for (const idChunk of chunk(ids)) {
     const { data: places, error: pErr } = await supabase
       .from("placement")
-      .select("target_bit_id, board:board!placement_board_id_fkey(id, title, state)")
+      .select(`target_bit_id, ${MEMBERSHIP_SELECT}`)
       .is("left_at", null)
       .in("target_bit_id", idChunk);
     if (pErr) throw pErr;
     for (const p of places ?? []) {
-      const bd = p.board as unknown as { id: string; title: string | null; state: string } | null;
-      if (!bd || bd.state !== "live") continue; // trashed/archived board renders nothing → not a live membership
+      const bd = liveBoardOf(p);
+      if (!bd) continue; // a trashed/archived board renders nothing → not a live membership
       const arr = boardsByBit.get(p.target_bit_id as string) ?? [];
-      arr.push({ id: bd.id, title: bd.title });
+      arr.push(bd);
       boardsByBit.set(p.target_bit_id as string, arr);
     }
   }
