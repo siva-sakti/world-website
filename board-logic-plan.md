@@ -48,7 +48,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
 | **S8** | `placement.height` stored and permanently false for text + audio | ✅ **FIXED** — one door `isFlexSized`, no height stored for text/audio, 4 tests |
 | **S2** | the optimistic seam has no stated rule | ✅ **WRITTEN as I-G7**, drawn from the six real cases; parts 2·3·4 already have tests, part 1 is named as the one that doesn't |
-| **S1** | `board-surface.tsx` does 7 jobs | ⬜ step 10 *(ruled: after tests)* |
+| **S1** | `board-surface.tsx` does 7 jobs | ✅ **917 → 638**, three seams out (`use-card-drag` · `use-board-pointer` · `use-alignment-acts`), each **diff-proven** behaviour-preserving |
 | **S9** | 88% of lines have no test | ⬜ the whole plan |
 
 > **⚠ P1 was wrong as I first described it, and the test is what caught me.**
@@ -506,7 +506,7 @@ so this is a contained change, not a sweep.
 | 7 | ✅ Fixed `docs/INDEX.md` — it named the superseded composition spec as live | no |
 | 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
 | 9 | ✅ S8 — no height stored for text + audio | no |
-| 10 | S1 — split `board-surface.tsx` by its seven jobs, on top of the tests | no *(ruled: after tests)* |
+| 10 | ✅ S1 — three seams lifted out; **owner should eyeball a real board** (the suite can't cover this) | **a look** |
 | 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |
 
 Steps 1–7 are reversible, tested, and on the branch.

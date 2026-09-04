@@ -36,11 +36,11 @@ import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
 import { useCardDrag } from "./use-card-drag";
 import { useBoardPointer } from "./use-board-pointer";
+import { useAlignmentActs } from "./use-alignment-acts";
 import { useMeaningActs } from "./use-meaning-acts";
 import { useGeometry } from "./use-geometry";
 import { UndoDevReadout } from "./undo-dev-readout";
-import { tidyPatches, backZ, nextZ as zAbove, alignPatches, distributePatches } from "./board-arrange";
-import type { Patch, AlignEdge, Axis } from "./board-arrange";
+import { backZ, nextZ as zAbove } from "./board-arrange";
 import { useCreateDoors } from "./use-create-doors";
 
 // The board's compose surface, on real data, on an infinite canvas. Local state
@@ -250,6 +250,11 @@ export function BoardSurface({
       setEditingId, clearSelection, createTextCard, cancelDrag,
     });
 
+  // Lining cards up: nudge · tidy · align · distribute (S1 — use-alignment-acts).
+  const { nudgeSelected, tidySelected, alignSelected, distributeSelected } = useAlignmentActs({
+    cards, cardsRef, selectedIds, patchCard, read, flashNote, arrange,
+  });
+
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
   // In-flight removes registered so duplicateThis can await them (hunt #9): they are
   // neither pending patches nor creates, so flushAll + pendingCreates both miss them.
@@ -295,15 +300,6 @@ export function BoardSurface({
   // The board's keyboard (use-board-keys — ordered guards, check-corrected): Escape is
   // TWO-step (edit → selected → clear), Delete = remove-from-this-board (the ruled
   // meaning), arrows nudge, Cmd+A selects all, Cmd+=/−/0 zoom.
-  function nudgeSelected(dx: number, dy: number) {
-    const moves: { bitId: string; before: { x: number; y: number }; after: { x: number; y: number } }[] = [];
-    for (const c of cards) {
-      if (!selectedIds.has(c.placementId) || c.locked) continue; // locked = position frozen
-      patchCard(c.placementId, c.bitId, { x: c.x + dx, y: c.y + dy });
-      moves.push({ bitId: c.bitId, before: { x: c.x, y: c.y }, after: { x: c.x + dx, y: c.y + dy } });
-    }
-    arrange.noteNudge(moves); // one entry per BURST (800ms window keyed on the selection)
-  }
   function removeSelectedByKey() {
     if (selectedIds.size > 1) {
       bulkUnplace();
@@ -317,57 +313,6 @@ export function BoardSurface({
   // sort by y, a new row opens past a 40-world-px band, x within a row. Real rendered
   // sizes via data-pid (text heights are stale by design). One patchCard per card — the
   // normal save path.
-  function tidySelected() {
-    const chosen = cards.filter((c) => selectedIds.has(c.placementId) && !c.locked); // locked cards stay put
-    if (chosen.length < 2) return;
-    // Real rendered sizes from THE LEDGER (registry stage 3 — read() is tidyPatches'
-    // exact input shape, state-fallback where unmeasured); the MATH stays pure in
-    // board-arrange.ts.
-    const patches = tidyPatches(read(chosen));
-    const befores = new Map(chosen.map((c) => [c.bitId, { x: c.x, y: c.y }]));
-    for (const p of patches) patchCard(p.placementId, p.bitId, { x: p.x, y: p.y });
-    arrange.recordTidy(patches, befores); // redo replays THESE patches, never re-runs tidy
-  }
-  // CARD ALIGNMENT (card-alignment-spec.md §2.3) — the owner's "PowerPoint buttons".
-  // Simpler than tidy on purpose: tidy builds a grid and so needs a reading order to decide
-  // which card lands in which slot; alignment has no slots, so "make these left edges match"
-  // does not care which card came first.
-  //
-  // Locked cards are excluded, exactly as tidy excludes them (owner ruling 2026-09-02:
-  // "cards have to be unlocked to align"). Sizes come from THE LEDGER, never stored w/h.
-  // One undo entry per press, replaying the stored patches — never re-running the maths,
-  // because a second align would compute a different bounding box.
-  function arrangeSelected(
-    label: string,
-    compute: (measured: ReturnType<typeof read>) => Patch[],
-  ) {
-    // cardsRef, NOT `cards`: a click handler closes over the render it was made in, and
-    // pressing two align buttons in a row must read the positions the FIRST one just
-    // wrote. The ref is re-pointed every render, so it cannot be a stale snapshot.
-    // (Owner-reported, 2026-09-02: "if I align top and then press bottom, the second one
-    // doesn't work — have to click first".)
-    const chosen = (cardsRef.current ?? cards).filter(
-      (c) => selectedIds.has(c.placementId) && !c.locked && !c.angle,
-    );
-    const patches = compute(read(chosen));
-    if (!patches.length) {
-      // A button that does nothing is indistinguishable from a broken one. This is
-      // REACHABLE and correct: align three same-height cards to the top and their
-      // bottoms are already aligned, so "bottom" has nothing to do. Say so.
-      if (chosen.length >= 2) flashNote("already lined up");
-      return;
-    }
-    const befores = new Map(chosen.map((c) => [c.bitId, { x: c.x, y: c.y }]));
-    for (const p of patches) patchCard(p.placementId, p.bitId, { x: p.x, y: p.y });
-    arrange.recordPlacements(label, patches, befores);
-  }
-  const alignSelected = (edge: AlignEdge) =>
-    arrangeSelected(`align ${edge === "hcenter" ? "centre" : edge === "vmiddle" ? "middle" : edge}`, (mm) =>
-      alignPatches(mm, edge),
-    );
-  const distributeSelected = (axis: Axis) =>
-    arrangeSelected(`distribute ${axis === "h" ? "across" : "down"}`, (mm) => distributePatches(mm, axis));
-
   // Lock / unlock the selected card's POSITION (B+): optimistic, rolled back on failure.
   // `applyLock` is the reversible core — undo replays it with the opposite state.
   async function applyLock(bitId: string, on: boolean): Promise<void> {
