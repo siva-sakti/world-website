@@ -1,104 +1,181 @@
 # The bit pages (Group E) — how to review them
 
-**Status: a PLAN.** Written 2026-09-03, after the board pass closed. The region:
-~2,900 lines across ~25 files — `/bits`, a bit's page, a note's page, `/write`, intake,
-`/trash`, `/archive`. Two files have tests. **Neither of us has read most of it**, which
-is why the code map rates it *unexamined*, not *suspect*.
+**Status: a PLAN, v2 — rewritten 2026-09-03 after an antagonist review returned
+"VERDICT: No."** The first draft opened on the wrong lead, contained two wrong
+measurements, left ~1,270 lines in no group at all, and had no way to tell when it was
+finished. What follows is the corrected version; §0 records what was wrong, because the
+mistakes are more instructive than the fix.
 
-## 1 · Why this pass starts from a different place than the board's
+**The region — settled, and bigger than v1 said:** ~4,200 lines. `/bits` · a bit's page ·
+**a note's page (`src/app/note/[id]`, 184 lines)** · `/write` · intake · `/trash` ·
+`/archive` · **and `src/components/` (1,087 lines, 11 files)**. The last two were in no
+group in `bits-and-boards-code-map.md` and in no review. `src/components/drawer.tsx` alone
+is **367 lines — the largest untracked file in the app.**
 
-The board review began cold: four audits reading for anything wrong. This one doesn't have
-to, because that pass produced **rules that didn't exist before**, and rules make an audit
-answerable instead of open-ended:
+---
 
-- **I-G5** — every date shows in the reader's own zone
-- **I-G6** — a copy inherits what the bit HAS, never what points AT it
-- **I-G7** — the optimistic rule, in four parts
-- the one-door pattern, and the five model-safety gates in `CLAUDE.md`
+## 0 · What the antagonist found, and what it cost
 
-So the question is no longer *"is anything wrong here?"* but *"does this region obey the
-rules we now have, and where does it decide something twice?"* That is a question with an
-end to it.
+Four of its findings were verified against the code before this rewrite. They are recorded
+because each is a *class* of mistake, not a one-off.
 
-## 2 · What we already know — measured, not assumed
+| | The mistake | Why it matters |
+|---|---|---|
+| **Anchoring** | v1 led on "four hand-rolled save loops" — the bug class I had just spent a week on. | Two worse defects were sitting in the region in plain sight (§1). The lead was familiarity, not evidence. |
+| **A number that looked like a signal** | v1's "9 files do optimistic updates" came from a grep including `useState` — which every client component has. It measured *"is a React component"*. | The step built on it would have audited nothing. **A measurement whose criterion you can't state is not a measurement**, and I presented it under a heading reading "measured, not assumed". |
+| **A count that was simply wrong** | There are **five** hand-rolled save loops, not four. | The fifth is `board-description.tsx` — **in the board region this pass already declared closed.** |
+| **No exit criterion** | v1 said the deliverable was moving Group E's rating "to a real number either way". | A number I set myself, satisfiable by any amount of looking. §5 replaces it. |
 
-| | |
-|---|---|
-| dates formatted outside `lib/dates` | **0** ✅ *(the boundary test covers this region too)* |
-| database reached outside `lib/db` | **0** ✅ |
-| unused parameters / locals | **0** ✅ |
-| typecheck · lint · build | clean ✅ |
-| **files doing optimistic updates** | **9** ⚠ — the exact pattern behind every board bug |
-| **hand-rolled debounced saves** | **3**, and **none** use the board's write queue ⚠ |
+**And a rule-conformance audit cannot find a defect for which no rule exists.** v1's premise
+— *"the question is no longer 'is anything wrong here'"* — was the anchoring restated as a
+virtue. Both defects below are rule **gaps**. The board's rules came from a canvas of
+optimistic drags; this region is server actions, forms and navigation.
 
-That last row is the lead this pass should open on.
+---
 
-## 3 · THE LEAD: four save loops, four separate correctness arguments
+## 1 · THE LEAD: the act table
 
-`bit-controls.tsx` (600ms) · `text-workspace.tsx` (350ms) · `quick-write.tsx` — plus the
-board's `write-queue.ts`. Same concern, four implementations, each with its own reasoning
-about ordering, retries and what happens when a write fails.
+Not the save loops. Two verified defects, found by reading the region rather than by
+importing the board's taxonomy:
 
-**The board's copy had two real bugs** — a dropped title and a stale write overwriting a
-newer one that had landed. Both were invisible to the build and to reading; only running
-the timing found them.
+**(a) The most destructive act has a door that never asks.** `note-card.tsx:141` and
+`note-row.tsx:88` trash a bit through a bare `<form action={trashFromInbox}>`: **one click,
+no confirm, no busy state, no failure message, no undo.** The two files have **zero** catch
+blocks between them, and `trashFromInbox` (`actions.ts:123`) has no try/catch and returns
+nothing, so a failure surfaces as an unhandled server-action error. Meanwhile
+`bit-controls.tsx:130` carries a comment calling itself *"THE one trash confirm … shared
+with the board, /bits and /write, so the same act asks the same question wherever you meet
+it."* **That comment is false on `/bits` — the page it names.**
 
-**A first look says `text-workspace.tsx` is actually SOUNDER than the board's was** — it
-carries the same per-editor write chain, and it writes `latest` rather than restoring a
-captured snapshot, which is the shape that made the board's P2 possible. That is worth
-saying plainly: this region is not assumed to be the weak one. **Two of the four are still
-unread.**
+**(b) The region's save door cannot tell you it wrote nothing.** `updateBitBody`
+(`bits.ts:332`) does `.update().eq()` with no `.select()` and no rows-affected check, so a
+0-row write — trashed row, RLS refusal, stale id — **resolves as success**. Its sibling
+`unplaceBit` asserts, with a comment about exactly this ("the lost-removal class"). Two
+client files already hand-compensate for the gap; that is `CLAUDE.md` gate 3 inverted — a
+rule enforced twice in app logic instead of once at the lowest layer.
 
-**How to review them:** not by reading each and judging. Write **one** set of timing tests
-— stall a write, queue a newer one, fail the first — and run **all four** through it. That
-is the only way this class of bug has ever been caught here, and the harness already
-exists in `write-queue.test.mjs`.
+### The instrument
 
-**The likely outcome, named in advance so it isn't a surprise:** if three of the four are
-sound and one is not, fix the one. If they differ in ways that all turn out to be right for
-their surface, leave them and write down why. **Do not merge them into one queue on
-tidiness grounds** — a shared abstraction across four surfaces with different needs is how
-the wrong abstraction gets built, and the board's queue is shaped by the board's problems
-(optimistic ids, call-in renames, group drags) that a text editor does not have.
+**One table. Every act in the region × five columns:**
 
-## 4 · The order
+> create · edit title/caption · edit body · tag · pin · folder · place · duplicate ·
+> archive · trash · restore · destroy · empty-trash
+>
+> **one door? · does it ask? · busy state? · is failure visible? · does its write assert it happened?**
 
-1. **The four save loops** (§3) — one harness, four subjects. Highest known risk.
-2. **The 9 optimistic surfaces against I-G7.** For each painted change, ask part 1's
-   question by hand: *what write makes this true?* That part has no test and is where the
-   duplicate-a-bit bugs came from.
-3. **Trace the flows, not the files.** Catch a bit → file it → find it → put it away →
-   bring it back → destroy it. Every bug this week lived at a seam between two surfaces
-   that disagreed, and reading file-by-file is exactly what misses those.
-4. **Find what is decided twice.** The board had three answers to "which boards is this
-   bit on" and four hand-kept lists of placement fields. Look for the same shape here —
-   especially around intake, where a bit gets its type, its size and its source.
-5. **Empty and error states.** `loose-file-intake.tsx` has 7 `catch` blocks and 0 empty
-   states; `intake.tsx` has 4 and 2. Not damning on its own — some of those files may have
-   nothing to be empty — but it is the cheapest thing to check and the house rule is
-   explicit: *every list can be empty, every upload can fail.*
-6. **Then, and only then, the big files.** `notes-browser.tsx` (416) · `actions.ts` (361) ·
-   `intake.tsx` (297). Judge them by the owner's ruling — **does each do ONE job well** —
-   not by line count.
+**No blank cells** — that is `CLAUDE.md` gate 2, applied to a surface instead of a record.
+It found both defects above by reading, it terminates, and it answers the owner's actual
+question (*was this built the right way*) rather than the one the board taught me to ask.
 
-## 5 · How to run it
+---
 
-**Delegate the reading, keep the judging.** The board pass used four audit agents and I
-verified their findings myself; two of the three things the last agent found were real and
-one changed my own account of a bug. Same shape here: agents read and report, I confirm
-against the code before anything is called a finding.
+## 2 · What we know — measured, with the criterion stated
 
-**Fix in the same order as the board pass: test first, then fix, then prove by reverting.**
-Every fix this pass was demonstrated by removing it again and watching its own test — and
-only its own test — go red. That is what "we checked" means, and it should not get weaker
-because this region is less familiar.
+| | | criterion |
+|---|---|---|
+| dates formatted outside `lib/dates` | **0** ✅ | `boundaries.test.mjs` |
+| database reached outside `lib/db` | **0** ✅ | `boundaries.test.mjs` |
+| unused parameters / locals | **0** ✅ | `tsc --noUnusedParameters` |
+| `requireUser` on every server action | **8 of 8** ✅ | read individually |
+| service-role key anywhere in `src/` | **0** ✅ | RLS is the boundary, as ruled |
+| **hand-rolled debounced saves** | **5** ⚠ | each read |
+| **acts with no confirm on a destructive path** | **2** 🔴 | §1(a) |
+| **db write doors that don't assert rows** | **≥1** 🔴 | §1(b) |
 
-## 6 · What would make this pass fail
+v1's "9 optimistic surfaces" row is **deleted**. The real ones, named rather than counted:
+`notes-browser.tsx:84` · `place-on-board.tsx:32` · `note-workspace.tsx:44` ·
+`text-workspace.tsx:81` · `loose-file-intake.tsx:59,146` · `intake.tsx:131`.
 
-Named up front, since both are easy to walk into:
+---
 
-- **Merging the four save loops** because four looks untidy. That is the Wrong Abstraction
-  failure mode by name; §3 says what to do instead.
-- **Finding nothing and calling that a result.** The honest outcome of an unexamined region
-  is often *"we looked, here is the map, two things need fixing."* The code map's rating for
-  Group E should move from *unknown* to a real number either way — that IS the deliverable.
+## 3 · The order
+
+1. **The act table** (§1). Fix what it exposes — starting with the unconfirmed trash.
+2. **Words lost before a write is ever attempted.** A category v1 missed entirely:
+   - `/write` and both text workspaces have **no crash guard**, while the *intake box* does
+     (`jot-draft.ts`). `quick-write.tsx`'s banner says *"Your words are still here"* — true
+     until the tab is reloaded or evicted, which on a phone is the ordinary case.
+   - `loose-file-intake.tsx:146` clears a caption **before** awaiting its write, so a failed
+     caption is destroyed; `intake.tsx:130` restores on every failure path. Same decision,
+     two answers, and the destructive one is uncommented.
+   - `loose-file-intake` sweeps uploaded files on **any** throw, where `actions.ts:105`
+     refuses to until a row abort is *confirmed* (R2.11). A throw with the row landed leaves
+     a live bit pointing at deleted files.
+3. **The five save loops** — moved down from the lead, and it already has two subjects:
+   **`BitTitle` (`bit-controls.tsx:36`) has no write chain** — type, blur, type, blur inside
+   600ms and the first request landing last leaves the database on the old title while the
+   screen shows the new one, with nothing to retry. **`board-description.tsx:20` is a
+   verbatim clone**, in the board region this pass called closed. *(`text-workspace.tsx` is
+   **sounder** than the board's queue was — the write chain is real and it writes `latest`
+   rather than a restored snapshot, so P2's shape can't occur. **Sounder, not sound:** it
+   marks a body clean before reconciling references, and has no retry timer at all.)*
+4. **Server actions** (`actions.ts`, 361 lines). Authorization checked out (see §2). The
+   gaps: `trashFromInbox` does **no input validation**; `makeBoardFromBits` has **no
+   try/catch** while every sibling returns `{error}` — three error contracts in one file.
+5. **Comments that assert false things** — the code map's own dimension #5, dropped from v1.
+   `actions.ts:131` is a doc-block for a function that has moved; `actions.ts:308` is
+   attached to the wrong one. §1(a)'s false comment is the costly kind.
+6. **The six scenes** (§4) — the seam-level check, as fixtures rather than a heading.
+7. **Then the big files**, judged by the owner's ruling — *does each do ONE job well* — not
+   by line count.
+
+---
+
+## 4 · The scenes — a procedure, not a heading
+
+v1 said "trace the flows", which a session with no memory cannot execute. `model-scenarios.md`
+already establishes the pattern: **each scene names its starting row state, the exact click
+path, and the expected rows after every step.**
+
+1. Catch a link on a phone → it lands loose → find it in `/bits`
+2. Write a note in `/write` → close the tab mid-sentence → reopen
+3. Caption a photo → the write fails → what is on screen, what is in the database
+4. Trash from the inbox → restore it → is it where it was
+5. Duplicate a bit → trash the copy → the original's files must survive
+6. Two tabs open on one note → type in both
+
+**Scene 6 is a ruling question, not a bug.** The schema is explicit: *"no version column,
+last-arrival-wins (I-D5)"*. For a card's x/y that is fine. For a rich-text **body** it means
+whole-document loss with no error. **Ask the owner whether I-D5 still holds now that a bit
+body is a document** — do not fix it silently.
+
+---
+
+## 5 · Done means
+
+v1 had no answer. This one is checkable by someone other than me:
+
+1. **Every file in the region** × the code map's five dimensions — **no blank cells**.
+2. **Every act** traced through create · edit · un-place · archive · trash · restore ·
+   destroy — **no blank cells** (`CLAUDE.md` gate 2, already the house rule).
+3. **Every finding** either fixed *with a test that goes red when the fix is reverted*, or
+   written into `parked.md` with its re-entry condition. Nothing sits in a chat log.
+
+---
+
+## 6 · The real failure modes
+
+v1 named two comfortable ones. These are the ones that would actually sink it:
+
+- **Reviewing only what the board taught me to look for.** Already happened once — it is
+  what §0 is about. The act table exists to look at the region on its own terms.
+- **Accepting agent reports as findings.** The code map caps agent reading at ~60% for a
+  reason, and most of this region cannot be run. Every finding gets confirmed against the
+  code before it is called one — as the four in §0 were.
+- **Declaring Group E done while `/note/[id]` and `src/components/` were never in anyone's
+  region.** 1,271 lines, including the app's largest untracked file.
+
+**One honest constraint, stated rather than promised around:** "prove by reverting" is the
+standard this pass has held, and **most of this region cannot meet it.** There are 2 test
+files and no React test runner. Reaching it for the save loops means extracting three of the
+region's most delicate files into pure modules — **a new pattern, needing the owner's
+sign-off before it starts** (`CLAUDE.md`: ask before adding patterns). Only the *technique*
+from `write-queue.test.mjs` is reusable, not the harness. Where that standard can't be met,
+the finding says so instead of borrowing confidence it hasn't earned.
+
+## 7 · Carried in from elsewhere
+- **`m6`** — the unlocated unreachable branch from the board pass; the ledger assigns it here.
+- **`/bits` loads every live bit and signs every thumbnail** on each load. Correct at
+  one-writer scale and commented as such — a named scaling cliff, not work.
+- **`notes-browser.tsx:190`** filters in memory over a client-held array. Correct today
+  because of `pagedRows`; worth one line, not a step.

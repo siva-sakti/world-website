@@ -158,10 +158,22 @@ to work.
 
 | Shape | Logic | One door | Proof | Record |
 |---|---|---|---|---|
-| ⚠ five over the ceiling | ❓ | ✅ recently consolidated | 🔴 | ❓ |
+| ⚠ five over the ceiling | 🔴 **2 verified defects** | 🔴 **NOT consolidated — see below** | 🔴 | 🔴 |
 
-**Confidence: ~45%, and I want to be exact about why: this is mostly *unexamined*, not
-*suspect*.** The four audits reached it thinly and I have not read the big files myself. It
+**Confidence: ~40% — REVISED DOWN 2026-09-03 after an antagonist read the region.** It is
+still mostly unexamined, but it is no longer only that: two defects are now verified.
+
+🔴 **The one-door ✅ this table carried was WRONG.** `/bits` trashes a bit through a bare
+form — **one click, no confirm, no busy state, no failure message** (`note-card.tsx:141`,
+`note-row.tsx:88`; zero catch blocks between them) — while `bit-controls.tsx:130` carries a
+comment claiming the confirm is *"shared with the board, /bits and /write."* It is not
+shared with `/bits`. 🔴 **`updateBitBody` does not assert rows written**, so a 0-row write
+resolves as success; its sibling `unplaceBit` does assert.
+
+⚠ **1,271 lines were in NO group in this map:** `src/app/note/[id]` (184) and
+**`src/components/` (1,087, 11 files — including `drawer.tsx` at 367, the largest untracked
+file in the app)**. Now claimed by the Group E pass. The 13,254-line total below counts
+bits + boards + lib only, and never included them. The four audits reached it thinly and I have not read the big files myself. It
 is the largest genuinely unknown region on this map.
 
 ✅ One real improvement landed here: the archive and trash confirmations, and the nine
@@ -194,7 +206,7 @@ yesterday's date on another**.
 | **F · shared helpers** | 1,300 | 5/18 | **~70%** | right shape; one date bug |
 | **C · the data layer** | 2,140 | ~0 | **~60%** | reviewable and reviewed; 3 known bugs; `bits.ts` too big |
 | **D · the board surface** | 3,400 | 1/12 | **~50%** | works daily, provable almost nowhere |
-| **E · the bit pages** | 2,900 | 2/25 | **~45%** | *unexamined*, not suspect — the real blind spot |
+| **E · the bit pages + components** | ~4,200 | 2/31 | **~40%** | 2 verified defects; 1,271 lines were in no group at all |
 | **B · saving** | 250 | ❌ | **~35%** | lowest confidence, highest stakes |
 
 **The honest headline: nothing here is rotten, and one thing is genuinely excellent (the
