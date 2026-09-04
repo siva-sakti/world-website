@@ -1,0 +1,112 @@
+                              set_config                               
+-----------------------------------------------------------------------
+ {"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}
+
+== A1 · birth: born private, live, title null (§4.1.3 / §12.2b) ==
+ born_private | born_live | title_null | indexed 
+--------------+-----------+------------+---------
+ t            | t         | t          | t
+
+== A2 · the search index moves with it: chip label + FOLDED text findable (J2/§13.7.4) ==
+ finds_chip_label | finds_folded | finds_subtitle | no_nodetype_pollution 
+------------------+--------------+----------------+-----------------------
+ t                | t            | t              | t
+
+== A3 · state crossfire: archived⛔starred · trashed⛔archived (house CHECKs) ==
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:33: ERROR:  new row for relation "composition" violates check constraint "composition_archived_not_alive"
+   (must refuse: archived_not_alive)
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:35: ERROR:  new row for relation "composition" violates check constraint "composition_trashed_archived_exclusive"
+   (must refuse: trashed_archived_exclusive)
+== A4 · the tie: flatness is physics — a BIT uuid cannot author (FK) ==
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:41: ERROR:  insert or update on table "reference2" violates foreign key constraint "reference2_from_composition_id_fkey"
+DETAIL:  Key is not present in table "composition".
+   (must refuse: FK — from must be a composition)
+== A5 · exactly-one target: two targets refused · zero refused ==
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:46: ERROR:  new row for relation "reference2" violates check constraint "reference2_exactly_one_target"
+   (must refuse: two targets)
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:48: ERROR:  new row for relation "reference2" violates check constraint "reference2_exactly_one_target"
+   (must refuse: zero targets)
+== A6 · not-self · dedup per kind · different kinds coexist · mutual allowed ==
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:54: ERROR:  new row for relation "reference2" violates check constraint "reference2_not_self"
+   (must refuse: self)
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:57: ERROR:  duplicate key value violates unique constraint "reference2_bit_once"
+   (must refuse: duplicate pair, bit kind)
+ three_ties_stand_incl_mutual 
+------------------------------
+ t
+
+== A7 · source as target · MERGE must repoint (the S4 rule) ==
+ tie_survived_merge 
+--------------------
+ t
+
+ tie_eaten_without_repoint 
+---------------------------
+ t
+
+== A8 · placement: composition on a board · I-L1 unique · revive keeps arrived_at · I-L2 durable ==
+psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-proofs.sql:86: ERROR:  duplicate key value violates unique constraint "placement_comp_once"
+   (must refuse: I-L1 one placement per pair)
+ arrived_survives_revive 
+-------------------------
+ t
+
+== A9 · board_cards third leg: label+preview · trash vanishes · restore returns (same row) ==
+ leg_ok | _ | preview_ok 
+--------+---+------------
+ t      | t | t
+
+ card_vanishes_on_trash 
+------------------------
+ t
+
+ card_returns_whole 
+--------------------
+ t
+
+== A10 · destroy per target kind: cascades both directions ==
+ ties_before 
+-------------
+           4
+
+ bit_ties_gone 
+---------------
+ t
+
+ authored_ties_gone 
+--------------------
+ t
+
+== A11 · composition_travel: the journey, one record two views (§30b) ==
+ journey_board | has_arrival | has_departure 
+---------------+-------------+---------------
+ t             | t           | t
+
+== A12 · files: registry rows cascade at destroy ==
+ file_rows_swept 
+-----------------
+ t
+
+== A13 · RLS: another user sees NOTHING; anon sees NOTHING (born-private world) ==
+                              set_config                               
+-----------------------------------------------------------------------
+ {"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}
+
+                              set_config                               
+-----------------------------------------------------------------------
+ {"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}
+
+ other_owner_sees_nothing 
+--------------------------
+ t
+
+ anon_sees_nothing_even_public 
+-------------------------------
+ t
+
+== A14 · opening: composition slot is a PLAIN unique constraint (Gate B F1) ==
+       conname        | plain_unique 
+----------------------+--------------
+ opening_one_per_comp | t
+
+== done ==

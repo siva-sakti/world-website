@@ -26,7 +26,7 @@
 - **Every stage ends green**: `pnpm build` + typecheck + its named proofs + the owner's feel-test list for that stage.
 
 ## 📍 YOU ARE HERE
-**Stage ⓪ (paper) — not building yet.** Waiting on: the other window's queue to clear · one owner decision (editor testing, below). Everything upstream — spec verified (D-146), storage proven (D-145), plan stress-tested, carry-through mapped — is **done**. *(Update this line at every stage boundary.)*
+**Stage ⓪ COMPLETE · the ①a migration file WRITTEN AND REHEARSED GREEN (2026-09-04)** — `verification/composition-add.sql`, proven by `run-composition-add-native.sh`: the deliberate-failure probe left zero objects (all-or-nothing, F6 confirmed) · the old world verified untouched (bit.kind · the old reference table · the_inbox · the_ledger all intact — the ①a promise, asserted not claimed) · the full attack suite 15/15, zero false. **Building waits ONLY on the other window's queue-clear ping.** Nothing waits on the owner until the ①b checkpoint. *(Update this line at every stage boundary.)*
 
 ## ⚠ AN OWNER DECISION FOUND 2026-09-04 — THE EDITOR CANNOT BE TESTED TODAY
 **The gap:** the test setup is plain Node, logic-only, no browser (`package.json`: `node --test 'src/**/*.test.mjs'`; no DOM library installed). **Stage ②'s acceptance is written as browser behaviour** — "Enter splits cleanly," "a heading drag carries its section," "fold/search/unfold." **None of it can run.** Acceptance criteria were written with no way to check them — **caught by the owner's "what else could be missing?", by no gate.**
