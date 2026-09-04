@@ -90,7 +90,7 @@ Update the status column in the same session anything moves. *(Findings live in
 
 | | What | Status |
 |---|---|---|
-| e1 | Group E — the bit pages, ~2,900 lines nobody has read this pass | ⬜ step 11 *(ruled: yes)* |
+| e1 | Group E — the bit pages, ~2,900 lines nobody has read this pass | ⬜ **planned: `bit-pages-review-plan.md`** — the lead is four hand-rolled save loops |
 | e2 | `card.tsx` (574) + `use-create-doors.ts` (503) — audited by agents, not read by me | ⬜ fold into step 10 |
 
 ### 📋 Feature gaps — decisions, not defects. Yours, and parked here so they aren't lost
@@ -507,7 +507,7 @@ so this is a contained change, not a sweep.
 | 8 | ✅ Both migrations written and proven on a throwaway PG17 (`verification/run-left-at-native.sh`) | **you run them** |
 | 9 | ✅ S8 — no height stored for text + audio | no |
 | 10 | ✅ S1 — three seams lifted out; **owner should eyeball a real board** (the suite can't cover this) | **a look** |
-| 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |
+| 11 | **Examine Group E** — planned in `bit-pages-review-plan.md`; next up | no |
 
 Steps 1–7 are reversible, tested, and on the branch.
 
