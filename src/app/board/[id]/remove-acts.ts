@@ -100,10 +100,14 @@ export function removeActs(deps: {
   const FLUSH_REFUSED = "FLUSH_REFUSED";
   const isFlushRefused = (e: unknown) => e instanceof Error && e.message === FLUSH_REFUSED;
 
-  // Put an optimistically-removed card back (unless something already renders under
-  // its placement id — never two cards per placement).
+  // Put an optimistically-removed card back — unless this BIT already renders, which is
+  // the same guard reviveOne uses (S3, 2026-09-03). It used to key on placementId, alone
+  // among the six restore paths: a call-in revive RENAMES a placement id, so the card
+  // could come back under a new one, this check would miss it, and the board would show
+  // TWO cards for one bit — a state `placement_bit_once` makes impossible in the database.
+  // The bit is the identity that matters on screen; the placement id is not stable.
   function restore(snap: CardVM) {
-    setCards((cs) => (cs.some((c) => c.placementId === snap.placementId) ? cs : [...cs, snap]));
+    setCards((cs) => (cs.some((c) => c.bitId === snap.bitId) ? cs : [...cs, snap]));
   }
 
   // ---- FLOOR 3: the keeping acts' reverses (undo plan §5, all amendments) ----
@@ -304,7 +308,20 @@ export function removeActs(deps: {
       labelFor(kind, snaps.length),
       snaps.map((c) => c.bitId),
       () => runLegs(live().map((c) => undoLegFor(kind, c))),
-      () => runLegs(live().map((c) => redoLegFor(kind, c))),
+      () => {
+        // End the edit if the card being taken away again is the one you are typing in
+        // (S7, 2026-09-03). removeGesture clears editingId; REDO went straight to the
+        // legs and skipped it, so redoing a trash on the card you were editing left
+        // editingId pointing at a card that no longer exists — every keystroke swallowed
+        // by a ghost until you pressed Escape. Matched against cardsRef (reverse-time
+        // truth, the house rule above) because a revive can have renamed the id.
+        const going = new Set(live().map((c) => c.bitId));
+        const ids = new Set(
+          (cardsRef.current ?? []).filter((c) => going.has(c.bitId)).map((c) => c.placementId),
+        );
+        setEditingId((cur) => (cur && ids.has(cur) ? null : cur));
+        return runLegs(live().map((c) => redoLegFor(kind, c)));
+      },
     );
 
     // The loose column repaints on the FIRST landed leg (so genuinely-loose bits show

@@ -26,6 +26,7 @@ function makeBoard(initial, opts = {}) {
     forgot: [], errors: [], looseRefreshes: 0, confirms: [], archiveConfirms: [],
   };
   let cards = [...initial];
+  let editingId = opts.editingId ?? null;
   const cardsRef = { get current() { return cards; } };
   const tracked = [];
   const entries = [];
@@ -50,7 +51,7 @@ function makeBoard(initial, opts = {}) {
     selectedIds: opts.selectedIds ?? new Set(),
     setCards: (fn) => { cards = fn(cards); },
     clearSelection: () => {},
-    setEditingId: () => {},
+    setEditingId: (v) => { editingId = typeof v === "function" ? v(editingId) : v; },
     settled: async (pid) => pid,
     flushNow: async (pid) => !(flushRefusedFor && pid === `p-${flushRefusedFor}`),
     trackRemove: (p) => tracked.push(p),
@@ -59,6 +60,7 @@ function makeBoard(initial, opts = {}) {
     onErr: (e) => log.errors.push(e),
     doors: {
       unplaceBit: async (_s, pid) => {
+        opts.duringUnplace?.(); // lets a test make the board change WHILE the write is in flight
         if (fail.on && pid === `p-${fail.on}`) throw new Error("network down");
         log.unplaced.push(pid);
       },
@@ -87,7 +89,14 @@ function makeBoard(initial, opts = {}) {
     await Promise.allSettled(tracked);
     await Promise.allSettled(tracked); // legs registered by a leg's own continuation
   };
-  return { acts, log, entries, flush, bits: () => cards.map((c) => c.bitId).sort() };
+  return {
+    acts, log, entries, flush,
+    bits: () => cards.map((c) => c.bitId).sort(),
+    cards: () => cards,
+    addCard: (c) => { cards = [...cards, c]; },
+    editing: () => editingId,
+    setEditing: (v) => { editingId = v; },
+  };
 }
 
 // ---- un-place, one card ----
@@ -357,4 +366,55 @@ test("undo waits for the gesture's writes to land before reversing (D6)", async 
   assert.ok(b.entries[0].settled, "the entry carries the gesture's own promise");
   await b.entries[0].settled;
   assert.deepEqual(b.log.unplaced, ["p-a"], "by the time undo may run, the write has landed");
+});
+
+// ---- S3 · one card per bit, always ----
+
+test("⚠ S3 — a failed un-place must not put a SECOND card on screen for the same bit", async () => {
+  let b;
+  b = makeBoard([card("a")], {
+    failOn: "a",
+    // While the un-place is in the air, the bit comes back under a DIFFERENT placement id —
+    // which is exactly what a call-in revive does. The rollback used to check the OLD
+    // placement id, miss, and add a duplicate.
+    duringUnplace: () => b.addCard(card("a", { placementId: "p-a-revived" })),
+  });
+  b.acts.unplaceSelected("p-a");
+  await b.flush();
+
+  assert.deepEqual(b.bits(), ["a"], "the bit must appear once, never twice");
+  assert.equal(b.cards().length, 1, "two cards for one bit is a state the database forbids");
+});
+
+// ---- S7 · the keyboard is never left typing into a card that is gone ----
+
+test("⚠ S7 — redoing a trash on the card you are editing ends the edit (the keyboard stays alive)", async () => {
+  const b = makeBoard([card("a"), card("b")], { selectedIds: new Set(["p-a"]) });
+  await b.acts.bulkTrash();
+  await b.flush();
+  assert.deepEqual(b.bits(), ["b"], "the card is gone");
+
+  await b.entries[0].undo();
+  await b.flush();
+  assert.deepEqual(b.bits(), ["a", "b"], "and undo brings it back");
+
+  b.setEditing("p-a"); // the owner clicks into the restored card and starts typing
+  await b.entries[0].redo();
+  await b.flush();
+
+  assert.deepEqual(b.bits(), ["b"], "redo takes it away again");
+  assert.equal(b.editing(), null, "and the edit must END — otherwise every keystroke is swallowed");
+});
+
+test("redoing a trash does NOT end an edit on some OTHER card", async () => {
+  const b = makeBoard([card("a"), card("b")], { selectedIds: new Set(["p-a"]) });
+  await b.acts.bulkTrash();
+  await b.flush();
+  await b.entries[0].undo();
+  await b.flush();
+
+  b.setEditing("p-b"); // editing a DIFFERENT card
+  await b.entries[0].redo();
+  await b.flush();
+  assert.equal(b.editing(), "p-b", "an unrelated edit must survive");
 });

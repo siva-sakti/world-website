@@ -154,8 +154,10 @@ export function BoardSurface({
   const resizeBefore = useRef<{ bitId: string; x: number; y: number; w: number; h?: number } | null>(null);
 
   // Don't lose a move or a keystroke to the 350ms debounce. One stable door to
-  // flushAll, fired when you leave the board and when the page goes away (a hidden
-  // tab, a switched app, a closed window — lib/save-guard).
+  // flushAll, fired when you leave the board, when the page goes away (a hidden tab,
+  // a switched app, a closed window), and when the CONNECTION COMES BACK — a write
+  // that failed offline waits in the queue with no timer, and this is what retries
+  // it (lib/save-guard).
   const leaveBoard = useRef(flushAll);
   // eslint-disable-next-line react-hooks/refs -- latest-callback ref: registered once
   leaveBoard.current = flushAll;

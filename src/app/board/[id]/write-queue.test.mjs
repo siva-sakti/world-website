@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { makeWriteQueue, newQueueState } from "./write-queue.ts";
+import { PLACEMENT_COLUMNS } from "../../../lib/placement-fields";
 
 // THE BOARD'S SAVE QUEUE, driven for real against fake doors.
 //
@@ -266,5 +267,26 @@ test("⚠ P6 — a failed save is not re-fired by a leftover timer (retry is you
     of("updatePlacement").length,
     1,
     "a stray timer must not re-fire the failed write behind the owner's back",
+  );
+});
+
+test("⚠ S4 — every field in the placement table actually reaches the database", async () => {
+  const { q, of } = harness();
+  q.patchCard("p1", "b1", { x: 1, y: 2, w: 3, h: 4, z: 5, angle: 6 });
+  await q.flushNow("p1");
+
+  const written = of("updatePlacement")[0].args[2];
+  assert.deepEqual(
+    written,
+    { x: 1, y: 2, width: 3, height: 4, z: 5, angle: 6 },
+    "each card key must land in its own column",
+  );
+  // And the table is not lying about itself: every column it names is one a write carries.
+  // `angle` was in the type and written by nobody — rotation worked all session and was
+  // gone on reload. A seventh field added to the table with no wiring fails here.
+  assert.deepEqual(
+    Object.keys(written).sort(),
+    [...PLACEMENT_COLUMNS].sort(),
+    "the field table and what is actually written must be the same set",
   );
 });

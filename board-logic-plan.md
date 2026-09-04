@@ -40,13 +40,13 @@ Update the status column in the same session anything moves. *(Findings live in
 | **P1** | a failed title/caption is dropped — **⚠ narrower than Claude described**, see below | ✅ **FIXED** — proven failing first, now green |
 | **P5** | 🆕 **`trackCreate` deletes by key with no identity guard** — a second create for the same card (un-place → undo revives the id) lets the first one's cleanup evict the second; `settled()` then returns early and the write hits a row that doesn't exist → **act silently lost**. `chains` was hardened against this exact shape in two places; `creates` was not. | ✅ **FIXED** + its own test |
 | **P6** | 🆕 `flush()` drops its debounce timer from the map but never `clearTimeout`s it, so a stray timer re-fires a restored patch — contradicting `restorePending`'s own stated policy of never re-arming | ✅ **FIXED** + its own test |
-| **S4/P4** | placement fields in 3 hand-kept lists — a new field silently doesn't save | ⬜ step 4 |
-| **S7** | `editingId` strands on an undo/redo reverse — keyboard goes dead | ⬜ step 4 |
-| **S3** | `restore()` guards by a different key than its 5 siblings — can show 2 cards for 1 bit | ⬜ step 4 |
+| **S4/P4** | placement fields in 3 hand-kept lists — a new field silently doesn't save | ✅ **FIXED** — one table (`lib/placement-fields.ts`) + a guard test |
+| **S7** | `editingId` strands on an undo/redo reverse — keyboard goes dead | ✅ **FIXED** + 2 tests |
+| **S3** | `restore()` guards by a different key than its 5 siblings — can show 2 cards for 1 bit | ✅ **FIXED** — guards by bit, like its siblings + test |
 | **S5** | 3 definitions of "which boards is this bit on"; the trash confirm can lie | ⬜ step 5 |
 | **S6** | `ago()` and `fmt()` disagree about what day it is | ⬜ step 5 |
 | **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
-| **S8** | `placement.height` stored and permanently false for text + audio | ⚪ **your call** — I recommend stop writing it |
+| **S8** | `placement.height` stored and permanently false for text + audio | ⚪ **RULED: stop storing it** (owner, 2026-09-03) — queued |
 | **S2** | the optimistic seam has no stated rule | ⬜ after step 5, drawn from the real cases |
 | **S1** | `board-surface.tsx` does 7 jobs | ⬜ step 10 *(ruled: after tests)* |
 | **S9** | 88% of lines have no test | ⬜ the whole plan |
@@ -82,7 +82,7 @@ Update the status column in the same session anything moves. *(Findings live in
 |---|---|---|
 | r1 | **I-G5** — every date shows in the reader's own zone | ✅ written · ⬜ its boundary test |
 | r2 | **the copy rule** — a copy inherits what the bit HAS, never what POINTS AT it | ⬜ step 6 |
-| r3 | retry when the connection returns | ⬜ step 3 |
+| r3 | retry when the connection returns | ✅ **DONE** — `online` in `save-guard`, so every surface gets it, + 4 tests |
 | r4 | `docs/INDEX.md` named a superseded spec as live | ✅ fixed |
 
 ### Examined vs unexamined
@@ -498,13 +498,13 @@ so this is a contained change, not a sweep.
 |---|---|---|
 | 1 | ✅ **Lift the save queue out of React + write the failing tests** — done, 149 → 158 | no |
 | 2 | ✅ **Fix P1 P2 P5 P6; the tests went green** — 160/160, each fix proven by reverting it | no |
-| 3 | Retry on reconnect (`online` event → one flush) — ruling 2 | no |
-| 4 | S4 field table · S7 `editingId` · S3 one guard key | no |
+| 3 | ✅ Retry on reconnect — one listener in `save-guard`, covers every saving surface | no |
+| 4 | ✅ S4 field table · S7 `editingId` · S3 one guard key — all three proven by reverting | no |
 | 5 | S5 one door for "which boards is this bit on" · S6 + E-1 dates (device-follows), with tests | no *(ruled)* |
 | 6 | The copy rule (A.3) into `invariants.md` + its guard test | no |
 | 7 | Fix `docs/INDEX.md` — it still names the superseded composition spec as live | no |
 | 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
-| 9 | S8 height decision | **your call** (I recommend b) |
+| 9 | S8 — stop storing a height for text + audio *(ruled)* | no |
 | 10 | S1 — split `board-surface.tsx` by its seven jobs, on top of the tests | no *(ruled: after tests)* |
 | 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |
 

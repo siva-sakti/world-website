@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Bit, Placement, Drawing } from "@/lib/types";
 import { removeObjects, copyPathsFor } from "@/lib/storage";
 import { setResting } from "./resting";
+import type { Pos } from "@/lib/placement-fields"; // the ONE placement field table
 
 // Data access for bits and their placements (§7). A bit is a thing; a placement
 // is the act of putting it on a board. Ids are client-supplied (crypto.randomUUID)
@@ -12,7 +13,6 @@ import { setResting } from "./resting";
 // `angle` (degrees, null = upright) rides here with the rest of the arrangement: it is
 // placement state like x/y/z, NOT part of the bit. Deliberately OUTSIDE updatePlacement's
 // lock filter below — rotation follows RESIZE (gated at the UI, legal at the DB), not move.
-type Pos = { x?: number | null; y?: number | null; width?: number | null; height?: number | null; z?: number | null; angle?: number | null };
 
 async function insertPlacement(
   supabase: SupabaseClient,

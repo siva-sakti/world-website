@@ -1,12 +1,12 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CardVM } from "./card-vm";
+import { CARD_POS_KEYS, CARD_TO_COLUMN, type PlacementPatch } from "../../../lib/placement-fields";
 
-// NOTE (rotation, 2026-09-03): this list and schedule()'s copy below are a HARD-CODED
-// pair — a CardVM key absent from both is silently dropped on its way to the database
-// (the act works for the session, then vanishes on reload, with no error anywhere).
-// Any future placement field must be added in BOTH places, and in bits.ts's `Pos`.
-export type PlacementPatch = { x?: number; y?: number; width?: number; height?: number; z?: number; angle?: number };
+// The patch type AND schedule()'s copy below both derive from ONE table now
+// (lib/placement-fields) — they used to be a hand-kept pair, which is how `angle` came
+// to be accepted by the type and written by nobody. Adding a field is one edit there.
+export type { PlacementPatch } from "../../../lib/placement-fields";
 
 /** THE OUTSIDE WORLD, passed in rather than imported.
  *
@@ -99,12 +99,11 @@ export function makeWriteQueue(
 
   function schedule(placementId: string, bitId: string, patch: Partial<CardVM>) {
     const cur = state.pending.get(placementId) ?? { bitId, placement: {} };
-    if (patch.x !== undefined) cur.placement.x = patch.x;
-    if (patch.y !== undefined) cur.placement.y = patch.y;
-    if (patch.w !== undefined) cur.placement.width = patch.w;
-    if (patch.h !== undefined) cur.placement.height = patch.h;
-    if (patch.z !== undefined) cur.placement.z = patch.z;
-    if (patch.angle !== undefined) cur.placement.angle = patch.angle;
+    // Driven by the ONE field table, so a new placement field is never half-added.
+    for (const key of CARD_POS_KEYS) {
+      const v = patch[key];
+      if (v !== undefined) cur.placement[CARD_TO_COLUMN[key]] = v;
+    }
     if (patch.body !== undefined) cur.body = patch.body;
     if (patch.content !== undefined) cur.content = patch.content;
     state.pending.set(placementId, cur);
