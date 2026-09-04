@@ -13,3 +13,10 @@
 **N5 · WHERE privacy lives — the standing architecture explained and put to her for re-stamp under the product frame:** two levels, two jobs — the board's toggle = the DOOR (room visitable?), the bit's toggle = the CLOAK (thing visible anywhere?); guest sees iff BOTH (the AND-law, proven). A bit's cloak is GLOBAL (ruled X6): never private-here-public-there — per-place control already exists as PLACEMENT ("visibility controls the thing; placement controls the where"). Composition = a door too, same law.
 
 **N6 · THE FORK REQUIRING HER WORD — publish-the-board semantics:** her sentence: "publishing would make all of the things public" (door + flip-all). The ruled shape: door-only (things keep their cloaks → gaps → hence the review screen: "14 private things won't show — review?", bulk-flip eyes-open). Claude's read: door-only + review — never silently flip a cloak she set by hand; flip-all builds the accidental-leak scene in. AWAITING: ① global-cloak re-stamp ② door-only-with-review vs flip-all.
+
+**N7 · Claude's full opinion, delivered as a stampable bundle** *(her ask: sensible functionally AND accessible)*:
+- Confusion dissolves when the app SHOWS outcomes instead of making users predict: the whole teaching load lands on ONE moment (the publish review screen) + ONE glanceable answer everywhere ("who can see this right now?" — and on a bit's page, "visible on: …" = the multi-place watchfulness solved as display).
+- **Born private, everything, NO settable default dial in v1** — the dial does no work once the review screen exists, creates the one dangerous state (a forgotten "public" setting), and dropping it DELETES the settings-storage schema gap (N3①). One-sentence model: "everything you make is yours alone until you show it — and when you show it, you're shown exactly what they'll see."
+- Whoever never publishes never meets privacy UI at all.
+- Publish = door-only + review (never silently flip a cloak) · the architecture (door/cloak/AND/global) stands.
+**AWAITING her stamps on the four-piece bundle.**
