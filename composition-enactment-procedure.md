@@ -1,4 +1,5 @@
-# The enactment paper — stage ⓪ output
+# The enactment procedure — stage ⓪'s output
+*(Renamed from "the enactment procedure" 2026-09-04 — the owner: "I get mixed up when you say on paper, since our whole project is about building note surfaces." Fair. It is a PROCEDURE: the steps for the database change, written before it is run.)*
 > **What this is:** the complete procedure for stage ①, written **before** it is needed and improvised nowhere. Paper only — nothing here has run.
 > **Read first, in full:** `composition-storage-decisions.md` · `verification/composition-schema-draft.sql` · `verification/composition-draft-proofs.out` · `verification/kind-seam-inventory.txt` · `docs/composition-technical-spec.md` §1.3 · `invariants.md`.
 > **The ruling that shapes everything below:** the owner's **fresh start** (`composition-spec.md` §21.7) — her existing pieces are test data and are **deleted**, not carried. There is no data move, no format conversion, no browser act.
@@ -48,6 +49,6 @@
 **The rule under all of it:** the app is deployed **after** the database is verified, never before — so there is never a build in the world expecting a shape the database does not have.
 
 ## H · What stage ⓪ still owes before ① begins
-- The real migration file written out (this paper is its specification).
-- **One final adversary pass** over this paper + the plan, against the codebase as it actually is.
+- The real migration file written out (this procedure is its specification).
+- **One final adversary pass** over this procedure + the plan, against the codebase as it actually is.
 - *(Riding alongside, not blocking: the merge-check on the three superseded docs; the naming-timing decision — free now, a schema change later.)*
