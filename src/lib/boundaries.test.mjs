@@ -55,3 +55,43 @@ test("the database is reached ONLY through lib/db", () => {
   );
   assert.deepEqual(found, [], `move these queries into lib/db: ${found}`);
 });
+
+test("every debounced save keeps its writes in order", () => {
+  // A REGRESSION GUARD, not a proof of correctness — worth being exact about the
+  // difference. It cannot show that these files save correctly; only a timing test can do
+  // that, and that needs them extracted into pure modules first (deferred by the owner,
+  // 2026-09-03). What it CAN do is stop the fix being quietly removed, and make a sixth
+  // hand-rolled save loop declare itself.
+  //
+  // The bug it guards: each save used to fire independently, so typing, blurring, typing
+  // and blurring inside the debounce could land the FIRST write LAST — the database keeps
+  // the old words, the screen shows the new ones, and the "saved" marker already matches
+  // so nothing ever retries. It was live in two files, one of them in a region this pass
+  // had already called closed.
+  const KNOWN_SAVE_LOOPS = [
+    "app/bit/[id]/bit-controls.tsx",
+    "app/bit/[id]/text-workspace.tsx",
+    "app/board/[id]/board-description.tsx",
+    "app/write/quick-write.tsx",
+    "app/board/[id]/write-queue.ts",
+  ];
+  // Matches the MECHANISM, not the word. The first version of this test looked for
+  // /chain/ and passed happily against a file whose chain had been deleted — because the
+  // comment explaining the chain still said "chain". Caught by reverting the fix and
+  // watching the test stay green, which is why fixes get reverted rather than trusted.
+  // Two shapes in use: a per-field ref (`chain.current = …`) and the board queue's
+  // per-ROW map (`state.chains.set(id, …)`), which needs one chain per card rather than
+  // one per surface. Both are the same mechanism — the next write waits on the last.
+  const CHAINED = /chain\.current\s*=|chains\.set\(/;
+  const missing = KNOWN_SAVE_LOOPS.filter(
+    (f) => !CHAINED.test(readFileSync(join(SRC, f), "utf8")),
+  );
+  assert.deepEqual(missing, [], `these save writes are not kept in order: ${missing}`);
+
+  // And the list is honest: anything else that debounces a save must be added to it.
+  const debouncers = sourceFiles()
+    .filter((f) => /setTimeout\(\s*(save|flush)\b/.test(readFileSync(f, "utf8")))
+    .map((f) => relative(SRC, f));
+  const unlisted = debouncers.filter((f) => !KNOWN_SAVE_LOOPS.includes(f));
+  assert.deepEqual(unlisted, [], `a new debounced save appeared — does it keep writes in order? ${unlisted}`);
+});

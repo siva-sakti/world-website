@@ -119,15 +119,6 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
   return {};
 }
 
-/** Trash a loose bit from the inbox (a freeze; restorable from trash). */
-export async function trashFromInbox(formData: FormData) {
-  const id = String(formData.get("id"));
-  const supabase = await createClient();
-  await requireUser(supabase);
-  await trashBit(supabase, id);
-  revalidatePath("/bits");
-}
-
 /** Door B (call-in from the inbox): send one or more loose bits to a board (Batch 2 —
  * send-to-board-plan.md). You're NOT on the board, so each arrival lands just to the RIGHT of the
  * board's existing cluster (anchorNearContent — never on top of it), cascading down-right so a batch

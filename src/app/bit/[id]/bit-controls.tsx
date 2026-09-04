@@ -32,17 +32,23 @@ export function BitTitle({
   const latest = useRef(initial); // what you've typed (a timer's closure can't see state)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [err, setErr] = useState(false);
+  // Per-field write chain — the same ordering rule the board's save queue has (R1.4).
+  // Without it each save fired independently: type, blur, type, blur inside the debounce
+  // and the FIRST request could land LAST, leaving the database on the old words while
+  // the screen shows the new ones — and `saved` already matching, so nothing ever retried.
+  // Found by an antagonist review, 2026-09-03; the same bug class as the board's P2.
+  const chain = useRef<Promise<void>>(Promise.resolve());
 
   function save() {
     timer.current = null;
     const next = latest.current;
     if (next.trim() === saved.current.trim()) return; // nothing changed
-    updateBitContent(supabase, bitId, next)
-      .then(() => {
-        saved.current = next;
-        setErr(false);
-      })
-      .catch(() => setErr(true));
+    const run = chain.current.then(async () => {
+      await updateBitContent(supabase, bitId, next);
+      saved.current = next;
+    });
+    chain.current = run.catch(() => {}); // settled-safe tail: one failure can't block the next write
+    run.then(() => setErr(false)).catch(() => setErr(true));
   }
 
   /** Write now if anything is waiting. Safe to call twice. */

@@ -5,7 +5,7 @@ import { typeLabel } from "@/lib/labels";
 import type { ShelfGroup } from "@/lib/db/shelf";
 import { GroupPicker, PinToggle } from "@/components/shelf-controls";
 import type { PanelBit } from "@/lib/db/inbox";
-import { trashFromInbox } from "./actions";
+import { InboxTrash } from "./inbox-trash";
 import { InboxTags } from "./inbox-tags";
 import { PlaceOnBoard } from "./place-on-board";
 
@@ -138,10 +138,7 @@ export function NoteCard({
           <GroupPicker bitId={item.id} groupId={item.group_id} groups={groups} />
           <PinToggle bitId={item.id} pinned={Boolean(item.pinned_at)} />
           {isLoose && <PlaceOnBoard bitId={item.id} boards={boards} onPlaced={onPlaced} />}
-          <form action={trashFromInbox}>
-            <input type="hidden" name="id" value={item.id} />
-            <button className="inbox-card-trash" title="move to trash" aria-label="move to trash">trash</button>
-          </form>
+          <InboxTrash bitId={item.id} onBoards={item.boards.length} className="inbox-card-trash" />
         </span>
       </div>
     </li>

@@ -92,7 +92,7 @@ Update the status column in the same session anything moves. *(Findings live in
 |---|---|---|
 | e1 | Group E — the bit pages, ~2,900 lines nobody has read this pass | ⬜ **planned: `bit-pages-review-plan.md`** — the lead is four hand-rolled save loops |
 | e2 | `card.tsx` (574) + `use-create-doors.ts` (503) — audited by agents, not read by me | ⬜ fold into step 10 |
-| **e3** | 🔴 **`board-description.tsx:20` has no write chain** — a verbatim clone of `BitTitle`, **in the board region this plan called CLOSED**. Type, blur, type, blur inside 600ms and the older write can land last: the database keeps the old description, the screen shows the new one, and nothing retries. Same class as P2. Found by the antagonist, verified. | ⬜ **fix — it dents "boards are done"** |
+| **e3** | 🔴 **`board-description.tsx:20` has no write chain** — a verbatim clone of `BitTitle`, **in the board region this plan called CLOSED**. Type, blur, type, blur inside 600ms and the older write can land last: the database keeps the old description, the screen shows the new one, and nothing retries. Same class as P2. Found by the antagonist, verified. | ✅ **FIXED** — write chain added; guard test goes red if removed |
 
 ### 📋 Feature gaps — decisions, not defects. Yours, and parked here so they aren't lost
 the pen ignores touch entirely · select mode kills panning for a mouse · notes on a board
