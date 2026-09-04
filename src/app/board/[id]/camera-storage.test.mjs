@@ -85,3 +85,41 @@ test("loadAnchor returns null and saveAnchor stays silent when storage throws (p
   assert.doesNotThrow(() => saveAnchor("board-x", { cx: 0, cy: 0, scale: 1 }));
   delete globalThis.localStorage;
 });
+
+// ---- screen → plane: the formula every position passes through ----
+
+import { screenToPlane, planeToScreen } from "./camera-storage.ts";
+
+const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg}: ${a} vs ${b}`);
+
+test("a tap at the board's top-left corner, untouched camera, is the plane's origin", () => {
+  const p = screenToPlane({ x: 100, y: 50 }, { left: 100, top: 50 }, { x: 0, y: 0, scale: 1 });
+  assert.deepEqual(p, { x: 0, y: 0 });
+});
+
+test("panning moves the window, not the plane: the same screen point maps further along", () => {
+  // Pan the camera 300 to the right; a tap at the same screen spot is now 300 further LEFT
+  // on the plane — because you slid the window right over a plane that stayed still.
+  const origin = { left: 0, top: 0 };
+  const before = screenToPlane({ x: 400, y: 0 }, origin, { x: 0, y: 0, scale: 1 });
+  const after = screenToPlane({ x: 400, y: 0 }, origin, { x: 300, y: 0, scale: 1 });
+  near(after.x, before.x - 300, "plane x");
+});
+
+test("zooming in makes the same screen distance a SHORTER plane distance", () => {
+  const origin = { left: 0, top: 0 };
+  const at1 = screenToPlane({ x: 600, y: 0 }, origin, { x: 0, y: 0, scale: 1 });
+  const at3 = screenToPlane({ x: 600, y: 0 }, origin, { x: 0, y: 0, scale: 3 });
+  near(at3.x, at1.x / 3, "3x zoom");
+});
+
+test("screen → plane → screen round-trips exactly, at both zoom limits and a real offset", () => {
+  const origin = { left: 37, top: 91 };
+  for (const scale of [0.2, 1, 3]) {
+    const cam = { x: -1234.5, y: 678.9, scale };
+    const screen = { x: 812, y: 455 };
+    const back = planeToScreen(screenToPlane(screen, origin, cam), origin, cam);
+    near(back.x, screen.x, `x at ${scale}`);
+    near(back.y, screen.y, `y at ${scale}`);
+  }
+});

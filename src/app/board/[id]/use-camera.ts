@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import type { CardVM } from "./card-vm";
 import { boundsOf } from "./geometry";
-import { anchorToCamera, cameraToAnchor, loadAnchor, saveAnchor, type Anchor, type Size } from "./camera-storage";
+import { anchorToCamera, cameraToAnchor, loadAnchor, saveAnchor, screenToPlane, type Anchor, type Size } from "./camera-storage";
 
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 3;
@@ -94,8 +94,7 @@ export function useCamera(
 
   function screenToWorld(clientX: number, clientY: number) {
     const r = boardRef.current!.getBoundingClientRect();
-    const c = camRef.current;
-    return { x: (clientX - r.left - c.x) / c.scale, y: (clientY - r.top - c.y) / c.scale };
+    return screenToPlane({ x: clientX, y: clientY }, r, camRef.current); // the tested formula
   }
 
   // Zoom toward the cursor (native listener so we can preventDefault the scroll).

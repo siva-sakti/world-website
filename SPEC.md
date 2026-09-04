@@ -38,6 +38,35 @@ Added **additively** to the proven base (migrations `…_shelf.sql`, `…_shelf_
 
 **Serving (presentation ≠ storage).** A note is served as a **surface** at `/note/[id]` — its own writing page, listed beside boards, never the `/bit` page (N1). On a board it renders as a page-shaped **doorway card** that opens the note (N3); the `board_cards` view doesn't expose `kind`, so the board page reads it in one indexed query (`getBitMeta`), same pattern as raw `content`.
 
+## 2z. The board's plane — coordinates, the camera, and what is remembered where *(foundations pass §6.1, 2026-09-04)*
+
+**A board is a flat plane with no edges and a fixed origin at (0, 0).** Every card's position is
+a pair of absolute plane coordinates — `placement.x`, `placement.y` — a fact about *where it is*,
+not about where anyone is looking. The same numbers on every device.
+
+**Panning moves a window across the plane; the plane and the cards stay still.** The window is
+the **camera**: an offset and a zoom (`{ x, y, scale }`, zoom clamped 0.2×–3×). A fresh board's
+camera starts at the origin. **Screen → plane** is one formula — `(screen − boardOrigin −
+camera) ÷ zoom` — lifted into `camera-storage.ts` as `screenToPlane` and tested (round-trip,
+both zoom limits, a real offset, a flipped sign fails). Every tap, drop and create goes through it.
+
+**The camera is remembered per board, per device** — in the browser's local storage
+(`board-camera:v1:<boardId>`), never in the database, never synced. Deliberate: one resident,
+and opening a board on your phone should not jump you to wherever your laptop was looking. What
+is stored is the plane point at the *centre* of the view plus the zoom, so the same spot stays
+centred when the window is resized.
+
+**A position is always a whole point.** *(Owner-ruled 2026-09-04: the database should not allow
+a positionless card.)* The original schema permitted both coordinates null — designed for a
+"collection mode" that was never built — and rendered such a card at (40, 40). Migration
+`20260904000001_position_not_null` closes it; until it is applied, `page.tsx` still defends with
+the fallback.
+
+**Where things land when you did not tap** (three rules, all tested): a drop or a bring-in while
+you are on the board → the top-centre of your current view, then the first clear spot near it
+(`firstClearSpot`); a send from `/bits` while you are not on the board → just right of whatever is
+already there (`anchorNearContent`); a board made from a selection → a grid.
+
 ## 3. Security — RLS, the ruled composition (replaces the old §3, which leaked)
 
 The browser holds the anon key; query filtering is not security. **RLS on every table.**

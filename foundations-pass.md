@@ -45,7 +45,7 @@ walked in this pass.**
 **A · SPACE — where things are, and how you see them**
 | mechanism | plainly | lives in | status |
 |---|---|---|---|
-| the coordinate system | a plane with a fixed origin; panning moves your window | `geometry.ts` · `use-camera.ts` | ❌ unwritten, unchosen |
+| the coordinate system | a plane with a fixed origin; panning moves your window | `geometry.ts` · `use-camera.ts` | ✅ **walked §6.1** — written · guarded · the one decision ruled |
 | the camera | pan · zoom · fit · pinch | `use-camera.ts` | ⚠ tested, unwritten |
 | the camera memory | where you were, per board, **per device** (local storage) | `camera-storage.ts` | ⚠ tested, unwritten, implicit choice |
 | how things arrive | where you tap · where you're looking · right-of-cluster | `placement-anchor.ts` · `board-arrange.ts` (firstClearSpot) · `use-create-doors.ts` | ⚠ tested, unwritten, three rules |
@@ -206,6 +206,28 @@ then bit types — on ground that's been looked at.
 - Not a rewrite of anything that's solid. Solid rows are left alone.
 
 ---
+
+## 5b · THE LEDGER — every action from every walkthrough, and where it stands
+
+*How a finding becomes something done.* Each walkthrough's heading 5 produces actions. **They
+are collected here, one row each, with status** — the same instrument as the board pass's
+ledger, which worked. A finding that is not in this list is a finding that got lost. The exit
+grid in §2 is updated from this list, never directly.
+
+**✅ done · ⏳ in flight · ⬜ queued · ⚪ owner's call · 🧾 migration written + proven, awaiting the owner's paste**
+
+| from | action | kind | status |
+|---|---|---|---|
+| §6.1 coordinates | one paragraph in `SPEC.md` §2z | write | ✅ |
+| §6.1 coordinates | `screenToPlane` lifted into the pure module + 4 tests; a flipped sign proven red | guard | ✅ |
+| §6.1 coordinates | **a position is always a whole point** — owner: *"I don't think the database should be allowing that"* | decide → change | 🧾 `20260904000001_position_not_null` proven; held with 005/006 |
+
+### The decisions list — everything waiting on the owner
+*(collected from every walkthrough's ⚪ rows, so they can be ruled in one sitting)*
+
+| from | decision | lean |
+|---|---|---|
+| §6.1 | ~~the null position~~ | ✅ **ruled**: not null |
 
 ## 6 · The walkthroughs
 

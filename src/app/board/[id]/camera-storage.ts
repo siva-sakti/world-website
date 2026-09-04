@@ -76,3 +76,26 @@ export function saveAnchor(boardId: string, anchor: Anchor): void {
     /* storage full or blocked — skip */
   }
 }
+
+/** SCREEN → PLANE. The one formula every tap, drop and create goes through: where your
+ *  finger is on the screen becomes where on the board's plane. `origin` is the board
+ *  element's top-left on screen (its bounding rect). Pure, so it can be tested — it lived
+ *  inside the camera hook for a year with no direct test, and a wrong sign here would
+ *  move every card on every board. Lifted 2026-09-04 (foundations pass, §6.1). */
+export function screenToPlane(
+  screen: { x: number; y: number },
+  origin: { left: number; top: number },
+  cam: Camera,
+): { x: number; y: number } {
+  return { x: (screen.x - origin.left - cam.x) / cam.scale, y: (screen.y - origin.top - cam.y) / cam.scale };
+}
+
+/** PLANE → SCREEN — the exact inverse, so the two can be checked against each other. */
+export function planeToScreen(
+  plane: { x: number; y: number },
+  origin: { left: number; top: number },
+  cam: Camera,
+): { x: number; y: number } {
+  return { x: plane.x * cam.scale + cam.x + origin.left, y: plane.y * cam.scale + cam.y + origin.top };
+}
+
