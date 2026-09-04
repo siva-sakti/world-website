@@ -192,3 +192,15 @@ different feature. If it is ever built, a typed store can be added then; the cel
 **Verdict: the table build is UNBLOCKED.** It needs a type, a substance branch, an editor, and
 a card renderer — no new column, no view change.
 
+---
+
+## ⚠ Sequencing note from the composition lane *(2026-09-04)*
+That lane's stage ②a adds the **task-list and table editor extensions** to the shared editor
+(`text-extensions.ts`, beside `text-bit.tsx`), exposed nowhere until their stage lands. **Two
+consequences for this plan:** Build 1 (checklist) becomes mostly *exposure* — the extension will
+already be registered — so check whether their stage has landed before starting, and build on it
+rather than beside it. And board cards gain **latent parse capability**: pasted rich content
+(a checklist, a table) will be stored as richer HTML in a card's `body` even before any UI
+exposes it. Harmless, owner-eyeballed at their accept, but worth knowing when a card's stored
+body looks richer than its editor can show.
+
