@@ -32,7 +32,7 @@
 | # | ruling | in spec |
 |---|---|---|
 | C1 | **composition → composition: YES** ("the basic Obsidian") | ✓ §9.3 |
-| C2 | **board inside a composition: RULED OUT** | ✓ §3.4, §9.2.4 |
+| C2 | ~~board inside a composition: RULED OUT~~ **SUPERSEDED (owner, 2026-09-03): a board may be REFERENCED as a doorway; containment stays out** | §3.4 amended · §31 |
 | C3 | **bit ↔ bit: no fourth mechanism**, deliberately | ✓ §3.1 (flatness) |
 | C4 | **board → composition: single-channel** — holding as a card only | ✓ §10 |
 | C5 | board↔board doorway is a **placement**; the reverse view is parked | ✓ §12.1b.6 (boards have no backlink surface) |
@@ -66,7 +66,7 @@
 |---|---|---|
 | F1 | `[[` opens a **search picker, two sections** (material · compositions) | ✓ §9.2 |
 | F2 | **Archived excluded from the picker** — ✅ genuinely ruled 2026-09-02 (*"no — it could add clutter"*) | ✓ §9.2.4 |
-| F3 | **Boards never** appear in the picker | ✓ §9.2.4 |
+| F3 | ~~Boards never appear in the picker~~ **SUPERSEDED (owner, 2026-09-03): the picker gains boards** | §31 |
 | F4 | **Born as a chip**; images/drawings born as **blocks** | ✓ §9.3 |
 | F5 | The chip is an **atom**, shows the **live** face; the stored copy is a shadow for search/export | ✓ §9.4 |
 | F6 | **Peek** on tap; "show in place" converts to a block; reversible | ✓ §9.5, §9.6.4 |

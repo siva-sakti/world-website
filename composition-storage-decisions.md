@@ -98,3 +98,6 @@ Two full trace tables, **zero MISSING rulings, zero structurally INVENTED elemen
 
 ## Q6 · (added) `@tiptap/static-renderer` — a new dependency for portable exports
 Needed so "I own all of it" keeps meaning *usable anywhere* (S12.5). New deps are owner-gated: **approve, name an alternative, or accept PM-JSON-only exports.**
+
+## Q-RESOLUTIONS (owner, 2026-09-03, same day)
+Q1 **RESOLVED — boards gatherable, doorway-only** (owner + Claude's concurring reasoning; §3.4 amended, register C2/F3 superseded, the DDL gate lifted). Q5 **RESOLVED — due date = piece metadata + list sort/filter** (no home surfacing, no reminders). Q3 rec delivered (lock remembered per piece — the felt "finished") — awaiting the word. Q2 reframed: **wrap × columns is ONE decision** (her columns sketch = Notion's wrap-substitute; rec: columns in, wrap out — reverses two standing rulings, needs her explicit word). Q6 explained (official renderer vs hand-kept converter; rec (a)) — awaiting approve/decline.

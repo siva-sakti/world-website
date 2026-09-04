@@ -97,10 +97,9 @@ create table reference2 (   -- ⚠ draft name; enactment renames/rebuilds today'
   from_composition_id uuid not null references composition(id) on delete cascade,
   to_bit_id           uuid references bit(id)         on delete cascade,
   to_board_id         uuid references board(id)       on delete cascade,
-      -- ⚠⚠ Q-A GATE (decisions §Q1): §30 ruled boards gatherable (2026-09-03)
-      -- but the direction law (§3.4) + register F3/C2 rule the opposite.
-      -- OWNER'S WORD REQUIRED before enactment; removal = this column + its
-      -- unique + one num_nonnulls argument.
+      -- ✅ GATE RESOLVED (owner, 2026-09-03): "compositions can reference
+      -- boards" — as a DOORWAY only (§3.4 amended; register C2/F3 superseded).
+      -- Ships ungated.
   to_composition_id   uuid references composition(id) on delete cascade,
   to_source_id        uuid references source(id)      on delete cascade,
       -- cascade = the degrade rule (§9.8/§11.4: row gone, chip → plain text).
