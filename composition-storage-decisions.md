@@ -101,3 +101,6 @@ Needed so "I own all of it" keeps meaning *usable anywhere* (S12.5). New deps ar
 
 ## Q-RESOLUTIONS (owner, 2026-09-03, same day)
 Q1 **RESOLVED — boards gatherable, doorway-only** (owner + Claude's concurring reasoning; §3.4 amended, register C2/F3 superseded, the DDL gate lifted). Q5 **RESOLVED — due date = piece metadata + list sort/filter** (no home surfacing, no reminders). Q3 rec delivered (lock remembered per piece — the felt "finished") — awaiting the word. Q2 reframed: **wrap × columns is ONE decision** (her columns sketch = Notion's wrap-substitute; rec: columns in, wrap out — reverses two standing rulings, needs her explicit word). Q6 explained (official renderer vs hand-kept converter; rec (a)) — awaiting approve/decline.
+
+## Q-RESOLUTION addendum (2026-09-03, late): THE FRESH START
+The owner dissolved the migration entirely: existing notes are test data, deleted at enactment (§21.7 superseded in place; count shown, backup first, her go). **Consequences:** S12.6's per-document fidelity proof — MOOT · the browser-context conversion act — MOOT (the adversary's argument 9 dies with it) · K2's flip-private — MOOT (nothing carried) · stage ① is one clean SQL migration. The S12.5 export-renderer requirement STANDS (new pieces still export portable HTML).

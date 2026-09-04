@@ -657,8 +657,8 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 - ⛔ **"link" is unavailable** — taken 2026-09-01 as the `link` bit type (D-129).
 - ⚪ **No words yet for the two directions** (forward / backward). Owner: *"forward link, back link — some of these things don't have words… we were using words to be straight with what we were accomplishing."* Today's backward surface reads **"gathered into."**
 
-### 21.7 Deferred
-⏸ **The migration** — moving existing notes across and rewriting pointers. *(Owner: "it's OK for the migration, I think about that a little bit later.")* Includes converting existing HTML bodies if §21.5 is adopted.
+### 21.7 ~~Deferred~~ → ✅ RULED: A FRESH START (owner, 2026-09-03)
+📜 The deferred migration question dissolved on the owner's word: *"I don't like the composition surface we have to date… whatever previous compositions I had, I'll just delete them — I've just been doing test playful ones, nothing serious. What matters is the feature is solid and really good."* **No notes are converted or carried across.** The enactment: new tables · the old note-rows DELETED (count shown at the checkpoint, after a backup, on her explicit go — restorable from the backup) · `kind` dropped · the code swept. Extends K2/K3's data-is-expendable rulings from chips/sources to the note rows themselves. **The HTML→JSON conversion — the plan's single riskiest step — is moot.**
 
 
 ## 23 · Per-surface presence, and composing beside the board *(2026-09-03; the floater worked through while the owner was at lunch)*
