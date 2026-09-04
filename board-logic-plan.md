@@ -47,7 +47,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | **S6** | `ago()` and `fmt()` disagree about what day it is | ✅ **FIXED** — one day-rule, 7 tests, proven by reverting |
 | **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
 | **S8** | `placement.height` stored and permanently false for text + audio | ✅ **FIXED** — one door `isFlexSized`, no height stored for text/audio, 4 tests |
-| **S2** | the optimistic seam has no stated rule | ⬜ after step 5, drawn from the real cases |
+| **S2** | the optimistic seam has no stated rule | ✅ **WRITTEN as I-G7**, drawn from the six real cases; parts 2·3·4 already have tests, part 1 is named as the one that doesn't |
 | **S1** | `board-surface.tsx` does 7 jobs | ⬜ step 10 *(ruled: after tests)* |
 | **S9** | 88% of lines have no test | ⬜ the whole plan |
 
