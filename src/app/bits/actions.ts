@@ -119,12 +119,6 @@ export async function addToInbox(input: IntakeInput): Promise<{ error?: string }
   return {};
 }
 
-/** Door B (call-in from the inbox): send one or more loose bits to a board (Batch 2 —
- * send-to-board-plan.md). You're NOT on the board, so each arrival lands just to the RIGHT of the
- * board's existing cluster (anchorNearContent — never on top of it), cascading down-right so a batch
- * doesn't pile. Best-effort: a trashed bit/board is reported, the rest still land. callInBit revives
- * a row the bit lived on before, never a duplicate (I-L1) — and each bit needs a FRESH placement id
- * (a reused one collides on the PK and would throw for every bit after the first). */
 /** DUPLICATE THIS BIT — a real copy with its own id and its own file (see duplicateBit).
  *
  *  Two doors, both single (owner: "duplicate this bit", singular):
@@ -214,15 +208,36 @@ export async function makeBoardFromBits(
   }
   const supabase = await createClient();
   await requireUser(supabase);
-  const board = await createBoard(supabase, title);
+  // Reported, not thrown (2026-09-03). This was the one action in the file that let a
+  // failure escape as an unhandled server-action rejection while every sibling returned
+  // `{ error }` — so the same kind of problem reached the owner two different ways
+  // depending on which button they pressed. Found by an antagonist review.
+  let board: Awaited<ReturnType<typeof createBoard>>;
+  try {
+    board = await createBoard(supabase, title);
+  } catch (e) {
+    console.error("makeBoardFromBits: the board couldn't be made:", e);
+    return { error: "Couldn't make the board — check your connection and try again." };
+  }
   // Two round trips for the whole batch (placeManyOnNewBoard), not two PER BIT. The loop
   // this replaced could outlive its own request on a busy tag and leave a half-filled
   // board with the owner told only that it "failed".
-  const { placed, skipped } = await placeManyOnNewBoard(
-    supabase,
-    board.id,
-    bitIds.map((bitId, i) => ({ bitId, ...gridPointForIndex(i, bitIds.length) })),
-  );
+  let placed: number;
+  let skipped: string[];
+  try {
+    ({ placed, skipped } = await placeManyOnNewBoard(
+      supabase,
+      board.id,
+      bitIds.map((bitId, i) => ({ bitId, ...gridPointForIndex(i, bitIds.length) })),
+    ));
+  } catch (e) {
+    // The board landed and the placing did not. Say so and hand back its id — an empty
+    // board the owner can see and trash beats a silent failure and a board they never
+    // learn about.
+    console.error("makeBoardFromBits: the board was made but nothing could be placed:", e);
+    revalidatePath("/");
+    return { boardId: board.id, error: "The board was made, but nothing could be placed on it — try again from the board." };
+  }
   revalidatePath("/");
   revalidatePath("/bits");
   revalidatePath(`/board/${board.id}`);
@@ -296,9 +311,6 @@ export async function captureLink(
   }
 }
 
-/** Bulk trash from the loose multi-select (owner-ruled 2026-08-31). Trash is a freeze —
- * everything lands in /trash, restorable — so best-effort like the bulk send: a failure is
- * reported, the rest still land. */
 /** Archive the selected bits — set aside, hidden but kept, reversible from /archive.
  *  Mirrors trashBits exactly (same loop, same partial-failure reporting): each bit is
  *  independent, so one failure must not abandon the rest, and the owner is told whether

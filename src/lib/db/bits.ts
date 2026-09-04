@@ -334,8 +334,17 @@ export async function updateBitBody(
   id: string,
   body: string,
 ): Promise<void> {
-  const { error } = await supabase.from("bit").update({ body }).eq("id", id);
+  // ASSERT THE WRITE HAPPENED (2026-09-03). This used to be `.update().eq()` with no
+  // row check, so a 0-row write — the bit trashed in another tab, an RLS refusal, a stale
+  // id — RESOLVED AS SUCCESS and the owner's words went nowhere while the screen said
+  // "saved". Its sibling `unplaceBit` has always asserted, with a comment about exactly
+  // this class; two client files had grown their own guards to compensate, which is
+  // CLAUDE.md gate 3 inverted (a rule enforced in app logic instead of at the one door).
+  // Every caller already waits for the row to exist, so this only ever fires on a genuine
+  // failure. Found by an antagonist review.
+  const { data, error } = await supabase.from("bit").update({ body }).eq("id", id).select("id");
   if (error) throw error;
+  if (!data?.length) throw new Error("that no longer exists — reload");
 }
 
 /** Write a bit's owner content — a caption, or a text bit's optional title (D-087). */
@@ -345,8 +354,12 @@ export async function updateBitContent(
   content: string | null,
 ): Promise<void> {
   const value = content && content.trim() ? content : null;
-  const { error } = await supabase.from("bit").update({ content: value }).eq("id", id);
+  // Asserted for the same reason as updateBitBody above — a title or caption that
+  // silently wrote nothing is the same lie, in fewer words.
+  const { data, error } = await supabase
+    .from("bit").update({ content: value }).eq("id", id).select("id");
   if (error) throw error;
+  if (!data?.length) throw new Error("that no longer exists — reload");
 }
 
 /** Un-place: take the card off this board. The membership row is KEPT (travel,
