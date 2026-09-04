@@ -54,6 +54,74 @@ untilted. **Rotation is arrange.** So is the degrees readout.
 away while tidying. **That is the only place the rule is deliberately broken**, and knowing it
 is the only one is worth more than a rule with no exceptions and no teeth.
 
+## 0b · THE VOCABULARY, confirmed *(owner, 2026-09-04)*
+
+**Confirming the understanding, since the owner asked to double-check it:**
+
+| | what it is | is it stored? |
+|---|---|---|
+| **board** | the surface. The thing you make and name | ✅ a `board` row |
+| **canvas** | **the board's infinite spatial rendering** — how a board is drawn, not a thing you have | ❌ not stored |
+| **frame** | an **optional page-shaped fixture placed ON a board** — "the artist composes on a *page*", `frame-plan.md`. A board stays infinite; the frame is a fixture within it | ✅ (its own row, when built) |
+| **arrange / edit** | **modes of the BOARD** — what the whole surface is doing right now | ❌ not stored; per-visit |
+
+**So the nesting is:** a **board** is rendered as an infinite **canvas**, may contain a
+**frame**, and is in one **mode** at a time. **The mode belongs to the board, not to the frame**
+— a frame does not have its own arrange/edit state; when the board is in arrange you move the
+frame and the cards alike. ⚪ *Flagging in case the owner meant otherwise — "each of these we
+have an edit mode or an arrange mode" could be read as per-frame, and that would be a different
+and much larger feature.*
+
+## 0c · ⭐ THE HARD LINE — and the exception DISSOLVES *(owner pressed, 2026-09-04)*
+
+The owner: *"If you say that you cannot write bit columns, and then you draw the line at
+arrange… does that make sense? Do we have exceptions?"*
+
+**Pressing on it was right, and the answer is: no exceptions. Claude's trash/archive carve-out
+was wrong** — pragmatism applied to a rule that was already correct.
+
+**Why it dissolves.** In arrange, the act you actually want is *"get this off my board"* — and
+that is **un-place**, which is a **placement** act and stays available. **Trash** is different:
+it removes the thing from *everywhere*, forever-ish. That is a decision about the **thing**, and
+you should be looking at the thing when you make it.
+
+So the line holds with no carve-out:
+- **Arrange** → *remove from this board* ✅ *(reversible, placement-level, exactly the tidying act)*
+- **Edit** → *trash · archive* ✅ *(thing-level, where you can see what you are throwing away)*
+
+**And it makes the app safer for free:** you cannot destroy anything from the mode where you are
+moving fast and clicking a lot. That is not a cost of the rule — it is the rule paying out.
+
+> **THE LINE, final: arrange mode NEVER writes a `bit` row. Not once, not for convenience.**
+
+## 0d · ⚠ WHAT WE WOULD LOSE — the careful audit *(owner: "I want to be very careful about what exactly is possible, what we might lose")*
+
+Running the hard line against everything the board can do today. **Three acts break**, and all
+three break the same way — they **create a bit** while you are arranging:
+
+| act today | why it conflicts | 🔵 resolution |
+|---|---|---|
+| **double-tap empty space → new text card** | creates a `bit` row | it **creates, then switches you to edit** on that card. You made a thing to write in; writing is where you were going |
+| **drop a photo / paste / the pen** | creates a `bit` row | the create is allowed as the *landing* of an arrange gesture, and **the "add a few words?" offer switches to edit** rather than appearing uselessly |
+| **the "add a few words?" offer** | writes `bit.content` | as above — it is the thing that hands you over |
+
+**The principle those three share, stated so it is not three special cases:**
+> **Making a new thing is the one act that crosses the line — and it crosses by handing you to
+> edit, never by writing from arrange.**
+
+**What is NOT lost, checked one by one:** moving · resizing · rotating · aligning · distributing ·
+tidying · locking · stacking · multi-select · marquee · pan · zoom · calling a loose bit in ·
+removing from this board · duplicating a card *(a bit write — ⚪ see below)* · the board's own
+title, description and timeline · undo · the pen as its own mode.
+
+⚪ **One genuinely unresolved case: DUPLICATE.** It writes a `bit` row (a real copy) but is
+plainly an arranging gesture — you duplicate a card to place it beside the original. It is the
+one act where the rule and the feel disagree and "hand off to edit" would be silly.
+**Three options:** (a) allow it in arrange as a stated second exception · (b) move duplicate to
+edit only · (c) 🔵 **re-read it as arrange-legal because the bit it writes is *new*, never an
+edit to something that exists** — the same carve the create acts get. **Lean (c)**, which keeps
+one rule: *arrange may bring new things into being; it may never change a thing that exists.*
+
 ## 1 · The one-sentence version
 
 **Arrange mode treats a card as an object; edit mode treats it as a page — and they LOOK
@@ -324,17 +392,41 @@ What the mode changes is **the rest of the alignment surface**, which is not cur
 `editing` guards, and the `selectMode` branches are all answering *"which mode is this
 really?"* one site at a time. One mode value answers it once.
 
-## 5 · How you switch — and the one genuine friction
+## 5 · How you switch, and panning — ✅ THE OWNER ANSWERED THE HARD ONE
 
-🔵 **Proposal:** a segmented control in the toolbar (**Arrange | Edit**) · `Escape` always
-returns to Arrange · **double-clicking a card jumps to Edit and opens that card**, because
-that is what the app does today and the muscle memory is worth keeping.
+🔵 **Switching:** a control in the toolbar · `Escape` always returns to **arrange** ·
+double-clicking a card jumps to **edit with that card open** (today's muscle memory, kept).
 
-⚠ **The friction, named rather than discovered:** in arrange mode, empty-space drag draws a
-marquee — so **panning needs another gesture.** Today `selectMode` off = pan, and that is the
-whole reason the toggle exists. Options: space-bar + drag (the convention in spatial tools) ·
-two-finger drag on a trackpad · a hand tool. **This needs the owner's hand to judge, and it is
-the thing most likely to make the feature feel worse rather than better.**
+### ✅ Panning — the owner's answer, and it is better than the question
+
+*"Wouldn't panning just be clicking either arrows, or dragging your mouse on empty space for
+arrange? Wouldn't that be easier?"*
+
+**Yes — and it dissolves the friction Claude called the biggest risk in this feature.**
+
+Claude had assumed arrange mode inherits `selectMode`'s behaviour, where empty-space drag draws
+a **marquee**, which is what forced panning onto some new gesture. **There is no reason to
+inherit that.** Keep the thing that works:
+
+| gesture | arrange | edit |
+|---|---|---|
+| **drag empty space** | **pan** — unchanged from today | **pan** |
+| **arrow keys** | **pan** ⚪ *(new — see below)* | *(they nudge a selected card today)* |
+| marquee (select several) | **shift + drag empty space** 🔵 | n/a |
+| double-tap empty space | new card → switches to edit | ⚪ open |
+
+**Why this is the better answer:** panning is the most-used gesture on an infinite canvas and
+it already works. Marquee is occasional, so **the modifier belongs on the rare act, not the
+constant one** — Claude had it backwards. It also means arrange mode does not change how the
+board feels to move around in, which removes the main way this feature could have made things
+worse.
+
+⚠ **One conflict the owner spotted:** *"right now I think if you're clicking empty space it
+could create a card."* Correct — **double-tap** empty space creates a text card. That is a
+*double*-tap and panning is a *drag*, so they do not collide today. **But arrow keys do
+collide:** they currently **nudge the selected card** (a placement write). ⚪ **So arrows can be
+pan OR nudge, not both.** 🔵 Lean: **arrows nudge when something is selected, pan when nothing
+is** — which is what you would expect either way.
 
 ## 6 · THE QUESTIONS — everything I need from you, in one batch
 
@@ -342,13 +434,13 @@ the thing most likely to make the feature feel worse rather than better.**
 it to me in the next batch." So this is the complete list, re-asked, not a delta.)*
 
 ### 🔴 Blocking — I cannot build without these
-1. **Panning in arrange mode.** Empty-space drag draws a marquee there, so panning needs
-   another gesture. Space-bar + drag · two fingers on a trackpad · a hand tool. **This is the
-   one most likely to make arrange feel worse than what you have now**, and it needs your hands,
-   not my judgement.
+1. ~~**Panning in arrange mode.**~~ ✅ **ANSWERED by the owner (§5): empty-drag stays pan;
+   marquee takes the modifier.** The modifier belongs on the rare act, not the constant one.
 2. **Which mode do you land in when you open a board?** 🔵 Lean **arrange** — you arrive to look
    and move; writing is something you go *into*. But you said edit is close to today's default,
    so landing in arrange is the bigger change to how it feels.
+3. **Duplicate** (§0d) — is it arrange-legal? 🔵 Lean yes, under *"arrange may bring new things
+   into being; it may never change a thing that exists."*
 
 ### 🟡 Shapes the feature, but I can build with the lean and you can overturn it
 3. **Does a selected card in ARRANGE show its details?** 🔵 Lean **no** — selecting to move is
