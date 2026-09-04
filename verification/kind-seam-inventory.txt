@@ -1,49 +1,94 @@
-src/app/api/export/route.ts
-src/app/archive/archive-controls.tsx
-src/app/bit/[id]/bit-controls.tsx
-src/app/bit/[id]/page.tsx
-src/app/bits/note-card.tsx
-src/app/bits/note-row.tsx
-src/app/bits/notes-browser.tsx
-src/app/bits/page.tsx
-src/app/board/[id]/board-surface.tsx
-src/app/board/[id]/card-defaults.ts
-src/app/board/[id]/card-vm.ts
-src/app/board/[id]/card.tsx
-src/app/board/[id]/page.tsx
-src/app/board/[id]/remove-acts.ts
-src/app/board/[id]/selected-bar.tsx
-src/app/board/[id]/tag-bar.tsx
-src/app/board/[id]/timeline/page.tsx
-src/app/board/[id]/use-create-doors.ts
-src/app/board/[id]/words-offer.tsx
-src/app/desk-alive.tsx
-src/app/graph/word-graph.tsx
-src/app/home-surfaces.tsx
-src/app/note/[id]/page.tsx
-src/app/outline/outline-row.tsx
-src/app/outline/outline-view.tsx
-src/app/outline/page.tsx
-src/app/page.tsx
-src/app/search/page.tsx
-src/app/search/search-filters.tsx
-src/app/search/search-live.tsx
-src/app/surface-row.tsx
-src/app/where-you-were.tsx
-src/app/write/quick-write.tsx
-src/components/confirm.tsx
-src/components/drawer.tsx
-src/components/record-opening.tsx
-src/lib/db/bit-copy-rule.ts
-src/lib/db/bits.ts
-src/lib/db/graph.ts
-src/lib/db/openings.ts
-src/lib/db/search.ts
-src/lib/db/shelf.ts
-src/lib/recent.ts
-src/lib/surfaces.ts
-src/lib/types.ts
-
-# Routes and functions the kind-retirement sweep must cover (S7 deliverable, 2026-09-04):
-#   /note/[id] (becomes /composition/[id]) · /notes (the compositions list) · listNotes() in lib/db
-#   bit_kind_allowed CHECK + bit.kind column dropped; search.ts kind param retyped; every file above re-visited.
+# The kind-seam inventory — the stage-①b sweep checklist
+# REGENERATED 2026-09-04 (adversary F11: the old inventory missed files that break,
+# and its footer named a route that does not exist). Method: grep -rln kind over
+# src/ + scripts/ (*.ts,*.tsx,*.mjs), curated + the gather call-sites the sweep
+# must rewrite. NOT every hit is a bit.kind read (some are Surface.kind /
+# target.kind unions that RENAME rather than vanish) — every file below must be
+# OPENED at the sweep, not batch-edited.
+#
+# ⚠ MOVE-TOGETHER PAIRS (each side alone turns the suite red):
+#   src/lib/db/bit-copy-rule.ts ("kind" in COPIED_TO_A_DUPLICATE) <-> src/lib/db/bits.ts (duplicateBit's kind: src.kind)
+#     — bit-copy-rule.test.mjs:70 asserts the list and the carry match exactly.
+#   src/lib/db/exported-tables.ts <-> scripts/test-port.mjs:208 (EXPORT_TABLES)
+#     — exported-tables.test.mjs asserts the two lists are identical.
+#
+# GATHER CALL-SITES (rewritten at ①b when reference2 -> reference; from_bit_id dies):
+#   src/app/bit/[id]/text-workspace.tsx
+#   src/app/board/[id]/write-queue.ts
+#   src/app/board/[id]/use-persistence.ts
+#   src/app/note/[id]/note-workspace.tsx
+#   src/app/board/[id]/bit-ref-view.tsx
+#   src/app/write/quick-write.tsx
+#   src/lib/db/references.ts
+#   scripts/test-port.mjs   (three reference writes using from_bit_id, ~:252-266)
+#
+# ALSO IN THE SWEEP though "kind"-grep-silent or special:
+#   src/lib/db/sources.ts        (mergeSources gains the reference2 repoint — ships at ①a)
+#   next.config.ts               (the /notes -> / redirect, :29)
+#
+# THE SURFACE FILES (the list room is HOME, not a /notes room — that room does not exist):
+#   src/app/page.tsx             (home = the list, via listNotes -> bits.ts:482)
+#   src/lib/surfaces.ts          (Surface.kind union · /note/${id} hrefs)
+#   src/app/home-surfaces.tsx
+#   src/app/desk-alive.tsx
+#   src/app/where-you-were.tsx
+#   src/lib/recent.ts
+#   src/app/bits/page.tsx        (:31 kind === "bit" filter)
+#   src/app/note/[id]/           (deleted; old note URLs 404 — the things are gone)
+#
+# THE FULL GREP (every file naming "kind"; open each at the sweep):
+#   scripts/test-port.mjs
+#   src/app/api/export/route.ts
+#   src/app/archive/archive-controls.tsx
+#   src/app/bit/[id]/bit-controls.tsx
+#   src/app/bit/[id]/page.tsx
+#   src/app/bits/note-card.tsx
+#   src/app/bits/note-row.tsx
+#   src/app/bits/notes-browser.tsx
+#   src/app/bits/page.tsx
+#   src/app/board/[id]/board-surface.tsx
+#   src/app/board/[id]/card-defaults.ts
+#   src/app/board/[id]/card-vm.test.mjs
+#   src/app/board/[id]/card-vm.ts
+#   src/app/board/[id]/card.tsx
+#   src/app/board/[id]/page.tsx
+#   src/app/board/[id]/remove-acts.test.mjs
+#   src/app/board/[id]/remove-acts.ts
+#   src/app/board/[id]/selected-bar.tsx
+#   src/app/board/[id]/tag-bar.tsx
+#   src/app/board/[id]/timeline/page.tsx
+#   src/app/board/[id]/use-create-doors.ts
+#   src/app/board/[id]/words-offer.tsx
+#   src/app/desk-alive.tsx
+#   src/app/graph/word-graph.tsx
+#   src/app/home-surfaces.tsx
+#   src/app/note/[id]/page.tsx
+#   src/app/outline/outline-row.tsx
+#   src/app/outline/outline-view.tsx
+#   src/app/outline/page.tsx
+#   src/app/page.tsx
+#   src/app/search/page.tsx
+#   src/app/search/search-filters.tsx
+#   src/app/search/search-live.tsx
+#   src/app/surface-row.tsx
+#   src/app/where-you-were.tsx
+#   src/app/write/quick-write.tsx
+#   src/components/confirm.tsx
+#   src/components/drawer.tsx
+#   src/components/record-opening.tsx
+#   src/lib/db/bit-copy-rule.ts
+#   src/lib/db/bits.ts
+#   src/lib/db/exported-tables.test.mjs
+#   src/lib/db/graph.ts
+#   src/lib/db/openings.ts
+#   src/lib/db/search.ts
+#   src/lib/db/shelf.ts
+#   src/lib/labels.test.mjs
+#   src/lib/recent.test.mjs
+#   src/lib/recent.ts
+#   src/lib/surfaces.ts
+#   src/lib/types.ts
+#
+# DROPPED FALSE POSITIVES: src/app/globals.css (.inbox-card-kind CSS classes —
+# renamed in the same sweep but not a logic seam) · src/app/bits/actions.ts:213
+# ("the same kind of problem" — prose).
