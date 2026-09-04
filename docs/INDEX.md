@@ -273,7 +273,7 @@ INDEX.md ................ this file — where everything is
 4. **⚠ `composition-base-spec.md` is a PALIMPSEST** — historical trail with internal contradictions. **Never build from a single section of it.** Read `aerial-review-findings.md` first if you must consult it.
 
 **IF the task is CONNECTION / REFERENCES / LINKS →**
-`composition-spec.md` §23.1 (presence is stored ON THE TIE) + `composition-technical-spec.md` §1.2 (the relations, superseded-but-uncovered) → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2·S5·S12·S13. **The direction principle and flatness are settled — do not re-litigate them without the owner.**
+`composition-spec.md` §23.1 (presence lives on the OCCURRENCE in the document — corrected 2026-09-03; the tie stays the dedup'd membership fact) + `composition-technical-spec.md` §1.2 (the relations, superseded-but-uncovered) → `app-things-inventory.md` §2 (actions by pair) → `integration-scenes.md` S2·S5·S12·S13. **The direction principle and flatness are settled — do not re-litigate them without the owner.**
 
 **IF the task is TABLES / TYPED FIELDS / TRACKERS →**
 `tables-and-structured-data.md` → `research-structured-data.md`. **The engine is parked; a table is formatting.**
