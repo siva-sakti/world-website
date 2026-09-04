@@ -54,6 +54,62 @@ untilted. **Rotation is arrange.** So is the degrees readout.
 away while tidying. **That is the only place the rule is deliberately broken**, and knowing it
 is the only one is worth more than a rule with no exceptions and no teeth.
 
+## 0a · ⭐ THE LINE, DERIVED THE RIGHT WAY ROUND *(owner corrected Claude, 2026-09-04)*
+
+**The correction.** Claude derived the mode boundary from the schema — *"arrange writes
+`placement` rows, edit writes `bit` rows"* — and then argued trash into edit because that is
+which table it touches. The owner: *"I'm not asking if it breaks the rule. I'm asking whether
+it makes sense to HAVE such a rule."*
+
+**That is the right challenge and Claude had it backwards.** A rule derived from which table a
+column lives in is an architecture convenience. It cannot be explained to anyone, it cannot be
+shown in a hint, and it produces answers nobody can predict. **The line has to make sense to a
+person first. The schema agreeing is evidence we got it right — never the reason.**
+
+### Said the way it should be said
+
+> **In ARRANGE you are working on the BOARD. In EDIT you are working on a THING.**
+
+That is the whole rule, and every case falls out of it without appeal to a table:
+
+| you want to… | which? | because |
+|---|---|---|
+| move · resize · tilt · stack a card | **arrange** | you are changing what the board looks like |
+| line things up, space them out | **arrange** | the board's composition |
+| put something on · **take it off this board** | **arrange** | *"I don't want to see this here"* is a fact about the **board** |
+| write in a card, retitle it, tag it | **edit** | you are changing the **thing** |
+| **trash · archive** | **edit** | *"this shouldn't exist"* is a fact about the **thing** — and you should be looking at the thing when you decide it |
+
+**The owner reached this independently while questioning it:** *"not seeing something on the
+board any more is the arrange view, but trashing and archiving you can only do in the edit
+view."* Same answer, arrived at from what a person is doing rather than from a schema — which
+is exactly why it is the version that goes in the hints.
+
+**And now the schema check, in its proper place:** this line happens to fall exactly on
+`placement` vs `bit` (§0). That is a **good sign** — the data model was built around the same
+distinction — but it is a confirmation, not the argument.
+
+### The say-it-out-loud test
+If a mode's rule cannot be said in one sentence a person nods at, it is the wrong rule. Both
+pass now: *"arrange changes the board · edit changes a thing."*
+
+### ✅ And this resolves DUPLICATE, which the rule-from-schema could not
+Claude's schema rule got stuck on duplicate (it writes a `bit` row but is obviously an
+arranging gesture) and needed a carve-out about *new* things. **Under the human rule there is
+no puzzle:** you duplicate a card **to put another one on the board** — that is composition.
+**Duplicate is arrange.** If you then want the copy to say something different, you switch to
+edit, exactly as you would for any card. *(The owner's point: the schema rule "was not
+resolving anything from the ground up.")*
+
+### On-screen, not just in a document *(owner: "helpful on-screen hints and guides")*
+The rule is only worth having if it can be *seen*:
+- The mode control says what the mode **does**, not just its name — 🔵 *"Arrange — move things
+  around"* / *"Edit — work on a thing"*.
+- Acts that belong to the other mode are **absent, not greyed** (a greyed button is a puzzle).
+- Trying an act the mode does not do gets the **offer** (§3b): *"edit this?"* — the app names
+  the mode exactly when you meet its edge.
+- ⚪ **Worth deciding with the naming pass:** whether these are called Arrange/Edit at all.
+
 ## 0b · THE VOCABULARY, confirmed *(owner, 2026-09-04)*
 
 **Confirming the understanding, since the owner asked to double-check it:**
@@ -72,7 +128,10 @@ frame and the cards alike. ⚪ *Flagging in case the owner meant otherwise — "
 have an edit mode or an arrange mode" could be read as per-frame, and that would be a different
 and much larger feature.*
 
-## 0c · ⭐ THE HARD LINE — and the exception DISSOLVES *(owner pressed, 2026-09-04)*
+## 0c · ~~THE HARD LINE~~ — the same conclusion, reached the WRONG WAY *(superseded by §0a)*
+
+*(Kept because the conclusion holds and the reasoning is instructive: it is right about WHERE the
+line falls and wrong about WHY, which is how a rule ends up unexplainable. Read §0a instead.)*
 
 The owner: *"If you say that you cannot write bit columns, and then you draw the line at
 arrange… does that make sense? Do we have exceptions?"*
@@ -114,7 +173,11 @@ tidying · locking · stacking · multi-select · marquee · pan · zoom · call
 removing from this board · duplicating a card *(a bit write — ⚪ see below)* · the board's own
 title, description and timeline · undo · the pen as its own mode.
 
-⚪ **One genuinely unresolved case: DUPLICATE.** It writes a `bit` row (a real copy) but is
+✅ ~~**One genuinely unresolved case: DUPLICATE.**~~ **RESOLVED in §0a** — under the human rule
+it is plainly arrange, with no carve-out needed. The three options below are kept only to show
+what rule-lawyering from a schema looks like when the rule is derived backwards.
+
+⚪ *(superseded)* **DUPLICATE.** It writes a `bit` row (a real copy) but is
 plainly an arranging gesture — you duplicate a card to place it beside the original. It is the
 one act where the rule and the feel disagree and "hand off to edit" would be silly.
 **Three options:** (a) allow it in arrange as a stated second exception · (b) move duplicate to
