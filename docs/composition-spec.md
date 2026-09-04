@@ -88,7 +88,7 @@ Four dimensions, no overlaps. Every feature in this spec belongs to exactly one.
 | **face** | a bit's computed headline: the owner's caption → else its first words → else nothing (visual bits stand in with a thumbnail) |
 | **chip** | the inline pill a pulled-in thing becomes in the writing; shows the target's face. *Shipped Aug 2026.* |
 | **peek** | tap a chip → a floating glimpse of the target beside it, with a door to open it. *Shipped Aug 2026.* |
-| **block** | a pulled-in thing rendered **in place** in the flow — preview-sized. *Ruled, unbuilt.* ⚑ *the word is overloaded (Notion's paragraph word) — naming session item.* |
+| **block** | a pulled-in thing rendered **in place** in the flow — preview-sized. *Ruled, unbuilt.* ⚠ **CONFIRMED DEFECT (owner, 2026-09-04): every unit in the writing is a block — a paragraph, a heading — so "block" cannot also name a pulled-in thing.** What is distinct is **provenance, not blockness**: its content lives elsewhere (§24.5b's window). The naming session owns the replacement; "chip" stands (owner-stamped). *(`naming-session-prep.md` F4.)* |
 | **frame** | ⛔ **not used in this spec.** The word belongs to the board's alignment feature (other track). |
 | **toggle** | a **collapsible section**: a labelled line with a triangle; click to unfold hidden content, click to fold it away. Manages length in long pieces. **Ruled IN** — collapsed content stays searchable; a hit inside a fold auto-unfolds it (§13.7) |
 | **callout** | a **boxed aside** — tinted, often with an icon — set apart from the flowing text. ⛔ **Ruled out** (§13.8) |
