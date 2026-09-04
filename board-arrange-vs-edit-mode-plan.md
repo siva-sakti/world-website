@@ -77,6 +77,62 @@ way this fails. If the whole board visibly changes appearance, that failure most
 it is often the only way to tell two similar images apart. 🔵 Lean: **no** in arrange — the
 image is the identity there — but this is the one place the rule might read as losing something.
 
+## 2c · ⭐ THE BOUNDARY, DRAWN CLEANLY *(owner, 2026-09-04: "I realize we need to draw the boundaries more cleanly")*
+
+### The one rule that decides every case
+
+> **Arrange acts on the card as an OBJECT. Edit acts on the thing's CONTENT.**
+> *Does this change where and how it sits — or what it is?*
+
+That single question settles the whole list below without case-by-case argument, which is
+what makes it a boundary rather than a preference.
+
+### ⚠ And the constraint the owner set, which is sharper than it looks
+
+*"That would not change how it's arranged on the page… you'd be able to click in, but you
+wouldn't be able to move things around."*
+
+**Edit mode must not re-lay-out the board.** Same cards, same places, same sizes. You are
+looking at the same arrangement — you simply cannot push it around, and you can work inside
+a card.
+
+**This has a consequence Claude's §2b missed.** If a card in arrange is *stripped* (no title,
+no tags) and in edit *shows its details*, then a text card would **grow** when the details
+appear — auto-height — and the board would visibly reflow on every mode switch. That is
+exactly what the owner just ruled out.
+
+So the details cannot simply be *added into* the card's box. Three ways out:
+- **(a) 🔵 the details overlay the card** — floating on top, the card's box unchanged. Layout
+  is untouched by construction, and it reads as "looking closer at this thing."
+- **(b) a side panel** — the details live off the card entirely. Zero layout risk; costs
+  screen and puts a thing's tags far from the thing.
+- **(c) the card reserves the space in both modes** — no reflow, but arrange stops being
+  visually clean, which was the whole point of §2b.
+
+**🔵 Lean: (a).** ⚪ **The owner's call** — it decides what edit mode *looks* like.
+
+### The boundary, act by act
+
+| act | mode | why, under the rule |
+|---|---|---|
+| move · resize · **rotate** · the **degrees readout** | **ARRANGE** | where and how it sits |
+| **snapping + the magenta guides** | **ARRANGE** | a drag is an arrange act; guides serve it |
+| align · distribute · tidy · send to back · lock | **ARRANGE** | arrangement, plainly |
+| multi-select · marquee | **ARRANGE** | you select several things *to arrange them* |
+| put a bit ON the board · take it OFF | **ARRANGE** | membership is where it sits |
+| double-tap empty space to make a card | **ARRANGE**, then drops you into EDIT | placing is arrange; the typing that follows is not |
+| the pen | its own mode | unchanged |
+| **write in a card** | **EDIT** | the content |
+| title · caption · tags · source | **EDIT** | what the thing is |
+| open a note/composition to its page | **EDIT** | going into the thing |
+| **pan · zoom** | **BOTH** | looking is not an act on anything |
+| **trash · archive** | **BOTH** — a deliberate exception | strictly "what it is", so the rule says edit. But you will want to throw something away while tidying, and hiding a destructive act behind a mode switch is worse than a tidy rule. *Stated as an exception rather than bent into the principle.* |
+
+### What is NOT different between the modes
+Same cards, same positions, same sizes, same zoom, same scroll position. **Switching modes
+changes what you can do and what you see ON a card — never where anything is.** A mode switch
+should be visually calm: nothing jumps.
+
 ## 3 · What each mode holds
 
 | | **ARRANGE** — the board as a space | **EDIT** — the card as a page |
