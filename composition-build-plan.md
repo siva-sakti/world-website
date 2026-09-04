@@ -8,6 +8,14 @@
 - **Nothing touches cloud without the owner's go.** Stage ① is the only stage that touches stored data.
 - **Every stage ends green**: `pnpm build` + typecheck + its named proofs + the owner's feel-test list for that stage.
 
+## 📍 YOU ARE HERE
+**Stage ⓪ (paper) — not building yet.** Waiting on: the other window's queue to clear · one owner decision (editor testing, below). Everything upstream — spec verified (D-146), storage proven (D-145), plan stress-tested, carry-through mapped — is **done**. *(Update this line at every stage boundary.)*
+
+## ⚠ AN OWNER DECISION FOUND 2026-09-04 — THE EDITOR CANNOT BE TESTED TODAY
+**The gap:** the test setup is plain Node, logic-only, no browser (`package.json`: `node --test 'src/**/*.test.mjs'`; no DOM library installed). **Stage ②'s acceptance is written as browser behaviour** — "Enter splits cleanly," "a heading drag carries its section," "fold/search/unfold." **None of it can run.** Acceptance criteria were written with no way to check them — **caught by the owner's "what else could be missing?", by no gate.**
+**Two honest options:** **(a)** add a browser-simulator for tests *(a new dep — owner-gated; the standard choice)* · **(b)** accept editor behaviour as **owner-feel-tested only** and rewrite ②'s acceptance to say so, rather than promise tests that cannot exist.
+🔵 **Claude's recommendation: (a)** — the heading-span logic is exactly what breaks silently months later; least safe resting on memory. ⚑ **Her call. Blocks ②b's acceptance, not ①.**
+
 ## ⚠ WHAT THE OWNER CAN DO AFTER EACH STAGE *(owner-raised 2026-09-04: "I don't wanna get there fast, I wanna get there good")*
 *(Was headed "the trough" — Claude's jargon, renamed at her ask: "what is the trough table?" A trough is just the dip where a cost is paid before the benefit arrives.)*
 ✅ **THE OWNER'S RULING (2026-09-04), which takes the pressure off entirely:** *"I'm OK sitting out using it for like three days at full functionality as long as we build something awesome — I appreciate you flagging it but it's not the biggest deal."* **So stage ① may be CAREFUL rather than rushed**; downtime is not a constraint on it. The table below stays as the honest before/after, no longer as a risk to manage.
@@ -33,7 +41,7 @@ She uses this app daily, so every stage states its own before/after. ⚠ **The d
 - **GREEN BEFORE DONE** — `pnpm build` + typecheck pass · new logic carries a test · nothing in the stage contradicts the model (§1–§3) or the guardrails (§22).
 
 ## Stage ⓪ · THE ENACTMENT PAPER (planning-grade, runs NOW)
-~~The three-act conversion procedure~~ **KILLED BY THE OWNER'S FRESH-START RULING (§21.7, 2026-09-03)** — no browser act, no fidelity proof, no per-document conversion; the plan's single riskiest step is gone. What remains on paper: the real migration file drafted from the proven DDL + the enactment extras (EXPORTED_TABLES lockstep · tie alter-vs-rebuild · mergeSources repoint) · **cloud-lag coordination:** `supabase/migrations/` is 2 files ahead of cloud (`…005` · `…006`, the other window's, proven; the enactment applies them first; my board_cards rebuild is display_size-free and runs after — `…006`'s header forbids standalone application) · the placement machinery satisfies the new `left_at` constraint + server-clock trigger by construction (proof suite already ran with both in the chain, green).
+~~The three-act conversion procedure~~ **KILLED BY THE OWNER'S FRESH-START RULING (§21.7, 2026-09-03)** — no browser act, no fidelity proof, no per-document conversion; the plan's single riskiest step is gone. **THE BACK-OUT PROCEDURE** *(gap found 2026-09-04 — a backup existed, the procedure did not)*: exactly what is done if the cloud step fails midway or the app misbehaves after deploy — the restore steps in order, written before they are needed rather than improvised under pressure. And: the real migration file drafted from the proven DDL + the enactment extras (EXPORTED_TABLES lockstep · tie alter-vs-rebuild · mergeSources repoint) · **cloud-lag coordination:** `supabase/migrations/` is 2 files ahead of cloud (`…005` · `…006`, the other window's, proven; the enactment applies them first; my board_cards rebuild is display_size-free and runs after — `…006`'s header forbids standalone application) · the placement machinery satisfies the new `left_at` constraint + server-clock trigger by construction (proof suite already ran with both in the chain, green).
 
 ## Stage ① · THE SPLIT — now ONE clean migration (fresh start, §21.7)
 1. New tables per the proven draft · `EXPORTED_TABLES` += composition, composition_file (test goes green).
