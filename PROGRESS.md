@@ -20,6 +20,8 @@ _Last updated: 2026-09-02_
 
 **Ruled today (D-144):** the ~150-line ceiling is **guidance, not a rule** — judge a file on doing ONE job well · retry on reconnect · split after tests · Group E (the bit pages, ~2,900 unread lines) gets examined too · **dates follow the reader's device** (I-G5), never a pinned zone.
 
+**⚠ TWO MIGRATIONS WRITTEN AND PROVEN, NOT APPLIED TO CLOUD (2026-09-03) — the repo's `supabase/migrations/` is AHEAD of the cloud by two files.** `20260903000005` (left_at on the server clock — safe standalone, additive, no view touched) and `20260903000006` (drop `display_size`). **Held at the owner's call while the composition data model is being designed. `…006` must NOT be pasted standalone:** it rebuilds `board_cards`, which the composition migration's step ⑥ also rebuilds — **fold it into that migration instead** (leave `display_size` out of the rebuilt view, drop the column + constraint). Paste-ready combined file, if ever wanted alone: `verification/apply-left-at-and-drop-display-size-to-cloud.sql` — **app deploy must come first for part 2.** Proof: `verification/run-left-at-native.sh`.
+
 **Awaiting the owner:** **S8** — `placement.height` is stored for text cards and permanently false; recommend stopping writing it *(the only open decision)*. Plus, when ready: the `left_at` server-clock migration, and R4's resize-handle look (D-140). The composition thread is **parked by the owner** and runs in its own window.
 
 *(Bullets below this line are history.)*

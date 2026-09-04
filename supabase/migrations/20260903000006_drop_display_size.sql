@@ -1,5 +1,13 @@
 -- DROP `placement.display_size` — a column nothing has ever read.
 --
+-- ⚠⚠ NOT YET APPLIED TO THE CLOUD, AND DELIBERATELY SO (owner call, 2026-09-03).
+-- This rebuilds `board_cards`, and the composition migration's step ⑥ ("regenerate
+-- views", docs/composition-technical-spec.md) rebuilds the SAME view. Two sessions
+-- rewriting one view is how definitions drift apart. **Whoever builds the composition
+-- migration: fold this in — while you are rebuilding board_cards anyway, leave
+-- display_size out and drop the column + its constraint.** Then this file is already
+-- satisfied and needs no separate paste.
+--
 -- It was added for a "full / small" card presentation that was never built. Today it is
 -- written by every insert (via its default), constrained, carried through `board_cards`,
 -- copied by duplicate-a-board, and typed in two places in the app — and NO code anywhere

@@ -1,5 +1,11 @@
 -- S6b — A CARD CANNOT LEAVE A BOARD BEFORE IT ARRIVED.
 --
+-- ⚠ NOT YET APPLIED TO THE CLOUD. Safe to apply standalone at any time — it is
+-- additive, touches no view, and the composition migration's placement-repointing
+-- (step ③) never changes left_at, so the trigger cannot fire during it. Held only
+-- because there is no reason to touch the database while a larger change to it is
+-- being designed, and the bug it fixes needs a clock-skewed device to bite.
+--
 -- `arrived_at` has always been stamped by the SERVER (`default now()`). `left_at` was
 -- stamped by the BROWSER (`new Date().toISOString()` in unplaceBit), so the two ends of
 -- one row's life were measured by two different clocks. A device a few minutes behind —
