@@ -20,7 +20,28 @@ each meaning its own click.
 **Every act is available in both modes.** What changes is what a click, a drag and a keystroke
 do, and what the card and the toolbar show.
 
+### 1.1 The argument, as a table — interaction depth *(the owner's framing: "what hierarchy would we need?")*
+
+| action | one surface | depth | two modes | depth |
+|---|---|---|---|---|
+| select · move | click · drag | 1 | arrange: click · drag | 1 |
+| resize · rotate · lock · trash · align… | select → handle/button | 2 | arrange: same | 2 |
+| **enter a card** *(cursor in the words)* | **second click on a selected card** | **2** | **edit: click** | **1** |
+| **see title · tags · source** | select → they appear | 2 | **edit: click — with the cursor** | **1** |
+| open full page | select → button · *or* double-click on a note | 2 / 1 | **double-click, every card** | 1 |
+
+**The mode buys two things:** entering drops from two clicks to one — small on a mouse, large on
+a phone — and double-click becomes free to mean *open* for every card, killing today's
+type-dependent inconsistency. **Everything else is the same depth either way**, which is why
+those acts hang off the selection, not the mode. **The cost is one switch per visit.**
+
 ---
+
+## 1b · The words *(confirmed by the owner 2026-09-04; definitions are `lexicon.md`'s)*
+**board** — the surface, stored · **canvas** — the board's infinite spatial *rendering*, never a
+synonym for board · **frame** — an optional page-shaped fixture *on* a board (`frame-plan.md`) ·
+**placement** — one bit sitting on one board · **card** — what a placement *looks like*, not
+stored. **Modes belong to the board**, not to the frame or to anything floating over it.
 
 ## 2 · The two modes, defined
 
@@ -212,6 +233,53 @@ conflicts because mode writes nothing.
 
 ---
 
+## 7b · What we would LOSE — audited against THIS version *(owner: "I want to make sure we don't lose anything we currently have")*
+
+Under input-meaning **no act is removed**. What changes:
+
+| today | after | verdict |
+|---|---|---|
+| click a selected text card → cursor | arrange: nothing; switch to edit → one click enters | **the one cost** — one extra step to start typing, per visit |
+| double-click: enters text / opens notes | double-click **opens**, every card | gain — one rule |
+| title/tags on any selected card | arrange: card clean, toolbar greyed · edit: on the entered card | moved, not lost |
+| the `selectMode` toggle | gone — marquee is shift+drag / a tool | habit change, one person |
+| everything else | identical | nothing lost |
+
+## 7c · Rulings and where they came from *(provenance — the old spec carried 43 owner references; this one must not carry fewer)*
+
+| ruling | the owner's words | where |
+|---|---|---|
+| a mode is worth having — to avoid the double click | *"if you have a mode then you [don't] have to make people click twice… it also makes sense in the mind to separate these actions"* | §1 |
+| **the mode decides input meaning, not permission** | *"are we getting confused by putting other actions, tying it to that?"* | §1 |
+| only the card you're inside shows its details | *"you want to see everything you're NOT touching look like it's in its final mode… only when you're editing do you want to see, for that specific thing, the title and the tags"* | §5 |
+| **one toolbar, greyed — not shuffled** | *"all the toolbar icons stay the same but… some things get greyed out… more intuitive than shuffling around the whole toolbar"* | §4 |
+| the toolbar is different between modes | *"it shouldn't be the same toolbar, but a lot of the foundational things should be the same"* | §4 |
+| panning stays on empty-drag | *"wouldn't panning just be… dragging your mouse on empty space? Wouldn't that be easier?"* | §3.2 |
+| trash · archive · remove belong in arrange | *"trashing and archiving and removing from a board would make sense to me in the arrange mode"* | §4 |
+| rotation is arrange | *(owner unsure; settled by the depth table and by `angle` being placement state — a confirmation, not the reason)* | §3.1 |
+| the "would you like to edit" offer | *"it'll prompt 'would you like to edit'"* | §4 |
+| a card never changes size between modes | *"that would not change how it's arranged on the page"* | §5 |
+| land in arrange | *(Claude's recommendation, §5b of the trail: safety — arrange cannot change anything you made; ⚪ owner has not ruled)* | §2 |
+| the words are the naming pass's | *"I'm doing a naming pass… I probably want to change the word bit also"* | §7.10 |
+
+## 7d · How it is built *(the five files — carried from the trail's §3b)*
+
+The owner's read holds: **edit mode is roughly today's default**, so the build is mostly
+*subtraction* plus one new value. `mode: "arrange" | "edit"` replaces the `selectMode` boolean
+in `board-surface.tsx`; **`mode` is what the surface is, `editingId` is which card you are in**,
+and `editingId` is only ever set in edit.
+
+| file | what changes |
+|---|---|
+| `card.tsx` | click → select *or* enter by mode; drag stays; handles gate on arrange; the details strip renders only when entered |
+| `use-board-pointer.ts` | already branches on `selectMode` for marquee-vs-pan — branches on a modifier instead. *A renamed condition.* |
+| `use-board-keys.ts` | arrows: nudge / pan / cursor by mode + selection; Escape's two stages; the mode shortcut |
+| `board-toolbar.tsx` | the switch · greying by mode · greyed-tap explains and offers |
+| `selected-bar.tsx` | folds into the toolbar's greyed pattern |
+
+**Not touched:** the database · the save queue · undo · the geometry ledger · `board_cards`.
+**No migration. Revertible in one commit.**
+
 ## 8 · Open decisions — the complete list for the owner
 1. **Shift-click in edit** — add to selection, or nothing? *(§3.1)*
 2. **Tags in arrange** — greyed entirely, or visible read-only? *(§4)*
@@ -221,8 +289,12 @@ conflicts because mode writes nothing.
 6. **Finger drawing** — should any mode accept it? *(§7.1)*
 7. **The words** — arrange/edit vs compose/view vs other. *(§7.10, naming pass)*
 
-## 9 · What this spec is checked against
+## 9 · What this spec is checked against, and where it came from
+- **`old/board-arrange-vs-edit-mode-plan.md`** — **the previous spec, archived** *(moved after the
+  2026-09-04 antagonist finished reading it)*. It holds the full reasoning trail: the schema-first
+  rule and why it was wrong, the review that killed v1, the loss audit, the owner's diagnosis
+  that rescued the idea. **Every ruling in §7c was lifted from it.** Read it for *why*; read this
+  for *what*.
 - `board-what-you-can-do.md` — every want there must reach its act in ≤2 gestures in some mode
-- `board-arrange-vs-edit-mode-plan.md` — the trail, including the review that killed v1
 - `docs/composition-spec.md` §4.2 — the floater must not conflict (§7.3)
 - `lexicon.md` — the words, under its naming-pass banner
