@@ -825,7 +825,7 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 ### 29c · Stamped: chips AND blocks, both in *(owner, 2026-09-03: "OK fine let's build inline… let's also have the block mentions… might as well build it and architect it in our schema")*
 - ✅ Inline mentions (chips) + embeds (blocks) both live in the architecture from day one.
 - ✅ Audio/pdf chip fallback confirmed against the board fact: on a board an audio bit IS the player (the block form, literally "how it looks on a board"); the chip adds the name form — caption → filename.
-- 🔵 **Bring-in grammar (leans, standing):** `[[` mid-sentence → chip · drawer DRAG → block between blocks · `/` menu → block. **The toggle is the safety valve under all three** — no door is a commitment (kinder than Notion's unflippable @-vs-/ choice).
+- 📜 **Bring-in grammar — CORRECTED (storage session, 2026-09-04): the RULED §9.3 governs.** Born-form follows the TARGET'S TYPE, not the door (owner-ruled, register F4): text·link·pdf·audio → **chip** · image·drawing → **block** · a composition → a distinct chip. Claude's door-grammar lean here contradicted that ruling and is withdrawn. What survives of it 🔵: the drawer's DRAG inserts between blocks (a block-level drop), and **the toggle stays the safety valve** — no arrival form is a commitment.
 - **Schema-blocking set, final:** §21.5 format (Claude's, at the session) · **file-registry vs walk-the-docs for the orphan sweep** (NEW — surfaced 2026-09-03, Claude's, at the session) · the tie CHECK written extensibly for parked board/source gathering (mechanical) · board symmetry (the owner's pending word). Everything else open is UI and trails the build safely.
 
 
