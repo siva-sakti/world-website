@@ -1,5 +1,46 @@
 # The board's two modes — the specification
 
+> # 🔴 ANTAGONIST v2 — verdict: NOT buildable. The core argument was FALSE. *(2026-09-04)*
+>
+> **Verified against the code, not relayed:**
+>
+> **B1 — the depth argument compared against a design that doesn't exist.** The spec said
+> entering a card today costs a *double-click*, and that on a phone double-tap fights the
+> browser. **Neither is true.** Entering is **click-when-already-selected**
+> (`card.tsx:350` — two separate taps, no timing window); there is no `onDoubleClick` on any
+> card body. And `.compose-board { touch-action: none }` (`globals.css:45`) **already**
+> suppresses browser double-tap zoom — empty-space double-tap-to-create proves it works on
+> touch today. So *"double-click is now free"* buys nothing: it was never spent. And the table
+> miscounted the incumbent: seeing a card's title/tags is **one** tap today (they appear on
+> select) — under the mode, from the landing mode, it is switch + tap = **two. Worse.**
+>
+> **The honest ledger:** the mode wins on entering the *second and later* card per visit; it
+> loses on seeing the first card's details; and "double-click = open everywhere" is available
+> today with no mode at all.
+>
+> **B2 — §4 violates §1.** The principle says *"never decides what you may DO"*; §4 greys **ten
+> controls by mode**. That is v1 with `disabled` instead of `display:none`. And it
+> contradicts itself: tags greyed in arrange for one card (§4), tags' *"natural home"* is
+> arrange for several (§7.7). **The fix is the owner's own words:** every act hangs off the
+> *selection*; the mode changes exactly two things — what a click on a card does, and where
+> typing goes.
+>
+> **B3 — edit mode has no selection or pointer model.** Drag on the *entered* card is text
+> selection (that is why `disableDragging={editing}` exists); marquee in edit selects things
+> nothing can act on; Escape's second stage returns to arrange with nothing to select.
+>
+> **Also:** a composition card's enter is **already ruled** — the floater
+> (`composition-spec.md` §10.1.4); this spec overrode it. `selectMode` is today's **only touch
+> multi-select**, retired with no replacement. §5.1 rules on board-cards, which never render.
+> Text cards **do** change height on enter (they are auto-height), so §5's "never changes
+> size" is false.
+>
+> **What survives all of it, and it is the owner's original instinct, not Claude's argument:**
+> *"it makes sense in the mind to separate these actions."* That is a reason. It is just not
+> the one this spec argued from. **Whether it is enough is the owner's call, with the corrected
+> ledger in front of them.**
+
+
 **Status: 🔵 a top-down draft for the owner, then an antagonist, then the owner again. Nothing
 built.** Written 2026-09-04. The reasoning trail that produced it is
 `board-arrange-vs-edit-mode-plan.md`; this document is the *result*, laid out from the top so
