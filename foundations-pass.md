@@ -23,36 +23,119 @@ than Claude.
 
 ---
 
-## 2 · The foundations — the things features stand on
+## 2 · What counts, and the complete list *(rebuilt from the code, 2026-09-04)*
 
-Not features. The things features *assume*. Candidates, with where each stands **today** (from
-this week's work — several are already solid):
+### What counts *(owner corrected Claude's first definition)*
+Claude first said a foundation is *"something features assume rather than provide."* The owner:
+*"Shouldn't we be looking at everything — anything we're calculating, any basis we're using to
+move forward?"* **Yes.** That definition let small things slip. **The list is every mechanism:
+anything the app calculates or relies on**, however small. A minor calculation nobody thinks of
+as a foundation can still be the thing that is wrong. The families below exist so the walk
+misses nothing — *"if creating families helps you run through things without missing anything,
+do it — just make sure the lists are comprehensive."*
 
-| foundation | what it is, plainly | written | tested | chosen |
-|---|---|---|---|---|
-| **the coordinate system** | the board is a plane with a fixed origin; panning moves your window, not the world | ❌ | ✅ | ❌ never |
-| **the camera memory** | where you were looking, per board, **per device** (local storage, not the database) | ❌ | ✅ | ⚪ implicit |
-| **how things arrive** | three paths: where you tap · where you're looking · right-of-cluster when you're not there | ❌ | ✅ | ⚠ partly |
-| **placement** | one bit on one board; position, size, tilt, lock, arrival, departure | ✅ | ✅ | ✅ |
-| **the render rule** | `board_cards`: a card shows iff present + bit live + board live | ✅ | ✅ | ✅ |
-| **selection** | which cards are picked; keyed by *bit* (a placement id can rename) | ❌ | ⚠ partly | ✅ this week |
-| **identity** | bit ids · placement ids · optimistic ids · reconcile | ❌ | ⚠ partly | ✅ |
-| **the save model** | optimistic + debounced + chained per row; the queue holds what isn't safely saved | ✅ | ✅ this week | ✅ this week |
-| **resting states** | live / archived / trashed; trash wins; one door | ✅ | ✅ | ✅ |
-| **the type set** | six kinds of bit; SQL and TypeScript must agree | ✅ | ✅ this week | ✅ |
-| **the copy rule** | a copy inherits what the bit has, never what points at it | ✅ this week | ✅ this week | ✅ |
-| **dates and zones** | stored UTC; shown in the reader's zone | ✅ this week | ✅ this week | ✅ this week |
-| **files** | where a bit's file lives, by type; copies get their own | ⚠ partly | ✅ | ✅ |
-| **two devices** | last write wins, no versions (I-D5) — ruled for positions, **not re-examined for a document body** | ✅ | ❌ | ⚠ needs re-ruling |
-| **undo** | one board-scoped stack; survivor rule; settled before reverse | ✅ | ✅ | ✅ |
-| **the security boundary** | RLS on every table; anon key only; no service key in `src/` | ✅ | ❌ **no test that every table has RLS** | ✅ |
-| **the board's kinds** | canvas vs frame — **ruled today as a choice at creation**; the frame plan says otherwise | ❌ | ❌ | ✅ today |
+**Built from the code**, one entry per mechanism module, so "comprehensive" is checkable: run
+`ls src/lib src/lib/db "src/app/board/[id]" src/components` and every non-test file is here.
 
-**Reading the grid:** eight rows are already solid from this week. The pass is about the other
-nine — and three of them (coordinates · arrivals · two devices) sit directly under the modes and
-frame builds, which is why this comes first.
+### The eight families — ~60 mechanisms
 
----
+**✅ = already solid from this week's board work (written · tested · chosen). Everything else is
+walked in this pass.**
+
+**A · SPACE — where things are, and how you see them**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| the coordinate system | a plane with a fixed origin; panning moves your window | `geometry.ts` · `use-camera.ts` | ❌ unwritten, unchosen |
+| the camera | pan · zoom · fit · pinch | `use-camera.ts` | ⚠ tested, unwritten |
+| the camera memory | where you were, per board, **per device** (local storage) | `camera-storage.ts` | ⚠ tested, unwritten, implicit choice |
+| how things arrive | where you tap · where you're looking · right-of-cluster | `placement-anchor.ts` · `board-arrange.ts` (firstClearSpot) · `use-create-doors.ts` | ⚠ tested, unwritten, three rules |
+| measured sizes | a card's real rendered size (text is auto-height) | `use-geometry.ts` | ⚠ |
+| default sizes | what size a new card gets, by type | `card-defaults.ts` | ✅ |
+| snapping | the magenta guides; nearest wins | `geometry.ts` | ✅ |
+| alignment maths | line up · even gaps · tidy · the visual box for tilted cards | `board-arrange.ts` · `geometry.ts` | ✅ |
+
+**B · THINGS — what a bit, a board and a placement are**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| placement | one bit on one board: position · size · tilt · lock · arrival · departure | `placement-fields.ts` · `db/bits.ts` | ✅ |
+| identity | bit ids · placement ids · optimistic ids · reconcile | `db/bits.ts` · `write-queue.ts` | ⚠ partly tested, unwritten |
+| the type set | six kinds; SQL and TypeScript must agree | `card-vm.ts` · `types.ts` | ✅ |
+| the copy rule | inherits what it has, never what points at it | `db/bit-copy-rule.ts` | ✅ |
+| files | where a bit's file lives, by type | `storage.ts` | ✅ |
+| media intake | image · audio · PDF: validate → decode → downscale | `media.ts` · `media-audio.ts` · `media-pdf.ts` | ⚠ |
+| the pen's strokes | a pressure-aware outline | `stroke.ts` | ⚠ |
+| a link's substance | fetching a page's title | `page-meta.ts` · `bits/actions.ts` | ⚠ |
+| the card view-model | what a card is to the screen | `card-vm.ts` | ✅ |
+| labels and faces | what to call a thing that has no name | `labels.ts` · the `face` column | ✅ |
+| html | escape · plain-text → paragraphs | `html.ts` | ⚠ |
+
+**C · ACTS — how things change**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| the save model | optimistic · debounced · chained per row · the queue holds what isn't saved | `write-queue.ts` · `use-persistence.ts` · `save-guard.ts` | ✅ |
+| creation | every way a card is born | `use-create-doors.ts` | ⚠ unwritten, 503 lines |
+| removal | remove · trash · archive; rollback per leg | `remove-acts.ts` · `db/resting.ts` | ✅ |
+| arrangement acts | the recording layer for move/align/tidy | `use-arrange-acts.ts` · `use-alignment-acts.ts` · `act-rules.ts` | ✅ |
+| meaning acts | tag · untag, recorded | `use-meaning-acts.ts` · `db/tags.ts` | ⚠ |
+| undo | one stack · survivor rule · settled before reverse | `undo-stack.ts` · `use-undo.ts` | ✅ |
+| the act door | a button that does something and might fail | `use-act.tsx` | ✅ |
+| confirms | trash · archive ask, one door each | `confirm.tsx` · `trash-confirm.ts` · `archive-confirm.ts` | ✅ |
+| the jot draft | the capture box survives a reload (local) | `jot-draft.ts` | ✅ tested |
+
+**D · STATE — what is remembered, and where**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| resting states | live · archived · trashed; trash wins | `db/resting.ts` | ✅ |
+| selection | which cards are picked; keyed by bit | `board-surface.tsx` · `use-marquee-select.ts` | ⚠ unwritten |
+| local storage | the safe wrapper | `local-storage.ts` | ✅ |
+| openings / recent | where you were, across devices (the database) | `db/openings.ts` · `recent.ts` · `record-opening.tsx` | ✅ |
+| the shelf | groups and pins — how home is arranged | `db/shelf.ts` | ⚠ |
+| **the mode** *(coming)* | arrange / edit, per visit | — | 🔵 specified, not built |
+
+**E · FINDING — how things are found**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| search | the search language; computed, stored nowhere | `db/search.ts` · `search-query.ts` | ⚠ **flagged inconsistent earlier** |
+| jump-to | word-start title matching | `jump-match.ts` | ⚠ |
+| the drawer | all your bits, by kind, filtered | `drawer.tsx` (367 lines) | ⚠ **never examined** |
+| loose / the inbox | which bits are on no board | `db/inbox.ts` · `db/board-membership.ts` | ✅ |
+| the outline | the world inverted for scanning | `outline.ts` | ⚠ |
+| the graph | the word web | `db/graph.ts` | ⚠ |
+| references / gather | the `[[` chip and its rows | `db/references.ts` · `bitref.ts` | ⚠ **format assumption (HTML regex)** |
+| paging | past 1000 rows, PostgREST truncates silently | `db/paged.ts` | ✅ |
+
+**F · TRUST — the boundaries**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| the security boundary | RLS on every table · anon key only · no service key | migrations · `supabase/` | ⚠ **no test that every table has RLS** |
+| two devices | last write wins, no versions (I-D5) | the schema | ⚠ ruled for positions, **not for a document** |
+| dates and zones | stored UTC, shown in the reader's zone | `dates.ts` · `zone.tsx` · `reader-zone.ts` · `stamp.tsx` | ✅ |
+| export completeness | every table the export must carry | `db/exported-tables.ts` | ✅ |
+| the boundary tests | dates only in one place; db only in one place; saves keep order | `boundaries.test.mjs` | ✅ |
+
+**G · STRUCTURE — what surfaces exist**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| the render rule | a card shows iff present + bit live + board live | `board_cards` view | ✅ |
+| the board's kinds | canvas vs frame — **ruled today: chosen at creation** | — | ❌ unwritten; frame plan says otherwise |
+| surfaces | a board or a note, flattened for home | `surfaces.ts` | ⚠ |
+| sources | where a bit came from | `db/sources.ts` | ⚠ |
+| the rail | one cabinet, everywhere | `rail.tsx` | ⚠ |
+| floating UI | pickers · peeks · menus, placed | `floating.ts` · `picker-menu.tsx` · `searchable-picker.tsx` · `folder-picker.tsx` | ⚠ |
+
+**H · INPUT — how you interact**
+| mechanism | plainly | lives in | status |
+|---|---|---|---|
+| the board's pointer | what a press on empty space means | `use-board-pointer.ts` | ✅ extracted, unwritten |
+| card drag | drag · group drag · snap | `use-card-drag.ts` | ✅ extracted |
+| marquee | rubber-band select | `use-marquee-select.ts` | ⚠ |
+| the keyboard | Escape · arrows · Delete · ⌘A · undo | `use-board-keys.ts` | ⚠ |
+| the pen's input | refuses fingers (palm rejection) | `draw-overlay.tsx` | ⚠ **flagged** |
+
+### The count
+~60 mechanisms. **About 25 already ✅.** The pass walks the other ~35, and three of them sit
+directly under the modes and frame builds: **the coordinate system · how things arrive · two
+devices for a document.** That is why this comes first.
 
 ## 3 · The process — beginning to end
 
