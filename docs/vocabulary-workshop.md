@@ -45,6 +45,13 @@ Her leanings: ✅ *"I like pull or gather"* · ❌ *bring* (*"that's what you're
 ### 3.4 ⚠ "block" — a CONFIRMED defect (owner, 2026-09-04)
 *"Anything can be a block on the composition surface — it's just that some blocks are bits, or links to other compositions."* **Right:** a paragraph is a block, a heading is a block — so "block" cannot ALSO name a pulled-in thing. **What is actually distinct is provenance, not blockness:** its content lives elsewhere. ✅ **"chip" survives** (*"chip is kind of cute"*); the SHOWN form needs the precise word. *(Marked at the definition in `composition-spec.md` §3.3.)*
 
+### 3.4b ⚠ "table" means THREE things — a collision the owner caught (2026-09-04)
+*"I saw the word table — I need more specifics about what that means."* She was right to stop on it:
+1. **a database table** — a storage box the app keeps records in (technical-only; the user never meets this sense)
+2. **the table block** — a grid you type into inside your writing (an editor feature, stage ②; user-facing)
+3. **the table BIT type** — a table as its own piece of material on a board (ruled X4, not in this build; user-facing later)
+Sense 1 stays technical vocabulary. Senses 2 and 3 will BOTH face the user someday — **the naming session should decide whether they can share the word or one needs renaming.**
+
 ### 3.5 The smaller opens
 The list's route *(the piece is `/composition/[id]`; the LIST is home — `/notes` is only a redirect)* · **the inbox / "loose"** — is *loose* the right word for a bit no board shows? · **the desk** vs home · `/write`'s fate *(stays a room, or becomes "new ___" everywhere)* · the **direction words** (forward has none; backward reads "gathered into").
 

@@ -81,3 +81,7 @@ The one thing the app never does: a paragraph from one piece *living inside* ano
 - **Verified:** a text card IS editable in place on a board (`card.tsx`'s `editing`), so the rule is *where it lives*, NOT "only its own page."
 - **And most bits have nothing to edit** — an image is a file, a recording is a recording. What changes is what you *say about* them: caption · tags · where it came from. **Only text is words you can rewrite.**
 - **Why the window is not a limitation but the point:** a composition does not contain a bit, it looks at one. Editing through it would be reaching through a window to redecorate another room — and the model's answer when you truly want your own version is the copy-door (`composition-spec.md` §24.5b).
+
+## The two doors, and the one law under the gestures *(2026-09-04; the line that landed with the owner)*
+**Two ways to bring things in:** the **typed shortcuts** — `[[` puts a chip in your sentence; the `/` menu puts a block on the page — for when you know what you want; and **the drawer** — browse your bits, click or drag one in — for when you want to look.
+**The one law under all the gestures:** *a gesture made inside the writing makes a NAME (a chip); a gesture that places something makes a THING (a block).* Clicking a drawer row inserts at your cursor (a chip, mid-sentence by physics); dragging a row onto the page drops a block. Same law everywhere — teachable in one sentence, plus on-hover hints (owner-ruled: distinct gestures, taught on screen).
