@@ -33,6 +33,11 @@ So there are two things a person is doing on a board, and they are different:
 question — *what would a person want here?* — and what they would *not* want is what gets
 greyed. That question, not a rule about permissions or data, decides every row of §3.
 
+**The owner's decision, in their words:** *"I think there should be an arrange mode versus an
+edit mode. I think it's good. I actually really like the idea."* And, on the cost once it was
+laid out honestly: *"that's all we lose — one little extra step to change one button. To me
+that's not a big deal."*
+
 **Two things Claude adds, both agreed in conversation:**
 - **Switching must be cheap** — one button. The app cannot see your state of mind, only which
   toggle you clicked. If switching is even slightly annoying, the modes become friction instead
@@ -101,7 +106,7 @@ person want when editing? Those are the buttons we grey.*
 |---|---|---|---|---|
 | *"move this"* | **drag** | ✅ | ⚪ **open** — see §3g | the defining arrange act |
 | *"make it bigger / smaller"* | **resize** | ✅ | 🔘 greyed | |
-| *"give it some life"* | **rotate** *(with the live degrees readout)* | ✅ | 🔘 greyed | |
+| *"give it some life"* | **rotate** *(with the live degrees readout)* | ✅ | 🔘 greyed | the owner was unsure — *"rotation should also be in the arrange mode… I don't know"* — and it settles under the method: turning a card is composing, not working on what it is |
 | *"put it back straight"* | **straighten** | ✅ | 🔘 greyed | |
 | *"these should line up"* | **line up** *(6)* | ✅ | 🔘 greyed | composing, plainly |
 | *"space these evenly"* | **even gaps** *(2)* | ✅ | 🔘 greyed | |
@@ -116,7 +121,7 @@ person want when editing? Those are the buttons we grey.*
 
 | what you're trying to do | what we call it | arrange | edit | how we're thinking about it |
 |---|---|---|---|---|
-| *"move around"* | **pan** *(drag empty space)* | ✅ | ✅ | looking is wanted in both |
+| *"move around"* | **pan** *(drag empty space)* | ✅ | ✅ | looking is wanted in both. **Owner-ruled that panning stays on empty-space drag** — *"wouldn't panning just be dragging your mouse on empty space? Wouldn't that be easier?"* — so select-several takes a modifier or a button, never the plain drag |
 | *"closer / further"* | **zoom** | ✅ | ✅ | |
 | *"show me everything"* | **fit to view** | ✅ | ✅ | |
 | *"when did all this arrive?"* | **timeline** | ✅ | ✅ | a separate page; not affected by mode |
@@ -183,8 +188,27 @@ Three tells, and **the cards are not one of them**:
 | **the cursor** | 🔵 a grab hand over cards | 🔵 a text cursor over cards |
 | **what happens when you interact** | a click selects · a drag moves | a click enters · typing writes |
 
+### The toolbar — one toolbar, greyed by mode *(owner-ruled)*
+
+> *"All the toolbar icons stay the same, but whether you're in one mode or the other some things
+> get greyed out or not clickable. That might be more intuitive than shuffling around the whole
+> toolbar every time."*
+
+And, earlier: *"it shouldn't be the same toolbar, but a lot of the foundational things should be
+the same."* Reconciled as: **the same controls in the same places; what differs is which are
+live.** A greyed control is not silent — **tapping it says in one line why, and offers the
+switch.** That is the owner's *"helpful on-screen hints and guides for people"* — the greyed
+button teaches what the other mode has, and is the shortcut into it.
+
+### The cards — they look like themselves
+
 **Cards look like themselves in both modes.** Owner: *"the cards don't have to look different…
 in general I want arrange mode to look like arrange mode, and I want things to look pretty."*
+
+*(For the record: the first idea was stronger — "every time you arrange it's just gonna be a
+cleaned-out version of the card, no title, no tag; every time you edit they'd see the details."
+The owner then narrowed it themselves: "you want everything you're NOT touching to look like it's
+in its final mode." So: clean everywhere, details only on the card you are inside.)*
 
 ⚪ **Open:** a subtle interactive hint on cards in arrange — *"little circles on the corners that
 get highlighted"* — owner: *"I don't know if we even need that."* Not decided; leave off until
@@ -194,6 +218,10 @@ the mode has been lived with.
 else on the board changes. *(Owner, earlier: "you want everything you're not touching to look
 like it's in its final mode.")* This is not a mode tell; it is just what being inside a card
 looks like.
+
+**Edit mode never moves anything.** Owner: *"that would not change how it's arranged on the
+page… you'd be able to click in, but you wouldn't be able to move things around."* Same cards,
+same places, same sizes, same zoom. A mode switch is visually calm.
 
 ---
 
