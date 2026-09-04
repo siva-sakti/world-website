@@ -36,15 +36,15 @@
 - *a finding with sources* → a `research-*.md` — 🟢 findings don't expire with plans
 - *scratch, a list, a parallel attempt* → **a new doc is fine** — mark it 🟠 and index it
 
-### Doc status right now — convergence OWED on the convergent-surfaces thread
+### Doc status right now — ✅ **the convergent-surfaces thread CONVERGED**: `composition-spec.md` is the verified authority (D-146); the three docs below are its predecessors and are superseded
 
 | doc | status |
 |---|---|
 | `app-things-inventory.md` | 🟢 the current answer to *what are we building* |
 | `research-block-editors.md` · `research-structured-data.md` | 🟢 findings, sourced, settled |
-| `convergent-surfaces-overview.md` | 🟠 working — its §0 is now under challenge |
-| `convergent-surfaces-stress-test.md` | 🟠 working — a reviewer's opinion, not ruled |
-| `composition-surface-spec.md` | 🟠 working — the doc-surface detail |
+| `convergent-surfaces-overview.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
+| `convergent-surfaces-stress-test.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
+| `composition-surface-spec.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
 | `tables-and-structured-data.md` | 🟠 working — an open question |
 | all `product-concept-*.md` | 🟠 working — thinking in progress, status-banners inside |
 

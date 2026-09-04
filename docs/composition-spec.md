@@ -514,7 +514,7 @@ The chain is **floater → panel → page**, each a single control. **Content is
 Every control reachable by keyboard · the picker and peek are focus-trapped while open and return focus to the caret on close · chips and blocks are announced as what they are (*"reference: 〈face〉"*) rather than as decoration · the fold state of a toggle is announced · contrast meets the app's existing standard. 🔵 **Not yet specified in detail; this is the floor, not the design.**
 
 ## 19 · What Part III does NOT cover
-Visual style — type, colour, spacing, the paper treatments — belongs to the **aesthetics track** (`aesthetics-phase.md`), not here. This Part specifies **structure and state**; the look is the owner's, and the two must be reconciled at her refinement pass.
+Visual style — type, colour, spacing, the paper treatments — belongs to **the owner's refinement pass**, not here. ⚠ *(2026-09-04: this previously cited `aesthetics-phase.md`, which does not exist — a broken pointer. The refinement pass has no doc yet; it is listed in the build plan's "riding alongside" and gets one when she starts it.)* This Part specifies **structure and state**; the look is the owner's, and the two must be reconciled at her refinement pass.
 
 ## 20 · Living with a composition — navigation, reading, history *(owner-ruled 2026-09-02; previously unnamed)*
 
