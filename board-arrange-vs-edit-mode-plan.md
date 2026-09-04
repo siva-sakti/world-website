@@ -1,4 +1,4 @@
-# Arrange mode vs Edit mode — a draft for the owner
+# A board's two modes: ARRANGE vs EDIT — a draft for the owner
 
 **Status: a DRAFT for the owner to react to.** Nothing built. Written 2026-09-04 at the
 owner's ask: *"I think there should be an arrange mode versus an edit mode… can you draft up
@@ -9,8 +9,10 @@ stuff… I think it would simplify things."*
 
 ## 1 · The one-sentence version
 
-**Arrange mode treats a card as an object. Edit mode treats it as a page.** Right now the
-board tries to be both at once, and works out which one you meant from how you clicked.
+**Arrange mode treats a card as an object; edit mode treats it as a page — and they LOOK
+different.** In arrange you see the things themselves, stripped of titles and tags; in edit you
+see each thing with its details. Right now the board tries to be both at once, and works out
+which one you meant from how you clicked.
 
 ## 2 · What this is, and what it is NOT *(corrected by the owner, 2026-09-04)*
 
@@ -47,6 +49,34 @@ argument for the feature.
 not hypothetical and it is not designed away by wanting it not to happen — it is paid for with
 visibility (§5) and with `Escape` always meaning "back to arrange".
 
+## 2b · ⭐ THE CARD LOOKS DIFFERENT IN EACH MODE *(owner-ruled 2026-09-04)*
+
+*"Every time you arrange, it's just gonna be a cleaned-out version of the card — no title, no
+tag. Every time you edit, they would see the details of it."*
+
+**This is the strongest part of the feature, and it was not in Claude's draft.** The modes were
+framed as differing in what your gestures *do*. The owner's version is that they differ in what
+you *see*:
+
+| | **ARRANGE** | **EDIT** |
+|---|---|---|
+| the card shows | **the thing itself, and nothing else** — the photo, the words, the drawing | the thing **plus its details**: title · tags · source · caption |
+| the board reads as | your material, arranged | your material, with its machinery visible |
+
+**Why this matters more than the gesture rules:** arranging is a *visual* act — you are judging
+shape, weight and spacing. Titles and tag chips are exactly the noise that makes that hard, and
+they are attached to every card at once. Stripping them is not a tidiness preference; it is what
+makes the arrange surface usable for the thing it is for.
+
+And it gives the mode an **honest tell**. §8 names "a mode you can be in without knowing" as the
+way this fails. If the whole board visibly changes appearance, that failure mostly cannot happen
+— the answer to *"which mode am I in?"* is the screen itself, not a highlighted button.
+
+⚪ **Open, and worth one look before it is called right:** does a card in arrange keep its
+*caption* (words the owner wrote about a photo)? It is a title by another name, but for a photo
+it is often the only way to tell two similar images apart. 🔵 Lean: **no** in arrange — the
+image is the identity there — but this is the one place the rule might read as losing something.
+
 ## 3 · What each mode holds
 
 | | **ARRANGE** — the board as a space | **EDIT** — the card as a page |
@@ -56,7 +86,7 @@ visibility (§5) and with `Escape` always meaning "back to arrange".
 | resize · rotate | ✅ | ✗ |
 | **alignment guides + snapping** | ✅ **only here** | ✗ |
 | align · distribute · tidy buttons | ✅ | ✗ hidden, not greyed |
-| multi-select · marquee | ✅ | ✗ |
+| multi-select · marquee | ✅ *(owner: selecting several is an arrange thing)* | ✗ |
 | lock · send to back · duplicate | ✅ | ✗ |
 | typing into a card | ✗ | ✅ |
 | tags · title · source · caption | ✗ | ✅ |
@@ -119,8 +149,9 @@ your bits changes, and it is revertible in one commit. That is unusual for a cha
 visible, and it is the argument for building it rather than debating it.
 
 ## 8 · What would make this fail
-- **A mode you can be in without knowing.** Mitigation: the cursor changes, the toolbar
-  changes shape, and `Escape` always gets you out.
+- ~~**A mode you can be in without knowing.**~~ **Largely answered by §2b** — the whole board
+  changes appearance, so the answer to "which mode am I in?" is the screen rather than a
+  highlighted button. `Escape` still always returns to arrange.
 - **Solving a problem that isn't there.** The owner's original example — guides intruding while
   editing — turned out to be already impossible. The case for this rests on the *other* four
   rows of §3, not that one.
