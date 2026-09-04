@@ -76,7 +76,15 @@ export function makeWriteQueue(
   function trackCreate(placementId: string, p: Promise<unknown>) {
     const safe = p.catch(() => {});
     state.creates.set(placementId, safe);
-    safe.finally(() => state.creates.delete(placementId));
+    // Delete only OUR entry (P5). A placement id can get a SECOND create — un-place a
+    // card, then undo, and remove-acts revives it under the same id — and the old
+    // unconditional delete let the first create's cleanup evict the second. `settled()`
+    // then returned immediately, and the write hit a row that did not exist yet: 0 rows,
+    // act silently lost. `chains` carries this same guard in two places; this map was
+    // missed when that hazard was fixed there.
+    safe.finally(() => {
+      if (state.creates.get(placementId) === safe) state.creates.delete(placementId);
+    });
   }
 
   /** Wait for this card's create (if in flight) and resolve the REAL placement id
@@ -114,9 +122,24 @@ export function makeWriteQueue(
    *  whole patch and showed a banner about words that had landed.) */
   async function flush(placementId: string): Promise<boolean> {
     const p = state.pending.get(placementId);
-    state.pending.delete(placementId); // capture-at-fire (kept BEFORE any await — deliberate)
+    // Cancel the debounce timer, don't merely forget it (P6). Forgetting left a stray
+    // timer that re-fired a failed write later — contradicting the stated policy that a
+    // failure is retried only by your next edit or by flushAll.
+    const armed = state.timers.get(placementId);
+    if (armed) clearTimeout(armed);
     state.timers.delete(placementId);
     if (!p) return true;
+    // SNAPSHOT — the entry STAYS QUEUED until the database confirms it (P1 · P2).
+    // The old shape removed it here, before any await, and tried to put it back on
+    // failure; in the gap a newer edit could be captured and land, and the put-back
+    // then re-queued the older values over it. Nothing is put back now because
+    // nothing is taken out — see clearWritten for the other half.
+    const snap: PendingWrite = {
+      bitId: p.bitId,
+      placement: { ...p.placement },
+      body: p.body,
+      content: p.content,
+    };
     // The row must exist before we update it; resolve the id AFTER the wait —
     // a reconcile may have landed meanwhile. (settled never rejects.)
     const realId = await settled(placementId);
@@ -130,36 +153,38 @@ export function makeWriteQueue(
     const prev = state.chains.get(realId) ?? Promise.resolve();
     const tail = prev
       .then(async () => {
-        if (Object.keys(p.placement).length)
-          await doors.updatePlacement(supabase, realId, p.placement);
+        if (Object.keys(snap.placement).length)
+          await doors.updatePlacement(supabase, realId, snap.placement);
         // The TITLE / CAPTION joins the queue (2026-09-03). It used to be written
         // directly, outside `pending`, which cost it two things every other write has:
         // a failed title was reported and then DROPPED, with no retry, while the banner
         // said "your work is still here" — and flushNow's "the words landed" promise,
         // which every remove act gates on, did not cover it at all.
-        if (p.content !== undefined) await doors.updateBitContent(supabase, p.bitId, p.content);
-        if (p.body !== undefined) {
-          await doors.updateBitBody(supabase, p.bitId, p.body);
+        if (snap.content !== undefined)
+          await doors.updateBitContent(supabase, snap.bitId, snap.content);
+        if (snap.body !== undefined) {
+          await doors.updateBitBody(supabase, snap.bitId, snap.body);
           bodyLanded = true; // the WORDS are safe from here (hunt #7 carve)
           // Reconcile the note's `[[` chips into `reference` rows (self-heals on a
           // later save/read if this leg fails — plan risk 1).
-          await doors.reconcileReferences(supabase, p.bitId, doors.extractRefIds(p.body));
+          await doors.reconcileReferences(supabase, snap.bitId, doors.extractRefIds(snap.body));
         }
+        clearWritten(placementId, realId, snap);
       })
       .catch((e) => {
         if (bodyLanded) {
-          // Only the reconcile leg failed: the body saved. No restore (it would
-          // re-write identical words), no banner (it would lie). Self-heals.
+          // Only the reconcile leg failed: everything the owner typed DID land, so it
+          // comes off the queue exactly as a success would. No banner (it would lie).
+          // The index self-heals on the next save.
+          clearWritten(placementId, realId, snap);
           console.error("reference reconcile failed (self-heals on next save):", e);
           return;
         }
         ok = false;
-        // The patch was captured-at-fire and deleted, so a failure used to strand
-        // the change in React state forever while the banner said "your work is
-        // still here" (review F3). Put it BACK so the next edit — or the flushAll
-        // when you leave the board / the tab hides — writes it. Keyed by realId:
-        // the optimistic id may have been reconciled away.
-        restorePending(realId, p);
+        // Nothing to put back: the patch never left `pending`. The next edit to this
+        // card, or flushAll when you leave the board, writes it. Deliberately does NOT
+        // re-arm a timer — an offline board would become a request storm re-firing the
+        // error banner every debounce.
         onErr(e);
       });
     state.chains.set(realId, tail);
@@ -170,21 +195,29 @@ export function makeWriteQueue(
     return ok;
   }
 
-  /** Put a FAILED patch back into `pending` so a later flush retries it. Field-level
-   *  merge with the CURRENT entry winning: anything already pending was scheduled
-   *  after this patch was captured, so it is genuinely newer. (Safe because no call
-   *  site ever patches x without y — a mixed old-x/new-y position can't arise.)
-   *  Deliberately does NOT re-arm a timer: an offline board would become a request
-   *  storm re-firing the error banner every 350ms. The natural retry points are the
-   *  next edit to this card and flushAll. */
-  function restorePending(key: string, p: { bitId: string; placement: PlacementPatch; body?: string }) {
-    const cur = state.pending.get(key);
-    if (!cur) {
-      state.pending.set(key, p);
-      return;
+  /** Take off the queue exactly what this write put in the database — and ONLY where the
+   *  queued value is still the one that was written. If you edited the card again while
+   *  the write was in the air, the queued value now differs, so it STAYS and the next
+   *  flush writes it. That comparison is the whole of P2's fix: a slow write can no longer
+   *  revert a newer one that already landed, because it can only ever clear its own value.
+   *
+   *  Clears under BOTH ids: a call-in revive can rename the card mid-write, and a value
+   *  left under the dead key would be re-written on every later flush, forever.
+   *
+   *  The queue's rule, in one line: **it holds what is not yet safely saved.** */
+  function clearWritten(key: string, realId: string, snap: PendingWrite) {
+    for (const k of new Set([key, realId])) {
+      const cur = state.pending.get(k);
+      if (!cur) continue;
+      for (const f of Object.keys(snap.placement) as (keyof PlacementPatch)[]) {
+        if (cur.placement[f] === snap.placement[f]) delete cur.placement[f];
+      }
+      if (snap.body !== undefined && cur.body === snap.body) delete cur.body;
+      if (snap.content !== undefined && cur.content === snap.content) delete cur.content;
+      const empty =
+        !Object.keys(cur.placement).length && cur.body === undefined && cur.content === undefined;
+      if (empty) state.pending.delete(k);
     }
-    cur.placement = { ...p.placement, ...cur.placement };
-    if (cur.body === undefined && p.body !== undefined) cur.body = p.body;
   }
 
   /** Drop everything queued for a card — called by the remove acts once the removal

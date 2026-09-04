@@ -13,8 +13,9 @@ import { makeWriteQueue, newQueueState } from "./write-queue.ts";
 // Nothing touches Supabase. The fakes record what WOULD have been written, and each
 // call can be left hanging so a test can decide when — and whether — it lands.
 //
-// The two tests marked ⚠ FAIL ON PURPOSE. They are the evidence for two live bugs;
-// they pass once the bugs are fixed, and not before.
+// The tests marked ⚠ were written BEFORE the fix and failed on purpose — they are the
+// evidence for four live bugs (P1 P2 P5 P6). They pass as of the queue redesign; each
+// one keeps failing forever if the bug is ever reintroduced, which is the point of them.
 
 /** Let every already-queued microtask run. */
 const tick = () => new Promise((r) => setImmediate(r));
@@ -222,4 +223,48 @@ test("a save made under the optimistic id lands on the real row after a call-in 
   assert.equal(writes.length, 1);
   assert.equal(writes[0].args[1], "real-1", "the write must find the revived row, not the id the client guessed");
   assert.deepEqual(writes[0].args[2], { x: 7 });
+});
+
+test("⚠ P5 — a second create for the same card must not be evicted by the first (un-place, then undo)", async () => {
+  const { q, of } = harness();
+  let landed1, landed2;
+  const create1 = new Promise((r) => (landed1 = r));
+  const create2 = new Promise((r) => (landed2 = r));
+  q.trackCreate("p1", create1);
+  q.trackCreate("p1", create2); // the undo-revive registers a SECOND create under the same id
+  landed1();
+  await tick();
+  await tick(); // the first create's cleanup runs here — it must not remove the second
+
+  q.patchCard("p1", "b1", { x: 5 });
+  const writing = q.flushNow("p1");
+  await tick();
+  await tick();
+  assert.equal(
+    of("updatePlacement").length,
+    0,
+    "the write must still be waiting — the row does not exist until the LIVE create lands",
+  );
+
+  landed2();
+  await writing;
+  assert.equal(of("updatePlacement").length, 1, "and it writes once the live create lands");
+});
+
+test("⚠ P6 — a failed save is not re-fired by a leftover timer (retry is your next edit, or leaving the board)", async () => {
+  const { q, manual, of } = harness({ debounceMs: 5 });
+  manual.add("updatePlacement");
+  q.patchCard("p1", "b1", { x: 1 }); // arms the debounce timer
+  const writing = q.flushNow("p1"); // fires early — and must CANCEL that timer
+  await tick();
+  of("updatePlacement")[0].reject(new Error("offline"));
+  await writing;
+
+  await sleep(25); // well past the debounce
+  await tick();
+  assert.equal(
+    of("updatePlacement").length,
+    1,
+    "a stray timer must not re-fire the failed write behind the owner's back",
+  );
 });

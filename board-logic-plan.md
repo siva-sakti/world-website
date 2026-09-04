@@ -36,10 +36,10 @@ Update the status column in the same session anything moves. *(Findings live in
 | | What | Status |
 |---|---|---|
 | **P3** | the save queue can't be tested — welded to React | ✅ **done** — `write-queue.ts`, 9 tests, 149 → 158 |
-| **P2** | a failed save can overwrite one that succeeded | ✅ **PROVEN FAILING** — wire traffic `[1, 2, 1]` |
-| **P1** | a failed title/caption is dropped — **⚠ narrower than Claude described**, see below | ✅ **PROVEN FAILING** (corrected) |
-| **P5** | 🆕 **`trackCreate` deletes by key with no identity guard** — a second create for the same card (un-place → undo revives the id) lets the first one's cleanup evict the second; `settled()` then returns early and the write hits a row that doesn't exist → **act silently lost**. `chains` was hardened against this exact shape in two places; `creates` was not. | ⬜ step 2 |
-| **P6** | 🆕 `flush()` drops its debounce timer from the map but never `clearTimeout`s it, so a stray timer re-fires a restored patch — contradicting `restorePending`'s own stated policy of never re-arming | ⬜ step 2 |
+| **P2** | a failed save can overwrite one that succeeded | ✅ **FIXED** — proven failing first (`[1,2,1]`), now green |
+| **P1** | a failed title/caption is dropped — **⚠ narrower than Claude described**, see below | ✅ **FIXED** — proven failing first, now green |
+| **P5** | 🆕 **`trackCreate` deletes by key with no identity guard** — a second create for the same card (un-place → undo revives the id) lets the first one's cleanup evict the second; `settled()` then returns early and the write hits a row that doesn't exist → **act silently lost**. `chains` was hardened against this exact shape in two places; `creates` was not. | ✅ **FIXED** + its own test |
+| **P6** | 🆕 `flush()` drops its debounce timer from the map but never `clearTimeout`s it, so a stray timer re-fires a restored patch — contradicting `restorePending`'s own stated policy of never re-arming | ✅ **FIXED** + its own test |
 | **S4/P4** | placement fields in 3 hand-kept lists — a new field silently doesn't save | ⬜ step 4 |
 | **S7** | `editingId` strands on an undo/redo reverse — keyboard goes dead | ⬜ step 4 |
 | **S3** | `restore()` guards by a different key than its 5 siblings — can show 2 cards for 1 bit | ⬜ step 4 |
@@ -496,8 +496,8 @@ so this is a contained change, not a sweep.
 
 | | | Needs you? |
 |---|---|---|
-| 1 | **Lift the save queue out of React + write the failing tests** — running now | no |
-| 2 | Fix P1 + P2 by the B.5 redesign; the same tests go green | no |
+| 1 | ✅ **Lift the save queue out of React + write the failing tests** — done, 149 → 158 | no |
+| 2 | ✅ **Fix P1 P2 P5 P6; the tests went green** — 160/160, each fix proven by reverting it | no |
 | 3 | Retry on reconnect (`online` event → one flush) — ruling 2 | no |
 | 4 | S4 field table · S7 `editingId` · S3 one guard key | no |
 | 5 | S5 one door for "which boards is this bit on" · S6 + E-1 dates (device-follows), with tests | no *(ruled)* |
