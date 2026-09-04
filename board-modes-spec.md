@@ -144,7 +144,7 @@ offers edit). Today it makes a card. That is a third behaviour that changes, add
 
 | what you're trying to do | what we call it | arrange | edit | how we're thinking about it |
 |---|---|---|---|---|
-| *"move around"* | **pan** *(drag empty space)* | ✅ | ✅ | looking is wanted in both. **Owner-ruled that panning stays on empty-space drag** — *"wouldn't panning just be dragging your mouse on empty space? Wouldn't that be easier?"* — so select-several takes a modifier or a button, never the plain drag |
+| *"move around"* | **pan** *(drag empty space)* | ✅ | ✅ | **both, but for a different reason than trash or duplicate:** panning is not part of either activity — it is how you get from one thing to the next. The floor you walk on, not something you do. Same for zoom and fit. **Owner-ruled that panning stays on empty-space drag** — *"wouldn't panning just be dragging your mouse on empty space? Wouldn't that be easier?"* — so select-several takes a modifier or a button, never the plain drag |
 | *"closer / further"* | **zoom** | ✅ | ✅ | |
 | *"show me everything"* | **fit to view** | ✅ | ✅ | |
 | *"when did all this arrive?"* | **timeline** | ✅ | ✅ | a separate page; not affected by mode |
@@ -176,10 +176,10 @@ If one feels wrong in practice, greying it is a single change.
 | *"this needs a name"* | **title · caption** | 🔘 | ✅ | |
 | *"file this with the retreat stuff"* | **tag** | 🔘 | ✅ | |
 | *"where did this come from?"* | **source** | 🔘 | ✅ | |
-| *"open it properly"* | **open** *(full page)* | ✅ | ✅ | going somewhere else; wanted from both |
+| *"open it properly"* | **open** *(full page)* | 🔘 greyed | ✅ | going into one thing — whether to write or to read — is the weeds. Owner: *"how would you do that in arrange mode?"* You wouldn't; you switch. *(Claude had it in both for the same wrong reason as §3a: "you might want it here." Same mistake, corrected.)* |
 
-**Edit is small on purpose.** It owns exactly the four things that change what a thing *is*.
-Everything else it shares with arrange. That is what keeps it from being a bucket.
+**Edit is small on purpose.** It owns the four things that change what a thing *is*, plus going
+into a thing. Everything else it shares with arrange. That is what keeps it from being a bucket.
 
 ### 3f · The board itself
 
