@@ -60,14 +60,28 @@ frame builds, which is why this comes first.
 isn't a foundation. **This is the only step that can't be delegated** — the list of what the app
 stands on is a judgement.
 
-**Step 2 · Read each unsolid foundation.** *(Claude + agents)* For every ❌ or ⚠: what does the
-code actually do? Agents read; Claude verifies every claim against the code before it's called a
-fact — the discipline that caught two false findings this week. Output: one paragraph per
-foundation, in plain words, *"here is what it does today."*
+**Steps 2 + 3 · Walk each foundation, in this order.** *(owner's shape, 2026-09-04: "what is
+happening conceptually, how is it being done, is it written down, how is it written down, what
+do we think of how it's done and how it's written down — and then the next step from there.")*
 
-**Step 3 · Ask "was it chosen?" of each.** *(Claude)* Name the alternative that wasn't taken, and
-whether the current shape is right or merely first. Where it's merely first: **a decision for the
-owner**, with two or three options and a lean — not a rewrite. Output: a short decision list.
+Each foundation gets the same five headings. **Understand, then judge, then act** — the judging
+never comes before the understanding, and the acting never comes before the judging.
+
+| | heading | what goes under it | whose |
+|---|---|---|---|
+| 1 | **Conceptually** | what this thing *is*, in plain words, at the level a person thinks — no code | Claude drafts, owner corrects |
+| 2 | **Technically** | how the code actually does it — the mechanism, with file references; every claim verified against the code, not recalled | Claude (agents read, Claude verifies) |
+| 3 | **Where it's recorded** | is it written down — where, and does the writing match the code? Is it tested — where, and does the test guard the mechanism or just the word? | Claude |
+| 4 | **What we think of it** | *of the mechanism:* is this the right way, or merely the first way? What is the alternative, and why is or isn't it better? *of the record:* is it in the right home, at the right level, in plain words? | **both** — Claude brings the engineering view, the owner the product view |
+| 5 | **The next step** | one of: **leave it** (solid) · **write it** (works, undocumented) · **guard it** (works, untested) · **decide it** (works, but never chosen — options to the owner) · **change it** (wrong) | Claude proposes, owner rules where it's a decision |
+
+The three questions in §1 are the **exit checklist** — the walkthrough is how each row gets its
+answers, and heading 4 is where a ✅ is earned rather than assumed.
+
+**Worked example first.** 🔵 Run the walkthrough on **the coordinate system** before running it
+on anything else — it is the one that surfaced this pass, it sits under both modes and the
+frame, and the facts are already in hand. The owner reads that one example and either the
+template holds or it gets fixed before sixteen more are written.
 
 **Step 4 · Owner rules.** *(owner)* On the decision list only. Everything else proceeds without
 them.
