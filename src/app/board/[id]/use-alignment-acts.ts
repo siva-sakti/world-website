@@ -8,9 +8,14 @@ import type { CardVM } from "./card-vm";
 // maths is all in board-arrange.ts and tested there; what lives here is which cards take
 // part, their REAL measured sizes, and the wording of the undo entry.
 //
-// The rule that repeats through all of them, now in one place: a LOCKED or ROTATED card
-// opts out. Locked is obvious. Rotated because its stored rectangle is no longer what the
-// eye sees, so lining up its edges would align something invisible.
+// The rule that repeats through all of them: a LOCKED card opts out. That is all.
+//
+// A ROTATED card used to opt out too, on the grounds that its stored rectangle is not what
+// the eye sees. The observation was right and the conclusion was wrong (owner, 2026-09-04:
+// *"once a bit is rotated, if you try to bring it into alignment you're not able to — to me
+// that's a bug"*). Alignment now measures the box you SEE (`visualBox` in geometry.ts), so a
+// tilted card lines up by its visible edges. Upright cards are untouched: at angle 0 the
+// visual box IS the card's box, asserted in geometry.test.mjs.
 //
 // A pure move: no behaviour changed in the extraction.
 
@@ -83,7 +88,7 @@ export function useAlignmentActs({
     // (Owner-reported, 2026-09-02: "if I align top and then press bottom, the second one
     // doesn't work — have to click first".)
     const chosen = (cardsRef.current ?? cards).filter(
-      (c) => selectedIds.has(c.placementId) && !c.locked && !c.angle,
+      (c) => selectedIds.has(c.placementId) && !c.locked,
     );
     const patches = compute(read(chosen));
     if (!patches.length) {

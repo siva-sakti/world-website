@@ -156,3 +156,42 @@ export function rotateAngle(
   const total = startAngle + normDeg(nowPointer - grabPointer);
   return normDeg(snap ? Math.round(total / 15) * 15 : total);
 }
+
+/** THE BOX YOU ACTUALLY SEE — a tilted card's upright bounding box.
+ *
+ *  A card's stored `x/y/w/h` describe it UNROTATED: the tilt is a CSS transform on the
+ *  card's inner content, so every measurement stays in unrotated space (card-vm.ts).
+ *  Once a card is turned, that rectangle is no longer what the eye sees — which is why
+ *  a rotated card used to be refused by alignment entirely (rotation-plan §5).
+ *
+ *  The owner overruled that (2026-09-04): *"once a bit is rotated, if you try to bring it
+ *  into alignment you're not able to — to me that's a bug."* Right. The answer to "the
+ *  stored rectangle isn't what you see" is to align by what you DO see, not to refuse.
+ *
+ *  For a w×h card turned θ about its centre, the upright box containing it is
+ *  |w·cos θ| + |h·sin θ| wide and |w·sin θ| + |h·cos θ| tall, on the same centre.
+ *
+ *  THE SAFETY PROPERTY: at θ = 0 this returns the card's own box exactly — cos 0 = 1,
+ *  sin 0 = 0 — so every upright card behaves precisely as before. That is what makes it
+ *  safe to route ALL alignment through here rather than branching on "is it tilted". */
+export function visualBox(b: Box, angle?: number | null): Box {
+  if (!angle) return b; // upright (and the 0/null/undefined cases) — the common path
+  const r = (angle * Math.PI) / 180;
+  const cos = Math.abs(Math.cos(r));
+  const sin = Math.abs(Math.sin(r));
+  const w = b.w * cos + b.h * sin;
+  const h = b.w * sin + b.h * cos;
+  // Same centre, grown outward — so the card does not appear to jump when it is aligned.
+  return { x: b.x + b.w / 2 - w / 2, y: b.y + b.h / 2 - h / 2, w, h };
+}
+
+/** Turn a desired VISUAL position back into the x/y that gets stored.
+ *
+ *  Alignment computes where the box you see should go; the database holds the unrotated
+ *  top-left. These are the same point only for an upright card, so every write of a
+ *  rotated card's position goes through here. */
+export function storedFromVisual(b: Box, angle: number | null | undefined, visual: { x: number; y: number }): { x: number; y: number } {
+  if (!angle) return visual;
+  const vb = visualBox(b, angle);
+  return { x: b.x + (visual.x - vb.x), y: b.y + (visual.y - vb.y) };
+}

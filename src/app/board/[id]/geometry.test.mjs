@@ -2,7 +2,7 @@
 // From the repo root:  pnpm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { boundsOf, snapTo, rotateAngle } from "./geometry.ts";
+import { boundsOf, snapTo, rotateAngle, visualBox, storedFromVisual } from "./geometry.ts";
 
 const box = (x, y, w, h) => ({ x, y, w, h });
 
@@ -131,4 +131,56 @@ test("rotate: Shift snaps the RESULT to exact multiples of 15", () => {
     const v = rotateAngle(0, 0, sweep, true);
     assert.equal(v % 15, 0, `${sweep}° snapped to ${v}`);
   }
+});
+
+// ---- the visual box: aligning a card you have TURNED ----
+
+const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 0.001, `${msg}: ${a} vs ${b}`);
+
+test("an upright card's visual box IS its box — the safety property", () => {
+  // This is what makes it safe to route every alignment through visualBox instead of
+  // branching on "is it tilted". If this ever fails, every upright card has moved.
+  const b = box(10, 20, 400, 60);
+  assert.deepEqual(visualBox(b, 0), b);
+  assert.deepEqual(visualBox(b, null), b);
+  assert.deepEqual(visualBox(b, undefined), b);
+});
+
+test("turned a quarter turn, a card's box swaps width and height", () => {
+  const v = visualBox(box(0, 0, 400, 60), 90);
+  near(v.w, 60, "width");
+  near(v.h, 400, "height");
+});
+
+test("a square turned 45° grows by √2, and does not drift off its centre", () => {
+  const v = visualBox(box(0, 0, 100, 100), 45);
+  near(v.w, 100 * Math.SQRT2, "width");
+  near(v.x + v.w / 2, 50, "centre x must not move");
+  near(v.y + v.h / 2, 50, "centre y must not move");
+});
+
+test("a turn one way and the same turn the other look identical", () => {
+  // The box only ever grows — the signs cancel — so -30° and 30° must agree.
+  assert.deepEqual(visualBox(box(5, 5, 300, 80), -30), visualBox(box(5, 5, 300, 80), 30));
+});
+
+test("a full turn is the same as no turn", () => {
+  const b = box(10, 20, 400, 60);
+  const v = visualBox(b, 360);
+  near(v.x, b.x, "x"); near(v.y, b.y, "y"); near(v.w, b.w, "w"); near(v.h, b.h, "h");
+});
+
+test("aligning a tilted card puts the edge you SEE where you asked", () => {
+  // The point of the whole exercise: "align left to 100" must line up the leftmost
+  // point of the tilted card, not the corner of a rectangle nobody can see.
+  const b = box(500, 200, 300, 80);
+  const target = 100;
+  const stored = storedFromVisual(b, 30, { x: target, y: b.y });
+  const after = visualBox({ ...b, x: stored.x }, 30);
+  near(after.x, target, "the visual left edge must land on the target");
+});
+
+test("converting back is exact for an upright card", () => {
+  const b = box(500, 200, 300, 80);
+  assert.deepEqual(storedFromVisual(b, 0, { x: 100, y: 50 }), { x: 100, y: 50 });
 });

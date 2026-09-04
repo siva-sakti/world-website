@@ -1,3 +1,5 @@
+import { visualBox, storedFromVisual } from "./geometry";
+
 // PURE arrangement geometry — no React, no DOM, no supabase (undo plan §4; the
 // camera-storage/placement-anchor precedent). Lifted OUT of board-surface.tsx so
 // the math the undo stack records is unit-testable, and so the a447a95 bug class
@@ -11,6 +13,9 @@ export type ArrangeCard = {
   y: number;
   z: number;
   locked?: boolean;
+  /** Degrees; undefined/0 = upright. Alignment works in the box you SEE, so a tilted
+   *  card lines up by its visible edges rather than by a rectangle nobody can see. */
+  angle?: number | null;
 };
 
 export type Patch = { bitId: string; placementId: string; x: number; y: number };
@@ -151,6 +156,18 @@ export type Axis = "h" | "v";
 
 type Measured = { card: ArrangeCard; w: number; h: number };
 
+/** The box the EYE reads for this card — its own rectangle when upright, its upright
+ *  bounding box when tilted. Every alignment measurement goes through here, so a rotated
+ *  card is no longer refused (owner-ruled 2026-09-04); at angle 0 it returns the card's
+ *  own box exactly, so upright cards are untouched. */
+const seen = (m: Measured): Box =>
+  visualBox({ x: m.card.x, y: m.card.y, w: m.w, h: m.h }, m.card.angle);
+
+/** …and back: alignment decides where the VISIBLE box goes; the database stores the
+ *  unrotated top-left. The same point only for an upright card. */
+const toStored = (m: Measured, x: number, y: number) =>
+  storedFromVisual({ x: m.card.x, y: m.card.y, w: m.w, h: m.h }, m.card.angle, { x, y });
+
 const patchIfMoved = (m: Measured, x: number, y: number): Patch[] =>
   x !== m.card.x || y !== m.card.y
     ? [{ bitId: m.card.bitId, placementId: m.card.placementId, x, y }]
@@ -164,18 +181,25 @@ const patchIfMoved = (m: Measured, x: number, y: number): Patch[] =>
  *  up centred on each other rather than edge-matched. */
 export function alignPatches(measured: Measured[], edge: AlignEdge): Patch[] {
   if (measured.length < 2) return [];
-  const minX = Math.min(...measured.map((m) => m.card.x));
-  const maxX = Math.max(...measured.map((m) => m.card.x + m.w));
-  const minY = Math.min(...measured.map((m) => m.card.y));
-  const maxY = Math.max(...measured.map((m) => m.card.y + m.h));
-  return measured.flatMap((m) => {
+  // Measured in VISIBLE space throughout, then converted back once at the write.
+  const boxes = measured.map(seen);
+  const minX = Math.min(...boxes.map((b) => b.x));
+  const maxX = Math.max(...boxes.map((b) => b.x + b.w));
+  const minY = Math.min(...boxes.map((b) => b.y));
+  const maxY = Math.max(...boxes.map((b) => b.y + b.h));
+  return measured.flatMap((m, i) => {
+    const b = boxes[i];
+    const to = (x: number, y: number) => {
+      const p = toStored(m, x, y);
+      return patchIfMoved(m, p.x, p.y);
+    };
     switch (edge) {
-      case "left":    return patchIfMoved(m, minX, m.card.y);
-      case "right":   return patchIfMoved(m, maxX - m.w, m.card.y);
-      case "hcenter": return patchIfMoved(m, (minX + maxX) / 2 - m.w / 2, m.card.y);
-      case "top":     return patchIfMoved(m, m.card.x, minY);
-      case "bottom":  return patchIfMoved(m, m.card.x, maxY - m.h);
-      case "vmiddle": return patchIfMoved(m, m.card.x, (minY + maxY) / 2 - m.h / 2);
+      case "left":    return to(minX, b.y);
+      case "right":   return to(maxX - b.w, b.y);
+      case "hcenter": return to((minX + maxX) / 2 - b.w / 2, b.y);
+      case "top":     return to(b.x, minY);
+      case "bottom":  return to(b.x, maxY - b.h);
+      case "vmiddle": return to(b.x, (minY + maxY) / 2 - b.h / 2);
     }
   });
 }
@@ -192,8 +216,10 @@ export function alignPatches(measured: Measured[], edge: AlignEdge): Patch[] {
  *  arithmetic the owner asked for. */
 export function distributePatches(measured: Measured[], axis: Axis): Patch[] {
   if (measured.length < 3) return [];
-  const pos = (m: Measured) => (axis === "h" ? m.card.x : m.card.y);
-  const size = (m: Measured) => (axis === "h" ? m.w : m.h);
+  // The gaps you SEE are the gaps that get evened out — so a tilted card's air is
+  // measured from its visible edges, not from a rectangle behind it.
+  const pos = (m: Measured) => (axis === "h" ? seen(m).x : seen(m).y);
+  const size = (m: Measured) => (axis === "h" ? seen(m).w : seen(m).h);
   const sorted = [...measured].sort((a, b) => pos(a) - pos(b));
   const first = sorted[0];
   const last = sorted[sorted.length - 1];
@@ -204,7 +230,9 @@ export function distributePatches(measured: Measured[], axis: Axis): Patch[] {
   let cursor = pos(first) + size(first) + gap;
   for (let i = 1; i < sorted.length - 1; i++) {
     const m = sorted[i];
-    out.push(...(axis === "h" ? patchIfMoved(m, cursor, m.card.y) : patchIfMoved(m, m.card.x, cursor)));
+    const b = seen(m);
+    const p = axis === "h" ? toStored(m, cursor, b.y) : toStored(m, b.x, cursor);
+    out.push(...patchIfMoved(m, p.x, p.y));
     cursor += size(m) + gap;
   }
   return out;

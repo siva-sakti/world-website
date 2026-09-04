@@ -435,13 +435,12 @@ export function BoardSurface({
     onRedo: () => void doRedo(),
   });
 
-  // Locked AND rotated cards are excluded by the align acts, so the buttons must count the
-  // same way (rotation-plan §5 — a rotated card opts out of alignment exactly as a locked
-  // one does; its stored rectangle is no longer what the eye sees, so aligning its edges
-  // would line up something invisible). Tidy is deliberately NOT filtered: it arranges into
-  // a grid rather than aligning edges, and a tilted card sits in its slot perfectly well.
+  // Locked cards are excluded by the align acts, so the buttons must count the same way.
+  // Rotated cards are NOT excluded any more (owner-ruled 2026-09-04) — alignment measures
+  // the box you see, so a tilted card lines up by its visible edges. Tidy was never
+  // filtered: it places cards in slots rather than aligning edges.
   const alignableCount = cards.filter(
-    (c) => selectedIds.has(c.placementId) && !c.locked && !c.angle,
+    (c) => selectedIds.has(c.placementId) && !c.locked,
   ).length;
   const selectedBit = selectedIds.size === 1 ? cards.find((c) => selectedIds.has(c.placementId)) ?? null : null;
 

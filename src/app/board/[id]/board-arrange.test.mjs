@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { groupDragPatches, tidyPatches, nextZ, backZ, firstClearSpot, alignPatches, distributePatches } from "./board-arrange.ts";
+import { visualBox } from "./geometry.ts";
 
 const card = (bitId, placementId, x, y, z = 0) => ({ bitId, placementId, x, y, z });
 
@@ -202,4 +203,71 @@ test("distribute needs three — two cards have nothing between them", () => {
 test("distribute takes them in POSITION order, not the order they were selected", () => {
   const cards = [m("c", 100, 0, 10, 10), m("a", 0, 0, 10, 10), m("b", 15, 0, 10, 10)];
   assert.equal(xOf(distributePatches(cards, "h"), "b"), 50, "same answer as when sorted");
+});
+
+// ---- aligning a card you have TURNED (owner-reported 2026-09-04) ----
+//
+// NOTE ON THESE FIXTURES: the first version of them passed even with the fix reverted,
+// because the upright card was leftmost either way — so the tilted card's visible box
+// never decided anything. They only test the change if the TILTED card is the one whose
+// visible edge sets the line. Found by reverting the fix and watching them stay green.
+
+test("a tilted card's VISIBLE edge sets the line the others align to", () => {
+  // The tilted card sits at x=100 but leans out past it, so what you SEE starts left of
+  // 100. Align-left must use that visible edge, not the stored corner behind it.
+  const tilted = { bitId: "b", placementId: "pb", x: 100, y: 0, z: 2, angle: 30 };
+  const upright = { bitId: "a", placementId: "pa", x: 400, y: 0, z: 1 };
+  const measured = [
+    { card: tilted, w: 200, h: 100 },
+    { card: upright, w: 200, h: 100 },
+  ];
+  const visibleLeft = visualBox({ x: 100, y: 0, w: 200, h: 100 }, 30).x;
+  assert.ok(visibleLeft < 100, "the tilted card must actually lean out past its stored x");
+
+  const patch = alignPatches(measured, "left").find((p) => p.bitId === "a");
+  assert.ok(patch, "the upright card moves to the line");
+  assert.ok(
+    Math.abs(patch.x - visibleLeft) < 0.001,
+    `upright card should land on the tilted card's visible edge (${visibleLeft}), got ${patch.x}`,
+  );
+});
+
+test("a tilted card being aligned lands its visible edge on the line", () => {
+  const upright = { bitId: "a", placementId: "pa", x: 100, y: 0, z: 1 };
+  const tilted = { bitId: "b", placementId: "pb", x: 500, y: 0, z: 2, angle: 30 };
+  const measured = [
+    { card: upright, w: 200, h: 100 },
+    { card: tilted, w: 200, h: 100 },
+  ];
+  const patch = alignPatches(measured, "left").find((p) => p.bitId === "b");
+  assert.ok(patch, "the tilted card must be moved at all — it used to be skipped upstream");
+  const after = visualBox({ x: patch.x, y: patch.y, w: 200, h: 100 }, 30);
+  assert.ok(Math.abs(after.x - 100) < 0.001, `visible left edge: ${after.x}, expected 100`);
+});
+
+test("distribute evens out the gaps you SEE, not the ones behind the tilt", () => {
+  const mk = (id, x, angle) => ({
+    card: { bitId: id, placementId: `p${id}`, x, y: 0, z: 1, angle },
+    w: 100,
+    h: 100,
+  });
+  // The middle card is turned 45°, so it takes up much more visible width than 100.
+  const measured = [mk("a", 0), mk("b", 300, 45), mk("c", 700)];
+  const patch = distributePatches(measured, "h").find((p) => p.bitId === "b");
+  assert.ok(patch, "the middle card moves");
+
+  const seenBox = (p, angle) => visualBox({ x: p, y: 0, w: 100, h: 100 }, angle);
+  const gapLeft = seenBox(patch.x, 45).x - 100;                       // a's right edge is 100
+  const gapRight = 700 - (seenBox(patch.x, 45).x + seenBox(patch.x, 45).w);
+  assert.ok(Math.abs(gapLeft - gapRight) < 0.001, `gaps must match: ${gapLeft} vs ${gapRight}`);
+});
+
+test("upright cards align exactly as before — the tilt change touched nothing else", () => {
+  const measured = [
+    { card: { bitId: "a", placementId: "pa", x: 100, y: 10, z: 1 }, w: 200, h: 100 },
+    { card: { bitId: "b", placementId: "pb", x: 340, y: 60, z: 2 }, w: 150, h: 80 },
+    { card: { bitId: "c", placementId: "pc", x: 700, y: 20, z: 3 }, w: 120, h: 90 },
+  ];
+  assert.deepEqual(alignPatches(measured, "left").map((p) => p.x), [100, 100]);
+  assert.deepEqual(alignPatches(measured, "top").map((p) => p.y), [10, 10]);
 });
