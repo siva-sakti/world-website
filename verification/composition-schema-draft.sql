@@ -13,7 +13,7 @@
 -- entry today; every future attr-carrying node joins this list or its words
 -- silently leave search — the recorded JSON cost, S2). left() guards the
 -- tsvector ceiling (E4: real at ~1MB distinct-lexeme text).
-create function composition_doc_text(d jsonb) returns text
+create function composition_body_text(d jsonb) returns text
 language sql immutable as $$
   select left(coalesce(string_agg(v.t, ' '), ''), 500000)
   from (
@@ -29,9 +29,9 @@ create table composition (
   owner_id    uuid not null default auth.uid(),           -- per-row ownership (D-107 pattern)
   title       text,                                        -- nullable; minted at exit is APP (§7)
   subtitle    text,                                        -- §6b (owner 2026-09-03; the §27 catch)
-  doc         jsonb not null,                              -- the writing (S2: JSON; born-on-first-content = app, §4.1.3)
+  body        jsonb not null,                              -- the writing — the lexicon's word (rule 7; Gate B F5). S2: JSON; born-on-first-content = app (§4.1.3)
   word_target int,                                         -- job facts §8 — all optional
-  due_at      date,
+  due_on      date,                                        -- a calendar date, not a moment — `_at` stays timestamptz-only (Gate B F6)
   for_whom    text,
   group_id    uuid references shelf_group(id) on delete set null,  -- one folder (§12.3; set-null strands nothing)
   pinned_at   timestamptz,                                 -- star (§12.4)
@@ -46,13 +46,13 @@ create table composition (
          else 'live' end) stored,
   search_tsv tsvector generated always as (               -- the index MOVES WITH it (§12.1.5, J2; E3 proven)
     to_tsvector('english',
-      coalesce(title,'') || ' ' || coalesce(subtitle,'') || ' ' ||
-      composition_doc_text(doc))) stored,
+      coalesce(title,'') || ' ' || coalesce(subtitle,'') || ' ' ||   -- subtitle indexed per D-088 (index ALL words; titling never hides)
+      composition_body_text(body))) stored,
   constraint composition_visibility_allowed check (visibility in ('public','private')),
   constraint composition_archived_not_alive check (archived_at is null or pinned_at is null),      -- house 20260902000002
   constraint composition_trashed_archived_exclusive check (deleted_at is null or archived_at is null) -- house 20260903000003
   -- NO source_id (§3.4b, owner-ruled) · NO lock column (Q3: §20.3 ⚪, add-later free)
-  -- NO kind/form column: fixed-kind is STRUCTURAL here (I-C5 by architecture)
+  -- NO kind/form column: fixed-kind (I-K1 / D-121 / register B4 / §3.4) is STRUCTURAL here — a separate table cannot convert
 );
 create index composition_owner  on composition (owner_id);
 create index composition_group  on composition (group_id);
@@ -77,8 +77,10 @@ create table composition_file (
   thumb_path     text,
   created_at     timestamptz not null default now(),
   constraint composition_file_once unique (composition_id, storage_path)
-      -- reconciled on save like reference rows; 1:1 ownership — a block copied
-      -- to another composition COPIES the file (I-G6's file law, S3)
+      -- rows are ADDED on save; removed ONLY by the deferred orphan sweep (row +
+      -- bytes together) or the destroy cascade + app sweep — NEVER eagerly on
+      -- save (§24.3: undo must restore; Gate B F4). 1:1 ownership — a block
+      -- copied to another composition COPIES the file (I-G6's file law, S3)
 );
 create index composition_file_owner on composition_file (owner_id);
 create index composition_file_comp  on composition_file (composition_id);
@@ -111,7 +113,11 @@ create table reference2 (   -- ⚠ draft name; enactment renames/rebuilds today'
   constraint reference2_not_self
     check (to_composition_id is distinct from from_composition_id)  -- §9.2.4
 );
--- one tie per ordered pair, per target kind (I-Ref2; the opening pattern):
+-- one tie per ordered pair, per target kind (I-Ref2). Precedent: init's
+-- tag_application_*_once / placement_*_once partial uniques (NOT opening's —
+-- its uniques are plain constraints for upsert inference; Gate B F8). These
+-- indexes back plain reads, never PostgREST on_conflict — the reconciler
+-- SELECTs then inserts/deletes (references.ts), so partial is safe HERE.
 create unique index reference2_bit_once  on reference2 (from_composition_id, to_bit_id)         where to_bit_id is not null;
 create unique index reference2_board_once on reference2 (from_composition_id, to_board_id)       where to_board_id is not null;
 create unique index reference2_comp_once on reference2 (from_composition_id, to_composition_id) where to_composition_id is not null;
@@ -146,7 +152,10 @@ alter table opening add column composition_id uuid references composition(id) on
 alter table opening drop constraint opening_exactly_one_target;
 alter table opening add  constraint opening_exactly_one_target
   check (num_nonnulls(board_id, bit_id, composition_id) = 1);
-create unique index opening_one_per_comp on opening (owner_id, composition_id) where composition_id is not null;
+alter table opening add constraint opening_one_per_comp unique (owner_id, composition_id);
+    -- PLAIN constraint, NOT a partial index — Gate B F1: opening.sql:22-27 documents
+    -- that PostgREST's on_conflict cannot infer a partial index (42P10 forever);
+    -- NULLS DISTINCT lets the other kinds' rows coexist, per the same header.
 create index opening_comp on opening (composition_id);
 
 -- ---- the board remembers its hide-compositions toggle (S8; §10.3.4 ruled) --
@@ -159,16 +168,17 @@ create or replace view board_cards with (security_invoker = true) as
               when p.target_board_id is not null then 'board'
               else 'composition' end as thing,
          p.target_bit_id, p.target_board_id,
-         p.x, p.y, p.width, p.height, p.z, p.display_size, p.arrived_at,
+         p.x, p.y, p.width, p.height, p.z, p.arrived_at,
+         -- (display_size dropped 20260903000006 — the draft tracks the directory at run time, Gate-A F6)
          coalesce(b.face, tb.title, c.title) as label,
          b.type, b.subtype_word_id, b.body, b.strokes, b.url,
          b.storage_path, b.thumb_path,
-         coalesce(b.visibility, tb.visibility, c.visibility) as target_visibility,
+         coalesce(b.visibility, tb.visibility, c.visibility) as target_visibility,   -- every leg exposes its target's visibility (I-P2: bit-privacy always wins per target; Gate B F7)
          b.source_id, s.name as source_name, s.url as source_url,
          p.locked_at, p.angle,
          p.target_composition_id,
          c.subtitle as comp_subtitle,
-         left(composition_doc_text(c.doc), 280) as comp_preview   -- §10.1.2: title+subtitle, opening lines standing in
+         left(composition_body_text(c.body), 280) as comp_preview   -- §10.1.2: title+subtitle, opening lines standing in
   from placement p
   left join bit b         on b.id  = p.target_bit_id
   left join board tb      on tb.id = p.target_board_id

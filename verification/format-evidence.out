@@ -1,0 +1,13 @@
+schema built DOM-free | node types: paragraph,blockquote,bulletList,codeBlock,doc,hardBreak,heading,horizontalRule,listItem,orderedList,text,bitRef
+
+== J1: valid doc with a chip — JSON round trip ==
+loads: true | refId survives: true
+
+== J2: doc containing an UNKNOWN node type ('callout' no longer registered) ==
+THREW: Unknown node type: callout
+
+== J3: known node with an UNKNOWN attribute (headingId before its extension) ==
+NO THROW | attr kept in model? false
+
+== J4: UNKNOWN MARK on text ==
+THREW: There is no mark type highlight in this schema

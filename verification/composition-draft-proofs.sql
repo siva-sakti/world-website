@@ -11,13 +11,13 @@ select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-1111111
 set role authenticated;
 
 \echo '== A1 · birth: born private, live, title null (§4.1.3 / §12.2b) =='
-insert into composition (id, doc) values
+insert into composition (id, body) values
   ('c0000000-0000-0000-0000-000000000001', '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first char"}]}]}');
 select visibility = 'private' as born_private, state = 'live' as born_live, title is null as title_null,
        search_tsv is not null as indexed from composition where id = 'c0000000-0000-0000-0000-000000000001';
 
 \echo '== A2 · the search index moves with it: chip label + FOLDED text findable (J2/§13.7.4) =='
-update composition set doc = '{"type":"doc","content":[
+update composition set body = '{"type":"doc","content":[
   {"type":"heading","attrs":{"level":2,"hid":"h-1"},"content":[{"type":"text","text":"Weekend"}]},
   {"type":"paragraph","content":[{"type":"text","text":"about "},{"type":"bitRef","attrs":{"refId":"b-1","label":"the marmoset quote"}}]},
   {"type":"toggle","attrs":{"open":false},"content":[{"type":"paragraph","content":[{"type":"text","text":"folded spelunking list"}]}]}]}'::jsonb,
@@ -49,7 +49,7 @@ insert into reference2 (from_composition_id) values ('c0000000-0000-0000-0000-00
 \echo '   (must refuse: zero targets)'
 
 \echo '== A6 · not-self · dedup per kind · different kinds coexist · mutual allowed =='
-insert into composition (id, doc) values ('c0000000-0000-0000-0000-000000000002', '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"two"}]}]}');
+insert into composition (id, body) values ('c0000000-0000-0000-0000-000000000002', '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"two"}]}]}');
 insert into reference2 (from_composition_id, to_composition_id)
   values ('c0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001');
 \echo '   (must refuse: self)'
@@ -117,10 +117,13 @@ select count(*) = 0 as file_rows_swept from composition_file;
 
 \echo '== A13 · RLS: another user sees NOTHING; anon sees NOTHING (born-private world) =='
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}', false);
-insert into composition (id, doc, visibility) values ('c0000000-0000-0000-0000-000000000003','{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"mine"}]}]}','public');
+insert into composition (id, body, visibility) values ('c0000000-0000-0000-0000-000000000003','{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"mine"}]}]}','public');
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', false);
 select count(*) = 0 as other_owner_sees_nothing from composition where id = 'c0000000-0000-0000-0000-000000000003';
 reset role; set role anon;
 select count(*) = 0 as anon_sees_nothing_even_public from composition;
 reset role;
+\echo '== A14 · opening: composition slot is a PLAIN unique constraint (Gate B F1) =='
+select conname, contype = 'u' as plain_unique from pg_constraint where conname = 'opening_one_per_comp';
+
 \echo '== done =='

@@ -1,0 +1,34 @@
+== E1 · SIZE: pg_column_size, same content both ways ==
+ id |      what       | html_bytes | jsonb_bytes | ratio 
+----+-----------------+------------+-------------+-------
+  1 | realistic piece |        201 |         622 |  3.09
+  2 | baseline        |         57 |         292 |  5.12
+
+
+== E2 · EXTRACTION over the real shapes (text nodes + label attr), incl. FOLDED content ==
+ id | finds_chip_label | finds_folded_text | false_pos_nodetype | false_pos_headingid 
+----+------------------+-------------------+--------------------+---------------------
+  1 | t                | t                 | f                  | f
+
+
+== E3 · GENERATED COLUMN with the real-shape extractor ==
+ rows_with_generated_tsv | all_populated 
+-------------------------+---------------
+                       2 | t
+
+
+== E4 · THE TSVECTOR CEILING: a long-form document (~1.4MB of text) ==
+ jsonb_bytes | extracted_chars 
+-------------+-----------------
+       16319 |         1408000
+
+-- attempting to_tsvector over it (does the save error?):
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/format-sql-evidence.sql:78: NOTICE:  NO ERROR — tsvector built, 12 lexemes
+-- and at a truly extreme size (~5.6MB text):
+psql:/private/tmp/claude-501/-Users-gargoodevi-Documents-world-website/2b79cb4c-f4c9-4a25-a56e-07092d6fc4db/scratchpad/format-sql-evidence.sql:90: NOTICE:  ERRORED: string is too long for tsvector (8197986 bytes, max 1048575 bytes)
+
+== E5 · left() guard: capped extraction stays under any ceiling ==
+ capped_chars 
+--------------
+       500000
+

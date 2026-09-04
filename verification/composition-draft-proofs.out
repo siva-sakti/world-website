@@ -104,4 +104,9 @@ psql:/Users/gargoodevi/Documents/world-website/verification/composition-draft-pr
 -------------------------------
  t
 
+== A14 · opening: composition slot is a PLAIN unique constraint (Gate B F1) ==
+       conname        | plain_unique 
+----------------------+--------------
+ opening_one_per_comp | t
+
 == done ==

@@ -110,3 +110,9 @@ Indexing every string pulls in **node type names and ids** (`doc`, `paragraph`, 
 - Real documents may use **marks with attributes**, not just nodes; the fixture used one `mention` node shape. The full inventory must come from the app's tiptap extension config.
 - Supabase's project Postgres major version was not confirmed to match 17 — check `supabase/config.toml` before relying on this there.
 - ⚠ **A quirk found by testing, in no documentation read:** Postgres's `.**` recursive wildcard returns each matching value **twice**; `string_agg(DISTINCT …)` is required.
+
+---
+# ⚠ ADVERSARIAL ADDENDUM (2026-09-03) — the strongest facts AGAINST this file's conclusion, found by the HTML's-best-case review
+1. **`enableContentCheck` / `contentError` — omitted above, material.** Tiptap CAN make HTML's silent drop loud (opt-in): *"Tiptap's content checking is 100% accurate for JSON content types. However… While Tiptap does its best to alert on missing nodes, certain mark-related issues might be missed in some situations."* — https://tiptap.dev/docs/guides/invalid-schema · `emitContentError` exists in the installed @tiptap/core@3.28.0 (verified in node_modules). **Why the JSON ruling still stands:** the guard costs the same to build either way, and only JSON's detection is guaranteed total.
+2. **The same docs praise HTML where this file under-quoted:** *"HTML can be easily rendered in other places, for example in emails and it's widely used, so it's probably easier to switch the editor at some point."* — https://tiptap.dev/docs/guides/output-json-html · and the persistence page allows *"saving HTML is possible and may be the easiest way to get renderable content."*
+3. **Correction to this file's own process:** the evidence outputs were once claimed "committed" while living in a session scratchpad; now genuinely in `verification/` (format-evidence.mjs reproduces its .out).
