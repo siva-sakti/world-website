@@ -327,6 +327,70 @@ Same cards, same positions, same sizes, same zoom, same scroll position. **Switc
 changes what you can do and what you see ON a card — never where anything is.** A mode switch
 should be visually calm: nothing jumps.
 
+## 2d · ⭐ WHAT A PERSON WANTS TO DO *(owner's ask, 2026-09-04 — the conceptual test)*
+
+*"Take what a user wants to do and list that — what does arrange do, what does edit do."*
+
+Acts are what the app offers. **Wants are what you arrived with.** A mode is only real if the
+wants inside it belong together — so this is the list the concept gets judged on, before any
+technical step is written.
+
+### ARRANGE — the wants
+| what you'd say | the act behind it |
+|---|---|
+| *"let me see what's on here"* | look · pan · zoom · fit |
+| *"this doesn't look right yet"* | move · resize |
+| *"these three belong together"* | move · align · distribute |
+| *"tidy this up, it's a mess"* | tidy |
+| *"this one matters more"* | make it bigger · bring it forward |
+| *"give this some life"* | tilt it |
+| *"don't let me knock this out of place"* | lock |
+| *"I want another one of these here"* | duplicate |
+| *"bring in that thing I caught yesterday"* | call a loose bit in |
+| **"I don't want to see this on this board any more"** | **take it off the board** |
+| *"start something here"* | new card → **hands you to edit** |
+
+**The thread:** every one is about **the board as a picture** — what is on it, where, how big,
+in what order. You are standing back and looking.
+
+### EDIT — the wants
+| what you'd say | the act behind it |
+|---|---|
+| *"let me write this down"* | write in a card |
+| *"that's not quite what I meant"* | rewrite · fix a typo |
+| *"this needs a name"* | title |
+| *"what even is this photo?"* | caption |
+| *"this belongs with the retreat stuff"* | tag |
+| *"where did this come from?"* | source |
+| *"read this properly"* | open a note to its page |
+| **"I'm done with this thing entirely"** | **trash · archive** |
+
+**The thread:** every one is about **one thing, up close**. You have stopped looking at the
+board and started looking at something on it.
+
+### ⚠ The three places the two lists rub — named, not hidden
+A conceptual review should push hardest here.
+
+1. **Tagging feels like organising, and organising feels like arranging.** *"This belongs with
+   the retreat stuff"* is the same instinct as *"these three belong together."* But a tag
+   travels with the thing to every board and to search, while a position belongs to one board
+   only. **The test that decides it:** does this change what you see on THIS board, or what the
+   thing is everywhere? Tagging is everywhere → edit. *(Still the sharpest tension in the model.)*
+2. **"Start something here" is an arrange want with an edit ending.** You wanted a note *in that
+   spot* — spatial — and a half-second later you are writing. This is the only want that spans
+   both, and it is why creating hands you over rather than being forbidden.
+3. **Reading spans both, and may not be either.** *"Let me see what's on here"* is arrange;
+   *"let me actually read this"* opens a note. ⚪ **Is reading a third posture we are pretending
+   is edit?** Arguably you should be able to read without being in the mode that can change
+   things. *(Flagged deliberately: it is the question most likely to reveal the two-mode split
+   is really a three-mode one, and it is better raised now than after building.)*
+
+### The claim being tested
+> **Arrange = "I am working on the board." Edit = "I am working on a thing."**
+> Every want above sits under one of those two sentences without being argued into it.
+
+**If a conceptual review finds a want that has to be argued into its mode, the split is wrong.**
+
 ## 3 · THE FULL LIST — what is possible, and what is NOT, in each mode
 
 *(Owner's ask: "be very clear — what is possible in which mode, what is not possible." The
