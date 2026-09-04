@@ -1,7 +1,8 @@
 # The composition — the specification
 
-> # ⚠ DRAFT — NOT YET VERIFIED LINE BY LINE. DO NOT BUILD FROM THIS.
-> ## STATUS · draft, written section by section with the owner (started 2026-09-02)
+> # ✅ VERIFIED — all four passes run and folded (2026-09-03). BUILD GATES ON THE BUILD PLAN.
+> ## STATUS · verified spec (started 2026-09-02 as a draft; banner exit earned 2026-09-03)
+> **The record:** Passes 1–3 (transcript-holding fork): 44 traced · zero unsourced · zero missing after fixes · 7 stale contradictions amended in place · 2 hardened quotes de-hardened. Pass 4 (cold builder): 20 guess-points → §32's fences + 11 in-place amendments; verdict *"stages ① and ② startable."* The storage layer is separately proven (D-145). **⚑ Four owner-words remain (§33) — none block reading this spec as true; #1 and #4 block enactment.** The old draft banner's discipline (citation, never care) remains this document's law.
 >
 > **The owner's standard for this document (2026-09-02):** *"I want you to be way more checking every last detail — confirming what was in our conversation and what made it into the document, so you don't miss anything and you don't hallucinate."*
 >
