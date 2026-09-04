@@ -43,3 +43,17 @@ Small pieces, each ending green. Match the surrounding code's style. **No refact
 
 ## The standing rule over all of it
 **When the spec doesn't answer it: stop and route** — to the spec, then to the owner. Never invent a decision mid-build and record it as settled. *(This project's named failure mode is fluent plausible detail; the guard is citation, never care.)*
+
+---
+## The norms, hardened by use *(added 2026-09-04 — each earned in this project, none theoretical)*
+- **The adversary pattern is not optional.** Every single adversarial pass in this project found something real — including one RETHINK that stopped a procedure that would have failed on first contact. Brief them SPECIFICALLY ("argue the opposite; check every citation; hunt the seams between late edits"); vague briefs flatter.
+- **"Recorded" means the edit RAN.** Twice, an edit was claimed in prose and never executed. Saying it is not doing it; the grep after is part of the doing.
+- **Confidence decomposes or it's vibes.** Never one number; per-layer, each with the evidence it rests on and the risk that remains named. Never invent a percentage.
+- **Findings get demoted-and-returned, not resolved by momentum.** Anything that turns out to be the owner's call goes back to her as a full question (scenario + options), never a compressed label she can't recognize.
+- **Rehearse against REAL data, not just fixtures.** The real-data run found what five adversaries could not (the backup's migration-position trap). And a restore that has never been performed is not a back-out plan.
+- **Golden outputs + counted refusals.** A proof runner asserts its own numbers (n truths, n refusals, zero false in ANY column) and diffs against a committed golden file — the runner that "printed green" over missing refusals was caught by its own hardening.
+- **Cross-window contracts live in BOTH lanes' documents,** named files, so no later session can miss them. Lanes: new files where possible; one named owner per shared file.
+- **The owner is the hands.** Never simulate a click; never claim a surface works from reading code. Numbered literal steps → her result is the evidence. Machine-checkable things still get proven with raw output.
+- **Two documents = a carry-through map.** Whenever truth and sequence live in different files, a both-directions map with a re-run rule — or they drift (found four homeless sections on its first run).
+- **Plain words beat codes in anything the owner reads.** Migration/S1–S4/trough/paper each cost a round-trip. Define terms at first use; when a word confuses, rename the artifact, not the owner.
+- **Hold the sequencing the owner set.** Anxious-and-curious is not a reason to start; her words: *"not at the cost of messing anything up."* Position ahead (paper, rehearsals, adversaries) — never build ahead.
