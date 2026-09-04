@@ -140,7 +140,20 @@ offers edit). Today it makes a card. That is a third behaviour that changes, add
 | *"move these five together"* | **select several** *(shift-click · marquee)* | ✅ | 🔘 greyed | edit is about one thing at a time |
 | *"snap it to that"* | **the guides** | ✅ *(while dragging)* | — | follows the drag |
 
-### 3c · Looking
+### 3c · Looking — **below the modes** *(owner-ruled 2026-09-04, after working it through)*
+
+**Pan, zoom and fit are not acts of either mode. They sit underneath both.** The test that
+decided it: a board bigger than the screen. In the weeds, you finish one card and the next is
+off-screen — if panning were arrange-only you would switch modes twice to reach it. So panning
+must exist in edit, not because it is part of working on a thing but because *you cannot work
+on a thing you cannot reach.* They are the precondition for being on the board at all: how you
+see, not what you do.
+
+**And this is where the cursor matters most** *(owner)*: *"the difference in the cursor could
+help people know which mode they're in, even when they're doing an action that exists in
+both."* When you line cards up or type, the act itself tells you the mode. When you pan, it
+feels identical in both — **the cursor is the only tell left.** So it is not decoration; it is
+the tell for exactly the moments the others go quiet.
 
 | what you're trying to do | what we call it | arrange | edit | how we're thinking about it |
 |---|---|---|---|---|
