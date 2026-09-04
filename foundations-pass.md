@@ -80,6 +80,7 @@ walked in this pass.**
 | undo | one stack · survivor rule · settled before reverse | `undo-stack.ts` · `use-undo.ts` | ✅ |
 | the act door | a button that does something and might fail | `use-act.tsx` | ✅ |
 | confirms | trash · archive ask, one door each | `confirm.tsx` · `trash-confirm.ts` · `archive-confirm.ts` | ✅ |
+| empty states | what a list says when it has nothing | `empty-message.ts` | ✅ tested |
 | the jot draft | the capture box survives a reload (local) | `jot-draft.ts` | ✅ tested |
 
 **D · STATE — what is remembered, and where**
@@ -89,7 +90,7 @@ walked in this pass.**
 | selection | which cards are picked; keyed by bit | `board-surface.tsx` · `use-marquee-select.ts` | ⚠ unwritten |
 | local storage | the safe wrapper | `local-storage.ts` | ✅ |
 | openings / recent | where you were, across devices (the database) | `db/openings.ts` · `recent.ts` · `record-opening.tsx` | ✅ |
-| the shelf | groups and pins — how home is arranged | `db/shelf.ts` | ⚠ |
+| the shelf | groups and pins — how home is arranged | `db/shelf.ts` · `shelf-controls.tsx` | ⚠ |
 | **the mode** *(coming)* | arrange / edit, per visit | — | 🔵 specified, not built |
 
 **E · FINDING — how things are found**
@@ -116,7 +117,8 @@ walked in this pass.**
 **G · STRUCTURE — what surfaces exist**
 | mechanism | plainly | lives in | status |
 |---|---|---|---|
-| the render rule | a card shows iff present + bit live + board live | `board_cards` view | ✅ |
+| the render rule | a card shows iff present + bit live + board live | `board_cards` view · `db/boards.ts` | ✅ |
+| a board's data | create · rename · describe · duplicate · trash · destroy · empty the trash | `db/boards.ts` | ⚠ unwritten as a whole |
 | the board's kinds | canvas vs frame — **ruled today: chosen at creation** | — | ❌ unwritten; frame plan says otherwise |
 | surfaces | a board or a note, flattened for home | `surfaces.ts` | ⚠ |
 | sources | where a bit came from | `db/sources.ts` | ⚠ |
@@ -133,7 +135,7 @@ walked in this pass.**
 | the pen's input | refuses fingers (palm rejection) | `draw-overlay.tsx` | ⚠ **flagged** |
 
 ### The count
-~60 mechanisms. **About 25 already ✅.** The pass walks the other ~35, and three of them sit
+**63 mechanisms — every non-test module in `src/lib`, `src/lib/db`, the board, `src/components` and `src/app/bits` is named** (checked against `ls`, 2026-09-04; three were missing on the first pass and are in now). **About 25 already ✅.** The pass walks the other ~35, and three of them sit
 directly under the modes and frame builds: **the coordinate system · how things arrive · two
 devices for a document.** That is why this comes first.
 
