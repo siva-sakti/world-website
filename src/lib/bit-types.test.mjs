@@ -77,3 +77,34 @@ test("every allowed type has a copy rule — a new type must not silently copy n
     }
   }
 });
+
+/** The substance rule: which column each type keeps its actual content in. */
+function substanceBranches() {
+  let branches = null;
+  for (const f of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort()) {
+    const sql = readFileSync(`${MIGRATIONS}/${f}`, "utf8");
+    const m = [...sql.matchAll(/constraint bit_substance_matches_type check \(([\s\S]*?)\n\s*\);/gi)].pop();
+    if (m) branches = [...m[1].matchAll(/when '([a-z_]+)'/g)].map((x) => x[1]);
+  }
+  return branches;
+}
+
+test("every allowed type says WHERE its content lives — no type falls through to `else true`", () => {
+  // bit_substance_matches_type ends with `else true`, so a type added to bit_type_allowed
+  // without its own branch is silently unconstrained: a 'table' bit with no cells at all,
+  // or a photo bit carrying a URL and no file, would both be legal rows. The constraint is
+  // what makes a malformed bit IMPOSSIBLE rather than merely unlikely, and the `else true`
+  // quietly opts a new type out of that protection.
+  //
+  // This is the guard for the owner's ask: "I want to make sure you don't allow users to
+  // make errors." The strongest version of that is not a warning in the app — it is a row
+  // the database will not accept.
+  const branches = substanceBranches();
+  assert.ok(branches && branches.length >= 4, `substance branches not found: ${branches}`);
+  const unconstrained = SCHEMA.filter((t) => !branches.includes(t));
+  assert.deepEqual(
+    unconstrained,
+    [],
+    `these types can hold any content, or none — give each a branch: ${unconstrained}`,
+  );
+});

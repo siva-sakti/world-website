@@ -159,3 +159,36 @@ are conditions retyped at each site. *That* is the cost, and naming them is the 
 4. **Add the missing per-type pieces the sweep found:** an attack suite in `verification/`, a
    `files/` prefix in `scripts/find-orphan-files.mjs`, and the `[[` picker's list.
 
+---
+
+## ⭐ WHERE A TABLE'S CELLS LIVE — answered *(owner asked 2026-09-04: "can we store that inside still like a thing like a bit?")*
+
+**Yes. In the column that already exists — `body`, the same one text bits use.**
+
+A table's cells serialize to HTML (`<table><tr><td>…`), exactly as rich text already does.
+So a table bit stores its substance in `body`, and the difference between a text bit and a
+table bit is its **`type`**, not where it keeps its content.
+
+**That dissolves the blank-card trap.** `board_cards` already carries `body`, so a table card
+renders with no change to the view. And for free, because they all already read `body`:
+**search** indexes the cells · **export** includes them · **duplicate** copies them (I-G6) ·
+the `face` column computes a label. Nothing new to plumb, and nothing to forget.
+
+**The one line the migration must add** — to `bit_substance_matches_type`, identical to text's:
+```sql
+when 'table' then body is not null and strokes is null and url is null
+              and captured_title is null and storage_path is null
+```
+⚠ **It is not optional.** That constraint ends in `else true`, so a type added without its own
+branch is silently **unconstrained** — a table bit with no cells at all would be a legal row.
+**Now guarded** (`bit-types.test.mjs`): every allowed type must declare where its content lives,
+proven by adding a type with no branch and watching the suite go red.
+
+**What this deliberately does not buy:** the cells are *text*, not data — no sorting, filtering
+or formulas. That engine is already parked (`docs/tables-and-structured-data.md`) and is a
+different feature. If it is ever built, a typed store can be added then; the cells being in
+`body` does not block it, because a migration can read them out.
+
+**Verdict: the table build is UNBLOCKED.** It needs a type, a substance branch, an editor, and
+a card renderer — no new column, no view change.
+
