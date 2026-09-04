@@ -242,6 +242,24 @@ selection's own bounding box or the average; whether locked cards are anchors or
 built right AFTER the guides while that code is open — but it is genuinely independent, and
 nothing in stage 4 depends on it.
 
+## 4e-2 · ⭐ THE RULED BUILD ORDER (owner, 2026-09-04) — what Claude builds next, in order
+
+*"Let's do all that first, and then keep in the queue getting the actual table and checklist
+built, and then the frame view as well."*
+
+| | | plan | needs the owner |
+|---|---|---|---|
+| **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
+| **2** | **A rotated card can be ALIGNED** (the visual-box maths; drop the four opt-outs) | same, §2 | a look at the result |
+| **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange (§2b) | `board-arrange-vs-edit-mode-plan.md` | the panning gesture (§5) |
+| **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
+| **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
+| **6** | **The frame** | `frame-plan.md` | the cloud paste |
+
+**Held behind this queue by the owner's sequencing:** the composition build (the other window
+waits for a ping when 1–6 are clear). **Not in the queue but not dropped:** the five save loops,
+the two-devices write-up (A11), a bit's journey, the Group E pass.
+
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
 **Status swept 2026-09-03** *(the owner: "I just feel like there may be a couple other threads
