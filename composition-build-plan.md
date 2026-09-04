@@ -67,3 +67,50 @@ The **naming session** (the list's route · "gather" still soft · the hover lay
 
 ## The gates, restated
 ①'s cloud step: **the owner's explicit go, after seeing the throwaway run.** Every stage: green build + its proofs before "done" is said. Any question the spec doesn't answer: **stop and route** — the spec's law (citation, never care) is this plan's law too.
+
+
+---
+# THE CARRY-THROUGH MAP — every spec section → its build home
+> ⭐ **Why this exists** *(owner, 2026-09-04)*: *"now that we have two levels of document — the big write-up and then the phased one — we have to make sure the things carry through."* The spec says **what is true**; this plan says **when it is built**. Nothing else guarantees every line of one reaches the other. **This map is the guarantee, and it is re-runnable.**
+> **The rule from now on:** a ruling added to the spec gets a row here **in the same pass** (the same discipline as `cross-feature-rulings.md`). A stage may build nothing that has no spec section; a spec section may name nothing that has no stage.
+
+| spec | build home |
+|---|---|
+| §1–§3 foundations · the laws · §22 guardrails | **not built — constraints.** Every stage is checked against them |
+| §4 birth (write page · list door) / (board compose-door) | **②a** / **⑤** |
+| §5 opening + the frames chain · §14 the three frames | **⑤** |
+| §6 saving · §6b parts · §7 the title + exit-mint | **②a** *(save machinery exists; the frames' indicator lands with ⑤)* |
+| §8 job facts (columns / the UI / the list's sort-filter) | **①** / **②a** / **②a** |
+| §9 pulling in — trigger · picker · chip · peek · block · drawer · edges | **③** *(all of it; §34's batching + failure states in its acceptance)* |
+| §10 on a board — the card · placement · hide-toggle | **⑤** *(the `hide_compositions` column lands in ①)* |
+| §11 states — live/archived/trashed/destroyed | **①** (columns + cascades) → behaviors surface in **②a/③/⑤** |
+| §12.1 search · §12.1b backlinks · §12.2–12.4 tags/folders/star · §12.5 export · §12.7 the pull | **①** · **③** · **①** · **①** · **①** |
+| §12.6 the graph | ⏸ parked — no stage, by design |
+| §13.1–13.6 the editor's v1 set | **②a** (surfacing · checklist · table · alignment) + **②b** (drag+span · columns · toggle) |
+| §13.7 toggles · §13.9 columns | **②b** |
+| §16 keyboard · §17 responsive/phone | **②a** *(⚠ was unhomed — see the gaps)* |
+| §20.1–20.3 headings · contents · the lock | **②a** *(the `locked_at` column in ①)* |
+| §20.4 undo · §20.5 drag + heading-span · §20.5b the folded-backspace path | **②b** |
+| §20.5c + §31.6 heading ids + cross-piece section links | **②a** (ids, via the vendor's unique-id extension) + **③** (the picker's heading-unfold) |
+| §20.6 affordances | **②a/③** per row |
+| §21 + §27 storage · the pointers · the views | **①** |
+| §23.1 presence per occurrence · §23.2 the board-side posture | **③** · **⑤** *(and §23.2 is re-presented to the owner AT ⑤ — still unconfirmed)* |
+| §24.1–24.2 the composing model · §24.3 pasted-image files · §24.4 flatness-as-FK · §24.5b window + copy-door | **②a** · **④** · **①** · **③/④** |
+| §25 the move inventory · §28 the walk · §24.6 the scenes | **not built — the acceptance fixtures.** Every stage tests against them |
+| §26 the hover layer | **⑥** |
+| §29 chips per type · §30 the bring-in list (four targets) | **③** |
+| §32.2 make-this-a-bit · §32.3 the node registry · §32.4 the small answers | **④** · **②a** *(fixed before anything persists)* · **②a/③** |
+| §34 the pointer stress-test | **③** (its two requirements are in ③'s acceptance) |
+
+## ⚠ THE GAPS THIS MAP FOUND — four spec sections had NO build home
+*(Found on the first run, 2026-09-04 — exactly the failure the owner predicted.)*
+1. ⭐ **§15 · Empty, loading, error — every screen.** Spans every stage and belonged to none. **Ruled here: §15 is not a stage — it is an ACCEPTANCE LINE ON EVERY STAGE.** No stage is done until its new screens have their three states. *(The owner: "if loading or [a fetch] fails, we need to write those things down.")* Stage ③ additionally owes the block's states (§34.5), which §15 never covered.
+2. **§18 · The accessibility floor** — keyboard reachability · focus-trapping the picker/peek and returning focus to the caret · chips and blocks announced as what they are · the toggle's fold state announced. **Homed: ②a for the page's floor, ③ for chip/peek/block announcements, ⑤ for the frames' focus handling** — each in its stage's acceptance, not a separate stage.
+3. **§16 keyboard · §17 responsive** — implied but never assigned. **Homed above: ②a**, with ⑤ owning the frames' phone rule (page-only).
+4. **§12.6 the graph** — correctly homeless (parked); recorded so its absence reads as deliberate, not missed.
+
+## How to re-run this check
+1. Walk the spec's section list; every section appears in the table above or in the "not built" rows.
+2. Walk the stages; every item a stage builds cites a spec section.
+3. A row that cannot be filled either way **is the finding** — a spec section with no builder, or a stage inventing work nobody ruled.
+**Run it: after any spec change, and once more before stage ① starts** *(the second run is best done by an independent agent — the author is the wrong checker, the same reason Gate B exists).*

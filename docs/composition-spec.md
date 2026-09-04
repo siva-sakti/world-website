@@ -494,6 +494,8 @@ The chain is **floater → panel → page**, each a single control. **Content is
 
 **The house rule this obeys:** *every list can be empty, every write can fail, and nothing fails silently.*
 
+⭐ **HOW THIS SECTION IS BUILT (2026-09-04, the carry-through check):** §15 is **not a build stage — it is an acceptance line on EVERY stage.** No stage is done until each new screen it introduces has its empty · loading · error states. *(The check found §15 had no build home at all — exactly the between-the-documents gap the owner predicted. §18's accessibility floor was homed the same way: ②a the page, ③ chip/peek/block announcements, ⑤ the frames' focus handling.)* **Stage ③ additionally owes the BLOCK's loading and failure states — which this section never covered** (§34.5).
+
 ## 16 · Keyboard
 - **Escape** — closes the picker (inserting nothing) · then the peek · then the floater. One layer per press, innermost first.
 - **Enter** — in the picker, selects. In the body, splits the block (§13.3).
