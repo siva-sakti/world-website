@@ -8,11 +8,26 @@
 - **Nothing touches cloud without the owner's go.** Stage ① is the only stage that touches stored data.
 - **Every stage ends green**: `pnpm build` + typecheck + its named proofs + the owner's feel-test list for that stage.
 
+## ⚠ THE TROUGH — what the owner can DO after each stage *(owner-raised 2026-09-04: "I don't wanna get there fast, I wanna get there good")*
+She uses this app daily, so every stage must state its own before/after. **Especially stage ①: her old pieces are gone and the new surface has none of its features yet — for that stretch her writing surface is PLAINER than today.** That is acceptable only if it is said out loud, not discovered.
+| after | what she can do that she couldn't | what is temporarily worse |
+|---|---|---|
+| ⓪ | nothing changes — paper only | nothing |
+| ① | compositions are real things: their own room, their own home in the data; bits/boards untouched | **her old test pieces are gone; the surface is plain** — no new editor features yet |
+| ②a | a real writing surface — headings, lists, checklists, tables, the lock, the piece's job facts, sortable list | drag-reorder not there yet |
+| ②b | move blocks; fold sections; columns | — |
+| ③ | ⭐ **the promise lands** — everything she has collected is reachable inside her writing | — |
+| ④ | make a bit from a selection; paste images into a piece | — |
+| ⑤ | write beside a board without leaving it | — |
+| ⑥ | prop bits above the writing | — |
+**And the rule that makes "good" real:** ⭐ **every stage ends with the OWNER USING IT for something real — not with tests going green.** Tests prove it does not break; only she can say whether it is worth having.
+
 ## ⭐ THE STANDING ACCEPTANCE — applies to EVERY stage below
 *(Written 2026-09-04 after the carry-through map found §15/§16/§17/§18 with no build home. **These are not a stage — they are the floor every stage must clear**, stated once because repeating them eight times is how they drift out of sync. A stage's own "Accept" line is IN ADDITION to these. Named in plain words, not codes — the owner: "what is all this??", and she was right.)*
 - **THE THREE STATES** *(§15)* — every new screen needs three versions: **empty** (nothing in it yet), **loading**, and **broken** (something failed). *No stage is done until each screen it introduces has all three.* The happy version is the easy one to build and the only one anyone remembers; the house rule is that every list can be empty, every fetch can fail, and nothing fails silently.
 - **REACHABLE WITHOUT A MOUSE** *(§18)* — every control keyboard-reachable · anything that opens returns your cursor where it was when it closes · anything a screen reader meets is announced as what it is.
 - **KEYBOARD AND PHONE** *(§16/§17)* — new controls have their key paths; new screens hold together at phone width (the frames: page-only).
+- **NO HOVER-ONLY ACTS** *(§17, owner-raised 2026-09-04)* — desktop-first is fine; **hover-only is not.** Any act this stage introduces has a non-hover path or an explicit written "not on phone." *(Two already flagged: the drag handle, the block's open-door.)*
 - **GREEN BEFORE DONE** — `pnpm build` + typecheck pass · new logic carries a test · nothing in the stage contradicts the model (§1–§3) or the guardrails (§22).
 
 ## Stage ⓪ · THE ENACTMENT PAPER (planning-grade, runs NOW)

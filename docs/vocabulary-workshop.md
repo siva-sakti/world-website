@@ -50,3 +50,30 @@ The list's route *(the piece is `/composition/[id]`; the ROOM is still `/notes`)
 
 ## 4 · How this workstream runs
 Her window drives; nothing here blocks the build *(the build runs on concepts, which are settled)* · a word graduates only when SHE says it · graduation = `lexicon.md` in the same pass, tombstone for the retired word, then the code sweep · **the sweep costs rise with time** — a word used in 30 files is a bigger rename than one used in 3.
+⭐ **AND THERE IS ONE SPECIFIC MOMENT THE COST JUMPS (flagged 2026-09-04):** right now, changing "composition" is FREE. **The moment stage ① creates a table with that name, changing it becomes a schema change + a code sweep.** Three honest options, to be picked on purpose rather than by drift: **(a)** close the naming before stage ① · **(b)** accept the later rename cost knowingly · **(c)** decide deliberately that the TABLE's name and the WORD SHE SAYS need not match (the lexicon's code-naming authority would be carved for this one case). ⚪ **The owner's pick.**
+
+## 5 · ✅ Confirmed by the owner (2026-09-04) — the board family
+*(Her words, verbatim. **Recorded, not enacted** — she said "not to action on"; no code sweep, no lexicon graduation, until she calls it.)*
+
+- **board** — the surface you make and name *(stored)*
+- **canvas** — the board's infinite spatial rendering. How a board is **drawn**, not a thing you have *(not stored)*
+- **frame** — an optional page-shaped fixture placed on a board. The board stays infinite; the frame sits within it *(stored, when built)*
+- **arrange / edit** — modes of the board *(not stored)*
+
+**Two things these four expose — flagged, not solved:**
+
+### 5.1 ⚠ "frame" is about to be stored TWICE, meaning two different things
+Both are planned and neither is built, so this is cheap to fix now and expensive later.
+| | what it means | where it would live |
+|---|---|---|
+| **frame** *(confirmed above)* | the page-shaped fixture on a board | `board.frame_x/y/w/h` — `frame-plan.md` §33 *(+ a future `frame` table, §52)* |
+| **frame** *(already planned)* | a **card's border treatment**: none · paper-mat · hairline · polaroid · museum | `placement.frame` — `aesthetics-phase.md` §54, P3 §102 |
+One word, two stored things, one screen. **One of them needs a different word** — and the card-border sense is the easier one to move, since nothing has been built on it and its own doc already calls it "border/frame."
+
+### 5.2 ⭐ "mode" is now carrying two different jobs
+Her own definitions separate them cleanly, which is the useful part:
+- **how a board is DRAWN** — she calls this a *rendering* (canvas). But `lexicon.md` also has **collection mode** and **document mode** on this same axis, and calls canvas "a board's spatial rendering **mode**."
+- **what your HANDS are doing** — arrange / edit. This is the axis she just called *mode*.
+- and §3.3's propping surface is a third thing she also wants to call **a mode** (*"like you're in the study"*).
+
+**If "canvas is a rendering, not a mode" holds, it settles the other two for free:** collection and document become *renderings* alongside canvas, and **mode** is left to mean only *what your hands are doing* — which is exactly the sense §3.3 reaches for. Not ruled; her call.

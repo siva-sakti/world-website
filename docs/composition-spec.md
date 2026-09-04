@@ -504,6 +504,7 @@ The chain is **floater → panel → page**, each a single control. **Content is
 - ⚪ Tab order across title → subtitle → body → footer.
 
 ## 17 · Responsive
+⭐ **THE RULE THAT KEEPS DESKTOP-FIRST FROM BLOCKING PHONE (owner-raised 2026-09-04: "I want desktop to work really well but I want to make sure it doesn't block anything on other surfaces"):** **desktop-first is fine; hover-ONLY is not.** Every act needs a non-hover path **or** an explicit written "not on phone." ⚠ **Audited 2026-09-04 — two affordances are currently hover-only with no phone story:** the **drag handle** (§13.3.5/§20.6) and the **block's open-the-original door** (§20.5b.3/§20.6). *(Silent bit-hood is safe — §3.4 already says "tap or hover.")* **Each needs its touch path or its exclusion, decided at build, not discovered.** §17 previously ruled layout only, never which ACTS survive — the gap this audit closed.
 **Phone:** the full page only *(owner-ruled)* — no floater, no panel; the drawer becomes a full-screen sheet reached by a control, not a side column.
 **Tablet:** page and panel; ⚪ whether the floater makes sense at that size.
 **Desktop:** all three frames.
