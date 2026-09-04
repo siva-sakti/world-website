@@ -13,6 +13,16 @@
 - Insert via toolbar (page/write contexts at minimum; render everywhere). Minimal ops UI: add/remove row/column (tiptap commands; a small menu on table selection). Keep it plain — **no typed columns, no sorting, no formulas** (that's the parked engine, `docs/tables-and-structured-data.md`).
 - Small-card rendering: allow horizontal scroll within the card rather than squeezing.
 
+> **⚑ GAP FOUND 2026-09-03 — this build covers only HALF of what was ruled.** Cross-feature
+> ruling **X4** (owner, 2026-09-02: *"a table should be its own bit… in the boards a bit that can
+> be a table"*) says a table is **both** formatting inside writing **and its own bit type on a
+> board**. Build 2 above does the formatting half only; there is no `'table'` in `bit.type`
+> anywhere in this plan. Either the second half is a separate build (a migration + a renderer +
+> an intake, like Build 3) or X4 has been narrowed — **the owner's call, and it should be made
+> before Build 2 ships**, because a table typed as writing today is awkward to promote to a bit
+> later. Raised when the owner asked about "three new bit types" and only one of the three
+> turned out to need a type at all.
+
 ## Build 3 · The generic FILE bit (M)
 - Migration: add `'file'` to the `bit.type` CHECK — follow the exact pattern of `20260830000003_audio_type.sql` / `...04_pdf_type.sql`. Throwaway-proven first; **cloud apply stays owner-gated**, as always.
 - Intake: generalize the existing file-bit foundation (`createFileBit`, the audio/pdf machinery) — accept any mime that isn't already image/audio/pdf; store via the same bucket + `storage_path`; keep `file_name`, `mime`, `byte_size`.
