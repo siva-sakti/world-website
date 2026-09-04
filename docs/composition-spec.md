@@ -787,7 +787,7 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 **Step 5 — the bit's fate while gathered:** trashed → chip keeps stored text, peek says gone 🔨, **block display ⚪** · destroyed → tie cascades, **chip degrades to plain text** 🔨, block 🔵 lean: collapses to the same text (one degrade rule) · archived → ⚪ match archived-on-boards. **The three blanks are one family: what a block shows per dead-or-resting state — one sitting closes all three.**
 **Step 6 — onward:** second piece → second tie, independent presence ✅ · the composition on a board → a doorway; **gathered bits do not leak onto the board** ✅ · piece into piece → the piece's chip, no cascade ✅ flatness · the pull → the bit appears; the piece only if IT carries the tag ✅.
 
-### 28b · The duplication law *(proposed 2026-09-03, shipped code verified to obey it — awaiting the owner's stamp)*
+### 28b · The duplication law — ✅ STAMPED *(owner, 2026-09-03: "that feels sensible — something we can stand on"; shipped code verified to obey it)*
 **The copy always gets what the bit IS (content · file · source · tags · folder) and never where it SITS (no placements, no ties). The door adds exactly one "here":** bits list → nothing (loose) · a board → one placement on THIS board (+24px, shipped 🔨) · a composition → one tie into THIS piece (§24.5b, unbuilt). Three doors, one law; they differ only in where you were standing.
 
 ### 28c · Board symmetry *(owner, leaning: "when this goes on a board it should act like a bit")*
@@ -872,4 +872,4 @@ Sources have no trash/archive (they die directly — smaller state family); rena
 - **Tags come: the safe error.** A wrongly-carried tag is visible in the pull, one tap to fix; a wrongly-dropped tag is SILENT loss (the copy vanishes from pulls, nothing tells you).
 - **Folder comes:** filed with its original — the needs-no-explanation answer (the other window's ruling, holds in both contexts).
 - **Never: placements and ties** — those are the original's LIFE STORY, not facts about the material. The copy starts its own.
-- ⭐ **Why one rule survives both contexts:** everything that comes is true of the material AT BIRTH in any context; everything context-dependent is added by the door (this board · this piece) or by later edits. ⚪ awaiting the owner's word on this argument.
+- ⭐ **Why one rule survives both contexts:** everything that comes is true of the material AT BIRTH in any context; everything context-dependent is added by the door (this board · this piece) or by later edits. ✅ **STAMPED (owner, 2026-09-03): "that feels sensible — something we can stand on."**
