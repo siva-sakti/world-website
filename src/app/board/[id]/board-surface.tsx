@@ -35,6 +35,7 @@ import { removeActs } from "./remove-acts";
 import { useUndo } from "./use-undo";
 import { useArrangeActs } from "./use-arrange-acts";
 import { useCardDrag } from "./use-card-drag";
+import { useBoardPointer } from "./use-board-pointer";
 import { useMeaningActs } from "./use-meaning-acts";
 import { useGeometry } from "./use-geometry";
 import { UndoDevReadout } from "./undo-dev-readout";
@@ -78,7 +79,6 @@ export function BoardSurface({
   const enqueueWords = (v: { bitId: string; kind: "image" | "drawing" | "audio" | "pdf" | "link" }) =>
     setWordsQueue((q) => (q.some((x) => x.bitId === v.bitId) ? q : [...q, v]));
   const [looseRefresh, setLooseRefresh] = useState(0); // bump → the loose column reloads
-  const [isPanning, setIsPanning] = useState(false); // drives the grabbing cursor
   const [duplicating, setDuplicating] = useState(false); // the ⧉ act is in flight
   const [duplicatingBit, setDuplicatingBit] = useState(false); // a card's own copy is in flight
 
@@ -86,8 +86,6 @@ export function BoardSurface({
   const fileRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
-  const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
-  const pan = useRef<{ sx: number; sy: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [supabase] = useState(() => createClient());
   const router = useRouter();
 
@@ -241,6 +239,15 @@ export function BoardSurface({
       supabase, boardId, boardRef, screenToWorld, camRef, cards, setCards,
       setSelectedIds, selectOne, setEditingId, setDrawMode, nextZ,
       trackCreate, reconcileId, setConverting, setCapturing, setWordsFor: enqueueWords, onErr, sizeOf,
+    });
+
+  // A press on EMPTY SPACE: pan · pinch · marquee · tap-to-clear · double-tap-to-create
+  // (S1 — lifted out whole into use-board-pointer).
+  const { isPanning, onBoardPointerDown, onBoardPointerMove, onBoardPointerCancel, onBoardPointerUp } =
+    useBoardPointer({
+      cards, boardRef, cam, setCam, screenToWorld, scheduleSave,
+      pinchDown, pinchMove, pinchUp, marquee, selectMode,
+      setEditingId, clearSelection, createTextCard, cancelDrag,
     });
 
   // Remove acts (I-W1) — un-place / trash, singular + bulk — through the settled door.
@@ -482,67 +489,6 @@ export function BoardSurface({
     onUndo: () => void doUndo(),
     onRedo: () => void doRedo(),
   });
-
-  // ---- pan + pinch + tap on empty space ----
-  function onBoardPointerDown(e: React.PointerEvent) {
-    if (e.target !== boardRef.current) return; // empty space only (cards handle their own)
-    setEditingId(null);
-    if (pinchDown(e)) {
-      // A second finger = a pinch: never a pan, marquee, or tap. Abandon any
-      // in-progress marquee (its anchor must not be stomped — plan finding 7).
-      marquee.cancel();
-      pan.current = null;
-      lastTap.current = null;
-      setIsPanning(false);
-      return;
-    }
-    if (selectMode) {
-      marquee.start(e); // select-mode: empty-space drag draws a marquee (not a pan)
-      return;
-    }
-    pan.current = { sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y, moved: false };
-    clearSelection();
-  }
-
-  function onBoardPointerMove(e: React.PointerEvent) {
-    if (pinchMove(e)) return; // an active pinch owns the move
-    if (marquee.move(e, cards)) return; // a marquee is active — it handled the move
-    const p = pan.current;
-    if (!p) return;
-    const dx = e.clientX - p.sx;
-    const dy = e.clientY - p.sy;
-    if (!p.moved && Math.hypot(dx, dy) < 4) return;
-    if (!p.moved) { p.moved = true; setIsPanning(true); }
-    setCam((c) => ({ ...c, x: p.cx + dx, y: p.cy + dy }));
-    scheduleSave(); // user pan → remember the new view (debounced)
-  }
-
-  // An interrupted gesture (OS gesture, alert, tab switch) must strand no state.
-  function onBoardPointerCancel(e: React.PointerEvent) {
-    cancelDrag(); // touchcancel fires no drag-stop; no line may strand, no snap state survive
-    pinchUp(e);
-    marquee.cancel();
-    pan.current = null;
-    setIsPanning(false);
-  }
-
-  function onBoardPointerUp(e: React.PointerEvent) {
-    if (pinchUp(e)) return; // a finger lifting out of a pinch is never a tap
-    if (marquee.end()) return; // a marquee was active — it handled the up
-    const p = pan.current;
-    pan.current = null;
-    setIsPanning(false);
-    if (!p || p.moved) return; // a pan, not a tap
-    const w = screenToWorld(e.clientX, e.clientY);
-    const now = performance.now();
-    const prev = lastTap.current;
-    if (prev && now - prev.t < 340 && Math.hypot(w.x - prev.x, w.y - prev.y) < 28 / cam.scale) {
-      lastTap.current = null;
-      createTextCard(w.x, w.y);
-    } else {
-      lastTap.current = { t: now, x: w.x, y: w.y };
-    }
-  }
 
   // Locked AND rotated cards are excluded by the align acts, so the buttons must count the
   // same way (rotation-plan §5 — a rotated card opts out of alignment exactly as a locked
