@@ -34,5 +34,8 @@ walker+label+count (6·5·8) → db module (1) → **variant/showToolbar commit*
 ## 5 · Accept *(+ the five floor rules)*
 Every T green in `pnpm test` · every V green in `verification/` with committed output · every B pasted in its commit · **the §1 paragraph performed by the owner on the real app** · boards/bits: byte-identical re-save + her eyes (stated honestly per A10).
 
-## ⚑ The four owner words *(short, none urgent — defaults proceed if she says nothing)*
-**Q1** tags/folder/star ON a composition: build applying in ②a, or defer to ③ with the footer omitting those rows till then? *(lean: defer — nothing half-wired)* · **Q2** while locked, are the job facts (target/due/for) editable? *(lean: no — unlock first, one tap)* · **Q3** minting when you merely switch apps (tab-hidden): keep (your G9 fence) or only on real leave? *(lean: keep, flagged for feel)* · **Q4** the interim puts your pieces ON home (a section/tab) though §31.2 said due dates "not on home" — bless the interim? *(lean: yes; the real room arrives with its name)*
+## ⚑ The four owner words — ✅ ANSWERED (owner, 2026-09-04)
+**Q1 — tags/folder/star: DEFERRED to ③, blessed with a condition:** *"I don't wanna halfway anything, but I also don't wanna lose stuff — as long as you put it in the right place."* → the footer omits those rows in ②a; the deferral is parked in ③'s piece list (bring-in owns applying), nothing half-wired, nothing lost.
+**Q2 — the lock covers the job facts: RULED.** *"It makes sense to [refuse] the word target, due date and who it's for if you don't unlock."* → the refusal table stands as leaned: refuse body · title · subtitle · job facts; allow unlock · trash · archive · reading.
+**Q3 — minting on switch-away: RULED, keep.** *"Switching apps could be going out for longer, so it doesn't hurt to date-title — annoying to backspace, but at least you won't have an untitled thing."* → tab-hidden mints; the annoyance is accepted with open eyes.
+**Q4 — the interim list on home: proceeding on the default** (she asked about the route instead — answered: the room's address carries the chosen word, minted at the naming session; a section on home until then).
