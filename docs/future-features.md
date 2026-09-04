@@ -44,3 +44,8 @@ resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piec
 
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
+
+## F-10 · The deck — a sequence of bounded frames *(rescued 2026-09-04 by the merge-check; 🔵 unruled, never owner-ruled)*
+**The idea, in one line:** *a deck is a SEQUENCE of frames, and each frame's interior is a small bounded board* — ordered like a format, free inside like a canvas, printable/exportable because it is bounded. Placement mechanics we already own, inside edges.
+**Provenance:** `docs/composition-surface-spec.md` §5 (superseded 2026-09-04), where it was marked 🔵 unruled and described as "second, lighter — the owner: *less intense* for now."
+⚠ **Why it is here:** the merge-check found it in **no live document** — not this shelf, not `parked.md`. It would have been lost when that file archived. **Filed, not proposed.** The owner rules whether it ever re-enters.
