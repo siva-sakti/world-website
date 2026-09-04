@@ -122,6 +122,13 @@ export function Card({
   // Two-step: a fresh click selects (shows the resize frame); clicking an
   // already-selected text card enters edit mode.
   const wasSelected = useRef(false);
+  // Did this gesture MOVE the card? react-rnd does not suppress the click that follows a
+  // drag — verified by inspection: the word "click" does not appear anywhere in its build,
+  // so it cannot be swallowing one. A comment here claimed it did, and on that basis the
+  // additive click below toggled selection unconditionally: shift-dragging a selected card
+  // dropped it and deselected it in the same gesture. The 4px slop matches the pan and
+  // marquee thresholds, so a hand that twitches still counts as a tap.
+  const dragged = useRef(false);
   // ROTATION (rotation-plan §1): the live angle during a handle drag. null = not
   // rotating, so the card shows its stored angle. Kept in state (not a ref) because
   // the tilt must repaint each frame; the drag is rare and short, unlike a card drag.
@@ -249,8 +256,14 @@ export function Card({
       cancel=".compose-rotate-handle"
       style={{ zIndex: card.z }}
       className={`compose-card${selected ? " is-selected" : ""}`}
-      onDragStart={() => onDragStart?.()}
-      onDrag={(_e, d) => onDragMove?.(d.x, d.y)}
+      onDragStart={() => {
+        dragged.current = false;
+        onDragStart?.();
+      }}
+      onDrag={(_e, d) => {
+        if (Math.abs(d.x - card.x) > 4 || Math.abs(d.y - card.y) > 4) dragged.current = true;
+        onDragMove?.(d.x, d.y);
+      }}
       onDragStop={(e, d) => {
         // The snap lands FIRST, and BOTH consumers get the same coords — forwarding the
         // raw drop to onDragEnd would desynchronise a group drag by the snap distance.
@@ -322,9 +335,16 @@ export function Card({
           if (!additive && !selected) onSelect(false);
         }}
         onClick={(e) => {
+          // A drag ends with a click on the same element, so every branch here has to
+          // ask whether the card actually moved. Without this, shift-dragging deselects
+          // and dragging a text card opens it for editing.
+          if (dragged.current) {
+            dragged.current = false;
+            return;
+          }
           const additive = selectMode || e.shiftKey || e.metaKey || e.ctrlKey;
           if (additive) {
-            onSelect(true); // toggle (react-rnd suppresses click after a drag, so a drag won't toggle)
+            onSelect(true); // toggle
             return;
           }
           if (isText && !editing && wasSelected.current) onEdit();

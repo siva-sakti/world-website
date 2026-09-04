@@ -68,13 +68,14 @@ Update the status column in the same session anything moves. *(Findings live in
 
 | | What | Status |
 |---|---|---|
-| m1 | dead exports: `isBusy` / `version`; `display_size` stored + constrained + copied, never read | ⬜ |
-| m2 | a comment claims react-rnd suppresses a click after a drag — **verified false** | ⬜ |
-| m3 | a comment claims `DEFAULT_W = 240` matches the renderer — it is 400 | ⬜ |
-| m4 | an unused `placementId` parameter on two remove doors | ⬜ |
-| m5 | `looseRefresh` bumped on a path where nothing became loose | ⬜ |
-| m6 | one unreachable branch | ⬜ |
-| m7 | stale line references in `frame-plan.md` | ⬜ |
+| m1 | dead exports: `isBusy` / `version` (+ its `bump()` and 8 call sites) | ✅ **REMOVED** — nothing in the app ever read them; `use-undo`'s comment describing `version` as the render mirror was also false and is corrected |
+| m1b | `display_size` stored, constrained, copied by duplicate, **never read** | ⚪ **needs a migration you run** — inert meanwhile; queued with the other schema changes |
+| m2 | a comment claimed react-rnd suppresses a click after a drag | ✅ **FIXED — and it hid a real bug.** Verified myself: the string "click" appears **0 times** in react-rnd's whole build, so it suppresses nothing. Shift-dragging a selected card therefore dropped it *and deselected it* in one gesture, and dragging a text card could open it for editing. Now guarded with the same 4px slop as pan and marquee |
+| m3 | `DEFAULT_W = 240` claimed to match the render default — it is 400 | ✅ **FIXED** — the comment now says what it is: a deliberate approximation, and nothing depends on it matching |
+| m4 | an unused `placementId` parameter on two remove doors | ✅ **REMOVED** — worse than unused: it implied trash and archive were card-scoped, when both take the bit off **every** board. Call sites shown before changing the signature (2 app, 12 test) |
+| m5 | `looseRefresh` bumped on a path where nothing became loose | ✅ **REMOVED** — a duplicate lands PLACED on the board, so the loose column had nothing new to show; it was a wasted round trip on every duplicate |
+| m6 | one unreachable branch | ⚠ **NOT LOCATED** — the audit recorded that it exists but never where. Searched (`tsc --allowUnreachableCode false` finds none). Left open rather than guessed at; re-find it in the Group E pass or drop it |
+| m7 | stale line references in `frame-plan.md` | ✅ **FIXED — and doubly stale.** It described "TWO hand-written lists" at line numbers that had both drifted; the second list no longer exists (the insert was changed to spread the row), so the note described work already done. Line numbers deliberately not restored |
 
 ### Rules to write down, with the test that enforces each
 

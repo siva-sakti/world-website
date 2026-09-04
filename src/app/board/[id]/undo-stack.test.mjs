@@ -82,12 +82,14 @@ test("the busy latch: a second press mid-flight is ignored, not queued", async (
   s.push(entry("slow", { undo: () => gate }));
   const p1 = s.undo(retryable);
   const r2 = await s.undo(retryable); // while the first is in flight
-  assert.equal(r2, null);
-  assert.equal(s.isBusy(), true);
+  assert.equal(r2, null, "the second press is dropped, not queued behind the first");
   release();
   const r1 = await p1;
   assert.equal(r1.ok, true);
-  assert.equal(s.isBusy(), false);
+  // …and the latch cleared: a later press works. Asserted through behaviour rather
+  // than through an isBusy() accessor, which nothing in the app ever called.
+  s.push(entry("after", {}));
+  assert.notEqual(await s.undo(retryable), null, "the stack accepts work again");
 });
 
 test("settled is awaited (settled-safe) BEFORE the reverse runs (D6)", async () => {
@@ -116,19 +118,6 @@ test("a REJECTED settled does not block the reverse (settled-safe)", async () =>
   const r = await s.undo(retryable);
   assert.equal(r.ok, true);
   assert.equal(ran, true);
-});
-
-test("version() bumps on push, run, and state flips — the render mirror's food", async () => {
-  const s = createUndoStack();
-  const v0 = s.version();
-  const e = s.push(entry("a"));
-  assert.ok(s.version() > v0);
-  const v1 = s.version();
-  s.markFailed(e);
-  assert.ok(s.version() > v1);
-  const v2 = s.version();
-  await s.undo(retryable); // discards the corpse — still a mutation
-  assert.ok(s.version() > v2);
 });
 
 test("D1 regression: an act that FAILS while ↶ waits never runs its reverse", async () => {

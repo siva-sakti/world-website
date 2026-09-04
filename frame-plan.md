@@ -100,8 +100,12 @@ exists"). No placement-chain interaction. **Two named consequences (antagonist):
 - **every frame move bumps the board's `updated_at` → home's touched_at re-sorts. RULED
   ACCEPTED:** moving furniture IS an edit — exactly as card moves already bump it. Consistent,
   chosen, not accidental.
-**duplicateBoard: TWO hand-written lists** (the select at boards.ts:44 AND the insert at :52)
-each gain the four columns — there is no column loop; the frame is silently dropped today.
+**duplicateBoard: ONE hand-written list** — the `board_cards` select in `duplicateBoard`
+(`lib/db/boards.ts`) gains the four columns; the insert spreads the row it read, so it needs
+no edit. *(Corrected 2026-09-03: this said TWO lists at `boards.ts:44` and `:52`. Both line
+numbers had drifted, and the second list no longer exists — the insert was changed to spread.
+Line numbers are deliberately not restored here; they go stale silently, which is how this
+note came to describe work that was already done.)*
 Proof of the copy = the stage browser truth-check (the SQL harness can't run TypeScript).
 
 ### Snap integration (lands with/after the guides)

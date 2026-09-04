@@ -12,7 +12,12 @@
 export type Point = { x: number; y: number };
 export type PlacedCard = { x: number | null; y: number | null; width: number | null };
 
-const DEFAULT_W = 240; // matches the render-layer text default; only used to measure existing cards
+// A rough stand-in width for legacy rows that stored none. Deliberately APPROXIMATE and
+// deliberately not imported from the render layer: this only needs to land newcomers
+// OUTSIDE the existing cluster, and a card that measures as zero-width would get one
+// dropped on top of it. (It used to claim it matched the render default; it does not —
+// text cards are 400 — and nothing here depends on that being true.)
+const DEFAULT_W = 240;
 const GAP = 48; // clearance to the right of the cluster
 const CASCADE = 40; // per-arrival diagonal offset so several sent at once don't stack
 

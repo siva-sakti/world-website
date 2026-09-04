@@ -41,8 +41,6 @@ export function createUndoStack(cap = 20) {
   let busy = false;
   // Bumped on EVERY mutation — including the live→dead flips inside run() — so the
   // React seam can mirror it and the buttons/readout actually re-render (D14).
-  let version = 0;
-  const bump = () => void version++;
 
   /** Record a deliberate act. Returns the entry so the act's own .catch can mark
    *  it failed. Caps at `cap` (oldest drops) and CLEARS redo — a new act forks
@@ -52,7 +50,6 @@ export function createUndoStack(cap = 20) {
     undos.push(entry);
     if (undos.length > cap) undos.shift();
     redos.length = 0;
-    bump();
     return entry;
   }
 
@@ -60,7 +57,6 @@ export function createUndoStack(cap = 20) {
    *  the entry no longer describes anything that happened. */
   function markFailed(entry: UndoEntry): void {
     entry.state = "failed";
-    bump();
   }
 
   function peekLive(list: UndoEntry[]): UndoEntry | null {
@@ -81,12 +77,10 @@ export function createUndoStack(cap = 20) {
     // can never reverse. Silently — the button's label already skipped them.
     while (from.length && from[from.length - 1].state !== "live") {
       from.pop();
-      bump();
     }
     const e = from[from.length - 1];
     if (!e) return null;
     busy = true;
-    bump();
     try {
       if (e.settled) await e.settled.catch(() => {}); // the act's write is done, either way
       // The act may have FAILED while we waited (its .catch marks the entry before
@@ -98,20 +92,16 @@ export function createUndoStack(cap = 20) {
       await (dir === "undo" ? e.undo() : e.redo());
       from.pop();
       to.push(e);
-      bump();
       return { ok: true, label: e.label };
     } catch (error) {
       if (classify(error) === "terminal") {
         e.state = "dead"; // the next press discards it and runs the one beneath
-        bump();
         return { ok: false, terminal: true, label: e.label, error };
       }
       // Retryable: the entry STAYS — the button can try again (network came back).
-      bump();
       return { ok: false, terminal: false, label: e.label, error };
     } finally {
       busy = false;
-      bump();
     }
   }
 
@@ -123,8 +113,6 @@ export function createUndoStack(cap = 20) {
     /** What the buttons render; null → disabled. Skips corpses without mutating. */
     nextUndoLabel: () => peekLive(undos)?.label ?? null,
     nextRedoLabel: () => peekLive(redos)?.label ?? null,
-    isBusy: () => busy,
-    version: () => version,
     /** The dev readout's food (stages 2–4's only visible surface). */
     snapshot: () => ({
       undos: undos.map((e) => ({ label: e.label, state: e.state })),

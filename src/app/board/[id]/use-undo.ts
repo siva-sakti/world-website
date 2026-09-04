@@ -5,9 +5,9 @@ import { createUndoStack, type UndoEntry } from "./undo-stack";
 
 // The React seam over the pure undo stack (board-undo-technical-plan.md §2).
 // Owns: the stack's lifetime (one ref = one board visit — BoardSurface never
-// remounts without a route change), the render mirror (the stack's version
-// counter into state, so buttons/readout re-render on every mutation including
-// the flips inside undo()), the terminal-vs-retryable classification, and the
+// remounts without a route change), the render mirror (a snapshot of the stack
+// copied into state after every mutation, so buttons/readout re-render — including
+// for the flips inside undo()), the terminal-vs-retryable classification, and the
 // owner-facing copy for a failed reverse. The acts call record(); stage 5's
 // buttons call undo()/redo().
 

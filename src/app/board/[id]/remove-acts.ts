@@ -368,7 +368,11 @@ export function removeActs(deps: {
 
   /** Trash the whole bit — hidden everywhere, restorable from /trash. Trash is the
    *  heavy act (it comes off EVERY board), so the confirm is honest about it (F16). */
-  async function trashSelected(placementId: string, bitId: string) {
+  // Takes the BIT, not the card: trash and archive are bit-wide acts — they take the
+  // thing off every board it sits on. They used to accept a placementId as well and
+  // ignore it, which quietly suggested the opposite for the two most destructive acts
+  // on the board.
+  async function trashSelected(bitId: string) {
     let boards = 1;
     try { boards = (await doors.getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
     if (!(await doors.confirmTrash({ noun: "card", onBoards: boards }))) return;
@@ -395,7 +399,7 @@ export function removeActs(deps: {
   /** Archive the whole bit — set aside, restorable from the archive. Same "onBoards"
    *  honesty as trash: archiving something placed elsewhere hides it there too, since
    *  archived bits fail the SAME board_cards `state = 'live'` filter trashed ones do. */
-  async function archiveSelected(placementId: string, bitId: string) {
+  async function archiveSelected(bitId: string) {
     let boards = 1;
     try { boards = (await doors.getBitBoards(supabase, bitId)).length; } catch { /* fall back to the plain confirm */ }
     if (!(await doors.confirmArchive({ noun: "card", onBoards: boards }))) return;

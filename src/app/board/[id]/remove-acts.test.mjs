@@ -172,7 +172,7 @@ test("un-place many: undo brings them all back", async () => {
 
 test("trash one: asks first, freezes the bit, labels singular", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.trashSelected("p-a", "a");
+  await b.acts.trashSelected("a");
   await b.flush();
   assert.equal(b.log.confirms.length, 1, "a destructive act always asks");
   assert.deepEqual(b.log.trashed, ["a"]);
@@ -182,7 +182,7 @@ test("trash one: asks first, freezes the bit, labels singular", async () => {
 
 test("trash one: declining the confirm does nothing at all", async () => {
   const b = makeBoard([card("a")], { confirm: false });
-  await b.acts.trashSelected("p-a", "a");
+  await b.acts.trashSelected("a");
   await b.flush();
   assert.deepEqual(b.bits(), ["a"], "the card stays");
   assert.deepEqual(b.log.trashed, []);
@@ -193,14 +193,14 @@ test("trash one: the confirm is TOLD how many boards the card is on", async () =
   const b = makeBoard([card("a")], {
     boards: [{ id: "board-1", title: "x" }, { id: "board-2", title: "y" }, { id: "board-3", title: "z" }],
   });
-  await b.acts.trashSelected("p-a", "a");
+  await b.acts.trashSelected("a");
   await b.flush();
   assert.deepEqual(b.log.confirms[0], { noun: "card", onBoards: 3 }, "so the shared door can warn it leaves all of them");
 });
 
 test("trash one: UNDO restores the bit globally, then repaints the card", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.trashSelected("p-a", "a");
+  await b.acts.trashSelected("a");
   await b.flush();
   await b.entries[0].undo();
   assert.deepEqual(b.log.restored, ["a"]);
@@ -209,7 +209,7 @@ test("trash one: UNDO restores the bit globally, then repaints the card", async 
 
 test("trash one: REDO re-trashes WITHOUT asking again", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.trashSelected("p-a", "a");
+  await b.acts.trashSelected("a");
   await b.flush();
   await b.entries[0].undo();
   const asksBefore = b.log.confirms.length;
@@ -241,7 +241,7 @@ test("trash many: an empty selection asks nothing and records nothing", async ()
 
 test("archive one: asks first, sets the bit aside, labels singular", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   assert.equal(b.log.archiveConfirms.length, 1, "a destructive-feeling act always asks");
   assert.deepEqual(b.log.archived, ["a"]);
@@ -251,7 +251,7 @@ test("archive one: asks first, sets the bit aside, labels singular", async () =>
 
 test("archive one: declining the confirm does nothing at all", async () => {
   const b = makeBoard([card("a")], { confirm: false });
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   assert.deepEqual(b.bits(), ["a"], "the card stays");
   assert.deepEqual(b.log.archived, []);
@@ -262,14 +262,14 @@ test("archive one: the confirm is TOLD how many boards the card is on", async ()
   const b = makeBoard([card("a")], {
     boards: [{ id: "board-1", title: "x" }, { id: "board-2", title: "y" }],
   });
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   assert.deepEqual(b.log.archiveConfirms[0], { noun: "card", onBoards: 2 }, "archiving hides it from every board it's on");
 });
 
 test("archive one: UNDO un-archives the bit globally, then repaints the card", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   await b.entries[0].undo();
   assert.deepEqual(b.log.unarchived, ["a"]);
@@ -278,7 +278,7 @@ test("archive one: UNDO un-archives the bit globally, then repaints the card", a
 
 test("archive one: REDO re-archives WITHOUT asking again", async () => {
   const b = makeBoard([card("a")]);
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   await b.entries[0].undo();
   const asksBefore = b.log.archiveConfirms.length;
@@ -308,7 +308,7 @@ test("archive many: an empty selection asks nothing and records nothing", async 
 
 test("a failed ARCHIVE write puts the card back too (the same rollback path as trash)", async () => {
   const b = makeBoard([card("a")], { failOn: "a" });
-  await b.acts.archiveSelected("p-a", "a");
+  await b.acts.archiveSelected("a");
   await b.flush();
   assert.deepEqual(b.bits(), ["a"], "rolled back");
   assert.equal(b.entries[0].failed, true, "nothing happened → no memory");

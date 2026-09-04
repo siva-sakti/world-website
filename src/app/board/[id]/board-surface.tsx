@@ -617,7 +617,9 @@ export function BoardSurface({
       };
       setCards((cs) => [...cs, copy]);
       selectOne(res.placementId);
-      setLooseRefresh((n) => n + 1);
+      // No loose-column refresh: the copy is PLACED here (it has a placementId), so
+      // nothing became loose and the column has nothing new to show. Refreshing it was
+      // a wasted round trip on every duplicate.
     } catch (e) {
       onErr(e);
     } finally {
@@ -778,8 +780,8 @@ export function BoardSurface({
           onDuplicate={() => void duplicateSelected(selectedBit)}
           duplicating={duplicatingBit}
           onUnplace={() => unplaceSelected(selectedBit.placementId)}
-          onTrash={() => trashSelected(selectedBit.placementId, selectedBit.bitId)}
-          onArchive={() => archiveSelected(selectedBit.placementId, selectedBit.bitId)}
+          onTrash={() => trashSelected(selectedBit.bitId)}
+          onArchive={() => archiveSelected(selectedBit.bitId)}
         />
       )}
       <div
