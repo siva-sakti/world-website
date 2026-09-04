@@ -1,4 +1,5 @@
-# The composition build plan — six stages, gated
+# The composition build plan — gated stages
+> ⚠ **TERMINOLOGY, fixed after a confusion Claude caused (owner, 2026-09-04):** **"the schema change"** = the file that changes the database's SHAPE (always needed). **"the data move"** = carrying old notes across — **CANCELLED by the fresh-start ruling (§21.7)**. Claude had used "the migration" for both, which read as if the cancelled thing was still in the plan. Two words from now on.
 *(v2, 2026-09-03 — restructured after the owner's confidence challenge ("sensible technically, not neatly packaged") + a re-audit that caught three fall-throughs + registry verification of every extension. Originally written the same day, after: the spec verified banner-off (D-146) · the storage session proven (D-145) · §33's words 1–3 landed. House genre: spec → build plan → verification; every stage cites the spec and names its acceptance. The builder follows this and improvises nothing; a question the plan doesn't answer routes to the spec, then to the owner.)*
 
 ## The rules over the whole build
@@ -17,6 +18,11 @@
 4. **Prove:** the draft attack suite re-run against the REAL migration file · zero orphans · export completeness · the S-C scenes seeded FRESH in the new home and replayed.
 5. **⚑ CHECKPOINT — the owner's #4 nod:** backup shown → the delete-count shown ("N test notes will be removed — restorable from the backup") → throwaway run's raw output → her explicit go → cloud → deploy.
 **Accept:** the tech-spec §5 provables minus migration-counts (moot) · the owner opens the app and bits/boards are exactly as they were; the compositions list starts empty and ready.
+
+## ⚠ THE ONE PLACE BITS AND COMPOSITIONS COUPLE *(owner-surfaced 2026-09-04: "we have to make sure the way you're building compositions works with the way bits are currently done")*
+**Verified facts:** only the **text** bit type has a body at all (drawing = `strokes` jsonb · image/audio/pdf = files · link = url), and that body is **HTML**; the composition's is **JSON**. **Board text-cards and compositions mount the SAME editor component** (`TextBit`, from `board/[id]/card.tsx` · `bit/[id]/text-workspace.tsx` · `write/quick-write.tsx`) — the ruled "one shared editor" (§13).
+**The requirement:** the shared editor must write **HTML when mounted on a bit and JSON when mounted on a composition** — an explicit per-mount setting, never an accident. Its capability set stays shared (§13); only the OUTPUT differs. A test asserts each mount's format. *(Not hard; must be deliberate.)*
+**The ruled sequencing** *(owner asked for the ideal, not a forced fit)*: the ideal end-state is ONE format everywhere, but the reasons JSON won for compositions mostly do not transfer to bits (no chips after the split — flatness · no headings · little structure), and the risk classes are opposite — **her compositions are deletable test data; her bits are the real notebook.** So: composition on JSON now (greenfield, zero risk), and **a bit-format conversion stays its own later, separately-proven project** — after the JSON path has real use behind it. Recorded so it is a decision, not a drift.
 
 ## Stage ②a · THE EDITOR — SURFACING + THE PAGE (low-risk half)
 **Registry-verified (2026-09-03, npm reads, no installs): every needed piece EXISTS as an official MIT `@tiptap/*` 3.x extension** — task-list/item (checklist) · table · **details (the toggle)** · **drag-handle** · **unique-id (the heading `hid`s — the vendor's own tool, not custom code)** · static-renderer (already approved). **The ONE custom build in the whole editor: columns** (no official or findable community package — §13.9 is its spec).
