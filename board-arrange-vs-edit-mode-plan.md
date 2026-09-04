@@ -67,6 +67,66 @@
 >
 > **Everything below is kept as the reasoning trail. It is not a build plan.**
 
+> ## ⭐ THE ANALYSIS THAT WAS MISSING: INTERACTION DEPTH *(owner, 2026-09-04 — "what hierarchy would we need based on the list of actions?")*
+>
+> **The owner's actual argument for the mode, which Claude kept missing:** a mode is a device
+> for **flattening gesture depth**. With one surface, a card needs *click = select* and
+> *double-click = enter*. With two modes, **each mode gets a whole gesture vocabulary to itself**,
+> so *click* can mean *select* in one and *enter* in the other — **no double-click anywhere.**
+> That is not about permissions or visibility. It is about **how many things you have to do to
+> get to the thing you wanted.**
+>
+> So the right analysis is: every action on a card · the gesture that reaches it · how deep.
+> Under one surface, and under two modes. Then decide from the table, not from philosophy.
+>
+> ### Every action on a card, and how deep it is
+>
+> | action | ONE surface | depth | TWO modes | depth |
+> |---|---|---|---|---|
+> | select | click | 1 | **arrange:** click | 1 |
+> | move | drag | 1 | **arrange:** drag | 1 |
+> | resize · rotate | select → handle | 2 | **arrange:** select → handle | 2 |
+> | lock · send back · duplicate · remove · trash · archive | select → button | 2 | **arrange:** select → button | 2 |
+> | select several · align · distribute | shift-click / marquee → button | 2 | **arrange:** same | 2 |
+> | **enter a card (cursor in the words)** | **double-click** | **1, but heavy** ⚠ | **edit:** click | **1** |
+> | **see the title · tags · source** | select → they appear | 2 | **edit:** click — they appear *with* the cursor | **1** |
+> | **change the title** | select → click title | 2 | **edit:** click card → click title | 2 |
+> | **tag it** | select → tag bar | 2 | **edit:** click card → tag bar | 2 |
+> | open full page | select → button, *or* double-click on a note | 2 / 1 | ⚪ **double-click is now FREE** — can mean "open" everywhere | 1 |
+>
+> ### What the table says, plainly
+>
+> **The mode buys exactly two things, and they are real:**
+> 1. **Entering a card drops from double-click to click.** On a mouse that is a small win. **On
+>    touch it is a large one** — double-tap is awkward, slow, and on many phones fights the
+>    browser's zoom. The app is phone-capture-first. *(This is the argument that decides it.)*
+> 2. **Double-click becomes free** — it can mean **"open full page"** for every card, instead of
+>    being spent on "enter text" for text cards and "open" for notes, which is the type-dependent
+>    inconsistency that is the real defect today.
+>
+> **Everything else is the same depth in both designs.** Lock, trash, align, tag: select-then-act,
+> two steps, either way. **The mode does not flatten those** — and it should not try to, which is
+> why hanging them off the *selection* rather than the *mode* was right.
+>
+> **The cost is one mode switch, paid per visit, not per card.** If you enter more than one card
+> per visit, the mode has already paid for itself in gestures.
+>
+> ### ✅ RECOMMENDATION — committed, not floated
+> **Build the two modes, scoped to input-meaning.** The interaction-depth argument is sound and
+> it is strongest exactly where the app lives (touch). Concretely:
+> - **Arrange:** click selects · drag moves · handles resize/rotate · buttons act on the selection ·
+>   double-click **opens** full page · the card shows nothing but itself.
+> - **Edit:** click **enters** (cursor + title + tags + source appear together) · typing writes ·
+>   drag still moves *(same foundations, the owner's rule — a silent no-op is worse)* ·
+>   double-click **opens** full page · buttons act on the entered card.
+> - **The toolbar differs** — that is the tell. Arrange shows the spatial tools; edit shows the
+>   thing's tools. *"It shouldn't be the same toolbar."*
+> - **Land in arrange.** Escape returns to it.
+>
+> ⚪ **One thing genuinely open:** in edit, does a click on a **photo** card "enter" it (show its
+> caption/tags) the way a click on a text card does? 🔵 Lean yes — the point of edit-click is
+> *"show me this thing's details, one click."*
+
 > ## 🟡 THE OWNER'S RESPONSE — and it may rescue the idea *(2026-09-04)*
 >
 > *"It does really make sense to have a mode — things can be edited, [vs] it's just arranged.
