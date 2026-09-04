@@ -8,9 +8,26 @@
 -- NOTHING is deleted or dropped: bit.kind stays · the old reference table stays
 -- (gather keeps working) · no rows are touched. The live app runs unmodified.
 -- ⚠ PRECONDITIONS: …005 and …006 applied first (this file's board_cards rebuild
---   assumes display_size is already gone). At enactment this file moves into
---   supabase/migrations/ TOGETHER WITH: EXPORTED_TABLES += composition,
---   composition_file AND the scripts/test-port.mjs:208 list (F9) — same change.
+--   assumes display_size is already gone).
+-- ⚠ THE ①a COMMIT MANIFEST — this file moves into supabase/migrations/ together
+--   with, and ONLY with (antagonist Q4):
+--   1. THE REGEX FIX FIRST, test-first (antagonist finding 1 — the digit-blind
+--      guard): exported-tables.test.mjs's two scans use [a-z_]+ and cannot SEE
+--      "reference2"; widen both to [a-z0-9_]+ and watch the missing-table
+--      assertion fail before…
+--   2. EXPORTED_TABLES += composition, composition_file, **reference2** — and
+--      the second hard-coded list at scripts/test-port.mjs:208 (F9). At ①b the
+--      rename swaps reference2→reference in BOTH lists in that same change.
+--   3. mergeSources' reference2 repoint (S4) — harmless early (table empty
+--      until stage ③), disastrous late.
+--   4. Nothing else: the composition TS types ride with ②a (no dead code).
+-- DISCLOSURES (antagonist F6c/d + Q6): board_cards.target_visibility changes
+--   meaning for board-target rows (was NULL, now tb.visibility — no runtime
+--   consumer today, types.ts only) · this file ships RLS but NO GRANTS —
+--   Supabase default privileges cover new tables (the opening precedent:
+--   apply-opening-to-cloud.sql shipped none and works); the rehearsal grants
+--   out-of-band only because throwaway PG17 lacks Supabase's defaults ·
+--   composition_travel ships consumer-less until the travel UI — deliberate.
 -- All-or-nothing: one transaction (F6); a mid-run failure leaves NOTHING.
 -- ============================================================================
 begin;

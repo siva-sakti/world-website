@@ -48,8 +48,32 @@ select 'the_ledger still exists:      ' || exists (select 1 from information_sch
 select 'new tables all present:       ' || (select count(*)=3 from information_schema.tables where table_name in ('composition','composition_file','reference2'));
 SQL
 
+echo "=== PROBE 3 · the old world BEHAVES (antagonist F3a — reads and writes, not existence) ==="
+psql -d "$DB" -t <<'SQL'
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', false) \g /dev/null
+set role authenticated;
+insert into bit (id, type, body) values ('beefbeef-0000-0000-0000-000000000001','text','<p>old world</p>');
+insert into bit (id, type, body, kind) values ('beefbeef-0000-0000-0000-000000000002','text','<p>a note</p>','note');
+insert into reference (from_bit_id, to_bit_id) values ('beefbeef-0000-0000-0000-000000000002','beefbeef-0000-0000-0000-000000000001');
+select 'old-style reference write works:  ' || (count(*)=1) from reference where from_bit_id='beefbeef-0000-0000-0000-000000000002';
+select 'the_inbox still serves reads:     ' || (count(*)>=1) from the_inbox where id='beefbeef-0000-0000-0000-000000000001';
+select 'the_ledger still serves reads:    ' || (count(*)>=2) from the_ledger;
+insert into board (id, title) values ('beefbeef-0000-0000-0000-00000000000b','old board');
+insert into placement (board_id, target_bit_id, x, y) values ('beefbeef-0000-0000-0000-00000000000b','beefbeef-0000-0000-0000-000000000001',1,1);
+select 'board_cards still serves reads:   ' || (count(*)=1) from board_cards where board_id='beefbeef-0000-0000-0000-00000000000b';
+reset role;
+SQL
+
 echo "=== the full attack suite against the ①a schema ==="
-psql -d "$DB" -f "$HERE/composition-draft-proofs.sql" 2>&1 | tee "$HERE/composition-add-proofs.out" | grep -cE "^ t($| )" | xargs echo "true assertions:"
-grep -E "^ f($| )" "$HERE/composition-add-proofs.out" && echo "⚠ FALSE ASSERTIONS ABOVE" || echo "zero false assertions"
+psql -d "$DB" -f "$HERE/composition-draft-proofs.sql" > "$HERE/composition-add-proofs.out" 2>&1
+T=$(grep -cE "^ t($| )" "$HERE/composition-add-proofs.out")
+E=$(grep -c "^psql:.*ERROR" "$HERE/composition-add-proofs.out")
+echo "true assertions: $T (want 15) · refusals fired: $E (want 8)"
+[ "$T" = "15" ] || { echo "⚠ TRUE-COUNT WRONG"; exit 1; }
+[ "$E" = "8" ]  || { echo "⚠ REFUSAL-COUNT WRONG (antagonist F3c: a lost CHECK would land silently)"; exit 1; }
+grep -E " f( |$)" "$HERE/composition-add-proofs.out" | grep -vE "^\s*$" && { echo "⚠ FALSE VALUE SOMEWHERE IN A ROW (F3b: any-column check)"; exit 1; } || echo "no false value in any result column"
+if [ -f "$HERE/composition-add-proofs.golden.out" ]; then
+  diff -q "$HERE/composition-add-proofs.out" "$HERE/composition-add-proofs.golden.out" >/dev/null && echo "matches the committed golden output" || { echo "⚠ DIFFERS FROM GOLDEN — investigate before trusting"; diff "$HERE/composition-add-proofs.out" "$HERE/composition-add-proofs.golden.out" | head -20; exit 1; }
+fi
 dropdb "$DB"
 echo "done — verification/composition-add-proofs.out"
