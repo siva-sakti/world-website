@@ -68,3 +68,10 @@ The **compose door being deliberate** teaches that compositions are made, not ca
 
 ## 8 · Where this sits (upstream/downstream)
 Upstream: `product-concept-people.md` (who they are · flows-not-definitions · templates as teacher) · `composition-definition.md` (what's true). Downstream: the actual copy, after naming. `user-flows.md` Arc 0 holds the *technical* first-run mechanism (detect empty owner → seed or guide).
+
+## The three verbs — the whole system in one breath *(added 2026-09-03; verification P2-M1 — this grounding existed only in chat and settled the owner instantly: "OK, things are already ruled… so exciting")*
+Everything a person does with captured things inside their writing is one of three verbs:
+- **POINT** — a chip: *"go look there."* A name, never content. Targets: a piece · a section inside a piece · a bit · a board · a source.
+- **SHOW** — a block: the thing's content appears in place, in the flow. Bits only; a window onto the real thing.
+- **QUOTE** — the words become *yours*: paste (plain text, no strings) or "bring in as a copy" (a real new bit, yours to edit).
+The one thing the app never does: a paragraph from one piece *living inside* another, in sync. That's neither pointing nor quoting — and the model's answer is better: words needed in two places are *material*; make the bit.

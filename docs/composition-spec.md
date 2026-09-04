@@ -457,7 +457,7 @@ Auto-format your words into anything · auto-create bits from pasted content · 
 *The owner, mid-design: "I'm getting unravelled about the vision here… I wanna make sure I have guardrails on what's the goal, what are we trying to promise."* The rails were already installed; collected here so a wobble can be answered by pointing:
 1. **Two surfaces, one job each.** Boards bring material together **in space**; compositions **in words**. A want that sounds spatial (floating, place-anywhere) belongs to the board — which exists and is built. ⭐ **The observed proof (2026-09-03): when the composition is loosened far enough — "maybe a bit could float?" — it re-invents the board.** The two surfaces are each other's guardrail.
 2. **Nothing floats in writing. Ever.** *(owner, 2026-09-02: "never — we are doing this never.")*
-3. **Typing is not collecting.** Every block gets an identity; no block enters the collection. A bit is a deliberate act (brought in, or promoted by "make this a bit").
+3. **Typing is not collecting.** *(Her ruling is the no-collection half; "every block gets an identity" is 🔵 Claude's operationalization — P1-M1.)* No block enters the collection; A bit is a deliberate act (brought in, or promoted by "make this a bit").
 4. **The promise, one sentence: *everything you've collected is available inside your writing.*** Concrete and demonstrable — the claim no other tool can make, and the one the owner can always back up. *(And "bring a bit in line and type around it" is not the lesser version of convergence — it IS convergence.)*
 
 ---
@@ -552,11 +552,11 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 
 🔵 **The simplification it opens:** if a heading owns a span for *dragging*, let it own the same span for *folding* — **a heading IS the collapsible section**, and there is no separate toggle block type to build or explain. One concept, two operations. *(Satisfies the owner's "I think we should have collapsible sections" without a second mechanism. Not yet ruled.)*
 
-### 20.5c Headings as destinations *(owner, 2026-09-02: "we definitely need headers, jump to headers, linking to headers")*
+### 20.5c Headings as destinations *(owner, 2026-09-02: "we definitely need headers, jump to headers, linking to headers" — ⚠ quote-context note (P1-D1): her message trails into "Maybe I don't even—" immediately after; the linking half read firm but not beyond doubt. The weight now rests on §31.6's explicit sections pick, which is beyond doubt.)*
 1. ✅ **Headings** — structure inside the writing (§20.1).
 2. ✅ **Jump to a heading** — the table of contents does this; clicking an entry scrolls there.
 3. ✅ **Link to a heading** — a heading is a **destination that can be pointed at**, not only a label. *This is new (2026-09-02) and has no prior entry.*
-   - ✅ **Within the same composition: yes.** ⛔ **Across compositions: you link to the whole composition, not to a heading inside it** *(owner's lean 2026-09-02: "I think you can link to the full composition, but we can think about that"; Claude agrees — reasoning below).*
+   - ✅ **Within the same composition: yes.** 📜 ~~Across compositions: whole composition only~~ **SUPERSEDED (owner, 2026-09-03 — §31.6): pointing may target a named SECTION across pieces**; transclusion stays out *(owner's lean 2026-09-02: "I think you can link to the full composition, but we can think about that"; Claude agrees — reasoning below).*
      **Why the model itself says no:** the owner's own general rule is *"the block is however that bit looks ON A BOARD; the chip is its collapsed form."* A **heading inside a composition has no board form** — it is not a thing that can sit on a board — so it has no block, and the one rule that covers every other target cannot cover it. Pointing at a heading would also make references non-uniform: some at things, some at places inside things.
      **And the escape hatch already exists:** if a section is important enough to be pointed at from elsewhere, it wants to *be its own composition* — which the model supports today, at no cost.
    - ⚪ **What the link needs:** a heading must carry a **stable id** that survives being renamed and being moved, or every link breaks the first time the owner edits a title.
@@ -578,8 +578,8 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 | **text inside a block** | ✅ **selectable and copyable** *(owner-ruled: "any text can be copy and pasted by the user — they'd just put their mouse over it")*. It is text on the screen and behaves like text. |
 | a **drag handle** | ✅ on hover | drag UP or DOWN to reorder (§20.5) · click for the block menu |
 | a **toggle's line** | ✅ | folds/unfolds |
-| the **title / subtitle** | ✅ when writable | edits in place; ⛔ inert when read-locked (§20.3) |
-| **footer entries** (tags · boards · "pulled into") | ✅ | navigate to that thing |
+| the **title / subtitle** | 🔵 when writable | edits in place; inert when read-locked — Claude's derivation from §20.3, unruled (P1-U1) |
+| **footer entries** (tags · boards · "pulled into") | 🔵 | navigate to that thing — the house wire-affordances norm, not a composition ruling (P1-U2) |
 
 ### 20.7 Two compositions side by side *(owner: "sounds nice — I wonder what we'd need, or do people just open two windows")*
 **Today it already works: two browser windows.** Zero cost, zero build.
@@ -607,7 +607,7 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 |---|---|---|
 | `tag_application` | `target_bit_id` | + `target_composition_id` |
 | `placement` (on a board) | `target_bit_id` | + `target_composition_id` |
-| `reference` (gather) | `from_bit_id` · `to_bit_id` | both sides gain one |
+| `reference` (gather) | `from_bit_id` · `to_bit_id` | 📜 ~~both sides gain one~~ superseded by §24.4: **from = composition ONLY** (flatness as physics); to = the four targets |
 | `opening` | `bit_id` | + `composition_id` |
 
 **Not an invention — the house pattern.** `placement` and `opening` already do exactly this (bit-or-board, exactly one, enforced by CHECK).
@@ -617,7 +617,7 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
 *(For the record, the accident is real — verified in code 2026-09-02: `gather-picker.tsx` applies no kind filter and `reference.to_bit_id` accepts any bit, so a composition can already be gathered into a composition. Nobody decided that. The new tie table must permit it **on purpose**.)*
 ⚪ **And the gesture itself is open** — `[[` need not stay the way you point at something just because it started there.
 
-### 21.5 How the writing is stored — 🔵 recommendation, not yet ruled
+### 21.5 How the writing is stored — ✅ DECIDED (delegated §30b; ruled JSON at the storage session, D-145 — evidence + adversarial review in `composition-storage-decisions.md` S2/S12). *(Header was stale — P3-7.)* The survey below is the original reasoning:
 **The three options, and what Notion actually does** *(owner asked)*:
 
 > ⚠⚠ **VERIFICATION BANNER (owner instruction, 2026-09-02: "stop making such substantial claims without proper proof").** In this subsection **only these are verified**, by web search against Notion's own engineering blog + ByteByteGo: *everything in the editor (text · images · headings · lists · pages) is a block stored as a Postgres row* · *sharded by workspace ID* · *~20 billion block rows in early 2021 → 200+ billion by 2024* · *32 physical instances (2021) → 96 (2023)*. **Everything else below about Notion is Claude's INFERENCE from the product's behaviour and its public API — motives, trade-offs, and what users value are NOT sourced.** They are marked 🔵. **⭐ None of the §21 storage ruling depends on any of it** — the decision rests on measurements of THIS repo (§21.1), which were run and are reproducible.
@@ -713,7 +713,7 @@ A pasted image is a block of writing (resizable, left/centre/right), NOT a bit. 
 ⚪ **The follow-on: where does the copy get edited?** (a) 🔵 **lean, v1** — every block edits on its bit's page: one rule, one extra click · (b) copy-blocks edit in place, shared ones don't — demands a visible tell · (c) everything edits in place through the window, with a "make your own copy first" offer exactly when the bit lives elsewhere — deluxe, technically hairiest (an editor inside an editor). Decide at build.
 
 ### 24.6 The scenes *(run 2026-09-03; the model's test fixtures)*
-S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → drawer → weave) ✓ **the promise working** · S-C3 six pasted screenshots → all writing; one promoted later ✓ · **S-C4 the typo in a gathered quote → ⚪ window-or-copy, unanswered** · **S-C5 essay wants to become a board → laborious (promote × N); F-4 piece-as-board's re-entry case; "either order" is a core principle, so the roughness matters** · S-C6 the inline table → formatting; promote when wanted ✓ · S-C7 quoting your own earlier piece → whole-composition tie or plain paste; a *passage* can't be pulled — escape: make the section its own composition; feel it in practice.
+S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → drawer → weave) ✓ **the promise working** · S-C3 six pasted screenshots → all writing; one promoted later ✓ · **S-C4 the typo in a gathered quote → ✅ ANSWERED (§24.5b: a block is a WINDOW + the copy-door)** *(stale ⚪ cleared, P3-4)* · **S-C5 essay wants to become a board → laborious (promote × N); F-4 piece-as-board's re-entry case; "either order" is a core principle, so the roughness matters** · S-C6 the inline table → formatting; promote when wanted ✓ · S-C7 quoting your own earlier piece → whole-composition tie or plain paste; a *passage* can't be pulled — escape: make the section its own composition; feel it in practice.
 
 ## 25 · The moves — the practical inventory *(laid out 2026-09-03 at the owner's ask: "what are the moves, what do we limit, what flexibility might they want — literally")*
 **Markers: ✅ ruled · 🔨 built today · ⚪ open · ⛔ limited on purpose.**
@@ -723,7 +723,7 @@ S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → d
 - **Act on a brought-in thing:** chip click → peek ✅ · block click → selects ✅ · resize/align ✅ · presence stored per-tie ✅ (§23.1) · delete → tie dropped on save 🔨 · **edit it here ⚪ window-or-copy**
 - **Get around / meta:** contents (nav only) ✅ · links to headings ✅ · lock ✅ · tag/place/trash inherited ✅
 - **⛔ On purpose:** nothing floats (content) · typing never mints bits · ~~no columns~~ *(columns-block ruled IN, §31.4)* / no page-nesting (hierarchy is Notion's move; the web here is tags+gather) · no auto-anything (sole exception: the exit-minted title) · no `[[` in the title · no built side-by-side
-- **Flexibility they WILL ask for** — decide before they ask: "fix the typo right here" (⚪ window-or-copy) · "collapse this block to a chip" (⚪ per-spot chip↔block toggle — 🔵 lean yes) · "colors/highlights/callouts" (⚪ where formatting stops — callouts cut once, make it a ruled line) · "two columns just here" (answer = the board; the refusal must feel good) · "turn this list into a board" (F-4, parked)
+- **Flexibility they WILL ask for** — decide before they ask: "fix the typo right here" (⚪ window-or-copy) · "collapse this block to a chip" — ✅ **already RULED** (§9.5–9.6/F6: peek's "show in place" ⇄ the block's tuck control, reversible per instance; P3-6 caught this re-opening a decided thing) · "colors/highlights/callouts" (⚪ where formatting stops — callouts cut once, make it a ruled line) · "two columns just here" (answer = the board; the refusal must feel good) · "turn this list into a board" (F-4, parked)
 
 ## 26 · THE HOVER LAYER — bits propped above the writing *(the owner's feature, 2026-09-03 — fully ruled in one sitting)*
 
@@ -761,7 +761,7 @@ Not in the composition's undo (not the piece) · exists on the composition **pag
 1. **The SUBTITLE column** — ruled in §6b, absent from §21.2's carries-list; would have been silently dropped at build. **Added: title · subtitle · the writing · …**
 2. **`board_cards` grows a third leg** — bit-or-board becomes bit-or-board-or-composition; liveness rules ride along (trashed doorway hides, restores back; archived matches archived bits).
 3. **Composition-owned files: trash keeps, DESTROY sweeps** — the destroy trigger for the orphan sweep, previously unnamed.
-4. ⚪ **Travel:** 🔵 lean — **surfaces don't travel** (no `composition_travel`), matching boards. Needs the owner's nod.
+4. ✅ ~~travel lean~~ **RULED the OTHER way (owner, §30b): the journey IS remembered** — `composition_travel` drafted and proven (D-145). *(Verification P3-2: this line had gone stale against §30b.)*
 
 ### 27.2 Inherited clean (verified against §21.2–§21.3 + existing patterns)
 tags · folder · alive · archive(state) · trash-as-freeze · openings · created/updated · search · the lock column · destroy cascades the ties · a chip pointing at a destroyed composition degrades to plain text (the bits mechanism, unchanged).
@@ -774,7 +774,7 @@ tags · folder · alive · archive(state) · trash-as-freeze · openings · crea
 **Work, no decisions:** the pull / home / find / graph each grow a composition leg · archived-target display matches bits.
 
 ### 27.5 ⚪ "Done" — asked, not invented
-No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deliberately none** — the gradient stays felt, not stored. The owner says the word if wrong (it would be a column).
+No draft-vs-finished state exists anywhere in the model. ✅ **RULED (owner, §28c): no done state** — the gradient stays felt, not stored. *(Cross-ref added, P3-7; and §31.3's remembered lock is how "finished" gets FELT.)*
 
 
 ## 28 · The walk — one bit through a composition, every branch *(owner-asked 2026-09-03: "the paths a bit can take… a sequential logical step-through")*
@@ -784,14 +784,14 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 **Step 2 — living there:** chip↔block ✅ · resize/align on the tie, per piece ✅ · moved up/down = doc position only ✅ · gathered twice in one piece = ONE tie, two chips 🔨 · chip peeks, block selects ✅.
 **Step 3 — editing:** (a) writing around it → bit feels nothing ✅ · (b) edit-while-it-lives-elsewhere → **the pop-up** ("edits everywhere / make a copy") ✅ owner's flow · (c) copy → the one law (IS comes: content·file·source·tags·folder; SITS never; + one "here" tie, swapped in place); ⚠ noticed consequence: **the copy is a real bit and joins the collection** — correct by the law, flagged for eyes-open · (d) bit edited elsewhere → **the piece changes untouched** — the window's honest price ✅.
 **Step 4 — removal, writing side:** delete chip/block → tie dropped on save; bit untouched; re-gather freely 🔨 · composition trashed → all frozen, backlink hidden not gone, restore = all back ✅ · destroyed → ties cascade; bit lives on ✅.
-**Step 5 — the bit's fate while gathered:** trashed → chip keeps stored text, peek says gone 🔨, **block display ⚪** · destroyed → tie cascades, **chip degrades to plain text** 🔨, block 🔵 lean: collapses to the same text (one degrade rule) · archived → ⚪ match archived-on-boards. **The three blanks are one family: what a block shows per dead-or-resting state — one sitting closes all three.**
+**Step 5 — the bit's fate while gathered:** trashed → **chip RULED (§9.8/G3): greys and freezes, restore-door in the tap** *(today's code shows the peek's gone-state — a build gap, not an open question; P3-5)* · archived → **chip RULED (§9.8/G3): grey, still enterable** · destroyed → tie cascades, **chip degrades to plain text** 🔨. **Only the BLOCK forms are open** (🔵 lean: a dead block collapses to its chip's text — one degrade rule): **one small sitting, blocks only** *(the walk had overstated the blanks; chips were ruled all along — P3-5)*.
 **Step 6 — onward:** second piece → second tie, independent presence ✅ · the composition on a board → a doorway; **gathered bits do not leak onto the board** ✅ · piece into piece → the piece's chip, no cascade ✅ flatness · the pull → the bit appears; the piece only if IT carries the tag ✅.
 
 ### 28b · The duplication law — ✅ STAMPED *(owner, 2026-09-03: "that feels sensible — something we can stand on"; shipped code verified to obey it)*
 **The copy always gets what the bit IS (content · file · source · tags · folder) and never where it SITS (no placements, no ties). The door adds exactly one "here":** bits list → nothing (loose) · a board → one placement on THIS board (+24px, shipped 🔨) · a composition → one tie into THIS piece (§24.5b, unbuilt). Three doors, one law; they differ only in where you were standing.
 
 ### 28c · Board symmetry *(owner, leaning: "when this goes on a board it should act like a bit")*
-🔵 Claude's recommendation: take it as the principle — **on a board, a composition behaves exactly as a bit does**, which implies it inherits the arrival-record + revive-on-return machinery bits already have (proven, run-1d). One behavior for everything placeable. ⚪ Awaiting the owner's word (her first instinct was no-history; symmetry says keep it because bits do).
+🔵 Claude's recommendation: take it as the principle — **on a board, a composition behaves exactly as a bit does**, which implies it inherits the arrival-record + revive-on-return machinery bits already have (proven, run-1d). One behavior for everything placeable. ✅ **RULED (owner, §30b 2026-09-03): symmetry — the journey remembered, one record two views.** *(Stale ⚪ cleared, verification P3-3.)*
 ✅ **"Done" state: RULED OUT** (owner, 2026-09-03: "I don't think there has to be a done state") — the gradient stays felt, never stored.
 
 
@@ -825,7 +825,7 @@ No draft-vs-finished state exists anywhere in the model. 🔵 Assumption: **deli
 ### 29c · Stamped: chips AND blocks, both in *(owner, 2026-09-03: "OK fine let's build inline… let's also have the block mentions… might as well build it and architect it in our schema")*
 - ✅ Inline mentions (chips) + embeds (blocks) both live in the architecture from day one.
 - ✅ Audio/pdf chip fallback confirmed against the board fact: on a board an audio bit IS the player (the block form, literally "how it looks on a board"); the chip adds the name form — caption → filename.
-- 📜 **Bring-in grammar — CORRECTED (storage session, 2026-09-04): the RULED §9.3 governs.** Born-form follows the TARGET'S TYPE, not the door (owner-ruled, register F4): text·link·pdf·audio → **chip** · image·drawing → **block** · a composition → a distinct chip. Claude's door-grammar lean here contradicted that ruling and is withdrawn. What survives of it 🔵: the drawer's DRAG inserts between blocks (a block-level drop), and **the toggle stays the safety valve** — no arrival form is a commitment.
+- 📜 **Bring-in grammar — CORRECTED (storage session, 2026-09-04): the RULED §9.3 governs.** Born-form follows the TARGET'S TYPE, not the door (owner-ruled, register F4): text·link·pdf·audio → **chip** · image·drawing → **block** · a composition → a distinct chip. Claude's door-grammar lean here contradicted that ruling and is withdrawn. What survives of it 🔵: the drawer's DRAG inserts between blocks (a block-level drop), and **the chip⇄block flip is the safety valve** — ✅ ruled machinery (§9.5–9.6/F6), not a pending lean *(P3-6)*: no arrival form is a commitment.
 - **Schema-blocking set, final:** §21.5 format (Claude's, at the session) · **file-registry vs walk-the-docs for the orphan sweep** (NEW — surfaced 2026-09-03, Claude's, at the session) · the tie CHECK written extensibly for parked board/source gathering (mechanical) · board symmetry (the owner's pending word). Everything else open is UI and trails the build safely.
 
 
@@ -877,9 +877,9 @@ Sources have no trash/archive (they die directly — smaller state family); rena
 
 ## 31 · Post-session rulings (owner, 2026-09-03 — answering the storage session's §Q)
 1. ✅ **Boards gatherable — the collision RESOLVED** (see the amended direction law, §3.4). The tie's `to_board_id` ships ungated.
-2. ✅ **Due date surfacing:** on the piece as metadata + **in the compositions list, sortable/filterable by date** — *"it displays as part of the metadata… they can sort it by date or filter by date."* Not on home; no reminders (the §8 ⛔ stands).
+2. ✅ **Due date surfacing** *(her words carried "that's my current idea, I'm open to your ideas" — ruled-as-current, revisitable; P1-note)*: on the piece as metadata + **in the compositions list, sortable/filterable by date** — *"it displays as part of the metadata… they can sort it by date or filter by date."* Not on home; no reminders (the §8 ⛔ stands).
 3. ✅ **The lock: RULED — remembered per piece** (owner, 2026-09-03: "I think we should have a lock and it would be remembered, that makes sense to me"). `locked_at` joins the draft; a left-locked piece is the FELT finished without a done-state (§28c).
-4. ✅ **RULED (owner, 2026-09-03): the COLUMNS BLOCK is IN; wrap is OUT** ("I think columns block should be fine" — her own sketch: image in one column, text beside, resizable divider; text does NOT continue beneath). **Supersedes** §13.2.2's wrap-in · §13.1's columns-⛔ · the §25 no-columns limit (all edited this pass). **STANDS untouched:** float-never (E4's other half) · the boards test itself (callouts stay dead). The §30c gallery lean folds in (a gallery ≈ image columns).
-5. ✅ **The export renderer APPROVED** (owner, 2026-09-03: "I'm fine with it as long as it's thought out and built well") — `@tiptap/static-renderer`, installed at enactment, export-route only.
+4. ✅ **RULED (owner, 2026-09-03): the COLUMNS BLOCK is IN; wrap is OUT** ("I think columns block should be fine" — her own sketch: image in one column, text beside, resizable divider; text does NOT continue beneath). **Supersedes** §13.1's columns-⛔ · the §25 no-columns limit — her word covers those. ⚑ **The WRAP-OUT half (and §13.2.2/E4's supersession) is Claude's one-decision framing — her explicit word covered columns only** (P1-D2); **one-word confirm requested: wrap gone for good, yes?** **STANDS untouched:** float-never (E4's other half) · the boards test itself (callouts stay dead). The §30c gallery lean folds in (a gallery ≈ image columns).
+5. ✅ **The export renderer APPROVED** (owner, 2026-09-03: "I'm fine with it as long as it's thought out and built well") — `@tiptap/static-renderer`, installed at enactment, export-route only. ⚑ *(Her wording also floated "rendering our own"; recorded as approval-of-the-recommendation — say the word if you meant the hand-built one instead; P1-note.)*
 6. ✅ **RULED (owner, 2026-09-03): pointing across pieces starts at SECTIONS — option (b).** A chip may target a composition OR a named heading inside one; the reader lands at that section. Chosen from the decision-support menu, stakes stated (upgradeable a→b→c, no rework; (c) addable if (b) leaves wanting). **Supersedes §20.5c's across-compositions-whole-only clause** — its objections aged out: headings carry stable ids anyway (the links ruling) and chip-only targets have precedent (sources, §30d). **The picker unfolds a piece's headings beneath it** (a heading is a *chosen name* — why picking one from outside works). **A dangling anchor degrades to the whole piece, gracefully.** ⛔ **Transclusion stays out** — content-inside-your-piece is the blocks-as-rows machine, declined; reuse = material, always.
    **Schema consequence: NONE.** The anchor is **occurrence-data** — it lives in the chip node's attrs in the document, exactly like presence (§23.1); the tie's FK stays whole-composition, so every cascade/dedup rule is untouched (two chips at different sections of one piece share one tie row). Zero DDL change; the draft stands as proven.
