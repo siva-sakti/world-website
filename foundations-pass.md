@@ -163,7 +163,27 @@ never comes before the understanding, and the acting never comes before the judg
 The three questions in §1 are the **exit checklist** — the walkthrough is how each row gets its
 answers, and heading 4 is where a ✅ is earned rather than assumed.
 
-### The probing questions — asked of EVERY mechanism, under heading 2
+### The probing PRINCIPLES — what makes a question find something *(owner's ask: "whatever meta-principles these are, fold them in")*
+
+The four questions that found four misses were not special. Each was an instance of a principle
+that applies to every mechanism. **The principles are the process; the questions below are just
+their current examples, and the examples grow.**
+
+| principle | what it means | the miss it would have caught |
+|---|---|---|
+| **Enumerate, never sample.** | Whatever you named is a subset. List the whole set before judging any of it. | I named x and y and called it "the coordinate system." z was the third one. |
+| **Trace a value to where it is consumed.** | A number is computed somewhere, stored somewhere, rendered somewhere. Check every boundary it crosses, not just where it is born. | Alignment computes fractions → stored as doubles → rendered at fractional pixels. Nobody looked past the first step. |
+| **Check the seams with what is COMING, not only what exists.** | A mechanism is examined alone but will live among planned work. Hold it against every planned build. | The frame plan stores a rectangle on the plane; the owner ruled a frame is a kind of board. Two coordinate models, and the walkthrough never looked sideways. |
+| **Push every variable to its extremes.** | Zero · absent · negative · huge · "a year of this." See what the code does there, not in the middle. | No bounds on position. A null position rendering at (40, 40). Unbounded z. |
+| **Find the second copy.** | Wherever a rule is decided, ask who else decides it. Two copies drift; every "keep in sync" comment this week had failed. | *(The board pass: four placement-field lists, three definitions of "on which boards," two export-table lists.)* |
+
+**How to use them:** under heading 2, after the mechanism is described, run each principle
+against it deliberately — *what is the whole set · where does each value travel · which planned
+build touches this · what happens at the extremes · who else decides this.* Then the questions
+below as a checklist. **When a walkthrough misses something, name which principle would have
+caught it — and if none would, that is a new principle, not a new question.**
+
+### The probing questions — the current examples, asked of EVERY mechanism
 
 *(Added 2026-09-04 after the first walkthrough. The owner asked whether a second look with
 more guidelines would find more. It found four things in ten minutes. So the guidelines are
