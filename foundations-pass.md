@@ -204,3 +204,89 @@ then bit types — on ground that's been looked at.
 - Not the Group E (bit pages) review — that's `bit-pages-review-plan.md`, and it comes after.
 - Not a UI or design pass.
 - Not a rewrite of anything that's solid. Solid rows are left alone.
+
+---
+
+## 6 · The walkthroughs
+
+*One per mechanism, five headings each, in the order: understand · judge · act. Every claim
+under "Technically" was checked against the code before it was written.*
+
+### 6.1 · The coordinate system *(the worked example — 2026-09-04)*
+
+**1 · Conceptually**
+
+A board is a flat plane with no edges. It has a fixed point of origin that never moves. Every
+card has a position on that plane — a pair of numbers saying how far from the origin it sits.
+When you pan, **you are moving a window across the plane; the plane and the cards stay still.**
+When you zoom, the window gets bigger or smaller. So a card's position is a fact about *where it
+is*, not about *where you happen to be looking* — the same number on your phone and your laptop.
+
+There is one more thing the plane allows that nobody talks about: **a card can be on a board
+with no position at all.** The rule is *both coordinates or neither* — never half a point.
+
+**2 · Technically** *(verified)*
+
+- The origin is `(0, 0)`. A fresh board's camera starts there at zoom 1 — `use-camera.ts:24`.
+- A card's position is stored as absolute plane coordinates: `placement.x`, `placement.y`
+  (`placement-fields.ts`). Both nullable; the database enforces *both or neither* —
+  `placement_position_whole: (x is null) = (y is null)`, `init.sql:346`.
+- The window is the **camera**: `{ x, y, scale }` — an offset and a zoom. Zoom is clamped to
+  **0.2×–3×** (`use-camera.ts:6-7`).
+- **Screen → plane:** `(clientX − boardLeft − camera.x) / scale` — `use-camera.ts:98`. Every
+  tap, drop and create goes through this, so where your finger is becomes where on the plane.
+- **The camera is remembered per board, per device**, in the browser's local storage under
+  `board-camera:v1:<boardId>` — `camera-storage.ts:16`. **Not the raw offset**: it stores the
+  plane point at the *centre* of your view plus the zoom (`Anchor = { cx, cy, scale }`), so the
+  same spot stays centred if the window is resized. Never the database; never synced.
+- **A card with no position** is rendered at `(40, 40)` — `page.tsx:57`, `r.x ?? 40`. Nothing in
+  the app writes a null position today; every create path passes both coordinates.
+
+**3 · Where it's recorded**
+
+*Written down:* **nowhere.** Not `SPEC.md`, not `model.md`, not `invariants.md`. The facts above
+exist only as comments in three files. A reader of the technical manual cannot learn that the
+board has an origin, that positions are absolute, or that the camera is per-device.
+
+*Tested:* **well, for what is tested.** `geometry.test.mjs` (22 tests) pins snapping and the
+visual box; `camera-storage.test.mjs` (7) pins the anchor round-trip, the resize behaviour, the
+zoom clamp, and storage failing safely. **Not tested:** `screenToWorld` itself — the one formula
+everything else depends on has no direct test — and the null-position fallback.
+
+**4 · What we think of it**
+
+*Of the mechanism:*
+- **Absolute origin is the right choice, not merely the first.** The alternative — positions
+  relative to the first card, or to the content's bounds — makes every position change when
+  that reference moves or is deleted. Every infinite canvas that lasts uses a fixed origin.
+  **Chosen, in hindsight, correctly.**
+- **Camera per device is right for one resident.** The alternative — syncing it through the
+  database — means opening a board on your phone jumps you to wherever your laptop was looking,
+  which is almost never what you want. **Chosen correctly; but it was never stated, and the
+  share-sheet work will need to know it** (a phone arrival cannot land "where you were looking"
+  on another device — the arrivals corner sidesteps this).
+- **The centre-anchor for memory is better than it needed to be** — it survives a window resize.
+  Good.
+- ⚠ **The null position is a state the schema permits and the app never creates.** It was
+  designed for an earlier "collection mode" (§2c of the old model) that was never built. Today
+  it is a latent path: if anything ever wrote a null position — a migration, a future feature —
+  every such card would land at `(40, 40)` and stack there. *Either it is a real future state and
+  its rendering rule should be decided, or it is vestigial and the constraint should become
+  `not null`.* **A decision, not a bug.**
+- ⚠ **`screenToWorld` has no direct test.** It is one line and it is right — but it is the line
+  every position passes through, and a wrong sign in it would move every card.
+
+*Of the record:* there is none to judge. The comments are good; they are just not where anyone
+would look.
+
+**5 · The next step**
+
+| | |
+|---|---|
+| **write it** | one paragraph in `SPEC.md` (the plane, the origin, absolute positions, the camera as a window, per-device memory) — the §1 text above, tightened |
+| **guard it** | a direct test on `screenToWorld` (round-trip with `worldToScreen`; zoom 0.2, 1, 3; a non-zero offset) |
+| **decide it** | ⚪ **the null position** — future state, or vestigial? Owner's call; 🔵 lean vestigial → `not null` |
+| leave it | the origin · the camera design · per-device memory — solid |
+
+**Verdict on the mechanism: right. Verdict on the record: absent.** Cost to fix: one paragraph,
+one test, one decision.
