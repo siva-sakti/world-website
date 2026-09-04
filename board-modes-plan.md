@@ -12,19 +12,40 @@ stuff… I think it would simplify things."*
 **Arrange mode treats a card as an object. Edit mode treats it as a page.** Right now the
 board tries to be both at once, and works out which one you meant from how you clicked.
 
-## 2 · The claim worth checking first: this REMOVES a mode
+## 2 · What this is, and what it is NOT *(corrected by the owner, 2026-09-04)*
 
-The instinct against modes is that each new one is a new way to be confused — *"why isn't
-this working?"* That objection doesn't land here, because **the board already has a partial
-arrange mode and calls it something else.**
+**Claude's first draft got this wrong and the owner caught it.** It argued that this
+"removes a mode", because `selectMode` already changes empty-drag to a marquee and card-tap
+to toggle-selection — so the feature was really that toggle, finished and named.
 
-`selectMode` (the toolbar toggle, `board-surface.tsx:66`) already changes two things:
-empty-space drag draws a **marquee** instead of panning, and a tap on a card **toggles
-selection** instead of opening it. That is arrange mode, half-built and unnamed.
+The owner: *"select mode lets you select multiple things. That's different than an entire
+surface for arrangement, or an entire surface for editing."*
 
-**So this is not a third mode. It is `selectMode`, finished and named.** Mode count stays at
-two (plus the pen), and one of them stops being a mystery toggle. *That* is where the
-simplification the owner is after actually comes from — not from adding a switch.
+**Correct.** `selectMode` is a **selection technique** — how you pick several things. What is
+being proposed is a **posture for the whole surface** — what the board *is* right now. Those
+are different kinds of thing, and the first framing shrank the second into the first because
+the first was already familiar. *(A recurring Claude failure this session: reaching for a
+reframe that makes an idea sound cheaper, and losing what it was.)*
+
+**So state it honestly: this ADDS a mode.** `selectMode` folds INTO arrange mode — multi-select
+is simply always available there — which is a genuine tidy-up, but a small one, and not the
+argument for the feature.
+
+### The real argument, now that "it's free" is off the table
+
+1. **One posture means one meaning per gesture.** Today a click on a card means *select* or
+   *edit* depending on the card's type and on whether it was already selected. That rule is
+   learnable but it is a rule; a mode replaces it with a fact you can see.
+2. **Each surface can then be designed for its job** — spatial affordances (guides, grids,
+   alignment) belong to arranging and clutter writing; the chrome that serves writing (title,
+   tags, source) clutters arranging. Today both compete for the same screen at the same time.
+3. **The two jobs diverge as the board gets richer.** More card types and more spatial tools
+   make one undifferentiated surface harder, not easier.
+
+### And the honest cost
+**It is a mode, with a mode's real failure: being in the wrong one and not knowing.** That is
+not hypothetical and it is not designed away by wanting it not to happen — it is paid for with
+visibility (§5) and with `Escape` always meaning "back to arrange".
 
 ## 3 · What each mode holds
 
