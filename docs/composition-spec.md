@@ -863,3 +863,13 @@ The app has exactly **five nameable kinds of thing**; the list is closed, not op
 2. **Sources are CHIP-ONLY, by the owner's own general rule:** the block is "how it looks on a board," and a source cannot sit on a board → no block form exists. Citing the well is always a mention. *(The same logic will govern tags if ever ruled in.)*
 Sources have no trash/archive (they die directly — smaller state family); renames free by id-reference (P9).
 **The one display family, now full width:** what a chip/block shows when its target (bit · board · composition · source) is trashed · archived · destroyed — one sitting closes the whole grid.
+
+
+### 30e · Paste-a-block-onto-a-board — ✅ RULED; and the copy rule, argued properly *(2026-09-03)*
+**✅ The paste ruling (owner):** *"We should allow either — the user chooses"* — the same bit placed (one thing, edits show everywhere — said plainly) **or** a copy (independent from now on). ⭐ **The same consequence-moment pattern as the edit pop-up** — the fork offered exactly when it matters, learned once. ⚪ the highlighted default (🔵 lean: the same bit — one-thing-many-places is the model's heart; the copy is the deliberate exception).
+**The copy-contents rule, now argued rather than asserted** *(the owner's test: does context — board vs composition — change what comes?)*:
+- **Source comes: copying doesn't change history.** The copy's words still came from where the original's came from — a fact about the material, context-free. A future rewrite that outgrows its source is handled by the existing change-source act, not predicted by the copy rule.
+- **Tags come: the safe error.** A wrongly-carried tag is visible in the pull, one tap to fix; a wrongly-dropped tag is SILENT loss (the copy vanishes from pulls, nothing tells you).
+- **Folder comes:** filed with its original — the needs-no-explanation answer (the other window's ruling, holds in both contexts).
+- **Never: placements and ties** — those are the original's LIFE STORY, not facts about the material. The copy starts its own.
+- ⭐ **Why one rule survives both contexts:** everything that comes is true of the material AT BIRTH in any context; everything context-dependent is added by the door (this board · this piece) or by later edits. ⚪ awaiting the owner's word on this argument.
