@@ -95,7 +95,7 @@ person want when editing? Those are the buttons we grey.*
 |---|---|---|---|---|
 | *"start a note right here"* | **new card** *(double-tap empty space)* | ✅ makes it, then **switches you to edit** on it | ✅ makes it, entered | you wanted a note *there* (arranging) and now you want to write in it (editing). The one act that crosses over, and it crosses by handing you across. |
 | *"draw something"* | **the pen** | ✅ | ✅ | a tool you pick up and put down, in either mode |
-| *"put this photo on"* · paste · drop | **drop · paste** | ✅ | ✅ | getting things in is wanted in both states |
+| *"put this photo on"* · paste · drop | **drop · paste** | ✅ | ✅ | getting things in is wanted in both states. After a drop, the *"add a few words?"* offer appears — 🔵 it appears in **either** mode, and accepting it **enters** the card (so from arrange, it switches you to edit on that card, exactly as a new text card does) |
 | *"add a recording / a PDF"* | **+ audio · + pdf** | ✅ | ✅ | same |
 | *"paste a link"* | **capture a link** | ✅ | ✅ | same |
 | *"bring in that thing I caught yesterday"* | **bring in** *(from the drawer)* | ✅ | ✅ | placing is composing, but you may also want it while working on a related thing |
@@ -221,7 +221,25 @@ looks like.
 
 **Edit mode never moves anything.** Owner: *"that would not change how it's arranged on the
 page… you'd be able to click in, but you wouldn't be able to move things around."* Same cards,
-same places, same sizes, same zoom. A mode switch is visually calm.
+same places, same zoom. A mode switch is visually calm.
+
+⚠ **One honest exception:** the card you *enter* may **grow** — a text card is as tall as its
+content, and entering it adds its title line and formatting bar. **It grows in place and moves
+nothing else** (cards are absolutely positioned). So "edit never moves anything" is exactly
+true; "nothing changes size" is not, and the earlier draft claimed it was.
+
+### What "enter" means, per kind of card
+
+Clicking a card in edit *enters* it — but a photo has no cursor to place. What entering means,
+kind by kind:
+
+| kind of card | click in edit → |
+|---|---|
+| **text** | the cursor goes into the words; the title line and the formatting bar (bold · italic · list) appear |
+| **image · PDF · audio · link** | its caption field is focused; tags and source appear |
+| **drawing** | ⚪ open — caption only (🔵 lean), or reopen the pen on it? *(reopening edits saved strokes, which is not built)* |
+| **note / composition** | **already ruled elsewhere** — the floater opens (`docs/composition-spec.md` §10.1.4). Not decided here |
+| **a board placed as a card** | *(does not render today — nothing to decide)* |
 
 ---
 
@@ -229,7 +247,12 @@ same places, same sizes, same zoom. A mode switch is visually calm.
 
 > *"You'll just be in arrange mode until you click into edit, and then you click out."*
 
-- **You land in arrange.** Every time you open a board.
+- **You land in arrange.** Every time you open a board. Two reasons, both from the trail:
+  **safety** — arrange cannot change anything you have made (not a word, not a tag, nothing
+  thrown away), so arriving there cannot damage anything: a stray tap on a phone lands harmlessly.
+  And **simplicity** — in arrange the entire writing machinery is idle (no save timer, no
+  cursor, no title queue), so the mode a board sits in while nobody is doing anything is the
+  one with the least running.
 - **One button switches.** The toggle. 🔵 Plus a keyboard shortcut.
 - **In arrange, clicking a card you've already selected does nothing** — *"if you just click on
   something and you're in arrange mode, I think nothing would happen"* — **except a small bubble
