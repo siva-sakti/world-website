@@ -20,3 +20,11 @@
 - Whoever never publishes never meets privacy UI at all.
 - Publish = door-only + review (never silently flip a cloak) · the architecture (door/cloak/AND/global) stands.
 **AWAITING her stamps on the four-piece bundle.**
+
+**N8 · ⚠ NOTHING BELOW IS DECIDED — the owner's explicit instruction ("please don't note all of this as decided — the discussion is good to note, but I don't know if we've decided"). N7's "awaiting stamps" framing is WITHDRAWN; these are discussion notes only.**
+
+**N9 · Her pushback broke Claude's no-dial position, legitimately:** the per-bit annoyance is real for the GARDEN-FIRST resident (mostly-public person: under born-private, every new bit needs a flip or published boards silently gather gaps — a forever tax). Claude's no-dial was over-fit to the journal-first posture. Concession: **the user-set default earns its place in a product with both kinds of resident.**
+
+**N10 · The split under discussion (answers her three-toggles worry):** the dial covers THINGS (bits — many, made constantly); DOORS (boards + compositions) are always born private and opened deliberately, no dial — few in number, and the consequential act should be felt. Factory = private for everyone; openness is a chosen posture. *(Undecided.)*
+
+**N11 · The seam named:** a journal-person adds a bit to an ALREADY-PUBLISHED board → lands private → invisible → "why can't you see it?" Candidates: an at-the-moment mention ("this board is published — this bit won't show; show it?") · nothing + the glanceable line · born-where-it-lands (a bit created ON a published board leans public — touches her multi-place watchfulness; named, not pushed). *(Undecided.)*
