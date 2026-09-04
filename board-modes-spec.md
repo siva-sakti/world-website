@@ -220,7 +220,12 @@ into a thing. Everything else it shares with arrange. That is what keeps it from
 
 ---
 
-## 4 · How you know which mode you're in — the tells *(owner-ruled)*
+## 4 · How you know which mode you're in — the tells *(owner-ruled; section confirmed 2026-09-04)*
+
+The three tells cover different moments: *what happens when you interact* fires only when you
+act on something mode-specific · *the toggle* is always there but you have to look · *the
+cursor* is always in front of you and needs no act — and it is the only tell during the shared
+acts (pan, zoom, fit), where the first goes silent.
 
 > *"Cursor, and then the toggle, and then what happens when you interact — that's the tell."*
 
@@ -229,7 +234,7 @@ Three tells, and **the cards are not one of them**:
 | tell | arrange | edit |
 |---|---|---|
 | **the toggle** — a control with the mode's word on it, always visible | *arrange* | *edit* |
-| **the cursor** | 🔵 a grab hand over cards | 🔵 a text cursor over cards |
+| **the cursor** | 🔵 a grab hand over cards *(this is a thing you pick up)* | 🔵 a text cursor over cards *(this is a thing you go into)* — same over empty space in both, since panning is the same in both |
 | **what happens when you interact** | a click selects · a drag moves | a click enters · typing writes |
 
 ### The toolbar — one toolbar, greyed by mode *(owner-ruled)*
@@ -340,24 +345,26 @@ Here is every one, with the **two that actually change** marked.
 | today | where it lands |
 |---|---|
 | click a card → selects it | arrange: same. edit: **enters** it |
-| **click a selected text card → starts editing** | ⚠ **CHANGES**: in arrange, nothing (a bubble offers edit). Owner: *"yes, I think so."* |
-| click a note card twice → opens its page | both: **open** is a button; ⚪ or double-click |
-| drag a card → moves it | arrange: same. edit: ⚪ §3g |
+| **click a selected text card → starts editing** | ⚠ **CHANGES**: in arrange, nothing — a bubble offers edit. Owner: *"yes, I think so."* |
+| click a note card twice → opens its page | **edit only** — open is going into a thing. Greyed in arrange |
+| drag a card → moves it | arrange: same. edit: ⚪ §3g — lean nothing |
 | resize / rotate handles on a selected card | arrange: same. edit: greyed |
 | **select-mode toggle** (tap toggles selection; drag draws a marquee) | ⚠ **CHANGES**: folded into arrange as *select several* — must keep its touch behaviour (§6) |
 | align · distribute · tidy on a selection | arrange: same. edit: greyed |
-| lock · send to back · straighten · duplicate · remove · trash · archive · open on a selection | arrange: same. edit: on the entered card, per §3 |
-| tags · title · caption · source on a selected card | edit: on the entered card. arrange: not shown; the bubble offers edit |
+| lock · send to back · straighten | arrange: same. edit: greyed |
+| duplicate · remove · trash · archive on a selection | **both** (§3d) |
+| open on a selection | **edit only** |
+| tags · title · caption · source on a selected card | **edit only**, on the entered card. arrange: greyed; the bubble offers edit |
 | **double-tap empty space → new text card, editing** | ⚠ **CHANGES**: arrange: nothing, or the bubble offers edit. edit: same |
-| drag empty space → pan | both: same |
+| **+ text · + audio · + pdf · the pen · drop · paste · bring in** | **edit only** — putting something on is composing (§3a). Greyed in arrange |
+| drag empty space → pan · zoom · fit · timeline | **below the modes** — same in both (§3c) |
 | shift+click / marquee → select several | arrange: same. edit: greyed |
-| arrows nudge · Delete removes · ⌘A selects all · ⌘Z undoes | arrange: same. edit: text meanings, except ⌘Z which is one stack |
-| pan · zoom · fit · timeline · the board's title and description | both: same |
-| the pen | both: a tool |
-| undo | both: one stack |
+| arrows nudge · Delete removes · ⌘A selects all | arrange: same. edit: text meanings |
+| ⌘Z undoes | both: one stack |
+| the board's title and description | both: the board's, not a card's |
 
 **Nothing else exists to be lost.** Three behaviours change; all three are one-line release notes
-for one person.
+for one person. Everything else is the same act in a named place.
 
 ---
 
