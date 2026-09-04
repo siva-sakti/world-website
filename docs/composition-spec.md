@@ -836,11 +836,20 @@ The app has exactly **five nameable kinds of thing**; the list is closed, not op
 | **a bit** (any type) | ✅ | the core |
 | **another composition** | ✅ | ruled §21.4; owner reconfirmed 2026-09-03 ("by name" — its title chip) |
 | **a whole board** | ✅ **RULED IN 2026-09-03** | owner: "maybe they want to gather a whole board and reference it — that should be OK." Was parked (A15's reverse direction); re-entry recorded in `parked.md`. Looks are already covered by the general rule: chip = its title · **block = its doorway card** (how it looks on a board, literally) |
-| **a source** | ⚪ | owner asked what it means (answered: citing the WELL, not one bucket — "as [Maria's newsletter] keeps arguing…" → chip to the source, peek to its everything-from-it page); her call pending |
+| **a source** | ✅ **RULED IN (2026-09-03)** | owner, once first-class sources were re-explained: "you could link a source and it takes you to the source page — that feels fine." Distinction kept crisp: a LINK bit = material (the saved page as a card); a SOURCE = provenance (the well). Both can coexist on one catch |
 | **a tag** | ⚪ 🔵 lean: not now | a tag-chip points at a search-result, not a thing; the pull is its surface; add-later needs no rework |
-**Schema consequence:** the tie's CHECK is now load-bearing carpentry — *exactly one of: bit · board · composition* (+ source if ruled in).
+**Schema consequence:** the tie's CHECK — *exactly one of: bit · board · composition · source*. Four targets, ruled; only the tag stays out (lean, revisitable free).
 
 ### 30b · Board symmetry — ✅ RULED (owner, 2026-09-03)
 *"I think we want to remember the journey — we would capture that metadata for a composition, and the board would be capturing the other side too."* **A composition on a board acts exactly like a bit:** the journey remembered (arrived · left · returned), returns REVIVE the old record (I-L1, proven machinery). **Precision kept:** the metadata is ONE record read from two sides — the board's timeline from one, the composition's page from the other. Never stored twice (derive-don't-duplicate).
 **Format decision (§21.5): delegated** — *"sounds good for you to decide when it's time."* Claude decides at the storage session, evidence on the table (standing lean: JSON).
 **⚪ Still awaiting the owner: the duplication-law stamp (§28b) · source in-or-out · the §29 red-pen marks (truncation feel · glyphs · thumb+caption · table's weak chip).**
+
+
+### 30c · Block-level cases *(2026-09-03; the owner: "what cases might I be missing")*
+- **One block per row, full width — the linear law.** The §25 ⛔ on columns HOLDS (side-by-side = the board's job). 🔵 The side-by-side-images want (a before/after pair) is served later by a **gallery block** — ONE block holding several images (the Medium/Substack convention, not a column system); v1 stays strict; zero rework.
+- 🔵 **Blocks live in the main flow only** — never inside a list item or a quote (that's nesting; hierarchy stays out). Chips go anywhere — they're text.
+- ⚪ **Copy a block → paste on a BOARD:** places the bit (new placement, same bit — 🔵 lean) vs mints a copy. The one still-open travel case.
+- **A read-locked piece:** blocks aren't draggable or deletable; tap/peek still works — the lock freezes the writing, not the looking.
+- **Export is a snapshot:** a block is a live window on screen, but an export freezes what it showed at that moment. Said once, so nobody expects exports to update.
+- **Editing, the two-layer recap:** the costume (size · alignment · chip↔block) is free, per spot; the content is the WINDOW rule (§24.5b) — the pop-up when it lives elsewhere, free when it lives only here.
