@@ -155,13 +155,39 @@ never comes before the understanding, and the acting never comes before the judg
 | | heading | what goes under it | whose |
 |---|---|---|---|
 | 1 | **Conceptually** | what this thing *is*, in plain words, at the level a person thinks — no code | Claude drafts, owner corrects |
-| 2 | **Technically** | how the code actually does it — the mechanism, with file references; every claim verified against the code, not recalled | Claude (agents read, Claude verifies) |
+| 2 | **Technically** | how the code actually does it — the mechanism, with file references; every claim verified against the code, not recalled. **Then the probing questions below, every one, every time** | Claude (agents read, Claude verifies) |
 | 3 | **Where it's recorded** | is it written down — where, and does the writing match the code? Is it tested — where, and does the test guard the mechanism or just the word? | Claude |
 | 4 | **What we think of it** | *of the mechanism:* is this the right way, or merely the first way? What is the alternative, and why is or isn't it better? *of the record:* is it in the right home, at the right level, in plain words? | **both** — Claude brings the engineering view, the owner the product view |
 | 5 | **The next step** | one of: **leave it** (solid) · **write it** (works, undocumented) · **guard it** (works, untested) · **decide it** (works, but never chosen — options to the owner) · **change it** (wrong) | Claude proposes, owner rules where it's a decision |
 
 The three questions in §1 are the **exit checklist** — the walkthrough is how each row gets its
 answers, and heading 4 is where a ✅ is earned rather than assumed.
+
+### The probing questions — asked of EVERY mechanism, under heading 2
+
+*(Added 2026-09-04 after the first walkthrough. The owner asked whether a second look with
+more guidelines would find more. It found four things in ten minutes. So the guidelines are
+now written, and **this list grows every time a walkthrough misses something** — that is how
+the pass converges on complete instead of hoping.)*
+
+1. **What are ALL of its dimensions?** Not the obvious ones. *(The coordinate walkthrough said
+   x and y, and forgot z — the third coordinate.)*
+2. **What are the units, and the precision?** Integers or floats; what rounds; what accumulates.
+3. **What are the bounds?** What happens at zero, at the extremes, at "a lot"?
+4. **What can be absent?** Every nullable; what the app does when it is.
+5. **How does it touch each piece of PLANNED work** — modes · the frame · compositions · the new
+   bit types? *(The frame stores a rectangle on the plane; the owner ruled a frame is a kind of
+   board. The coordinate walkthrough did not ask, and so did not find the conflict.)*
+6. **What happens on two devices?**
+7. **What happens at scale** — a thousand cards, a year of use?
+8. **What is its inverse?** Undo, reverse, round-trip — does one exist, and does it exactly undo?
+9. **Who else decides the same thing?** A second copy of the rule anywhere — the pattern behind
+   most of this week's bugs.
+10. **What did the last walkthrough miss** that applies here?
+
+**The goal, stated honestly:** not *"find everything"* — that cannot be known. **The goal is: find
+everything the list asks, and grow the list every time a miss surfaces.** A walkthrough is done
+when every question has an answer; the *pass* is done when the list has stopped growing.
 
 **Worked example first.** 🔵 Run the walkthrough on **the coordinate system** before running it
 on anything else — it is the one that surfaced this pass, it sits under both modes and the
@@ -221,6 +247,8 @@ grid in §2 is updated from this list, never directly.
 | §6.1 coordinates | one paragraph in `SPEC.md` §2z | write | ✅ |
 | §6.1 coordinates | `screenToPlane` lifted into the pure module + 4 tests; a flipped sign proven red | guard | ✅ |
 | §6.1 coordinates | **a position is always a whole point** — owner: *"I don't think the database should be allowing that"* | decide → change | 🧾 `20260904000001_position_not_null` proven; held with 005/006 |
+| §6.1b coordinates | z is unbounded and never compacted — state it in `SPEC.md` §2z | write | ⬜ |
+| §6.1b coordinates | 🔴 **the frame's coordinate model conflicts with today's "kind of board" ruling** | decide | ⚪ **owner** — see the decisions list |
 
 ### The decisions list — everything waiting on the owner
 *(collected from every walkthrough's ⚪ rows, so they can be ruled in one sitting)*
@@ -228,6 +256,7 @@ grid in §2 is updated from this list, never directly.
 | from | decision | lean |
 |---|---|---|
 | §6.1 | ~~the null position~~ | ✅ **ruled**: not null |
+| §6.1b | **What is a frame's coordinate space?** The plan: a rectangle *on* the infinite plane, positioned in plane coordinates. Today's ruling: a frame *is* the bounded space, chosen at creation. (a) a frame is a board whose plane has edges — same coordinates, bounded · (b) a frame is a rectangle on a canvas, as planned · (c) both exist. | 🔵 **(a)** — it is what the owner said, and it keeps one coordinate system |
 
 ## 6 · The walkthroughs
 
@@ -312,3 +341,23 @@ would look.
 
 **Verdict on the mechanism: right. Verdict on the record: absent.** Cost to fix: one paragraph,
 one test, one decision.
+
+#### 6.1b · The second look *(after the owner asked "did you find everything?")*
+
+Four more, from the probing questions:
+
+- **z — the third coordinate — was never mentioned.** Stacking order: `nextZ` = highest + 1 on
+  every click-to-front, `backZ` = lowest − 1. **Never compacted**: an `int` that grows by one
+  per raise, forever. Practically unbounded for one person (2 billion raises), but nothing
+  says so, and it is part of "where a card is."
+- **Precision.** Alignment produces fractions (`(minX + maxX) / 2`); positions are doubles;
+  cards render at fractional pixels. ⚪ Whether that blurs text edges is a browser question —
+  worth one look on a real screen, not a decision.
+- 🔴 **The frame conflicts with today's ruling, and this walkthrough should have caught it.**
+  `frame-plan.md` stores a frame as **a rectangle on the plane** (`frame_x/y/w/h` on `board`).
+  The owner ruled today that **a frame is a kind of board chosen at creation** — not a rectangle
+  on a canvas. Those are different coordinate models: in the plan, a frame has a position on an
+  infinite plane; in the ruling, a frame *is* the whole bounded space. **Probing question 5
+  exists because of this miss.** → the ledger, as a decision.
+- **Bounds.** None. A card can be at x = 10¹⁵ and the plane will hold it; fit-to-view will
+  still find it. Irrelevant for one person; now stated rather than unexamined.
