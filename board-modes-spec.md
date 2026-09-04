@@ -30,8 +30,9 @@ So there are two things a person is doing on a board, and they are different:
   keyboard and the details, and you do not want to knock anything out of place.
 
 **The surface should match which one you are doing.** Each mode is built by asking one
-question — *what would a person want here?* — and what they would *not* want is what gets
-greyed. That question, not a rule about permissions or data, decides every row of §3.
+question — *what is a person DOING here?* — not what they might want. **Arrange is what you do
+to what is already there, from a distance. Edit is what makes or changes a thing.** What does
+not fit is what gets greyed. That question, not a rule about permissions or data, decides every row of §3.
 
 **The owner's decision, in their words:** *"I think there should be an arrange mode versus an
 edit mode. I think it's good. I actually really like the idea."* And, on the cost once it was
@@ -89,16 +90,31 @@ it · where it lives · how we are thinking about it — and **⚠ where it does
 **The method for every row** *(owner)*: *what would a person want when arranging? What would a
 person want when editing? Those are the buttons we grey.*
 
-### 3a · Putting something on the board
+### 3a · Putting something on the board — **EDIT** *(owner corrected Claude, 2026-09-04)*
+
+> *"This is all composition, or editing. None of this seems like arranging. How would putting
+> something new on the board be arranging?"*
+
+**Right.** Claude had these in both, on the reasoning that *getting things in is wanted in either
+state*. That was the wrong test. The question is not what you might *want* while glancing — it
+is what you are *doing*. **Adding something is composing.** The moment you add, you have stopped
+glancing.
+
+**So the line sharpens:** arrange is what you do to *what is already there* — and that includes
+taking away. Edit is what *makes or changes a thing* — and that includes putting a new one on.
+**In arrange the set of things can shrink. Only in edit can it grow.**
 
 | what you're trying to do | what we call it | arrange | edit | how we're thinking about it |
 |---|---|---|---|---|
-| *"start a note right here"* | **new card** *(double-tap empty space)* | ✅ makes it, then **switches you to edit** on it | ✅ makes it, entered | you wanted a note *there* (arranging) and now you want to write in it (editing). The one act that crosses over, and it crosses by handing you across. |
-| *"draw something"* | **the pen** | ✅ | ✅ | a tool you pick up and put down, in either mode |
-| *"put this photo on"* · paste · drop | **drop · paste** | ✅ | ✅ | getting things in is wanted in both states. After a drop, the *"add a few words?"* offer appears — 🔵 it appears in **either** mode, and accepting it **enters** the card (so from arrange, it switches you to edit on that card, exactly as a new text card does) |
-| *"add a recording / a PDF"* | **+ audio · + pdf** | ✅ | ✅ | same |
-| *"paste a link"* | **capture a link** | ✅ | ✅ | same |
-| *"bring in that thing I caught yesterday"* | **bring in** *(from the drawer)* | ✅ | ✅ | placing is composing, but you may also want it while working on a related thing |
+| *"start a note right here"* | **new card** *(double-tap empty space)* | 🔘 greyed → the bubble offers edit | ✅ makes it, entered | making a thing is composing. *(The "hands you across" idea is gone — you are already in edit.)* |
+| *"draw something"* | **the pen** | 🔘 | ✅ | a drawing is a new thing |
+| *"put this photo on"* · paste · drop | **drop · paste** | 🔘 | ✅ *(then the "add a few words?" offer, entering the card)* | |
+| *"add a recording / a PDF"* | **+ audio · + pdf** | 🔘 | ✅ | |
+| *"paste a link"* | **capture a link** | 🔘 | ✅ | |
+| *"bring in that thing I caught yesterday"* | **bring in** *(from the drawer)* | 🔘 | ✅ | owner: *"bringing in from the drawer is also putting something on the page"* |
+
+⚠ **One consequence to notice:** in arrange, **double-tapping empty space does nothing** (or
+offers edit). Today it makes a card. That is a third behaviour that changes, added to §7.
 
 ### 3b · Composing — the board as a picture
 
@@ -304,7 +320,7 @@ Here is every one, with the **two that actually change** marked.
 | align · distribute · tidy on a selection | arrange: same. edit: greyed |
 | lock · send to back · straighten · duplicate · remove · trash · archive · open on a selection | arrange: same. edit: on the entered card, per §3 |
 | tags · title · caption · source on a selected card | edit: on the entered card. arrange: not shown; the bubble offers edit |
-| double-tap empty space → new text card, editing | arrange: same, **and switches you to edit**. edit: same |
+| **double-tap empty space → new text card, editing** | ⚠ **CHANGES**: arrange: nothing, or the bubble offers edit. edit: same |
 | drag empty space → pan | both: same |
 | shift+click / marquee → select several | arrange: same. edit: greyed |
 | arrows nudge · Delete removes · ⌘A selects all · ⌘Z undoes | arrange: same. edit: text meanings, except ⌘Z which is one stack |
@@ -312,8 +328,8 @@ Here is every one, with the **two that actually change** marked.
 | the pen | both: a tool |
 | undo | both: one stack |
 
-**Nothing else exists to be lost.** Two behaviours change; both are one-line release notes for
-one person.
+**Nothing else exists to be lost.** Three behaviours change; all three are one-line release notes
+for one person.
 
 ---
 
