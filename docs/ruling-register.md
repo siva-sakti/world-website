@@ -58,7 +58,7 @@
 | E1 | Debounced save + flush on leave/hide/close; **never silent failure** | ✓ §6 |
 | E2 | **Title minted at exit only**, fixed date-time format, replaceable; the one machine-write exception | ✓ §7 |
 | E3 | A composition holds **job facts** — word target · due date · who it's for. ⛔ not a task manager | ✓ §8 |
-| E4 | ~~Wrap yes~~ ⚑ **supersession PENDING one owner word** (P1-D2: her word covered columns-in; wrap-out was Claude's framing — §31.4 carries the ask); **float-no STANDS** | §31.4 |
+| E4 | ~~Wrap yes~~ **SUPERSEDED, owner-confirmed 2026-09-03 (§33.1): the columns block replaces wrap**; **float-no STANDS** | §31.4/§33 |
 | E5 | **Text alignment** is owed | ✓ §13.2.1 |
 
 ## F · Pulling in
