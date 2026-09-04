@@ -45,7 +45,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | **S3** | `restore()` guards by a different key than its 5 siblings — can show 2 cards for 1 bit | ✅ **FIXED** — guards by bit, like its siblings + test |
 | **S5** | 3 definitions of "which boards is this bit on"; the trash confirm can lie | ✅ **FIXED** — one door (`lib/db/board-membership`), 3 callers, 5 tests |
 | **S6** | `ago()` and `fmt()` disagree about what day it is | ✅ **FIXED** — one day-rule, 7 tests, proven by reverting |
-| **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ⚪ **needs a migration you run** |
+| **S6b** | `left_at` uses the browser clock, `arrived_at` the server's — can leave before arriving | ✅ **migration written + PROVEN locally** (`20260903000005`) — ⚪ **you run it** |
 | **S8** | `placement.height` stored and permanently false for text + audio | ✅ **FIXED** — one door `isFlexSized`, no height stored for text/audio, 4 tests |
 | **S2** | the optimistic seam has no stated rule | ✅ **WRITTEN as I-G7**, drawn from the six real cases; parts 2·3·4 already have tests, part 1 is named as the one that doesn't |
 | **S1** | `board-surface.tsx` does 7 jobs | ✅ **917 → 638**, three seams out (`use-card-drag` · `use-board-pointer` · `use-alignment-acts`), each **diff-proven** behaviour-preserving |
@@ -69,7 +69,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | | What | Status |
 |---|---|---|
 | m1 | dead exports: `isBusy` / `version` (+ its `bump()` and 8 call sites) | ✅ **REMOVED** — nothing in the app ever read them; `use-undo`'s comment describing `version` as the render mirror was also false and is corrected |
-| m1b | `display_size` stored, constrained, copied by duplicate, **never read** | ⚪ **needs a migration you run** — inert meanwhile; queued with the other schema changes |
+| m1b | `display_size` stored, constrained, copied by duplicate, **never read** | ✅ **migration written + PROVEN locally** (`20260903000006`), app side already clean — ⚪ **you run it** |
 | m2 | a comment claimed react-rnd suppresses a click after a drag | ✅ **FIXED — and it hid a real bug.** Verified myself: the string "click" appears **0 times** in react-rnd's whole build, so it suppresses nothing. Shift-dragging a selected card therefore dropped it *and deselected it* in one gesture, and dragging a text card could open it for editing. Now guarded with the same 4px slop as pan and marquee |
 | m3 | `DEFAULT_W = 240` claimed to match the render default — it is 400 | ✅ **FIXED** — the comment now says what it is: a deliberate approximation, and nothing depends on it matching |
 | m4 | an unused `placementId` parameter on two remove doors | ✅ **REMOVED** — worse than unused: it implied trash and archive were card-scoped, when both take the bit off **every** board. Call sites shown before changing the signature (2 app, 12 test) |
@@ -504,7 +504,7 @@ so this is a contained change, not a sweep.
 | 5 | ✅ S5 one door · S6 one day-rule · **E-1 dates now follow the device** (`Stamp` · `ZoneProvider` · `readerZone`) | no |
 | 6 | ✅ The copy rule → **I-G6** + `lib/db/bit-copy-rule.ts` + its guard test | no |
 | 7 | ✅ Fixed `docs/INDEX.md` — it named the superseded composition spec as live | no |
-| 8 | S6b migration (`left_at` on the server clock) — written and proven locally | **you run it** |
+| 8 | ✅ Both migrations written and proven on a throwaway PG17 (`verification/run-left-at-native.sh`) | **you run them** |
 | 9 | ✅ S8 — no height stored for text + audio | no |
 | 10 | ✅ S1 — three seams lifted out; **owner should eyeball a real board** (the suite can't cover this) | **a look** |
 | 11 | **Examine Group E** — the bit pages, ~2,900 unread lines | no *(ruled: yes)* |

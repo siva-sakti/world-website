@@ -5,7 +5,6 @@
 
 export type Visibility = "public" | "private"; // "shared" joins later (§2a)
 export type BitType = "text" | "drawing" | "image" | "audio" | "pdf" | "link"; // link revived as a first-class type (link-bit-plan.md); bookmark stays retired (D-102)
-export type DisplaySize = "full" | "small";
 
 // A pen stroke = an ordered list of [x, y, pressure] points (vector, tiny).
 export type Point = number[];
@@ -74,7 +73,6 @@ export type Placement = {
   width: number | null;
   height: number | null;
   z: number | null;
-  display_size: DisplaySize;
   locked_at: string | null; // locked = position frozen (drag/resize/nudge/tidy skip it); null = unlocked
   arrived_at: string;
   left_at: string | null;
@@ -93,7 +91,6 @@ export type BoardCard = {
   width: number | null;
   height: number | null;
   z: number | null;
-  display_size: DisplaySize;
   arrived_at: string;
   label: string | null; // the face (bit) or title (board)
   type: BitType | null;

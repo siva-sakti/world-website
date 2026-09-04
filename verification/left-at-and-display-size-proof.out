@@ -1,0 +1,68 @@
+==============================================================
+S6b — a card cannot leave before it arrived
+==============================================================
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+--- 1. a browser with a slow clock writes a departure BEFORE the arrival
+    EXPECT: the trigger overrides it with the server clock; left_at > arrived_at
+UPDATE 1
+ departure_is_after_arrival | stamped_by_the_server_just_now 
+----------------------------+--------------------------------
+ t                          | t
+(1 row)
+
+--- 2. a revive clears the departure (the call-in path must still work)
+    EXPECT: left_at is null
+UPDATE 1
+ revived_ok 
+------------
+ t
+(1 row)
+
+--- 3. moving a DEPARTED card must not re-stamp its departure
+    EXPECT: unchanged_departure = true
+UPDATE 1
+UPDATE 1
+ unchanged_departure 
+---------------------
+ t
+(1 row)
+
+--- 4. the CHECK forbids the bad state even with the trigger disabled
+    EXPECT: ERROR placement_left_after_arrived
+ALTER TABLE
+psql:/Users/gargoodevi/Documents/world-website/verification/left-at-and-display-size-proof.sql:43: ERROR:  new row for relation "placement" violates check constraint "placement_left_after_arrived"
+DETAIL:  Failing row contains (dddddddd-0000-0000-0000-000000000001, bbbbbbbb-0000-0000-0000-000000000001, cccccccc-0000-0000-0000-000000000001, null, 99, 99, null, null, null, 2026-09-03 17:09:32.174364-07, 2026-09-03 17:09:31.174364-07, 2026-09-03 18:09:32.177816-07, 00000000-0000-0000-0000-0000000000aa, null, null).
+ALTER TABLE
+==============================================================
+display_size — gone, and the board still renders
+==============================================================
+--- 5. the column is gone
+    EXPECT: 0
+ display_size_columns_left 
+---------------------------
+                         0
+(1 row)
+
+--- 6. board_cards still returns a live card, with every column it had but that one
+    EXPECT: 1 row, and has_angle / has_locked_at true
+UPDATE 1
+ live_cards 
+------------
+          1
+(1 row)
+
+ has_angle | has_locked_at | display_size_gone 
+-----------+---------------+-------------------
+ t         | t             | t
+(1 row)
+
+--- 7. the render rule still holds: trash the bit, the card must vanish
+    EXPECT: 0
+UPDATE 1
+ cards_for_a_trashed_bit 
+-------------------------
+                       0
+(1 row)
+

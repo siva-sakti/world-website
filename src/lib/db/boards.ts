@@ -69,7 +69,7 @@ export async function duplicateBoard(supabase: SupabaseClient, boardId: string):
   try {
     const { data: rows, error: e3 } = await supabase
       .from("board_cards") // the render rule — never the raw table (A2)
-      .select("target_bit_id, target_board_id, x, y, width, height, z, display_size, locked_at, angle")
+      .select("target_bit_id, target_board_id, x, y, width, height, z, locked_at, angle")
       .eq("board_id", boardId);
     if (e3) throw e3;
     if (rows && rows.length) {
