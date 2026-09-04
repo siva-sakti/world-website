@@ -75,3 +75,9 @@ Everything a person does with captured things inside their writing is one of thr
 - **SHOW** — a block: the thing's content appears in place, in the flow. Bits only; a window onto the real thing.
 - **QUOTE** — the words become *yours*: paste (plain text, no strings) or "bring in as a copy" (a real new bit, yours to edit).
 The one thing the app never does: a paragraph from one piece *living inside* another, in sync. That's neither pointing nor quoting — and the model's answer is better: words needed in two places are *material*; make the bit.
+
+## A bit is its own artifact *(owner's framing, 2026-09-04 — "bit becomes like its own artifact"; sharpened against the code)*
+> **You edit a bit wherever it LIVES — on any board it sits on, or on its own page. Never from inside a composition, because there it is a window.**
+- **Verified:** a text card IS editable in place on a board (`card.tsx`'s `editing`), so the rule is *where it lives*, NOT "only its own page."
+- **And most bits have nothing to edit** — an image is a file, a recording is a recording. What changes is what you *say about* them: caption · tags · where it came from. **Only text is words you can rewrite.**
+- **Why the window is not a limitation but the point:** a composition does not contain a bit, it looks at one. Editing through it would be reaching through a window to redecorate another room — and the model's answer when you truly want your own version is the copy-door (`composition-spec.md` §24.5b).
