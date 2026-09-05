@@ -48,6 +48,13 @@ onEdit / onOpen) stay with the caller.
   enter: "write" | "focus-caption" | "open" }>` — the four consequences currently packed into the
   `isFlexSized` binary, unpacked into declared fields (tldraw's flag pattern at our scale).
   card.tsx's inline ternaries read the table; `isFlexSized` dies or derives.
+- **S8 ruled (owner, 2026-09-05) — `flexHeight` is the DEFAULT, not a prison:** the owner wants
+  auto-size as the beautiful default AND the option of a fixed card to play with aesthetically.
+  So the semantics: the table gives each type its default; for a text card **`height` null =
+  auto-sizes from its words (today's only real behavior) · a stored number = a deliberately
+  FIXED card** (the aesthetic option, built in the design-pass era — the table must not preclude
+  it). Consequence for now, in this step: **stop writing false heights** — auto-sized cards write
+  null, and the stored field stops lying by finally meaning something. With a test.
 - **Why before the new types:** a table bit wants both-axis resize *without* aspect lock —
   neither of today's two presets; the first type outside the binary otherwise becomes nested
   conditionals.

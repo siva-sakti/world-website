@@ -24,7 +24,7 @@ _Last updated: 2026-09-02_
 
 **⚠ TWO MIGRATIONS WRITTEN AND PROVEN, NOT APPLIED TO CLOUD (2026-09-03) — the repo's `supabase/migrations/` is AHEAD of the cloud by two files.** `20260903000005` (left_at on the server clock — safe standalone, additive, no view touched) and `20260903000006` (drop `display_size`). **Held at the owner's call while the composition data model is being designed. `…006` must NOT be pasted standalone:** it rebuilds `board_cards`, which the composition migration's step ⑥ also rebuilds — **fold it into that migration instead** (leave `display_size` out of the rebuilt view, drop the column + constraint). Paste-ready combined file, if ever wanted alone: `verification/apply-left-at-and-drop-display-size-to-cloud.sql` — **app deploy must come first for part 2.** Proof: `verification/run-left-at-native.sh`.
 
-**Awaiting the owner:** **S8** — `placement.height` is stored for text cards and permanently false; recommend stopping writing it *(the only open decision)*. Plus, when ready: the `left_at` server-clock migration, and R4's resize-handle look (D-140). The composition thread is **parked by the owner** and runs in its own window.
+**Awaiting the owner:** ~~S8~~ **RULED 2026-09-05** (null = auto-size, the default; a stored number = a deliberately fixed card, design-pass era; false writes stop in 2b — `card-split-plan.md` ③). ~~R4~~ **CLOSED 2026-09-05** (the grab-zone change was the owner's own ask — make the action possible; the LOOK belongs to the design pass, now in the after-F arc). The `left_at` migration paste = item 0 of the queue. The composition thread is **parked by the owner** and runs in its own window.
 
 *(Bullets below this line are history.)*
 
