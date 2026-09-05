@@ -413,4 +413,4 @@ backups/          local db dumps (gitignored)
 | `../board-actions-technical-audit.md` | ⭐ the board's technical audit + the committed six-layer target (D-135) | live reference |
 | `../board-undo-technical-plan.md` | undo/redo: the full plan, two antagonist rounds, the scaffolding ledger | ✅ shipped (D-137) |
 | `../geometry-registry-plan.md` | the measuring layer + the snap-guide design from the owner's references | stages 1–3 ✅ · guides next |
-| `../frame-plan.md` | the optional page fixture on a board — antagonist-hardened, owner-ruled | ready to build (migration owner-gated) |
+| `../frame-spec.md` | ⭐ **the frame = a KIND of board with a fixed size (owner-ruled 2026-09-05)** — goals · method · layer map | in spec (step 2 of 6) — supersedes `../old/frame-plan.md`, whose fixture-on-a-canvas model is DEAD (migration owner-gated) |

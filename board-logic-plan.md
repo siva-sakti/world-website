@@ -75,7 +75,7 @@ Update the status column in the same session anything moves. *(Findings live in
 | m4 | an unused `placementId` parameter on two remove doors | ✅ **REMOVED** — worse than unused: it implied trash and archive were card-scoped, when both take the bit off **every** board. Call sites shown before changing the signature (2 app, 12 test) |
 | m5 | `looseRefresh` bumped on a path where nothing became loose | ✅ **REMOVED** — a duplicate lands PLACED on the board, so the loose column had nothing new to show; it was a wasted round trip on every duplicate |
 | m6 | one unreachable branch | ⚠ **NOT LOCATED** — the audit recorded that it exists but never where. Searched (`tsc --allowUnreachableCode false` finds none). Left open rather than guessed at; re-find it in the Group E pass or drop it |
-| m7 | stale line references in `frame-plan.md` | ✅ **FIXED — and doubly stale.** It described "TWO hand-written lists" at line numbers that had both drifted; the second list no longer exists (the insert was changed to spread the row), so the note described work already done. Line numbers deliberately not restored |
+| m7 | stale line references in `old/frame-plan.md` | ✅ **FIXED — and doubly stale.** It described "TWO hand-written lists" at line numbers that had both drifted; the second list no longer exists (the insert was changed to spread the row), so the note described work already done. Line numbers deliberately not restored |
 
 ### Rules to write down, with the test that enforces each
 

@@ -1,7 +1,7 @@
 # The frame — a board with a fixed size
 
 **Status: 🟡 goals ruled by the owner; the architecture derived from them, step by step,
-not yet complete. Nothing built.** Started 2026-09-05. The earlier `frame-plan.md` (a rectangle
+not yet complete. Nothing built.** Started 2026-09-05. The earlier `old/frame-plan.md` (a rectangle
 placed on a canvas — the wrong model) is archived in `old/` and is not an input to this.
 
 **One word, used one way:** **frame** = a board with a fixed size. Not "page," not "notebook

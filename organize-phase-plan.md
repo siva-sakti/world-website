@@ -97,7 +97,9 @@ Ordered so each item lands on ground the previous one cleared. Each gets its own
 
 - **THE FRAME (owner idea, 2026-09-01 — filed from the reference-screenshots conversation):**
   an **optional page-shaped frame summonable onto any board** — NOT a second board mode. The
-  board stays the free infinite canvas; the frame is a fixture on it: its edges/margins/center
+  ~~board stays the free infinite canvas; the frame is a fixture on it~~ **MODEL CHANGED
+  (owner, 2026-09-05): a frame is a KIND of board with a fixed size, chosen at creation —
+  `frame-spec.md` is the live document; the fixture model is archived.** Old text: its edges/margins/center
   join the snap-guide candidates (the geometry-registry machinery, trivially composable), cards
   drift in/out freely, per-board and stored (tiny owner-gated migration), and someday the
   natural boundary for EXPORTING a board as a finished image (what the reference artist is
@@ -254,7 +256,7 @@ built, and then the frame view as well."*
 | **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange (§2b) | `board-arrange-vs-edit-mode-plan.md` | the panning gesture (§5) |
 | **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
 | **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
-| **6** | **The frame** | `frame-plan.md` | the cloud paste |
+| **6** | **The frame** | `old/frame-plan.md` | the cloud paste |
 
 **Held behind this queue by the owner's sequencing:** the composition build (the other window
 waits for a ping when 1–6 are clear). **Not in the queue but not dropped:** the five save loops,

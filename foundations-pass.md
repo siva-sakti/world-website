@@ -276,7 +276,7 @@ grid in §2 is updated from this list, never directly.
 | from | decision | lean |
 |---|---|---|
 | §6.1 | ~~the null position~~ | ✅ **ruled**: not null |
-| §6.1b | ~~What is a frame's coordinate space?~~ | ✅ **RULED (a), 2026-09-05.** Owner: *"a frame is a kind of board… fixed sizes, like 8½×11, A4, square, or a pixel size… you can zoom in but not infinitely — like what you can print out and see. No, a frame is not a rectangle drawn on a board. There's either an infinite canvas or a defined size."* → `frame-plan.md` must be re-cut before build: no `frame_x/y` on the plane; the frame *is* the plane, bounded. |
+| §6.1b | ~~What is a frame's coordinate space?~~ | ✅ **RULED (a), 2026-09-05.** Owner: *"a frame is a kind of board… fixed sizes, like 8½×11, A4, square, or a pixel size… you can zoom in but not infinitely — like what you can print out and see. No, a frame is not a rectangle drawn on a board. There's either an infinite canvas or a defined size."* → `old/frame-plan.md` must be re-cut before build: no `frame_x/y` on the plane; the frame *is* the plane, bounded. |
 
 ## 6 · The walkthroughs
 
@@ -374,7 +374,7 @@ Four more, from the probing questions:
   cards render at fractional pixels. ⚪ Whether that blurs text edges is a browser question —
   worth one look on a real screen, not a decision.
 - 🔴 **The frame conflicts with today's ruling, and this walkthrough should have caught it.**
-  `frame-plan.md` stores a frame as **a rectangle on the plane** (`frame_x/y/w/h` on `board`).
+  `old/frame-plan.md` stores a frame as **a rectangle on the plane** (`frame_x/y/w/h` on `board`).
   The owner ruled today that **a frame is a kind of board chosen at creation** — not a rectangle
   on a canvas. Those are different coordinate models: in the plan, a frame has a position on an
   infinite plane; in the ruling, a frame *is* the whole bounded space. **Probing question 5

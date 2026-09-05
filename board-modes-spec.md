@@ -74,7 +74,7 @@ that's not a big deal."*
 Either kind can be in either mode. **The mode belongs to the board you are on**, not to a card,
 not to a frame, and not to anything floating above the board (a composition's floater).
 
-> ⚠ **This corrects `frame-plan.md`**, which currently describes the frame as a fixture you
+> ⚠ **This corrected the old frame plan** (now `old/frame-plan.md`, archived), which described the frame as a fixture you
 > place *on* a canvas. The owner has ruled it is a *kind of board* chosen at creation. The
 > frame plan needs updating before that build; *"moving between canvas and frame more
 > smoothly"* is a later question the owner has explicitly deferred.
@@ -402,7 +402,7 @@ logic.** Their prop lands first in its own small commit; the mode gate rebases o
 5. **Arrows with nothing selected in arrange** — pan? *(§6)*
 6. **The composition floater over a board** — confirm with that lane. *(§6)*
 7. **The words** — the naming pass. *(§2)*
-8. **`frame-plan.md`** needs re-cutting to "a kind of board chosen at creation." *(§2)*
+8. **`old/frame-plan.md`** needs re-cutting to "a kind of board chosen at creation." *(§2)*
 
 ## 10 · Where this came from
 - `old/board-arrange-vs-edit-mode-plan.md` — the first draft and the review that killed it
