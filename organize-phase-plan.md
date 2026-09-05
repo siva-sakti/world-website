@@ -252,11 +252,26 @@ built, and then the frame view as well."*
 | | | plan | needs the owner |
 |---|---|---|---|
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
-| **2** | **A rotated card can be ALIGNED** (the visual-box maths; drop the four opt-outs) | same, §2 | a look at the result |
-| **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange (§2b) | `board-arrange-vs-edit-mode-plan.md` | the panning gesture (§5) |
+| **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
+| **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange | `board-modes-spec.md` (v3 — the old plan is in `old/`) | its §9 opens |
 | **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
 | **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
-| **6** | **The frame** | `old/frame-plan.md` | the cloud paste |
+| **6** | **The frame — a KIND of board, fixed size (ruled 2026-09-05)** | `frame-spec.md` | the cloud paste |
+
+**HOW EACH ITEM LEAVES THE QUEUE — the foundation gates (folded 2026-09-05; the layer model:
+`foundations-pass.md` §2b).** An item is gated only by the layers it cuts. Before its build: the
+gate walkthroughs run (§3 process — write the rule, test it red, owner tries a real board), the
+decisions they surface go to the owner **batched** (the frame-three pattern), then the build
+follows its spec. The gates:
+- **1 readout** — no gate (a small rendering readout).
+- **3 modes** — **L4 rendering + L5 input** (+ L6 temporary state, small). *The next real
+  foundation work.* Starts once the universal-card verdict (two independent agents, running
+  2026-09-05) lands — modes' per-mode card look builds directly on that structure.
+- **4 checklist · 5 table** — **L7 creation + L8 identity** walkthroughs; plus the same card
+  verdict (interactive content inside a draggable card is its hard case).
+- **6 frame** — mostly clear already (**L2 plane · L3 camera** walked ✅); remaining: the **L1
+  board-data** walkthrough (duplicate must copy kind + size) + the kind/size migration, which
+  also drops the dead `frame_x/y/w/h` columns (never a standalone paste).
 
 **Held behind this queue by the owner's sequencing:** the composition build (the other window
 waits for a ping when 1–6 are clear). **Not in the queue but not dropped:** the five save loops,
