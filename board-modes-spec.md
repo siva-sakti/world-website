@@ -394,6 +394,10 @@ logic.** Their prop lands first in its own small commit; the mode gate rebases o
 
 ---
 
+> **Absorbed from the card split (D-149):** the perf pass — stable handlers → `memo` on the card
+> shell (pan stops re-rendering N cards) + the idle-tiptap question (an at-rest text card mounts a
+> full editor; this spec's own "writing machinery idle in arrange" goal). Lands with modes' build.
+
 ## 9 · What is still open — the complete list
 1. **Dragging other cards in edit** — nothing (🔵), or still moves? *(§3g)*
 2. **Duplicate in edit** — keep, or grey? *(§3g)*

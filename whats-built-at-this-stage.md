@@ -318,6 +318,9 @@ grid in §2 is updated from this list, never directly.
 | §6.1b coordinates | 🔴 **the frame's coordinate model conflicts with today's "kind of board" ruling** | decide | ⚪ **owner** — see the decisions list |
 | L4 rendering | **the universal card CONFIRMED by convergence** — a breaker over our code (yes-with-changes, high confidence; per-type spatial ownership "strictly worse") and a researcher over tldraw/Excalidraw/React Flow/Konva (pattern verified from their code, zero counterexamples), independent charges, same answer | verdict | ✅ 2026-09-05 |
 | L4 rendering | **the card split, ruled before modes** (owner): shell stays · per-type capability table · one content component per type · union CardVM (forgotten renderer = compile error) · `cancel`/nodrag convention replaces per-element stopPropagation · chrome outside the frame's clip plane (the R5 handle-clipping catch) · click-grammar tests FIRST | decide → build | 🧾 queued as 2b (§4e-2); plan just-in-time at start |
+| the queue itself | **antagonist review of the build order (owner-asked)**: 1→2b→3→4→5→6 SURVIVES; flaw found outside the list — no item 0 protecting the data (export links die in an hour, verified `route.ts:55` · originals discarded at intake, verified `media.ts` · restore never rehearsed) | verdict | ✅ 2026-09-05 |
+| the queue itself | **item 0 the safety sitting + 0b keep-originals RULED; composition ping stays after six (owner overruled the after-2b recommendation — bandwidth); split step ⑥ → modes; item loop gains 5b adversarial check + full-suite/backup language** | decide | ✅ D-149 |
+| E finding | **search flagged inconsistent, and NO queue item ever reaches it** (fails silently — a miss just hides things). Ride-along candidate, unscheduled | flag | ⚪ **owner: when?** |
 
 ### The decisions list — everything waiting on the owner
 *(collected from every walkthrough's ⚪ rows, so they can be ruled in one sitting)*

@@ -251,6 +251,8 @@ built, and then the frame view as well."*
 
 | | | plan | needs the owner |
 |---|---|---|---|
+| **0** | **THE SAFETY SITTING (ruled 2026-09-05, D-149)** — real export downloaded **+ media fetched inside its hour** · restore rehearsed on a throwaway · fresh backup · paste the two safe held migrations (005 + position_not_null — their hold reason expired with D-145/147; 006 stays folded) · the RLS-on-every-table test | Claude preps the package; plan just-in-time | **yes — the sitting is the owner's** |
+| **0b** | **KEEP ORIGINALS (ruled 2026-09-05)** — intake stores the full-quality original alongside the display copy, from now on. Slotted right after 0 because every photo added before it lands has no original, forever | plan just-in-time | no |
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
 | **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
 | **2b** | **THE CARD SPLIT (ruled 2026-09-05, D-148)** — shell stays; per-type capability table + one content component per type; union CardVM (forgotten renderer = compile error); the `cancel`/nodrag convention; chrome outside the frame's clip plane | plan written just-in-time at start; verdicts: `whats-built-at-this-stage.md` §5b | no — ruled |
@@ -274,7 +276,10 @@ follows its spec. The gates:
   also drops the dead `frame_x/y/w/h` columns (never a standalone paste).
 
 **Held behind this queue by the owner's sequencing:** the composition build (the other window
-waits for a ping when 1–6 are clear). **Not in the queue but not dropped:** the five save loops,
+waits for a ping when 1–6 are clear). **Re-ruled 2026-09-05 (D-149):** the queue antagonist
+recommended pinging after 2b (their next step is add-only, zero board files, and their rehearsed
+migration goes stale waiting); **the owner kept the hold — after all six** (bandwidth: one lane's
+rulings at a time). Their staleness cost is accepted knowingly; re-rehearse their migration at ping time. **Not in the queue but not dropped:** the five save loops,
 the two-devices write-up (A11), a bit's journey, the Group E pass.
 
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
@@ -439,9 +444,12 @@ For EVERY queue item, in order, no skipping:
 3. **Clarify** — ask the owner the questions that change the build (only real forks, not paint shades). A question about implementation is not a question about the concept; don't let one wear the other's costume.
 4. **Plan in detail** — written down (here or the item's own doc).
 5. **Check the plan** — proof it against the current code (read, don't assume).
+5b. **Adversarial check for restructuring/migration items** (added 2026-09-05, D-149): an
+   INDEPENDENT agent attacks the plan before build — every major catch this month came from one
+   (D-147's 15, D-148's convergence); self-review by the plan's author is not this step.
 6. **Clarify again** — anything the proof surfaced.
 7. **Build per plan** — improvise nothing.
-8. **Check the build** — tsc + lint + build green + trace the flows; schema = throwaway-proven first, cloud on the owner's "go." **Plus the language check: do the UI, the db functions and the comments use the ruled word from 2b, or did a synonym creep in?**
+8. **Check the build** — tsc + lint + build green + **the FULL test suite green, new tests proven red first** + trace the flows; schema = throwaway-proven first, **fresh backup before any owner paste**, cloud on the owner's "go." **Plus the language check: do the UI, the db functions and the comments use the ruled word from 2b, or did a synonym creep in?**
 9. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
 
 The owner's only standing jobs: answer clarifying questions + "needs owner" calls, feel-test, and dump ideas — filing them is Claude's job.

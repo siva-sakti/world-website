@@ -76,7 +76,7 @@ The R5 catch (an overhung card's handles must not clip with it) needs the shell 
 selection chrome in a sibling layer. Designed here, built with the frame — nothing needs it
 until a bounded board exists. → `frame-spec.md` layer map row 5.
 
-## Step ⑥ — perf *(after ④, its own small pass)*
+## Step ⑥ — perf *(MOVED to the modes build, D-149 — optimization doesn't ride inside a foundations item)*
 
 Stable handlers instead of ~17 inline closures per card → `memo` on the shell → pan stops
 re-rendering N cards. The idle-tiptap question (an at-rest text card mounts a full editor)
@@ -88,7 +88,7 @@ it isn't lost.
 ## Order and gate
 
 ① → ② → ③ → ④ complete **before the modes build starts** (both agents' hard constraint: modes
-edits the same grammar). ⑤ waits for the frame. ⑥ after ④, before modes' perf-sensitive work.
+edits the same grammar). ⑤ waits for the frame. ⑥ moved whole into modes (D-149).
 
 ## Open questions
 
