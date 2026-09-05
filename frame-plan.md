@@ -1,5 +1,69 @@
 # The frame — plan
 
+> # ⚠ THE MODEL CHANGED — RE-CUT BEFORE BUILDING *(owner-ruled 2026-09-05)*
+>
+> This plan describes the frame as **a rectangle placed on an infinite canvas** — four columns
+> `frame_x/y/w/h` giving its position and size *on the plane*, a fixture you can move. **The
+> owner has ruled it is not that:**
+>
+> > *"A frame is a kind of board — fixed sizes, like 8½×11, A4, square, or a pixel size. You can
+> > zoom in but not infinitely — like what you can print out and see. No, a frame is not a
+> > rectangle drawn on a board. There's either an infinite canvas or a defined size."*
+>
+> **So:** a board is *either* a canvas (no edges) *or* a frame (a page with a fixed size),
+> chosen when the board is made. **The frame IS the plane, bounded.** Its top-left corner is
+> (0, 0); nothing exists outside it. No `frame_x`/`frame_y` — a page has no position on anything.
+> What survives from this plan: a size on the board row (`frame_w`/`frame_h`, or a named
+> paper size), the CHECK on sanity, the render rule, the antagonist's catches. What goes: the
+> position columns, "move the frame," the pasteboard-as-placement-area, and every sentence that
+> says "on the canvas."
+>
+> **Claude's one honest counter-thought, raised once and then dropped:** the rectangle-on-a-canvas
+> model gives you *scratch material beside the page* — reference images around the thing you are
+> composing, the artist's desk. The bounded page does not. **But that need is already answered
+> elsewhere** — the composition surface's hover layer (`docs/composition-spec.md` §26: *"bits
+> propped above the writing as movable windows"*). So the owner's model loses nothing that isn't
+> covered. Not pressed.
+>
+> ## What was researched for the re-cut *(2026-09-05 — verified against sources; unverified bits labelled)*
+>
+> **Paper sizes in screen pixels** ✅ verified *(1 CSS pixel = 1/96 inch, the web standard)*:
+> - **US Letter** 8½×11 in → **816 × 1054** px on screen; 2551 × 3295 at print resolution (300 dpi)
+> - **A4** 210×297 mm → **794 × 1123** px on screen; 2480 × 3508 at 300 dpi
+> - **Square** — the owner's suggestion; 1080 × 1080 is the common social size *(⚠ not verified
+>   here, widely used)* · **custom pixel size** — as ruled
+>
+> 🔵 **Store the frame in screen pixels at 96 dpi.** Composition happens on screen; print or
+> export is a *scaling* concern at output time, not a storage concern. One number per side.
+>
+> **Zoom on a fixed page — how the tools the owner named do it:**
+> - **Photoshop** ✅ verified: extreme range — up to **12,800%** (one source says 3,200%; version
+>   dependent), down to 0.19% — because it edits *pixels*, and shows a pixel grid when close. It
+>   also shows a **grey pasteboard around the document** so the whole page sits with a margin,
+>   and *"Overscroll"* lets you pan past the edge. **The pasteboard is a visual margin, not a
+>   place to put things** — which is exactly the distinction the owner drew.
+> - **Canva** ✅ verified in part: zoom presets **50% · 75% · 100% · 200% · Fit**, from a
+>   bottom-right control; zooming never changes the design's size. ⚠ Its hard limits were not
+>   found in the sources — do not assume them.
+>
+> 🔵 **What that means for a notebook page — proposed, for the owner:**
+> 1. **"Fit" is the default view** — the whole page, with a small margin of grey around it, the
+>    way Photoshop and Canva both show a document. **Nothing can be placed in the margin.**
+> 2. **Zoom is bounded, and modest.** This is a page you compose and read, not pixels you
+>    retouch. 🔵 Fit → up to ~400%. Canva's presets are the closer model; Photoshop's 12,800% is
+>    for a different job. *"Like what you can print out and see"* — the owner's own bound.
+> 3. **The existing camera does all of this unchanged** — same `{ x, y, scale }`, same
+>    `screenToPlane`. The only additions: the plane has edges the camera cannot pan past (plus
+>    the margin), and the zoom floor is "fit," not 0.2×.
+> 4. **Cards cannot leave the page.** A drag that would cross the edge stops at it. ⚪ *Or* is
+>    clamped on release — a feel question for the owner's hands.
+>
+> ⚪ **Open for the owner, from the research:** Letter vs A4 as the offered default (the owner is
+> in the US; A4 is the world) · whether landscape is a separate choice or a rotation · what
+> "100%" means on a page (actual print size on screen, or fit?) · whether a frame can be resized
+> after creation, or the size is final.
+
+
 **Status:** planned → owner ruled → **antagonist: "build with changes" (14 items folded,
 2026-09-01 — the CHECK constraint WRITTEN AND PROVEN on a throwaway PG17, including the NaN
 hole it found; the schema half survived every attack; the rendering claim corrected)** → build. Born from the owner's
