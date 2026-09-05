@@ -123,6 +123,16 @@ The floater (§14.3: title+body, basic toolkit, no drawer) · dock→panel→pag
 The appendix table enacted (its own small migration + EXPORTED_TABLES row) · summon from the drawer's pin · screen-fixed · viewing-only · hide-all remembered · trashed-pin hidden-not-deleted. **Needs its name from the owner before its UI ships** (§26.5).
 **Accept:** *(+ the five floor rules)* §26.3's table demonstrated row by row; positions survive a reload; restore brings a pinned window back.
 
+## Stage Ⓥ · THE COMPOSITION'S VISIBILITY HALF *(added 2026-09-05 — the owner queued the board half into the board lane; this is this lane's share of `docs/visibility-model.md` §9)*
+**Gated on:** the board lane shipping the visibility core (the legacy flip · the bit default change · the publish act existing at all). Until then the composition build runs in an all-private world where none of this can fire — **the two builds never entangle.**
+**This lane's pieces, when its turn comes:**
+1. **The composition guest rules** — activate the drafted policy comments (already sitting in the ①a migration file).
+2. **The gather-barrier** at the one db door + the picker: gathering a private bit into a PUBLIC piece meets the ceremony (*make public · public copy · keep in hover*). ⚠ Stage ③ builds the picker with this **hook point named** so the barrier later lands in one place.
+3. **Piece-publish = resolve-first** — the review that walks each private gathered thing (flip · copy · remove) before the door opens.
+4. **The unpublish corner** — flipping a bit private while it's quoted in a public piece un-publishes the piece, with her confirm; never edits prose, never blocks.
+5. **View-as-visitor for pieces** + the hover view's elevated role (THE private-material mechanism on public pieces).
+**Accept:** the visibility model's §5 acts-table rows that touch pieces, each demonstrated · a public piece can never be made to render differently than authored (attempted and refused at every door).
+
 ## Riding alongside (not stages)
 The **naming session** (the list's route · "gather" still soft · the hover layer's name · §21.6's direction-words) — needed by ①'s route sweep at the redirect level only; full sweep at naming. · The **owner's refinement pass** over Part III + columns + chip cosmetics. · The fenced sittings: the block dead-display family (one sitting) · heading-also-folds. · The parked shelf stays parked (F-1…F-9).
 
@@ -159,6 +169,7 @@ The **naming session** (the list's route · "gather" still soft · the hover lay
 | §24.1–24.2 the composing model · §24.3 pasted-image files · §24.4 flatness-as-FK · §24.5b window + copy-door | **②a** · **④** · **①** · **③/④** |
 | §25 the move inventory · §28 the walk · §24.6 the scenes | **not built — the acceptance fixtures.** Every stage tests against them |
 | §26 the hover layer | **⑥** |
+| `docs/visibility-model.md` §9's composition half | **Ⓥ** *(gated on the board lane's visibility core)* |
 | §29 chips per type · §30 the bring-in list (four targets) | **③** |
 | §32.2 make-this-a-bit · §32.3 the node registry · §32.4 the small answers | **④** · **②a** *(fixed before anything persists)* · **②a/③** |
 | §34 the pointer stress-test | **③** (its two requirements are in ③'s acceptance) |
