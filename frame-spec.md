@@ -71,6 +71,22 @@ non-obvious ones.)*
 
 ---
 
+## 1a · The research behind R2/R6/R8 *(carried from `old/frame-plan.md` — evidence, not just conclusions)*
+
+**Paper sizes in screen pixels** ✅ verified *(1 CSS px = 1/96 inch, the web standard)*:
+**US Letter** 816 × 1054 px *(2551 × 3295 at 300 dpi print)* · **A4** 794 × 1123 px *(2480 ×
+3508)* · square: 1080 × 1080 is the common social size *(⚠ unverified, widely used)*.
+
+**Zoom on a fixed document, in the tools the owner named:** **Photoshop** ✅ up to 12,800%
+(one source: 3,200%; version-dependent) because it edits *pixels*; shows a **grey pasteboard
+around the document — a visual margin, not a place to put things**. **Canva** ✅ presets
+50 · 75 · 100 · 200% + Fit; zoom never changes the design. ⚠ Canva's hard limits were not found
+— not assumed. 🔵 Hence R6's shape: Fit as the floor and default, modest ceiling (~400%) — a
+frame is composed and read, not retouched.
+
+*(Sources are linked in the archived plan's banner. Rule restated: an archived document
+preserves history; anything still LOAD-BEARING must live in the current one.)*
+
 ## 1b · The layer map — canvas and frame through every layer *(the sensibility check)*
 
 **The claim this map exists to check:** *one coordinate system, one camera, one render path —
