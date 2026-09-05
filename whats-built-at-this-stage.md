@@ -320,7 +320,7 @@ grid in §2 is updated from this list, never directly.
 | §6.1 coordinates | one paragraph in `SPEC.md` §2z | write | ✅ |
 | §6.1 coordinates | `screenToPlane` lifted into the pure module + 4 tests; a flipped sign proven red | guard | ✅ |
 | §6.1 coordinates | **a position is always a whole point** — owner: *"I don't think the database should be allowing that"* | decide → change | 🧾 `20260904000001_position_not_null` proven; held with 005/006 |
-| §6.1b coordinates | z is unbounded and never compacted — state it in `SPEC.md` §2z | write | ⬜ |
+| §6.1b coordinates | z is unbounded and never compacted — state it in `SPEC.md` §2z | write | ✅ 2026-09-05 |
 | §6.1b coordinates | 🔴 **the frame's coordinate model conflicts with today's "kind of board" ruling** | decide | ⚪ **owner** — see the decisions list |
 | L4 rendering | **the universal card CONFIRMED by convergence** — a breaker over our code (yes-with-changes, high confidence; per-type spatial ownership "strictly worse") and a researcher over tldraw/Excalidraw/React Flow/Konva (pattern verified from their code, zero counterexamples), independent charges, same answer | verdict | ✅ 2026-09-05 |
 | L4 rendering | **the card split, ruled before modes** (owner): shell stays · per-type capability table · one content component per type · union CardVM (forgotten renderer = compile error) · `cancel`/nodrag convention replaces per-element stopPropagation · chrome outside the frame's clip plane (the R5 handle-clipping catch) · click-grammar tests FIRST | decide → build | 🧾 queued as 2b (§4e-2); plan just-in-time at start |

@@ -323,7 +323,9 @@ waits for a ping when 1–6 are clear). **Re-ruled 2026-09-05 (D-149):** the que
 recommended pinging after 2b (their next step is add-only, zero board files, and their rehearsed
 migration goes stale waiting); **the owner kept the hold — after all six** (bandwidth: one lane's
 rulings at a time). Their staleness cost is accepted knowingly; re-rehearse their migration at ping time. **Not in the queue but not dropped:** the five save loops,
-the two-devices write-up (A11), a bit's journey, the Group E pass.
+the two-devices write-up (A11), a bit's journey, the Group E pass, **snap guides while dragging a
+TILTED card** (named in `rotation-alignment-and-readout-plan.md` §future; caught absent from this
+list 2026-09-05).
 
 ## 4i · PUBLIC / PRIVATE — the sharing layer (owner re-raised 2026-09-05; filed, LATER phase)
 

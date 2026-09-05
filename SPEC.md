@@ -56,6 +56,8 @@ and opening a board on your phone should not jump you to wherever your laptop wa
 is stored is the plane point at the *centre* of the view plus the zoom, so the same spot stays
 centred when the window is resized.
 
+**z is unbounded and never compacted** — every bring-to-front takes max+1; the integers only grow, harmlessly (float8 headroom is astronomically beyond one writer's lifetime). Stated so nobody "fixes" it into a renumbering pass. *(ledger §6.1b, closed 2026-09-05)*
+
 **A position is always a whole point.** *(Owner-ruled 2026-09-04: the database should not allow
 a positionless card.)* The original schema permitted both coordinates null — designed for a
 "collection mode" that was never built — and rendered such a card at (40, 40). Migration
