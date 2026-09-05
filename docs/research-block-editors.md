@@ -1,6 +1,6 @@
 # Research — block editors: what exists, what feels good, what the alternatives cut
 
-> ## STATUS · 2026-08-31 · 🟢 HALF 1 LANDED (mechanics — Claude's agent) · ⚪ HALF 2 PENDING (the owner's Notion feel-protocol, `composition-surface-spec.md` §6b)
+> ## STATUS · 2026-08-31 · 🟢 HALF 1 LANDED (mechanics — Claude's agent) · ⚪ HALF 2 PENDING (the owner's Notion feel-protocol, `old/composition-surface-spec.md` §6b)
 > Findings fold into the spec's §4 cut; this doc keeps the full detail + sources. Research findings don't expire with plans.
 
 ## Executive summary — what it means for a v1 cut

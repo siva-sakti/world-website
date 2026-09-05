@@ -3,7 +3,7 @@
 > ## STATUS · 2026-09-01 · the CONCRETE list
 > Written at the owner's ask: *"what are the actual things I need to see in an app."* Everything the convergence work turned up, translated out of frameworks into **things you would see, click, or miss.** No taxonomy. No theory.
 > **✅ = there today · ⚠️ = half there · ❌ = missing · ⚪ = undecided whether we want it**
-> Detail/reasoning for any line: `convergent-surfaces-overview.md` · `convergent-surfaces-stress-test.md` · `composition-surface-spec.md`.
+> Detail/reasoning for any line: `old/convergent-surfaces-overview.md` · `old/convergent-surfaces-stress-test.md` · `old/composition-surface-spec.md`.
 
 ---
 

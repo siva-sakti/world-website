@@ -47,9 +47,9 @@
 |---|---|
 | `app-things-inventory.md` | 🟢 the current answer to *what are we building* |
 | `research-block-editors.md` · `research-structured-data.md` | 🟢 findings, sourced, settled |
-| `convergent-surfaces-overview.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
-| `convergent-surfaces-stress-test.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
-| `composition-surface-spec.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
+| `old/convergent-surfaces-overview.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
+| `old/convergent-surfaces-stress-test.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
+| `old/composition-surface-spec.md` | 📜 **SUPERSEDED 2026-09-04 by `composition-spec.md` (VERIFIED, D-146)** — thinking-stage material from before the spec existed; read as history, never build from it |
 | `tables-and-structured-data.md` | 🟠 working — an open question |
 | all `product-concept-*.md` | 🟠 working — thinking in progress, status-banners inside |
 
@@ -274,7 +274,7 @@ INDEX.md ................ this file — where everything is
 1. **START:** `composition-definition.md` — the concept. *(⚠ lags the newest stamps; see its banner.)*
 2. ⭐ **THE LIVE SPEC: `composition-spec.md`** — the full specification, written section by section with the owner (§24 the composing model · §24.5b window-or-copy · §25 the move inventory · §26 the hover layer). **Banner-marked DRAFT — read it, do not build from it yet.** It states outright that it **supersedes `composition-technical-spec.md`**.
    *(⚠ `composition-technical-spec.md` was named "THE LIVE SPEC" here until 2026-09-03 and is now the SUPERSEDED consolidation — a board session was misled by this line. Consult it only for what `composition-spec.md` has not yet covered.)*
-3. Capabilities: `composition-surface-spec.md`. Shelf: `future-features.md` (F-1…F-9).
+3. Capabilities: `old/composition-surface-spec.md`. Shelf: `future-features.md` (F-1…F-9).
 4. **⚠ `composition-base-spec.md` is a PALIMPSEST** — historical trail with internal contradictions. **Never build from a single section of it.** Read `aerial-review-findings.md` first if you must consult it.
 
 **IF the task is CONNECTION / REFERENCES / LINKS →**
@@ -284,7 +284,7 @@ INDEX.md ................ this file — where everything is
 `tables-and-structured-data.md` → `research-structured-data.md`. **The engine is parked; a table is formatting.**
 
 **IF the task is THE BIG PICTURE / STRATEGY / POSITIONING →**
-`convergent-surfaces-overview.md` → `convergent-surfaces-stress-test.md` (the challenge) → the `product-concept-*` family.
+`old/convergent-surfaces-overview.md` → `old/convergent-surfaces-stress-test.md` (the challenge) → the `product-concept-*` family.
 
 ### `teaching-the-user.md` — 🟠 what a person must learn, and how (2026-09-02)
 **Contains:** the three things a person MUST understand (everything else discoverable) · must-teach vs can-discover · **the moments and what teaches at each** (hints, tooltips, structural teaching, F-9's door) · the vocabulary users meet vs ours-only · **what the design teaches without words** · the opens. The user-facing counterpart to the specs.
@@ -303,7 +303,7 @@ INDEX.md ................ this file — where everything is
 
 ### `composition-base-spec.md` — 🟠 THE BASE SPEC: the composition re-derived, bottom-up (2026-09-01)
 **Contains:** the post-split model · the entity defined conceptually + technically (the surface-table shape) · relations reshaped (placement · reference · tags — one link mechanism) · **every act traced, no blank cells** · doors in/out · what it sheds from bit-hood, each chosen · invariants touched · the migration sketch · **§9: the nine questions the owner answers to settle the base.**
-**Gate:** owner answers §9 → 🟢 → enactment in the code window's lane. The capability layer (`composition-surface-spec.md`) builds on this after.
+**Gate:** owner answers §9 → 🟢 → enactment in the code window's lane. The capability layer (`old/composition-surface-spec.md`) builds on this after.
 
 ### `note-storage-audit.md` — 🟠 the ARCHITECTURE audit: the composition is architecturally material (2026-09-01)
 **Contains:** ⭐ the owner's reframe (a DATA-MODEL question, not storage: one entity playing two parts) · three verified proofs (public-by-default compositions · gatherable-as-material · architecturally "loose") · the real seam count (~30 files; corrects Claude's false "5 in 3") · the app-code-is-AHEAD finding · 🔵 the convergence finding (one surface table unifies the whole link fabric — comp→comp and comp→board become one row type; A15 dissolves) · the ONE ruling that gates the migration · Claude's updated recommendation.
@@ -312,15 +312,15 @@ INDEX.md ................ this file — where everything is
 **Contains:** every finding from the convergence work translated into **things you'd see or click** — writing a piece · linking (what can point at what) · getting things out · ordering · tables/fields · about a piece · and which lines have real evidence.
 **Is:** the plain-language output layer. Written after the owner named the translation loss: *"what are the actual things I need to see in an app."* Read this instead of the frameworks; the frameworks are the working-out.
 
-### `convergent-surfaces-stress-test.md` — 🔵 independent review of the convergence direction (2026-09-01)
+### `old/convergent-surfaces-stress-test.md` — 🔵 independent review of the convergence direction (2026-09-01)
 **Contains:** convergence as **ten operations** (we serve two) · six verdicts on our conclusions (what's weak, what's wrong, what to keep) · the excerpt problem with four costed stances · spatial→linear: the only four mechanisms that exist · seven ranked gaps · flagged uncertainty · heavy sourcing.
 **Is:** a reviewer's opinion, **not a ruling** — commissioned to attack, not validate. Read WITH the overview.
 
-### `convergent-surfaces-overview.md` — ⭐ THE ONE CLEAN READ of the convergence picture (2026-08-31)
+### `old/convergent-surfaces-overview.md` — ⭐ THE ONE CLEAN READ of the convergence picture (2026-08-31)
 **Contains:** the frame (free to diverge, formatted to converge) · the grown north star · the three surfaces' state · the 2×3 connective grid (Obsidian/Notion nested) · the engine digest · the story for people · **everything unruled, listed** · standing cautions.
 **Is:** the synthesis layer — every section points at its detail doc. Read this FIRST on the convergence topic; the trail lives in `product-concept-promise.md`.
 
-### `composition-surface-spec.md` — 🟡 preliminary thinking-spec (2026-08-31)
+### `old/composition-surface-spec.md` — 🟡 preliminary thinking-spec (2026-08-31)
 **Contains:** the diverge/converge picture drawn · the full entry/link **matrix** (what can enter what, incl. the one new model question: composition→composition) · the existing tiptap base · the doc-surface capability cut (blocks · the **bit-block** = gather matured) · the deck sketched lightly · quick research (tiptap ships a Notion-like template; Notion's synced blocks vs our native transclusion) · the owner's check-in list.
 **Does NOT:** rule, name, sequence, or touch schema. Gated on the owner's check-in → naming session → the item loop.
 
@@ -364,7 +364,7 @@ INDEX.md ................ this file — where everything is
 ## 8 · RESEARCH — findings don't expire with plans
 
 - **`research-structured-data.md`** — ⚪ landing doc for the engine research (Notion's data model · the common property/view architecture · Postgres field patterns). Folds into `tables-and-structured-data.md` §1b.
-- **`research-block-editors.md`** — ⚪ the landing doc for the composition-surface research (Claude's 3-question mechanics agent + the owner's Notion feel-protocol). Folds into `composition-surface-spec.md` when both halves land.
+- **`research-block-editors.md`** — ⚪ the landing doc for the composition-surface research (Claude's 3-question mechanics agent + the owner's Notion feel-protocol). Folds into `old/composition-surface-spec.md` when both halves land.
 
 - **`research-knowledge-layer.md`** — tags, backlinks, forward-links, graph; the connector's binding model came from here. Reference at build time.
 - **`research-canvas.md`** — how canvas apps are built (JSON Canvas · tldraw · Heptabase · Excalidraw), marked ADOPT / SKIP.

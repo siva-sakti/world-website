@@ -218,7 +218,7 @@ All six areas are **the same three moves**. An outreach list is a board of conta
 
 **The third is the one consistent with "one primitive, everywhere"** and the only one that connects to the spatial half. ⚪ **Not decided — the owner has not chosen between them, and may mean the first while asking for the second.**
 
-> ⭐ **THE CLEAN CURRENT-STATE READ of everything from here down is `convergent-surfaces-overview.md`** (2026-08-31). The sections below are the TRAIL — corrections, supersessions and provenance included, kept deliberately. Read the overview first; come here for how it was arrived at.
+> ⭐ **THE CLEAN CURRENT-STATE READ of everything from here down is `old/convergent-surfaces-overview.md`** (2026-08-31). The sections below are the TRAIL — corrections, supersessions and provenance included, kept deliberately. Read the overview first; come here for how it was arrived at.
 
 ## 2c-bis · ⭐⭐⭐ THE HEADLINE FINDING — we built the DIVERGENT half and not the CONVERGENT half (the owner, 2026-08-31)
 

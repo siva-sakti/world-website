@@ -2,13 +2,13 @@
 
 > ## STATUS · updated 2026-09-02 (morning session) · 🟠 WORKING — the single document for this feature
 > **The process (owner-set):** Part 1 is the **ideal future state**, drafted whole and refined **additively** — new rulings amend it in place, so nothing lives only in chat. Then Part 2 (today), Part 3 (the gap → plan). ⚪ marks the spots still unruled.
-> **Companions:** `note-storage-audit.md` (the evidence) · `composition-surface-spec.md` (the capability layer — blocks/Notion-feel — built AFTER this base) · `convergent-surfaces-overview.md` §00 (the layer map).
+> **Companions:** `note-storage-audit.md` (the evidence) · `old/composition-surface-spec.md` (the capability layer — blocks/Notion-feel — built AFTER this base) · `old/convergent-surfaces-overview.md` §00 (the layer map).
 
 ---
 
 # PART 1 · THE IDEAL STATE — the COMPLETE feature (owner: "the total end state, all the ways we want to see it")
 
-> ⭐ **THE NORTH STAR, the owner verbatim (2026-09-02):** *"**Notion, with Obsidian-like knowledge connection and graph capabilities** — is the ideal."* Notion's editing; Obsidian's fabric. Part 1 now holds the WHOLE ideal — base + capabilities — one picture. *(The capability detail worked out in `composition-surface-spec.md` is folded in as §1.10; that doc remains the working-out.)*
+> ⭐ **THE NORTH STAR, the owner verbatim (2026-09-02):** *"**Notion, with Obsidian-like knowledge connection and graph capabilities** — is the ideal."* Notion's editing; Obsidian's fabric. Part 1 now holds the WHOLE ideal — base + capabilities — one picture. *(The capability detail worked out in `old/composition-surface-spec.md` is folded in as §1.10; that doc remains the working-out.)*
 
 **Word pins (be exact, always):** **composition** = the writing surface only (formerly "note") — never a board. **board** = board. **a `[[` tie** = the in-writing reference — ⚠ deliberately NOT called "link": the lexicon (D-129, repo root) gives *link* exactly one live meaning — **the `link` bit type the other window shipped** — and keeps the relationship-sense dead. What Obsidian calls backlinks = our **"gathered into."** All placeholders until Q9. **tag** = a word-label — a different mechanism entirely.
 
@@ -89,7 +89,7 @@ Plus: ⚪ the picker's contents (falls out of the yes-cells) · ⚪ backlink sur
 | the same piece open in **two frames** at once | design debt (frame-handoff) — Claude's to solve, tracked |
 | the same piece in **two floaters** | no — one live editor per piece |
 
-## 1.10 The capabilities (the Notion half — summarized from `composition-surface-spec.md`)
+## 1.10 The capabilities (the Notion half — summarized from `old/composition-surface-spec.md`)
 Blocks: ~10 text-first (paragraph · headings · lists · **checklist** · quote · divider · code · **a table in the writing** · image) — **zero database blocks** (the unanimous informed cut) · drag-handle reorder · `/` insert menu · turn-into · structure-preserving paste · never-empty · **the bit-block**: a gathered bit shown in full (quote/image itself, source attached — the provenance dividend) as the grown form of the chip. Word count. *(The 8-behavior feel checklist + jank traps live in the spec; the owner's Notion feel-session still feeds the fine cut.)*
 
 ## 1.8 In its room and in the world
@@ -113,7 +113,7 @@ A "note": a bit-row wearing `kind='note'` — architecturally material (public-d
 1. **Settle Part 1's ⚪ marks** (the fabric sit-down + Q1 storage shape + the card mock + naming).
 2. **The migration** (code window's lane, house method): the surface shape · the full repoint list (reference.from · placement targets · tag_application · search_tsv/face · RLS · export · trash listing) · the sweep — base sketch in `note-storage-audit.md` §5; **a real enactment plan doc is owed before any build** (the checker: Part 3 as pointers is not buildable).
 3. **The board-side build:** ~~paste/type births bits~~ **already true in code** — what remains is ONLY the deliberate compose door + the floater + panel + chain. *(As previously written an engineer would have re-scoped done work.)*
-4. **Then the capability layer** (`composition-surface-spec.md`) on the corrected base.
+4. **Then the capability layer** (`old/composition-surface-spec.md`) on the corrected base.
 
 ## Settled-rulings log (additive)
 2026-09-01: source dropped · titles auto-fill (both surfaces) · nothing placed on a composition · board catches material/surfaces on purpose · panel+floater ruled. 2026-09-02: **default-open = the floater; chain floater→panel→page** · compose-from-selection **dropped** (the board is atmosphere, not a checklist — gather covers the specific case).
@@ -230,7 +230,7 @@ Owner-asked: *"what had we thought about before — how do we bring it all toget
 2. **CULL** — in-or-out *for this piece* (the cut pile; include-in-compile; the thing no spatial tool has). ⚪ restored, unruled.
 3. **EXCERPT** — quoting *part* of a bit; concretely broken for shipped PDF/audio (filename-only search). ⚪ restored; the stress-test's costed options stand (first-class excerpt-bit with a quote-hint was the reviewer's revised lean).
 4. **GROUP-NAMING** — name a cluster on a board. Went down with the (rightly) rejected compose-from-selection; the naming half was never itself rejected. ⚪ restored, unruled.
-Also surfaced: ⚑ **the owner's Notion feel-session is still owed** and the final toolkit cut waits on it. Everything else: carried, parked-on-purpose, or deliberately excluded — verified line by line against `convergent-surfaces-stress-test.md`, `convergent-surfaces-overview.md`, `product-concept-promise.md`, `composition-surface-spec.md`.
+Also surfaced: ⚑ **the owner's Notion feel-session is still owed** and the final toolkit cut waits on it. Everything else: carried, parked-on-purpose, or deliberately excluded — verified line by line against `old/convergent-surfaces-stress-test.md`, `old/convergent-surfaces-overview.md`, `product-concept-promise.md`, `old/composition-surface-spec.md`.
 
 ## Checker findings folded (independent audit, 2026-09-02 — full report in the session log)
 **Verdict: comprehensive-with-holes; NOT yet buildable.** Fixed same-day: the ghost §8 pointer · two false Part-2 claims (paste already births bits; the card already previews) · stale board-cell leftovers · the "link" word collision (D-129 shipped a `link` bit type — *link* is now TAKEN; Q9 tightens).
