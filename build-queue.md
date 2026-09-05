@@ -344,12 +344,17 @@ fetches) are guarded by construction** — the earlier two-doors worry dissolves
 **everything is born private** (I-P1 amended), and a **one-time legacy flip** (every founding-era
 public bit → private; counts shown, owner's go) must ship before any publish act exists.
 
-**The build (model §9, owner sequences):** ① legacy flip + bit default change (one small
-migration) ② composition guest policies ③ the gather-barrier at the picker ④ unpublish ⑤ the
-companion screens (the marker · view-as-visitor · the two review screens · flip notifications).
-**Board-lane UI pieces when it comes:** the marker on cards, the board review screen,
-view-as-visitor. **Placement: after Phase F** (unchanged unless the owner moves it). Open rider
-question: whether step ① rides item 0's sitting (safe either way — no publish door exists yet).
+**The build — LANE SPLIT CONFIRMED with the composition window (2026-09-05):**
+**THIS lane (bits + boards):** the legacy flip (counts + owner's go, BEFORE any publish act ever
+ships) · the bit default 'public'→'private' · the **board publish act** + its review screen
+(shows/won't-show, per-item bulk-flip) · the **marker** (a private bit on a published board never
+looks ordinary to the owner) · **flip notifications** listing where · **view-as-visitor** for
+boards. Board RLS needs nothing — July's guest door already implements the sealed law exactly.
+**THEIR lane (Stage Ⓥ of `composition-build-plan.md`, gated on ours shipping):** composition
+guest policies · the gather-barrier · piece-publish resolve-first · unpublish · view-as-visitor
+for pieces. Until either half ships, both builds run in an all-private world — nothing entangles.
+**Placement: after Phase F** (unchanged unless the owner moves it). Open rider question: whether
+the legacy flip + default change ride item 0's sitting (safe either way — no publish door exists).
 
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
