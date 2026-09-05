@@ -124,7 +124,7 @@ The appendix table enacted (its own small migration + EXPORTED_TABLES row) · su
 **Accept:** *(+ the five floor rules)* §26.3's table demonstrated row by row; positions survive a reload; restore brings a pinned window back.
 
 ## Stage Ⓥ · THE COMPOSITION'S VISIBILITY HALF *(added 2026-09-05 — the owner queued the board half into the board lane; this is this lane's share of `docs/visibility-model.md` §9)*
-**Gated on:** the board lane shipping the visibility core (the legacy flip · the bit default change · the publish act existing at all). Until then the composition build runs in an all-private world where none of this can fire — **the two builds never entangle.**
+**Gated on: the PUBLISH ACT + REVIEW SCREEN shipping in the board lane** *(gate precision from that lane, 2026-09-05: the legacy flip + bit default change may land much earlier, riding their safety sitting — and alone change nothing reachable, so they are NOT the gate)*. Until publish exists, the composition build runs in an all-private world where none of this can fire — **the two builds never entangle.** *(Their card-split also reserves the two seams this lane will need later: the marker as a per-card state, and the distinct piece-card family.)*
 **This lane's pieces, when its turn comes:**
 1. **The composition guest rules** — activate the drafted policy comments (already sitting in the ①a migration file).
 2. **The gather-barrier** at the one db door + the picker: gathering a private bit into a PUBLIC piece meets the ceremony (*make public · public copy · keep in hover*). ⚠ Stage ③ builds the picker with this **hook point named** so the barrier later lands in one place.
