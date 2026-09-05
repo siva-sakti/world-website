@@ -53,7 +53,7 @@ Two axes move roughly together but are not the same thing:
 - **Maturity** — seed → seedling → plant → fruit.
 - **Exposure** — *public* by default (the open web), *private* when I choose it (only me), and — someday — *shared* (people I hand a key to).
 
-> **⚠ Under active rethink (2026-08-25):** the paragraph below is the founding dream (public-by-default); the app as built today is all-private with no publish door, and the product ruling makes this tension real. A dedicated session decides: public-by-default, private-by-default, or something smarter. Until then, the built reality (private) stands.
+> **✅ RESOLVED (2026-09-05 — the dedicated session happened): `docs/visibility-model.md` is the authority.** The decision: **everything is born private; public is a permission crossed at moments; nothing is ever forced.** The paragraph below is the founding dream, kept as history — the owner erased its public-by-default explicitly ("that was before accounts and making this social"). Her sealed line: *"the entire architecture is there if people want public things, while not feeling intruded upon in their process, which has private parts to it."*
 
 **New things start public unless I say otherwise.** Most of what I make, I'm glad to have in the open — so openness is the default, and marking something private is one deliberate tap, always within reach. What I mark private stays mine alone — the morning pages that want to stay only mine, stay only mine. And nothing is ever actually visible to another person until I share a board on purpose — and at that moment I'm shown exactly what a guest will see, so every act of real publishing is a choice made with my eyes open.
 

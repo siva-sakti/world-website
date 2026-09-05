@@ -1,5 +1,7 @@
 # Product concept — privacy, sharing, and publishing
 
+> ## 📜 PREDATES THE SEALED MODEL (2026-09-05) — **the authority is `docs/visibility-model.md`**; read this file as early thinking only. The owner's sealed founding line lives in `product-concept-promise.md`.
+
 > ## STATUS · 2026-08-30
 > **⚪ OPEN — and explicitly flagged as needing its own session.** `philosophy.md` carries a standing warning: *"a dedicated session decides: public-by-default, private-by-default, or something smarter. Until then, the built reality (private) stands."*
 >

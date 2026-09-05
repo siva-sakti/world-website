@@ -1,3 +1,5 @@
+> ## 📜 HISTORICAL INPUT — the session continued past this review; **the authority is `docs/visibility-model.md`.** *(The review's Option 2 shaped the board half; the owner's medium-true instinct then added the composition hard rule the review did not foresee.)*
+
 # Fresh-eyes review: "flexibility without complexity — the simplest path"
 *(2026-09-05, an independent agent's report, written for the owner directly. Commissioned at her ask; it decides nothing. One term: a **spot** = one bit's seat on one board — the app keeps one row per bit-per-board; the hide mark lives there.)*
 

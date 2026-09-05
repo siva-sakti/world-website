@@ -26,10 +26,10 @@
 
 ## Cluster 1 — privacy & sharing · LOCKED (D-072)
 
-- **I-P1 — Two visibility fields.** A bit and a board each carry `visibility` ∈ {private, public} (`shared` later). → `constraint` (columns + defaults: bit public, board private).
+- **I-P1 — Visibility fields *(amended 2026-09-05)*.** Bit, board, and composition each carry `visibility` ∈ {private, public} (`shared` later). **Defaults: EVERYTHING born private** (`visibility-model.md` §1 — supersedes the founding bit-public default; the one-time legacy flip ships before any publish act). → `constraint`.
 - **I-P2 — Bit-privacy always wins.** A card (bit-card *or* board-card) is shown to a guest **iff its target is public**; board publicity never overrides a private target. → `computed` (RLS).
 - **I-P3 — Reachability AND visibility.** A guest sees a bit **iff** its surface is reachable (its board is public) **and** the bit itself is public. → `computed` (RLS).
-- **I-P4 — No public feed.** A bit is exposed to a guest only *through a reachable surface*, never merely by being public. → `computed` (RLS).
+- **I-P4 — No public feed *(RE-SCOPED 2026-09-05, `docs/visibility-model.md` §2)*.** Mechanically unchanged: a bit reaches a guest only through a reachable surface. **But the founding "never" is erased (owner: "that was before accounts and making this social")** — discovery/profiles are *not built*, no longer *prohibited*; the social session may design them. → `computed` (RLS).
 - **I-P5 — A private card renders absent.** Where a private target would show to a guest, nothing renders — the guest never learns something was withheld. → `computed`.
 
 ## Cluster 2 — placement lifecycle · LOCKED (D-073 — connectors: kill-with-confirm)

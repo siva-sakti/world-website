@@ -1,4 +1,6 @@
 # The privacy session — prep sheet
+> ## 📜 THE SESSION HAPPENED (2026-09-04→05) — this file is its historical INPUT.
+> **The authority now: `docs/visibility-model.md`** · the full reasoning: `privacy-session-notes.md` (N1–N47). Do not derive anything from this sheet.
 *(2026-09-04. Same pattern as the naming prep: everything already true, then the open questions in scenario form — so the sitting starts warm. Nothing here decides; the session is the owner's.)*
 
 ## 1 · What is ALREADY BUILT AND TRUE — more than you may remember
