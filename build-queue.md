@@ -253,14 +253,14 @@ built, and then the frame view as well."*
 |---|---|---|---|
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
 | **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
-| **2b** | **THE CARD SPLIT (ruled 2026-09-05, D-148)** — shell stays; per-type capability table + one content component per type; union CardVM (forgotten renderer = compile error); the `cancel`/nodrag convention; chrome outside the frame's clip plane | plan written just-in-time at start; verdicts: `whats-built-and-how-solid.md` §5b | no — ruled |
+| **2b** | **THE CARD SPLIT (ruled 2026-09-05, D-148)** — shell stays; per-type capability table + one content component per type; union CardVM (forgotten renderer = compile error); the `cancel`/nodrag convention; chrome outside the frame's clip plane | plan written just-in-time at start; verdicts: `whats-built-at-this-stage.md` §5b | no — ruled |
 | **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange | `board-modes-spec.md` (v3 — the old plan is in `old/`) | its §9 opens |
 | **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
 | **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
 | **6** | **The frame — a KIND of board, fixed size (ruled 2026-09-05)** | `frame-spec.md` | the cloud paste |
 
 **HOW EACH ITEM LEAVES THE QUEUE — the foundation gates (folded 2026-09-05; the layer model:
-`whats-built-and-how-solid.md` §2b).** An item is gated only by the layers it cuts. Before its build: the
+`whats-built-at-this-stage.md` §2b).** An item is gated only by the layers it cuts. Before its build: the
 gate walkthroughs run (§3 process — write the rule, test it red, owner tries a real board), the
 decisions they surface go to the owner **batched** (the frame-three pattern), then the build
 follows its spec. The gates:

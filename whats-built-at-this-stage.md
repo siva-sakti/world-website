@@ -1,4 +1,4 @@
-# The foundations pass — built to last, from the ground up
+# What's built at this stage — the master list, and how solid each piece is
 
 **Status: the process, defined. Not yet run.** Owner's ask, 2026-09-04: *"We need to make sure
 it's written down and standardised and tested before we keep building on top of it… define what

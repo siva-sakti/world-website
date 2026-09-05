@@ -24,7 +24,7 @@ first thing to build.
 | step | what | who | output |
 |---|---|---|---|
 | **1 · Goals as requirements** | each conceptual goal restated as one short sentence that could in principle be checked | owner rules, Claude words | a numbered list |
-| **2 · What each requirement touches** | for every requirement: which existing mechanism (from `whats-built-and-how-solid.md` §2) does it touch, and is that mechanism *compatible*, *needs a change*, or *conflicts*? | Claude | a requirement × mechanism grid |
+| **2 · What each requirement touches** | for every requirement: which existing mechanism (from `whats-built-at-this-stage.md` §2) does it touch, and is that mechanism *compatible*, *needs a change*, or *conflicts*? | Claude | a requirement × mechanism grid |
 | **3 · The deltas** | from the grid: the complete list of what the code must know or do that it does not today. This is *"the codebase needs to look like this."* | Claude; owner checks | the delta list |
 | **4 · Cluster and sequence** | group deltas by the component they hit; order by dependency — what must exist before what | Claude | the build order |
 | **5 · Antagonist** | on the deltas and the order: what requirement has no delta (missed), what delta serves no requirement (invented), what seam with the other lanes | agent; Claude verifies | fold-in |
@@ -67,7 +67,7 @@ only for the thing being built next.
 ## 2 · What each requirement touches *(step 2 — the grid)*
 
 *(To be filled next. For each requirement, every mechanism it touches, marked compatible ·
-change · conflict. The mechanisms are `whats-built-and-how-solid.md` §2's list; the coordinate system,
+change · conflict. The mechanisms are `whats-built-at-this-stage.md` §2's list; the coordinate system,
 how things arrive, the copy rule and the camera are the obvious four — the grid finds the
 non-obvious ones.)*
 
@@ -127,7 +127,7 @@ identical in both kinds — which is the whole point of "same coordinates, bound
 
 ### Where everything lives *(the owner asked — one place to look)*
 
-**Documents:** `frame-spec.md` (this — goals · method · layers) · `whats-built-and-how-solid.md` (the 63
+**Documents:** `frame-spec.md` (this — goals · method · layers) · `whats-built-at-this-stage.md` (the 63
 mechanisms · walkthroughs · ledger · probing principles) · `SPEC.md` §2z (the plane + camera,
 written yesterday) · `board-modes-spec.md` (arrange/edit) · `board-what-you-can-do.md` (every
 act) · `bits-and-boards-code-map.md` (file health) · archived: `old/frame-plan.md`.
