@@ -64,7 +64,7 @@ Her window drives; nothing here blocks the build *(the build runs on concepts, w
 
 - **board** — the surface you make and name *(stored)*
 - **canvas** — the board's infinite spatial rendering. How a board is **drawn**, not a thing you have *(not stored)*
-- **frame** — an optional page-shaped fixture placed on a board. The board stays infinite; the frame sits within it *(stored, when built)*
+- **frame** — 📜 *model CHANGED (owner-ruled 2026-09-05, board lane):* **a KIND of board** with a fixed size (Letter/A4/square/custom px), **chosen at creation** — a board is either infinite canvas or a bounded frame; never a rectangle sitting on a canvas. Live doc: `frame-spec.md` (old plan → `old/frame-plan.md`). Landscape/portrait are separate sizes, not a rotation.
 - **arrange / edit** — modes of the board *(not stored)*
 
 **Two things these four expose — flagged, not solved:**
@@ -73,7 +73,7 @@ Her window drives; nothing here blocks the build *(the build runs on concepts, w
 Both are planned and neither is built, so this is cheap to fix now and expensive later.
 | | what it means | where it would live |
 |---|---|---|
-| **frame** *(confirmed above)* | the page-shaped fixture on a board | `board.frame_x/y/w/h` — `frame-plan.md` §33 *(+ a future `frame` table, §52)* |
+| **frame** *(model changed 2026-09-05)* | **a board KIND: fixed-size, set at creation** | a board-kind column — `frame-spec.md` *(no `frame_x/y`; the frame IS the plane)* |
 | **frame** *(already planned)* | a **card's border treatment**: none · paper-mat · hairline · polaroid · museum | `placement.frame` — `aesthetics-phase.md` §54, P3 §102 |
 One word, two stored things, one screen. **One of them needs a different word** — and the card-border sense is the easier one to move, since nothing has been built on it and its own doc already calls it "border/frame."
 
