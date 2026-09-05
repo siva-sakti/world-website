@@ -578,3 +578,8 @@ But **"best of each, in one" is a known graveyard**, and it's worth being specif
 3. ⚪ **Do visual makers need a made-whole that isn't words?** Current answer: a well-arranged board can *be* their finished thing, and that's not a gap. Not ruled.
 4. ⚪ **Is the six-area cut right?** It's my list from the owner's examples. Wrong slices here would mis-shape everything downstream.
 5. → **Privacy / publishing** is not restated here. **It lives in `product-concept-privacy.md`** (six questions, plus what's actually built). Relevant to this file only as a *gate*: it decides how any of this positioning reaches a person who isn't the owner, and — via the Are.na question — whether the market we're aiming at is reachable without it.
+
+---
+## 🟢 An owner-spoken seed (2026-09-05, from the privacy session — her words, verbatim-near, marked for folding)
+> "We're not going to force people to be public — but I want the entire architecture to be there if people want public things, while not feeling intruded upon in their process, which has private parts to it."
+*(She flagged this herself: "I really like the way I said that — capture it in our marketing stuff." The privacy model built under it: two switches, one law — a private thing is never part of a public surface; viewing your own material is always free; barriers offer, reversals guide, nothing is forced. Full record: `docs/privacy-session-notes.md`.)*
