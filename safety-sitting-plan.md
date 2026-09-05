@@ -41,6 +41,13 @@ you *holding the proof*, not with a script having run.
 today's schema and **proven red** against a naked table. Nothing for you to do; it now fails the
 suite if any future migration creates a table without RLS.
 
+**6 · Re-run the ENTIRE proof suite — Claude's half** *(owner's catch, 2026-09-05: "when did you
+run that test — the previous build, or this going-over?")* The `verification/` SQL suites were
+each run the week their feature shipped (July–August) and not since; they are re-runnable by
+design. After the pastes, Claude re-runs every `run-*-native.sh` against a throwaway built from
+the full migration stack and reports the results raw — the whole schema proven green TOGETHER,
+today, not remembered green from August. Any red = a finding, handled before item 0b.
+
 ## What this sitting deliberately does NOT do
 006 (owner-ruled: folded, never standalone) · originals-keeping (that's item 0b, next, its own
 small build) · any schema change beyond the two proven pastes.
