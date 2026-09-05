@@ -316,6 +316,8 @@ grid in §2 is updated from this list, never directly.
 | §6.1 coordinates | **a position is always a whole point** — owner: *"I don't think the database should be allowing that"* | decide → change | 🧾 `20260904000001_position_not_null` proven; held with 005/006 |
 | §6.1b coordinates | z is unbounded and never compacted — state it in `SPEC.md` §2z | write | ⬜ |
 | §6.1b coordinates | 🔴 **the frame's coordinate model conflicts with today's "kind of board" ruling** | decide | ⚪ **owner** — see the decisions list |
+| L4 rendering | **the universal card CONFIRMED by convergence** — a breaker over our code (yes-with-changes, high confidence; per-type spatial ownership "strictly worse") and a researcher over tldraw/Excalidraw/React Flow/Konva (pattern verified from their code, zero counterexamples), independent charges, same answer | verdict | ✅ 2026-09-05 |
+| L4 rendering | **the card split, ruled before modes** (owner): shell stays · per-type capability table · one content component per type · union CardVM (forgotten renderer = compile error) · `cancel`/nodrag convention replaces per-element stopPropagation · chrome outside the frame's clip plane (the R5 handle-clipping catch) · click-grammar tests FIRST | decide → build | 🧾 queued as 2b (§4e-2); plan just-in-time at start |
 
 ### The decisions list — everything waiting on the owner
 *(collected from every walkthrough's ⚪ rows, so they can be ruled in one sitting)*
@@ -323,6 +325,7 @@ grid in §2 is updated from this list, never directly.
 | from | decision | lean |
 |---|---|---|
 | §6.1 | ~~the null position~~ | ✅ **ruled**: not null |
+| L4 | ~~universal card: keep or restructure?~~ | ✅ **RULED 2026-09-05**: keep the shell; split the insides (2b) BEFORE modes — two-agent convergence, D-148 |
 | §6.1b | ~~What is a frame's coordinate space?~~ | ✅ **RULED (a), 2026-09-05.** Owner: *"a frame is a kind of board… fixed sizes, like 8½×11, A4, square, or a pixel size… you can zoom in but not infinitely — like what you can print out and see. No, a frame is not a rectangle drawn on a board. There's either an infinite canvas or a defined size."* → `old/frame-plan.md` must be re-cut before build: no `frame_x/y` on the plane; the frame *is* the plane, bounded. |
 
 ## 6 · The walkthroughs
