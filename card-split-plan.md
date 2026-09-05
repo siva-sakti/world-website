@@ -70,6 +70,13 @@ onEdit / onOpen) stay with the caller.
   switch — **a forgotten renderer refuses to compile; the runtime fallback SAYS "unknown type",
   never an empty box.** The duplicated title/caption+source chrome renders once, placed by
   `chrome` from the table.
+- **Two reserved futures the registry must not preclude** (from the sealed visibility model and
+  the composition spec, read 2026-09-05): (a) **the visibility MARKER** — on a published board, a
+  private bit's card renders marked for the owner; a per-card STATE variant, like fixed-height —
+  the shell must leave a seam for state-driven chrome; (b) **a second card FAMILY** — a placed
+  composition renders as a card that is "visibly different from a bit-card" (their §10.1) with
+  tap→floater, when their lane lands after Phase F. The registry keys on bit `CardType` today;
+  its design must not weld "card" to "bit."
 - **⚠ Measured, not assumed: 18 files consume CardVM** (grep 2026-09-05; the agent said ~10).
   Sub-step: a per-consumer field audit BEFORE the union lands — expected: nearly all touch only
   base fields (drag, geometry, arrange, queue); any consumer reading per-type fields gets the

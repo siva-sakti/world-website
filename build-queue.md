@@ -328,27 +328,28 @@ the two-devices write-up (A11), a bit's journey, the Group E pass, **snap guides
 TILTED card** (named in `rotation-alignment-and-readout-plan.md` §future; caught absent from this
 list 2026-09-05).
 
-## 4i · PUBLIC / PRIVATE — the sharing layer (owner re-raised 2026-09-05; filed, LATER phase)
+## 4i · PUBLIC / PRIVATE — the sharing layer *(REWRITTEN 2026-09-05: the authority is now `docs/visibility-model.md`, SEALED)*
 
-**The owner's statement:** a bit is public or private; a board too; anything can go anywhere;
-other people see only what's public — *"you can put a private bit on a public board, but it
-won't display."*
+**The authority:** `docs/visibility-model.md` — owner-sealed 2026-09-05. Everything here is a
+pointer; that doc states the model. The two laws: boards = the **absence model** (a private bit on
+a published board renders absent for visitors, space kept; marked for you) · compositions = the
+**hard rule** (a private bit can never be incorporated into a public piece — prevented at the
+doors, never rendered broken).
 
-**Status — verified against the schema 2026-09-05: the heart of this is ALREADY RULED AND
-ENFORCED.** The owner's sentence is invariant **I-P5**, live at the wall since D-108: `bit.visibility`
-(default public, D-065) · `board.visibility` (default private) · the guest door shows a bit only if
-**public AND live AND on a public+live board** — a private bit on a public board is absent by row
-absence. Applied to cloud, proven leak-proof six ways (`run-public-door-native.sh`).
+**What already matches:** the bit/board columns + the visitor RLS implementing exactly the board
+AND-law (July, proven leak-proof). Because the wall is RLS, **both read paths (page load AND panel
+fetches) are guarded by construction** — the earlier two-doors worry dissolves at the DB.
 
-**What is NOT built (the actual later-phase work):** the **publish act** (no toggle anywhere in the
-UI) · the **public route** (a visitor has no page to see; today a guest resolves 0 boards) · the
-**review-everything gate** before first publish (ruled D-065) · compositions' visibility (their
-lane ruled private-born). Layer cuts: **L0 both read paths** (page load AND panel fetches must
-both respect it — the two-doors rule, §2b) · L1 (exists).
+**⚠ Superseded from the first version of this section:** bits are no longer default-public —
+**everything is born private** (I-P1 amended), and a **one-time legacy flip** (every founding-era
+public bit → private; counts shown, owner's go) must ship before any publish act exists.
 
-**Placement:** after the foundations queue (0–6) — its own phase; nothing in 0–6 stands on it.
-**One assumption to confirm with the owner at build:** "public" = anyone with the link, no
-accounts (that is what D-108 enforces).
+**The build (model §9, owner sequences):** ① legacy flip + bit default change (one small
+migration) ② composition guest policies ③ the gather-barrier at the picker ④ unpublish ⑤ the
+companion screens (the marker · view-as-visitor · the two review screens · flip notifications).
+**Board-lane UI pieces when it comes:** the marker on cards, the board review screen,
+view-as-visitor. **Placement: after Phase F** (unchanged unless the owner moves it). Open rider
+question: whether step ① rides item 0's sitting (safe either way — no publish door exists yet).
 
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
