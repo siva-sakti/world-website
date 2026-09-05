@@ -154,4 +154,4 @@ The owner asked directly. Nothing here is padded; each item is real work.
 
 ## 7 · If picked up cold, read in this order
 
-`product-concept-promise.md` §2b + §2c (why, and the three shapes) → this doc → `invariants.md` (I-G1, I-G2) → `lexicon.md` (naming, and step 2b) → `SPEC.md` §schema → `organize-phase-plan.md` §5 (the item loop — **step 2b, name it, is not optional**).
+`product-concept-promise.md` §2b + §2c (why, and the three shapes) → this doc → `invariants.md` (I-G1, I-G2) → `lexicon.md` (naming, and step 2b) → `SPEC.md` §schema → `build-queue.md` §5 (the item loop — **step 2b, name it, is not optional**).

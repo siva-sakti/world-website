@@ -59,7 +59,7 @@
 
 | I want to know… | go to |
 |---|---|
-| what to build next, in what order | **`organize-phase-plan.md`** |
+| what to build next, in what order | **`build-queue.md`** |
 | what a word means / is this term taken | **`lexicon.md`** |
 | what's true about the model right now | **`model.md`** |
 | what we promise the world & why anyone cares | **`product-concept-promise.md`** |
@@ -105,7 +105,7 @@ INDEX.md ................ this file — where everything is
 │   └── model-scenarios.md ............ 7 real scenes traced to the record
 │
 ├── THE PLAN ─ what happens next
-│   ├── organize-phase-plan.md ........ ⭐ THE live queue (Phases O · V · N)
+│   ├── build-queue.md ........ ⭐ THE live queue (Phases O · V · N)
 │   ├── aesthetics-phase.md ........... the design track (runs in parallel)
 │   └── parked.md ..................... everything deferred, with re-entry conditions
 │
@@ -130,7 +130,7 @@ INDEX.md ................ this file — where everything is
 
 ### `CLAUDE.md` — the operating manual + hub
 **Contains:** the session routine (read this, in this order) · the doc-map table · the stack · the working norms (plan before code · no debt · the five model-safety gates · bypass-permissions boundaries) · the design stance · what not to do · decided naming.
-**Does NOT cover:** what to build (→ `organize-phase-plan.md`) · what's true (→ `model.md`).
+**Does NOT cover:** what to build (→ `build-queue.md`) · what's true (→ `model.md`).
 **Links:** everything. It's the hub. → `INDEX.md` (this file) for the full map.
 
 ### `INDEX.md` — this file
@@ -184,7 +184,7 @@ INDEX.md ................ this file — where everything is
 **Contains:** stored vs computed · the nine stored things · the parts of a bit · display words · the three surface domains · the acts (verbs) · **RETIRED words that cause drift**.
 **Does NOT cover:** what things *are* (→ `model.md`).
 **Check this before naming anything.** Step 2b of the item loop lives or dies here.
-**Links:** `model.md` · `invariants.md` · `organize-phase-plan.md` §5 (the loop).
+**Links:** `model.md` · `invariants.md` · `build-queue.md` §5 (the loop).
 
 ### `invariants.md` — the always-true rules
 **Contains:** every rule that must hold no matter what the owner does, each tagged with where it's enforced (`constraint` > `computed` > `app`). Global rules + one cluster per closed area.
@@ -193,8 +193,8 @@ INDEX.md ................ this file — where everything is
 
 ### `user-flows.md` — every path, arc by arc
 **Contains:** Arcs 0–8 (onboarding · catch · arrange · write & gather · connect · organize · return · develop · manage), each with ✅/🔲 status **and its technical mechanism** · the gaps in one place.
-**Does NOT cover:** the sequenced build order (→ `organize-phase-plan.md`) · the persona flows that teach it (→ `product-concept-promise.md` §7).
-**Links:** `model.md` · `product-concept-promise.md` · `organize-phase-plan.md`.
+**Does NOT cover:** the sequenced build order (→ `build-queue.md`) · the persona flows that teach it (→ `product-concept-promise.md` §7).
+**Links:** `model.md` · `product-concept-promise.md` · `build-queue.md`.
 
 ### `model-scenarios.md` — seven real scenes traced to the record
 **Contains:** real moments from the owner's life traced through the model at record level; verdicts FITS / AWKWARD / MISSING. **Doubles as the translation test fixtures.**
@@ -205,7 +205,7 @@ INDEX.md ................ this file — where everything is
 
 ## 4 · THE PLAN — what happens next
 
-### `organize-phase-plan.md` — ⭐ **THE live plan + feature queue**
+### `build-queue.md` — ⭐ **THE live plan + feature queue**
 **Contains:** the surface map (rooms · lenses · housekeeping) · terminology rulings · **Phase O** (reorganize) · **Phase V** (the vision build) · **Phase N** (the note as a surface + the flows' gaps, N1–N7) · **§5 the item loop** — the 9-step workflow every item runs through, including **step 2b: name it before you build**.
 **Does NOT cover:** why (→ `product-concept-promise.md` / `philosophy.md`) · what's already broken (→ `feature-inventory.md`).
 **⭐ The owner's idea-dumps get filed HERE.** Read before proposing or sequencing anything.
@@ -214,7 +214,7 @@ INDEX.md ................ this file — where everything is
 ### `aesthetics-phase.md` — the design track (parallel)
 **Contains:** the north star (bold, ONE dominant direction; owner leaning indigo/Gzhel) · the working method for anything aesthetic · the design↔data bridge · surfaces × sub-elements · the staged build + gates · open decisions.
 **Does NOT cover:** brand identity, name, logo, or landing surface — **none of those exist anywhere yet** (see `product-concept-promise.md` §9).
-**Links:** `organize-phase-plan.md` · `philosophy.md`.
+**Links:** `build-queue.md` · `philosophy.md`.
 
 ### `parked.md` — the deferral ledger
 **Contains:** everything consciously deferred, each with a **named re-entry condition** and a pointer to where the ruling lives. An **index, never a source.**
@@ -236,9 +236,9 @@ INDEX.md ................ this file — where everything is
 
 ### `feature-inventory.md` — what's built, honestly
 **Contains:** every feature walked with a mark (✅ whole · ⚠️ named gap · 🚧 half-wired · ❌ missing) · **findings F1–F12** with severity, two of them *classes* not instances · the ruling F1 waits on.
-**Does NOT cover:** plans (→ `organize-phase-plan.md`).
+**Does NOT cover:** plans (→ `build-queue.md`).
 **Re-walk it after any phase closes** — a stale inventory is worse than none.
-**Links:** `organize-phase-plan.md` · `deliberations.md` · `parked.md`.
+**Links:** `build-queue.md` · `deliberations.md` · `parked.md`.
 
 ---
 
@@ -383,7 +383,7 @@ INDEX.md ................ this file — where everything is
 ## 9 · HISTORICAL — never build from these
 
 - **`agreements.md`** 📜 — the D-019→D-102 era rulings. **Predates the notes era entirely**; where it conflicts with `model.md`, `model.md` wins. Kept as the record of how the early model was reasoned.
-- **`ROADMAP.md`** 📜 — the older product-phase sketch, frozen pre-notes. **Superseded as the live plan by `organize-phase-plan.md`.**
+- **`ROADMAP.md`** 📜 — the older product-phase sketch, frozen pre-notes. **Superseded as the live plan by `build-queue.md`.**
 - **`old/`** — everything superseded. Never edited, never followed. Includes the completed audit docs.
 - **`README.md`** — stock Next.js boilerplate. Not a project doc.
 

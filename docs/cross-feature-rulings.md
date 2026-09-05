@@ -52,6 +52,6 @@
 ⛔ **Do not build composition behavior before step 2.** *(This is the sequencing the spec has carried since the tiers; the owner has now stated it independently.)*
 
 ## How to keep track
-- **This file is the index of them.** Anything here that is unbuilt eventually becomes a build item in `organize-phase-plan.md` (the app's real feature queue) or a handoff doc.
+- **This file is the index of them.** Anything here that is unbuilt eventually becomes a build item in `build-queue.md` (the app's real feature queue) or a handoff doc.
 - **The composition spec cross-references here** wherever a ruling reaches beyond it.
 - ⚑ **Owed:** X1, X2, X4, X5 have no build home yet — they need to reach the feature queue.

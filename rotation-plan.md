@@ -5,7 +5,7 @@ the hand** → **v3: this document, written 2026-09-03 after diagnosing v2 by re
 libraries.** This is the plan to EXECUTE. v1/v2 history is §7, kept because the mistakes are
 instructive, not because anything should be built from them.
 
-**The feature itself is unchanged and already ruled** (owner, `organize-phase-plan.md` §4g):
+**The feature itself is unchanged and already ruled** (owner, `build-queue.md` §4g):
 a card on a board can be tilted; the tilt is per-board; editing straightens it. **The model,
 the storage and the migration are DONE, applied to cloud, and correct — do not touch them.**
 What was wrong was the *interaction*, and that is all v3 changes.

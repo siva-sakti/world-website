@@ -408,7 +408,7 @@ as-is — was drawn under the assumption that only owning the input layer could 
 true. That assumption was wrong (§0.2), so the fork dissolves: **rotation becomes honest to ship
 the moment I3 lands, and there is no reason to cap what the owner explicitly asked to be
 uncapped** (*"everything should be able to be rotated… a whole little rotation thing"*,
-`organize-phase-plan.md:268`).
+`build-queue.md:268`).
 
 Hold ±20° in reserve as a one-line clamp in `card.tsx:169` if the owner's hands say the handle is
 still hard to find at big angles. That is a 30-second hand test, not a design decision.
@@ -419,11 +419,11 @@ still hard to find at big angles. That is a 30-second hand test, not a design de
   visually crosses a steeply tilted card may miss it. Pre-existing in kind (text cards' stored
   `h` is stale by design). Real but small; §3 (b).
 - **snap guides and align/distribute** already exclude rotated cards, owner-ruled
-  (`board-surface.tsx:311`, `:373`, `:502`; `organize-phase-plan.md:277`).
+  (`board-surface.tsx:311`, `:373`, `:502`; `build-queue.md:277`).
 - **the resize dots stay upright**, ruled and accepted (`globals.css:425-433`); re-resizable
   computes in unrotated screen space.
 - **centre-alignment survives rotation and edge-alignment does not** — noted at
-  `organize-phase-plan.md:281`, still not designed. Fine.
+  `build-queue.md:281`, still not designed. Fine.
 
 ---
 

@@ -86,7 +86,7 @@ Notice what her story is already doing: **every magic beat in it is a seam.** Th
 | **the question it answers** | what should we make? | how do they recognise themselves? |
 | **the axis that serves it** | **how their mind moves** | **the work they do** (their identity) |
 | **the audience** | us | them |
-| **where it lands** | `organize-phase-plan.md` — the build queue | onboarding · the landing · the flows |
+| **where it lands** | `build-queue.md` — the build queue | onboarding · the landing · the flows |
 | **how many categories** | few — 4–6 motions is plenty | many — as granular as recognition needs |
 
 ⚠ **And the reason to keep them apart is protective, not tidy.** **Conflating them is exactly how you end up building domain modules** — the thing the positioning rule forbids. "Fashion designer" read as a *build* input suggests a fashion-designer feature. Read as a *framing* input it suggests nothing but a story. **Identity belongs at level 2 only.**
@@ -343,7 +343,7 @@ Three gaps, each showing up in more than one situation — which is the test of 
 
 ## 7 · What this means for onboarding
 
-Currently **N7 in `organize-phase-plan.md`**, scheduled last, unbuilt. `user-flows.md` Arc 0 holds the old curriculum: a progressive 1-2-3 — catch a bit → put it on a board → write a note → mark something alive.
+Currently **N7 in `build-queue.md`**, scheduled last, unbuilt. `user-flows.md` Arc 0 holds the old curriculum: a progressive 1-2-3 — catch a bit → put it on a board → write a note → mark something alive.
 
 ⚠ **That curriculum is now suspect** (not yet changed — `user-flows.md` is a settled doc): it teaches a **pipeline**, and the surfaces are peers in either order. Teaching order-of-operations would teach the wrong thing on first contact.
 

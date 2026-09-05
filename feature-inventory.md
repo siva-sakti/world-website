@@ -1,6 +1,6 @@
 # The feature inventory — what exists, and how well
 
-**What this is:** every feature in the app, walked one at a time, with an honest mark on how finished it actually is and what's wrong with it. Not a plan (that's `organize-phase-plan.md`), not a technical manual (`SPEC.md`), not the words (`lexicon.md`) — **this one answers "what's there right now, and where are the rough edges."**
+**What this is:** every feature in the app, walked one at a time, with an honest mark on how finished it actually is and what's wrong with it. Not a plan (that's `build-queue.md`), not a technical manual (`SPEC.md`), not the words (`lexicon.md`) — **this one answers "what's there right now, and where are the rough edges."**
 
 Written 2026-08-28 by walking each surface in the code. Re-walk it after any phase closes; a stale inventory is worse than none.
 

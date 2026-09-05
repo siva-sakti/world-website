@@ -6,7 +6,7 @@ _Last updated: 2026-09-02_
 
 ## Status
 
-> **📍 What's next lives in `organize-phase-plan.md`** (the live plan + feature queue — `ROADMAP.md` is the older product-phase sketch, superseded). Read that first for *what to build*; read this section for *where we are right now*.
+> **📍 What's next lives in `build-queue.md`** (the live plan + feature queue — `ROADMAP.md` is the older product-phase sketch, superseded). Read that first for *what to build*; read this section for *where we are right now*.
 
 **📍 NOW (2026-09-03, afternoon) — WHERE WE ARE IN ONE READ.** The app is **live and daily-usable** at `world-website.vercel.app`. We are in the middle of **one continuous piece of work: making the boards trustworthy, not just working** — it began as "clean up two big files," and the owner reframed it into a real review: *is it functional, was it built the right way, does the logic hold from the ground up.*
 

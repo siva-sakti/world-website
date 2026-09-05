@@ -92,7 +92,7 @@ The owner's own reasoning, stated plainly. These are the six things safe to lean
 | **`model.md`** | the concepts as currently built — bit · board · note, how they join | **Downstream of this.** Concepts settle here first, then graduate into `model.md`. |
 | **`user-flows.md`** | Arc 0 onboarding + the 8 arcs | **Downstream.** The persona flows here become Arc 0's curriculum. |
 | **`aesthetics-phase.md`** | the in-app look (*Japanese · ethereal · analog*, papers, frames, tokens) | **Adjacent, not overlapping.** It has **no name, no identity, no voice, no landing** — that's thread 7. |
-| **`organize-phase-plan.md`** | the live feature queue | **Downstream.** Open feature questions get answered from here. |
+| **`build-queue.md`** | the live feature queue | **Downstream.** Open feature questions get answered from here. |
 
 ---
 

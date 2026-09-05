@@ -63,7 +63,7 @@ question (not mine):** *should* a starred bit greet you on the desk? That's a mo
 
 ## F6 — `/write` never says "saved" and can't reach what you wrote
 `write/quick-write.tsx:167-176` renders only an error or the `[[` hint; the toolbar's own comment
-promises an "open" button that isn't in the JSX (`:139-140`), and `organize-phase-plan.md:57`
+promises an "open" button that isn't in the JSX (`:139-140`), and `build-queue.md:57`
 records "saved · open →" as shipped. It isn't.
 **Fix:** surface the workspace's save status, and an **open →** link to `/note/{selfId}` once the
 note exists (`selfId` is already computed at `:25/:61`).

@@ -83,7 +83,7 @@ The owner called it confusing in the same session; the question was asked back a
 
 ## 4 · The enactment scope, whenever it does go
 
-So nobody under-scopes it later: the route `/note/[id]` · the `bit.kind` value `'note'` · the `/notes` room · every UI label · `lib/db` function names · D-121's wording · `model.md` · `user-flows.md` · `organize-phase-plan.md` · `lexicon.md`. Plus a language check that no synonym crept in.
+So nobody under-scopes it later: the route `/note/[id]` · the `bit.kind` value `'note'` · the `/notes` room · every UI label · `lib/db` function names · D-121's wording · `model.md` · `user-flows.md` · `build-queue.md` · `lexicon.md`. Plus a language check that no synonym crept in.
 
 ## 5 · The voice — a standing rule 🟢
 

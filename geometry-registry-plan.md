@@ -168,7 +168,7 @@ px), easy to drift past, ⌘/Ctrl refuses, edges + centers only.
 **Settled by the references:** guide color = magenta (`#e83e8c`-family against the paper
 ground; exact value at build) · gesture-only · full-length lines. **Bundled (owner offered,
 default yes):** the live W×H readout during a resize. **SUPERSEDED — rotation is now RULED
-IN (`organize-phase-plan.md` §4g item 2, 2026-09-02):** what this section called "not
+IN (`build-queue.md` §4g item 2, 2026-09-02):** what this section called "not
 proposed" was the re-entry condition being named, not a permanent no. The owner's call landed
 the next day: *"I do think rotation matters now that we're getting more visual spatial… if we
 do alignment, I think we should just let alignment happen… if they've done certain things with
@@ -176,7 +176,7 @@ the cards then it can no longer align."* **The ruling that dissolves the conflic
 plan: a rotated card opts OUT of alignment**, the same rule locked cards already follow — so
 `snapTo` never has to reason about rotated boxes, and rotation can be built before or after
 stage 4 without either being reworked. Rotation itself is not scheduled into a build order yet
-(a separate question from whether it's ruled in) — see `organize-phase-plan.md` §4g.
+(a separate question from whether it's ruled in) — see `build-queue.md` §4g.
 
 ## 5 · Stages & proof
 
@@ -304,7 +304,7 @@ order (the 40px banding in `tidyPatches`) exists ONLY because tidy builds a GRID
 ordered slots, so something must decide which card lands first. **Align buttons need no ordering
 at all**: "align left" makes every left edge match, and which card is "first" is meaningless.
 
-So the align/distribute set (`organize-phase-plan.md` §4e) is both **simpler to understand AND
+So the align/distribute set (`build-queue.md` §4e) is both **simpler to understand AND
 simpler to build** than extending tidy: no banding, no reading order, no square-root grid — just
 min/max/mean of the measured edges.
 

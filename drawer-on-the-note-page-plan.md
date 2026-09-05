@@ -1,6 +1,6 @@
 # The drawer on the note page + gather from it — the detailed plan (N4b)
 
-**What this is:** the item plan for **N4b** in `organize-phase-plan.md` — the drawer reaching the note page, clicking a row **gathering** into the writing, and the one-drawer extraction that makes it honest. Owner-asked 2026-08-28; sequenced before N5. Written against the code at `origin/main` (8f4ac0d), read not assumed.
+**What this is:** the item plan for **N4b** in `build-queue.md` — the drawer reaching the note page, clicking a row **gathering** into the writing, and the one-drawer extraction that makes it honest. Owner-asked 2026-08-28; sequenced before N5. Written against the code at `origin/main` (8f4ac0d), read not assumed.
 
 ---
 

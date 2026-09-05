@@ -2,7 +2,7 @@
 
 **STATUS: H1–H3 BUILT + deployed (D-124, 2026-08-29).** The linear merged home is live; `/boards` `/notes` redirect in; old pages retired. **H4 (the spatial desk) is the next phase.**
 
-**What/why:** the concept + rulings live in `organize-phase-plan.md` → Phase S and `model.md`; this is the *build* plan. Home stops being a separate "desk" **plus** two list rooms — it becomes ONE place: your **alive** things on top, then **all your surfaces** (boards + notes) as one list — filterable, sortable, searchable, in folders. Bits stay their own room. **Settled with the owner 2026-08-29.**
+**What/why:** the concept + rulings live in `build-queue.md` → Phase S and `model.md`; this is the *build* plan. Home stops being a separate "desk" **plus** two list rooms — it becomes ONE place: your **alive** things on top, then **all your surfaces** (boards + notes) as one list — filterable, sortable, searchable, in folders. Bits stay their own room. **Settled with the owner 2026-08-29.**
 
 ## The shape (top to bottom)
 ```

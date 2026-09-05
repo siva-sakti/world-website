@@ -55,4 +55,4 @@ Teach the model *by doing*, not a slideshow. A new user arrives empty.
 ---
 
 ## The gaps, in one place (the to-do the flows expose)
-See `organize-phase-plan.md` §Phase N for the *sequenced* version. Summary: note writing-page · note-on-board doorway · notes trash/archive · find filters · gather board/source · onboarding · (parked) phone capture · reference-graph · document-mode · publishing. Plus the standing code item: `board-surface.tsx` breakdown.
+See `build-queue.md` §Phase N for the *sequenced* version. Summary: note writing-page · note-on-board doorway · notes trash/archive · find filters · gather board/source · onboarding · (parked) phone capture · reference-graph · document-mode · publishing. Plus the standing code item: `board-surface.tsx` breakdown.

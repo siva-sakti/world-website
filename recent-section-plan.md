@@ -3,7 +3,7 @@
 **Status:** ✅ **BUILT · migration APPLIED to cloud · proven live end-to-end. Awaiting the owner's word to deploy.**
 Concept ruled → plan → **antagonist: "NOT build as written"** → corrected → built → proven.
 Owner-authorized 2026-09-01. Queue item
-**THE GAPS ROUND #4** (`organize-phase-plan.md`).
+**THE GAPS ROUND #4** (`build-queue.md`).
 **Standing limits:** the migration is **owner-pasted** (never by Claude) · **migration before
 deploy** · no deploy without the owner's word.
 
@@ -42,7 +42,7 @@ click to go back. It reorders itself as you move; nothing to curate, nothing to 
 
 ## 3 · Two things checked before planning
 
-**A7 does NOT block this.** `organize-phase-plan.md` warns *"A7 forecloses placement-level visit
+**A7 does NOT block this.** `build-queue.md` warns *"A7 forecloses placement-level visit
 history."* A7 is about where a **bit** has travelled between boards — v1 keeps one durable
 membership row, so a bit's entry/exit log isn't reconstructable. This records where **the owner**
 has been. Different record, no overlap; building this neither spends A7 nor makes it harder.

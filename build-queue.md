@@ -1,4 +1,4 @@
-# The organize phase + the feature queue — THE live plan
+# The build queue — THE live plan: the app map · the ordered queue · the idea dump · the item loop
 
 **What this is:** the single place that holds (1) the app's surface map + terminology, (2) the reorganize work, and (3) the ordered queue of every feature on deck. **When the owner has a scattered idea-dump, it gets filed HERE and reflected back — this doc absorbs the mess so the owner never has to manage it.** Owner + Claude, 2026-08-20.
 

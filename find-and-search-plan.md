@@ -1,6 +1,6 @@
 # Search & Jump-to — the two kinds of looking (plan)
 
-**Status:** NOT built yet. Concept + names + reuse architecture settled with the owner 2026-08-29. **Naming RULED:** the broad content tool is **Search** (renamed from "Find"); the targeted look is **Jump to**. This is the doc to follow when building. Sits under `organize-phase-plan.md` → Phase S.
+**Status:** NOT built yet. Concept + names + reuse architecture settled with the owner 2026-08-29. **Naming RULED:** the broad content tool is **Search** (renamed from "Find"); the targeted look is **Jump to**. This is the doc to follow when building. Sits under `build-queue.md` → Phase S.
 
 ---
 

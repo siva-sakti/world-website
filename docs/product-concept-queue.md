@@ -2,7 +2,7 @@
 
 **What this is:** **what's next in the product-concept workstream**, and what each item is waiting on. Kept separate from `product-concept-map.md` on purpose — that file is the **map** (what's where); this one is **what's next**.
 
-**Not the build queue.** Feature work lives in **`organize-phase-plan.md`** (Phases O/V/N + the item loop). **When an item here settles enough to build, it graduates there** — that's the handoff, and it's one-directional.
+**Not the build queue.** Feature work lives in **`build-queue.md`** (Phases O/V/N + the item loop). **When an item here settles enough to build, it graduates there** — that's the handoff, and it's one-directional.
 
 **Claude keeps this current** so the owner never has to hold the list.
 
@@ -18,14 +18,14 @@ Seven sittings, each with a deliverable. Ordered by dependency, not importance: 
 | ① | **The writer pass** — 5 situations × steps, owner corrects from life (essay · pitching · research-toward-nothing · a talk · the commonplace thread) | ~1 hr | gaps table #2 + the journey method proven | the only persona with a live oracle |
 | ② | **The collector-thinker pass** — the no-output person, the median Are.na user | ~45 min | is *invitation-not-mandate* structurally true? is the Are.na market takeable without social? | tees up ④ |
 | ③ | **Claude homework between sittings** — visual-artist + video-essayist passes, songwriter expansion, drafted solo | none | corrected-ready drafts | the owner reacts in minutes instead of building |
-| ③b | **THE GAP RULING** — decide which gaps close (ordered lists · a date you set · the wander-back surface · composition→composition · highlight capture · document mode) | ~45 min | **feature decisions** → graduate to `organize-phase-plan.md` | **the hinge between level 1 and level 2.** Journeys can't be written until the app they describe is decided |
+| ③b | **THE GAP RULING** — decide which gaps close (ordered lists · a date you set · the wander-back surface · composition→composition · highlight capture · document mode) | ~45 min | **feature decisions** → graduate to `build-queue.md` | **the hinge between level 1 and level 2.** Journeys can't be written until the app they describe is decided |
 | ④ | **The privacy/publishing session** — default · the publishable unit (pieces!) · key vs open web · what kind of social | ~1 hr | **the great unblocker**: brand, pieces-public, the Are.na answer | long-owed (`philosophy.md` flags it); everything downstream waits |
 | ⑤ | **The naming session** — composition · board · piece · the AND-collision, all at once | ~45 min | rulings → `lexicon.md`; ONE sweep handed to the build track | after ①②④ + research: name once, with maximum evidence |
 | ⑥ | **The line + the value-prop phrase** — the owner writes; Claude brings the material organized | owner's sitting | the outward line finished; "home base…" updated for the wide door | needs ⑤'s words and ⓪'s results |
 | ⑥b | **THE JOURNEYS** — the level-2 telling: each persona's path as a person experiences it, story not table | owner's sitting | the journeys — which **become the onboarding** | needs ③b (a real app to describe) + ⑥ (the words to describe it in) |
 | ⑦ | **Brand + the name** — the app's real name · identity vs in-app aesthetic · landing or not | ~1 hr | the name | last on purpose: a name compresses the argument, which is settled by now |
 
-**Then everything graduates and the workstream closes:** rulings → the settled docs · build items (audio bits · a date you set · ordered lists · the rename sweep · pieces · onboarding) → `organize-phase-plan.md` · the voice → the owner's re-voiced `vision-and-language.md`.
+**Then everything graduates and the workstream closes:** rulings → the settled docs · build items (audio bits · a date you set · ordered lists · the rename sweep · pieces · onboarding) → `build-queue.md` · the voice → the owner's re-voiced `vision-and-language.md`.
 
 **Parallel tracks, costing no sittings:** the `finished`-tag test in the live app (the owner's hands, ~2 weeks — feeds the pieces call) · the other window keeps building · research agents run between sittings.
 
@@ -37,7 +37,7 @@ Seven sittings, each with a deliverable. Ordered by dependency, not importance: 
 |---|---|---|---|
 | **LEVEL 1** — internal | situations × **actual steps** → gaps → **features** | Claude drafts, ⚑ owner corrects from life | ①②③ → **③b rules them** |
 | **LEVEL 2** — outward | the **journeys**, as a person experiences them — story, not table | ⚑ **the owner** (it's voice) | **⑥b** |
-| **→ onboarding** | falls out of the journeys | — | graduates to `organize-phase-plan.md` N7 |
+| **→ onboarding** | falls out of the journeys | — | graduates to `build-queue.md` N7 |
 
 ### ⭐ What "COMPLETE" means, and how we know we're done (owner's sharpening, 2026-08-31)
 
@@ -100,7 +100,7 @@ The owner framed level 1 not as *gap-finding* but as **"what makes a complete se
 | when a thing is… | it goes to |
 |---|---|
 | **ruled** (the owner says so) | the settled records — `model.md` · `lexicon.md` · `invariants.md` · `PROGRESS.md` |
-| **ready to build** | `organize-phase-plan.md` — the real build queue, through the 9-step item loop |
+| **ready to build** | `build-queue.md` — the real build queue, through the 9-step item loop |
 | **words for a person** | ⚑ `vision-and-language.md` — **the owner writes them** |
 | **parked for another window** | its own handoff doc (e.g. `tables-and-structured-data.md`) |
 
