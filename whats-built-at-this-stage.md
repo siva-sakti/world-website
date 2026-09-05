@@ -212,6 +212,12 @@ answers, and heading 4 is where a ✅ is earned rather than assumed.
 
 ### The probing PRINCIPLES — what makes a question find something *(owner's ask: "whatever meta-principles these are, fold them in")*
 
+**P0 · Check against the GOAL, never against the incumbent** *(owner, 2026-09-05: "you don't
+have to check in a way that's like — is what we did already good. Check if the goal is met, and if
+everything needs to be reshuffled, that's okay.")* The question is "what should this be, and is it
+that?" — not "is what exists defensible?". Sunk work carries no weight; a reshuffle verdict is a
+legitimate outcome of any walkthrough.
+
 The four questions that found four misses were not special. Each was an instance of a principle
 that applies to every mechanism. **The principles are the process; the questions below are just
 their current examples, and the examples grow.**

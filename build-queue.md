@@ -282,6 +282,28 @@ migration goes stale waiting); **the owner kept the hold — after all six** (ba
 rulings at a time). Their staleness cost is accepted knowingly; re-rehearse their migration at ping time. **Not in the queue but not dropped:** the five save loops,
 the two-devices write-up (A11), a bit's journey, the Group E pass.
 
+## 4i · PUBLIC / PRIVATE — the sharing layer (owner re-raised 2026-09-05; filed, LATER phase)
+
+**The owner's statement:** a bit is public or private; a board too; anything can go anywhere;
+other people see only what's public — *"you can put a private bit on a public board, but it
+won't display."*
+
+**Status — verified against the schema 2026-09-05: the heart of this is ALREADY RULED AND
+ENFORCED.** The owner's sentence is invariant **I-P5**, live at the wall since D-108: `bit.visibility`
+(default public, D-065) · `board.visibility` (default private) · the guest door shows a bit only if
+**public AND live AND on a public+live board** — a private bit on a public board is absent by row
+absence. Applied to cloud, proven leak-proof six ways (`run-public-door-native.sh`).
+
+**What is NOT built (the actual later-phase work):** the **publish act** (no toggle anywhere in the
+UI) · the **public route** (a visitor has no page to see; today a guest resolves 0 boards) · the
+**review-everything gate** before first publish (ruled D-065) · compositions' visibility (their
+lane ruled private-born). Layer cuts: **L0 both read paths** (page load AND panel fetches must
+both respect it — the two-doors rule, §2b) · L1 (exists).
+
+**Placement:** after the foundations queue (0–6) — its own phase; nothing in 0–6 stands on it.
+**One assumption to confirm with the owner at build:** "public" = anyone with the link, no
+accounts (that is what D-108 enforces).
+
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
 **Status swept 2026-09-03** *(the owner: "I just feel like there may be a couple other threads
