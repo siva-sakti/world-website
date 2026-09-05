@@ -51,14 +51,16 @@ only for the thing being built next.
 | R2 | A frame's size is one of: **US Letter · A4 · square · a custom pixel size.** | ✅ |
 | R3 | **US Letter is the default.** | ✅ 2026-09-05 |
 | R4 | **Landscape and portrait are separate sizes**, not a rotation of one. *(Owner: reorienting what is already on the page — what gets cut off — "sounds like a user's problem" to avoid.)* | ✅ 2026-09-05 |
-| R5 | The frame **is** the plane: its top-left is (0, 0); **nothing exists outside it**; a card cannot leave it. | ✅ |
+| R5 | The frame **is** the plane: its top-left is (0, 0); **nothing exists outside it**. A card may **overhang an edge — clipped at it, like print bleed** — but can never be dragged fully outside (it would vanish). | ✅ · overhang-clipped ruled 2026-09-05 |
 | R6 | You can **zoom in, but not infinitely** — "like what you can print out and see." The whole frame fits the view by default. | ✅ |
 | R7 | **Copying bits from one frame to another keeps their pixel position** — paste onto a landscape frame what was on a portrait one and it lands at the same coordinates. | ✅ 2026-09-05 |
 | R8 | The frame's size is stored in **screen pixels** (1 px = 1/96 in); print and export scale at output. | 🔵 Claude's proposal from the research |
 | R9 | Everything a canvas board can do, a frame board can do — modes, cards, arrange, edit — except pan past its edges and zoom past its bounds. | 🔵 implied by R1; stated so it is checkable |
+| R10 | **Fit = the whole page** — fit always shows the entire page, edges visible, the way a PDF viewer fits a page. (On canvas, fit frames the cards; on a frame, the page IS the thing you compose against.) | ✅ 2026-09-05 |
+| R11 | **100% = true print size**: the page at its real physical size on a standard screen (1 in = 96 px; Letter reads 816 px wide). Zooming to 100% ≈ holding the printed page. Confirms R8's pixel storage. | ✅ 2026-09-05 |
 
-⚪ **Still open from the research, not blocking step 2:** what "100%" means on a frame · whether
-a frame's size can change after creation.
+⚪ **Still open, not blocking step 2:** whether a frame's size can change after creation.
+*(What "100%" means — ruled, R11, 2026-09-05.)*
 
 ---
 

@@ -139,6 +139,53 @@ walked in this pass.**
 directly under the modes and frame builds: **the coordinate system · how things arrive · two
 devices for a document.** That is why this comes first.
 
+## 2b · THE LAYER MODEL — the board as a stack *(built with the owner 2026-09-05; checked against the code, not memory: every board-directory module and every §2 mechanism has exactly one home below, or sits in the named "outside the board" list. MECE is the rule: one home each, nothing unhomed.)*
+
+**The data model in one line — three memories.** The **database** remembers forever, for every
+device (Postgres rows + Storage bytes). **The device** remembers conveniences (localStorage: each
+board's camera, the jot draft). **The visit** remembers the working state (React state — gone when
+the tab closes, rightly). Every remembered thing on a board lives in exactly one of the three.
+
+**What moves where.** Rows come DOWN once at load (L0); media bytes come down as short-lived
+signed URLs at render; changes go UP as acts (L7) through the write queue and server actions (L8).
+**The screen never shows the database directly** — it shows the visit's working copy (`cards` in
+`board-surface.tsx`), which the database trails by a debounce. That one sentence is why the write
+queue's ordering rules exist.
+
+| # | layer | plainly | the data — what's held / sent where | in the code | §2 mechanisms homed here |
+|---|---|---|---|---|---|
+| **L0** | **the reads (load)** | you open `/board/x`: auth, then the server reads one view and the page arrives with its rows; panels read lazily later | `board_cards` rows (only: bit live + board live + placed) down as props; drawer/loose-column/pickers fetch their own lists client-side; media bytes down via signed URLs | `page.tsx` · `db/boards.ts` · `db/inbox.ts` · `storage.ts` (read half) | the render rule · loose/the inbox · paging |
+| **L1** | **stored truth** | what Postgres + Storage hold; RLS is the wall | `board` · `placement` (x y w h z angle · arrived · left) · `bit` (type + substance per type: body / storage_path / strokes / url / face) · tag & source rows · reference rows · opening rows | migrations · `verification/` | placement · the type set · the copy rule · files · resting states · the security boundary · export completeness · a link's substance (the stored half) |
+| **L2** | **the plane** | one coordinate system: every position is a point in px on an infinite plane, fixed origin | nothing stored beyond L1's numbers; pure arithmetic | `geometry.ts` (screen↔plane in `camera-storage.ts`) | the coordinate system |
+| **L3** | **the camera** | which rectangle of the plane your screen shows: pan · zoom · pinch · fit | `{x, y, scale}` per board **per device** — localStorage, never the database | `use-camera.ts` · `camera-storage.ts` · `local-storage.ts` | the camera · the camera memory · local storage |
+| **L4** | **rendering** | each placement becomes ONE universal card (position · size · tilt · selection frame — identical for every type) with **per-type content inside**; plus the chrome around the plane; plus the SECOND render path | text → tiptap · image → img · audio → player · pdf → first-page thumb + badge · link → page-card ladder · drawing → strokes as SVG; chrome = toolbar, selected-bar, tag-bar, drawer, loose column, pickers, confirms, snap guides; `/board/x/timeline` renders the SAME rows as days | `card.tsx` · `card-vm.ts` · `text-bit.tsx` · `doodle-bit.tsx` · `bit-ref-view.tsx` · `use-geometry.ts` · `stroke.ts` · panels/pickers · `timeline/` | the card view-model · measured sizes · default sizes · labels and faces · dates SHOWN (`stamp`/`zone`) · empty states · floating UI · the drawer (render half) |
+| **L5** | **input** | what a press MEANS: on empty space (pan / marquee / create) · on a card (select, then edit) · keys · pen refuses fingers | gestures in, acts out; nothing stored | `use-board-pointer.ts` · `use-card-drag.ts` · `use-marquee-select.ts` · `use-board-keys.ts` · `draw-overlay.tsx` (input half) | the board's pointer · card drag · marquee · the keyboard · the pen's input |
+| **L6** | **client state (the visit)** | what this visit remembers and rightly forgets at tab-close | `cards` (the working copy) · `selectedIds` + `selectMode` · `editingId` · `drawMode` · the undo stack · `error` · `wordsQueue` — all React state in `board-surface.tsx`. **The coming arrange/edit mode is exactly one new value here** (`selectMode` and `drawMode` are its precedents) | `board-surface.tsx` · `undo-stack.ts` · `use-undo.ts` | selection · undo · the mode *(coming)* |
+| **L7** | **acts** | the ~40 things you can do; each = change the working copy now, queue the write | optimistic change to L6 + a patch handed to L8; per-type intake on the way in (validate → decode → downscale) | `use-create-doors.ts` · `remove-acts.ts` · `use-arrange-acts.ts` · `use-alignment-acts.ts` · `act-rules.ts` · `board-arrange.ts` · `use-meaning-acts.ts` · `use-act.tsx` · confirm rules · `media*.ts` · `page-meta.ts` · `html.ts` · `words-offer.tsx` · `gather-picker.tsx` | creation · media intake · removal · arrangement acts · meaning acts · undo (the recording half) · the act door · confirms · snapping + alignment maths · the pen's strokes (intake half) · references/gather (the act half) |
+| **L8** | **persistence (the writes)** | the queue: debounced, snapshot-not-remove, per-row order kept, optimistic ids reconciled to real ones; server actions for the rest | patches UP to Postgres; the queue holds exactly what is not yet saved | `write-queue.ts` · `use-persistence.ts` · `save-guard.ts` · `bits/actions.ts` · `db/*` (write half) | the save model · identity · two devices |
+| **L9** | **the doors** | the board's edges to the rest of the app | in: place-on-a-board (from `/bits`, from a bit's page) · out: a card opens its bit's page · the visit recorded for home's recents | `place-on-board.tsx` · `record-opening.tsx` · `db/openings.ts` · `recent.ts` | openings / recent |
+
+**The type dimension (horizontal, not a layer).** A bit's type — today **text · image · audio ·
+pdf · link · drawing**, ruled to grow by **checklist · table · file** — threads THROUGH the
+stack: its own substance columns (L1), its own intake (L7), its own content inside the one
+universal card (L4). Adding a type = one row across three layers, never a new layer.
+
+**Where the two ruled changes cut** *(the point of the model)*:
+- **canvas | frame** cuts **L1** (a `kind` + size on `board`) · **L2** (the plane gains an edge) ·
+  **L3** (zoom/fit bounded) · **L4** (the page is drawn). The edge behaviors are ruled (2026-09-05,
+  → `frame-spec.md` R5/R10/R11): overhang clipped at the edge · fit = the whole page · 100% = true print size.
+- **arrange | edit** cuts **L6** (one new value) · **L4** (card look per mode) · **L5** (gesture
+  meaning per mode) and gates **L7**. Stores nothing — mode is per-visit (`board-modes-spec.md`;
+  owner may still overturn).
+
+**Outside the board (named so nothing silently vanishes):** search + jump-to · the outline · the
+graph · home/the shelf + surfaces · sources pages · the rail · capture/jot (and its draft). Each
+is its own, much shorter stack, looked at when a build touches it.
+
+**How this stays true (proposed, not built):** a manifest test — every board module declared with
+its layer; the test walks real imports and fails on an unhomed module or a lower layer importing a
+higher one (the boundary-test pattern). ⬜ awaiting the owner's go.
+
 ## 3 · The process — beginning to end
 
 **Step 1 · Confirm the list.** *(owner, 20 minutes)* Read §2. Add what's missing, strike what
