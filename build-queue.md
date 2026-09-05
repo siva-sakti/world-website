@@ -1,5 +1,25 @@
 # The build queue — THE live plan: the app map · the ordered queue · the idea dump · the item loop
 
+## ⭐ THE PHASE MAP — one story, era-labeled *(folded 2026-09-05, owner ask)*
+
+**MVP era (August), the lettered phases — history with statuses, not the live sequence:**
+| phase | was | stands today |
+|---|---|---|
+| **O · Organize** | home-as-shelf · notes view · sweep · health check | ✅ **done** — O1 shelf LIVE (the ⛔ cloud-gate line below is stale as of 2026-09-05; migration applied, app shipped) · O2 built (`notes-browser.tsx`) · O4 absorbed by V2's renames · O5 ran (D-140) |
+| **V · Vision build** | desk/cabinet home · kind marker · broom | ✅ **superseded/absorbed** — home revised by S; V2 kind landed with the notes era; V4's broom ran (`lib/dates.ts` exists) |
+| **N · Notes** | the note as a surface | ✅ N1 built (+ its year-late half caught F6, then built) |
+| **S · Home = surfaces** | one home, everything, alive floated | ✅ S1 find/jump · ✅ S2 built (home imports `surfaces` + `desk-alive`) · ⏸ S3 alive-canvas — parked, its own build |
+
+**PHASE F · FOUNDATIONS → V1 — NOW.** The hard line + the 2×2 target: §4e-0. The line items:
+§4e-2 (0 safety → 0b originals → 1 readout → 2b card split → 3 modes → 4 checklist → 5 table →
+6 frame), each behind only the gates it stands on; the ledger of flags rides in
+`whats-built-at-this-stage.md` §5b.
+
+**AFTER F (V1's remaining arc, in rough order):** the public/private app layer (§4i) · the naming
+pass (§2 — the owner's words land) · the composition ping (held behind F by the owner, D-149) ·
+S3 if still wanted. Then V1 is the thing described in §4e-0.
+
+
 **What this is:** the single place that holds (1) the app's surface map + terminology, (2) the reorganize work, and (3) the ordered queue of every feature on deck. **When the owner has a scattered idea-dump, it gets filed HERE and reflected back — this doc absorbs the mess so the owner never has to manage it.** Owner + Claude, 2026-08-20.
 
 ---
@@ -29,7 +49,7 @@
 - **The atom's everyday word = "note"; "bit" = the model/technical word.** *(Assumed default — owner may flip to "bit"/"fragment" anytime; sweep labels then.)*
 
 ## 3 · Phase O — ORGANIZE (now, in order)
-- **O1 · Home = the shelf.** *(Owner's clarify rulings 2026-08-21: a **quiet picker per board** — pick-or-type-new, no manage screen, groups exist because boards name them · pins on **boards AND notes** in one pass · **owner-ordered groups**.)* **Built 2026-08-22 (from the GitHub working copy — Documents locked again):** migration `20260822000001_shelf.sql` — a tiny `shelf_group` table (name unique-per-owner · owner-ordered `position` · owner RLS) + `board.group_id` (ON DELETE SET NULL — deleting a section strands nothing) + `board.pinned_at` + `bit.pinned_at` + the `home` view recreated so `b.*` carries the new columns. **Proven on a throwaway: `run-shelf-native.sh` — 10/10** (create/unique · assign · set-null survival · pins stick · home carries · stranger sees zero/writes land on zero/cross-owner insert refused · anon blind). App: `lib/db/shelf.ts` (one door) · home renders the **Shelf** (★ pinned → groups in your order with ↑/↓ → ungrouped; per-row group picker with "+ new group…" · ★/☆ pin · trash) · notes float pinned first + ★/☆ on cards and rows · `shelf_group` joins the export lockstep (I-G1). **⛔ GATED: cloud apply (backup → atomic → verify) needs the DB URL (in the locked .env.local) — then the app code ships.** Deploy order matters: migration FIRST (the app queries `shelf_group`; deploying early would 500 home).
+- **O1 · Home = the shelf.** *(Owner's clarify rulings 2026-08-21: a **quiet picker per board** — pick-or-type-new, no manage screen, groups exist because boards name them · pins on **boards AND notes** in one pass · **owner-ordered groups**.)* **Built 2026-08-22 (from the GitHub working copy — Documents locked again):** migration `20260822000001_shelf.sql` — a tiny `shelf_group` table (name unique-per-owner · owner-ordered `position` · owner RLS) + `board.group_id` (ON DELETE SET NULL — deleting a section strands nothing) + `board.pinned_at` + `bit.pinned_at` + the `home` view recreated so `b.*` carries the new columns. **Proven on a throwaway: `run-shelf-native.sh` — 10/10** (create/unique · assign · set-null survival · pins stick · home carries · stranger sees zero/writes land on zero/cross-owner insert refused · anon blind). App: `lib/db/shelf.ts` (one door) · home renders the **Shelf** (★ pinned → groups in your order with ↑/↓ → ungrouped; per-row group picker with "+ new group…" · ★/☆ pin · trash) · notes float pinned first + ★/☆ on cards and rows · `shelf_group` joins the export lockstep (I-G1). ~~⛔ GATED: cloud apply…~~ **SHIPPED long since — migration applied, app live (stale marker caught 2026-09-05 while writing the phase map).**
 - **O2 · Notes = the bit-first view.** *(Owner ruled 2026-08-21: FULL view — search + type filters like the board panel; sorts = newest · oldest · recently edited.)* **Detailed plan (code-proofed):** the page stays server-rendered but fetches `listAllBits` (the loose page already derives from it — F19, one definition) + pre-signs image thumbs, and hands everything to a new client `NotesBrowser`: **tabs loose (default, the current grid unchanged) | all** (`?view=all`, linkable) · in-memory **search** (face + body + source + tag words — the panel's ruled A22 pattern) · **type filters** (notes / images / sketches) · **sorts** newest (default) / oldest / recently-edited (`updated_at`). On "all," placed bits show **"on 〈board〉" links**; **place-on shows only for loose bits** (offering it on placed bits = the multi-board door, deliberately parked A20); trash works everywhere; the jot box stays on top of both tabs. Reuses `InboxCard` (a `showBoards` prop) + the panel's tab CSS. *Scale note: images pre-signed for the whole set — fine at one-writer scale, revisit with A22.*
 - **O3 · ✎ write shows its superpower.** The quiet `[[` hint + verify the gather button is in the toolbar (thumb-reachable on the Daylight).
 - **O4 · Terminology sweep** — every label/confirm/empty-state consistent with §2; per-page navs mirror the home hierarchy.
