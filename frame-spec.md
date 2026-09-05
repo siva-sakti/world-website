@@ -68,3 +68,52 @@ a frame's size can change after creation.
 change · conflict. The mechanisms are `foundations-pass.md` §2's list; the coordinate system,
 how things arrive, the copy rule and the camera are the obvious four — the grid finds the
 non-obvious ones.)*
+
+---
+
+## 1b · The layer map — canvas and frame through every layer *(the sensibility check)*
+
+**The claim this map exists to check:** *one coordinate system, one camera, one render path —
+the frame only adds bounds.* If any row's frame column needs more than a bound or a flag, the
+approach is wrong and we want to know at this level, not in code.
+
+Nine layers, storage to screen. Every claim verified against the code 2026-09-05.
+
+| layer | what it does | canvas today | **frame delta** | code | doc |
+|---|---|---|---|---|---|
+| **1 storage** | what is remembered | `placement.x/y/w/h/z/angle` (px) · `board` row | `board.kind` + a size (`frame_w/h`) — **one migration** | migrations · `placement-fields.ts` | `SPEC.md` §2 |
+| **2 read** | rows → the page | `getBoard` + `getBoardCards` (the render rule) | reads two more columns — **compatible** | `db/boards.ts` · `page.tsx` · `board_cards` view | `SPEC.md` §2 |
+| **3 the plane** | positions mean something | absolute px, origin (0,0), no edges | **edges at (0,0)–(w,h)** — same numbers, bounded | `geometry.ts` · `placement-fields.ts` | `SPEC.md` §2z ✅ |
+| **4 the camera** | which part you see | `{x, y, scale}` · zoom 0.2–3 · pan unbounded · per-device memory | **pan clamped to frame+margin · zoom floor = fit** — two clamps in one place | `use-camera.ts` · `camera-storage.ts` (tested) | §2z ✅ |
+| **5 render** | the plane → pixels | one CSS transform: `translate(cam) scale(cam)`; cards absolutely positioned inside | **unchanged** + draw the page edge and grey margin behind the cards | `board-surface.tsx:531` · `card.tsx` · `globals.css` | — |
+| **6 input** | gestures → intents | pointer (pan · marquee · tap) · card drag · keys | drag/nudge **clamped at the edges**; everything else unchanged | `use-board-pointer.ts` · `use-card-drag.ts` · `use-board-keys.ts` | modes spec §3 |
+| **7 measure** | real rendered sizes | the geometry ledger | **unchanged** | `use-geometry.ts` | — |
+| **8 arrange maths** | snap · align · tidy · clear spots | pure, tested | **unchanged** (already bounded by inputs) — ⚠ except `firstClearSpot`, which must not propose a spot outside the frame | `board-arrange.ts` · `geometry.ts` | — |
+| **9 persist** | changes → storage | the write queue | **unchanged** | `write-queue.ts` · `use-persistence.ts` · `db/bits.ts` | `SPEC.md` |
+
+**Reading the map:** the frame touches **1 (two columns), 3–4 (bounds), 5 (a drawing), 6 (a
+clamp), 8 (one function)** — and leaves 2, 7, 9 untouched. **Five deltas, all of them bounds or
+flags. The claim holds at this level.** R7 (paste keeps pixel position) rides on layer 3 being
+identical in both kinds — which is the whole point of "same coordinates, bounded."
+
+### How we check sensibility, at each altitude
+- **High level (now):** the map above — every layer named, every frame cell filled. **A blank
+  cell is an unexamined layer.** None is blank.
+- **Mid level (step 2–3 of §0):** the requirement × mechanism grid. Every R touches ≥1 layer;
+  every delta traces to an R. A delta with no R was invented; an R with no delta was missed.
+- **Low level (step 6, per build):** the pure layers (3, 4, 8) get tests before the visual ones
+  are touched — the camera clamps and the edge-clamped drag are provable the way `screenToPlane`
+  was, by maths, before anything is on a screen.
+- **Always:** the antagonist at step 5, and the owner's eye on the result — the two checks that
+  have caught what the others missed all week.
+
+### Where everything lives *(the owner asked — one place to look)*
+
+**Documents:** `frame-spec.md` (this — goals · method · layers) · `foundations-pass.md` (the 63
+mechanisms · walkthroughs · ledger · probing principles) · `SPEC.md` §2z (the plane + camera,
+written yesterday) · `board-modes-spec.md` (arrange/edit) · `board-what-you-can-do.md` (every
+act) · `bits-and-boards-code-map.md` (file health) · archived: `old/frame-plan.md`.
+
+**Code, by layer:** the table above's code column is complete — thirteen files, and layers 3, 4,
+7, 8 are the tested pure core (63 of this suite's 217 tests).
+
