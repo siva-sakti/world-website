@@ -529,3 +529,12 @@ For EVERY queue item, in order, no skipping:
 9. **Hand to the owner to test** — deploy + a concrete feel-test list. Then record (D-log + docs same-session).
 
 The owner's only standing jobs: answer clarifying questions + "needs owner" calls, feel-test, and dump ideas — filing them is Claude's job.
+
+
+---
+# 🔄 CROSS-LANE SYNC · 2026-09-05 *(from the composition lane — the streams as they stand, so this queue and that plan agree)*
+1. **THE PLATFORM (this queue, ACTIVE):** item 0 safety sitting → 0b keep-originals → card split (2b) → modes → checklist/table → frame · + the visibility BOARD half (§4i; the flip may ride item 0). Goal: bits+boards solid for a launchable v1.
+2. **THE COMPOSITION (standalone stream, READY + HOLDING):** spec verified · storage proven against real data · stages ⓪–Ⓥ planned (`composition-build-plan.md`) · **starts on this queue's Phase-F ping** (the owner's standing hold, re-affirmed knowingly at D-149). Old-architecture retirement (①b) is proceduralized inside that stream — not a bits/boards item; the only cross-lane rule: don't deepen the kind-seam (verified holding).
+3. **THINKING THREADS (parallel, owner-paced):** naming (`docs/naming-session-prep.md` — cheapest before stage ① names a table) · accounts/social (`docs/accounts-session-prep.md`) · vocabulary (her window).
+**Filed here from the cross-feature debt:** X1 the global date format (one owner pick, app-wide; stage ②a minting uses an interim default until then) · X2 the pull's kind filter · X5 board auto-titles — all post-Phase-F queue items.
+**⚑ Parked for the ACCOUNTS sitting — the launch-cut fork:** v1-for-others minimally = platform + accounts + publish; **compositions in the launch cut, or the first post-launch gift?** The owner leans after; to be chosen there, not drifted into.
