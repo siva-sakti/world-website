@@ -244,6 +244,29 @@ selection's own bounding box or the average; whether locked cards are anchors or
 built right AFTER the guides while that code is open — but it is genuinely independent, and
 nothing in stage 4 depends on it.
 
+## 4e-0 · ⭐ THE TARGET — MVP → V1, the hard line *(owner-ruled 2026-09-05)*
+
+**The MVP** (what exists): **one cell** — a canvas board with **one mixed mode** (not a true edit
+mode; selection, arranging and writing share one undifferentiated surface), six bit types, no
+visitor-facing layer.
+
+**V1** (the public-facing target): **the full 2×2** — two board kinds × two true modes — plus
+nine bit types, the public/private layer (§4i), and the owner's names (§2 naming pass).
+
+| | **arrange mode** | **edit mode** |
+|---|---|---|
+| **canvas** | built at **item 3** (modes) | built at **item 3** — today's mixed mode SPLITS; its basis is re-examined first (2b + the L5 walkthrough) |
+| **frame** | built at **item 6** (R9: everything canvas can do) | built at **item 6** |
+
+The grid completes at item 6. **The existing cell is not grandfathered:** the mixed mode's basis
+(how cards render · what gestures mean) is re-based by 2b and the L5 walkthrough BEFORE it splits
+— per P0, checked against the target, not against the incumbent.
+
+**THE REFERENCING RULE (the hard line):** MVP-era artifacts — proofs, rulings, code — are
+**evidence about what exists, never authority about what V1 should be.** Every "already proven"
+claim names its era (e.g., "MVP-era SQL proof, July — re-run at item 0"). What the MVP carries
+into V1 it carries because a CHECK said keep, never because it was built (nothing-is-legacy).
+
 ## 4e-2 · ⭐ THE RULED BUILD ORDER (owner, 2026-09-04) — what Claude builds next, in order
 
 *"Let's do all that first, and then keep in the queue getting the actual table and checklist
@@ -256,10 +279,10 @@ built, and then the frame view as well."*
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
 | **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
 | **2b** | **THE CARD SPLIT (ruled 2026-09-05, D-148)** — shell stays; per-type capability table + one content component per type; union CardVM (forgotten renderer = compile error); the `cancel`/nodrag convention; chrome outside the frame's clip plane | plan written just-in-time at start; verdicts: `whats-built-at-this-stage.md` §5b | no — ruled |
-| **3** | **ARRANGE vs EDIT mode** — incl. the stripped card in arrange | `board-modes-spec.md` (v3 — the old plan is in `old/`) | its §9 opens |
+| **3** | **ARRANGE vs EDIT mode — builds the canvas ROW of the 2×2** (canvas×arrange + canvas×edit; today's mixed mode splits) | `board-modes-spec.md` (v3 — the old plan is in `old/`) | its §9 opens |
 | **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
 | **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
-| **6** | **The frame — a KIND of board, fixed size (ruled 2026-09-05)** | `frame-spec.md` | the cloud paste |
+| **6** | **The frame — a KIND of board, fixed size; completes the 2×2** (frame×arrange + frame×edit, R9) | `frame-spec.md` | the cloud paste |
 
 **HOW EACH ITEM LEAVES THE QUEUE — the foundation gates (folded 2026-09-05; the layer model:
 `whats-built-at-this-stage.md` §2b).** An item is gated only by the layers it cuts. Before its build: the
