@@ -276,7 +276,7 @@ grid in §2 is updated from this list, never directly.
 | from | decision | lean |
 |---|---|---|
 | §6.1 | ~~the null position~~ | ✅ **ruled**: not null |
-| §6.1b | **What is a frame's coordinate space?** The plan: a rectangle *on* the infinite plane, positioned in plane coordinates. Today's ruling: a frame *is* the bounded space, chosen at creation. (a) a frame is a board whose plane has edges — same coordinates, bounded · (b) a frame is a rectangle on a canvas, as planned · (c) both exist. | 🔵 **(a)** — it is what the owner said, and it keeps one coordinate system |
+| §6.1b | ~~What is a frame's coordinate space?~~ | ✅ **RULED (a), 2026-09-05.** Owner: *"a frame is a kind of board… fixed sizes, like 8½×11, A4, square, or a pixel size… you can zoom in but not infinitely — like what you can print out and see. No, a frame is not a rectangle drawn on a board. There's either an infinite canvas or a defined size."* → `frame-plan.md` must be re-cut before build: no `frame_x/y` on the plane; the frame *is* the plane, bounded. |
 
 ## 6 · The walkthroughs
 
