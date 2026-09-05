@@ -1,0 +1,16 @@
+=== a positionless placement is now impossible ===
+INSERT 0 1
+INSERT 0 1
+--- EXPECT: ERROR, not-null violation
+psql:/Users/gargoodevi/Documents/world-website/verification/position-not-null-proof.sql:7: ERROR:  null value in column "x" of relation "placement" violates not-null constraint
+DETAIL:  Failing row contains (22015079-572d-4857-aed7-d7979987bcd1, bbbbbbbb-0000-0000-0000-000000000009, cccccccc-0000-0000-0000-000000000009, null, null, null, null, null, null, 2026-09-04 16:33:09.453194-07, null, 2026-09-04 16:33:09.453194-07, 00000000-0000-0000-0000-0000000000aa, null, null).
+--- EXPECT: ERROR — half a point is also refused
+psql:/Users/gargoodevi/Documents/world-website/verification/position-not-null-proof.sql:10: ERROR:  null value in column "y" of relation "placement" violates not-null constraint
+DETAIL:  Failing row contains (682d12af-22ed-47ed-8131-6ed292c18d6d, bbbbbbbb-0000-0000-0000-000000000009, cccccccc-0000-0000-0000-000000000009, null, 10, null, null, null, null, 2026-09-04 16:33:09.453721-07, null, 2026-09-04 16:33:09.453721-07, 00000000-0000-0000-0000-0000000000aa, null, null).
+--- EXPECT: 1 row — a whole point still works
+INSERT 0 1
+ placed 
+--------
+      1
+(1 row)
+
