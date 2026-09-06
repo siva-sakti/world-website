@@ -1,5 +1,7 @@
 # Lexicon — the precise words
 
+
+> **⭐ THE FROZEN BUILD DICTIONARY (owner-ruled 2026-09-06):** pending the naming/branding session, the build uses ONE consistent placeholder set — **bit · board · composition · chip · block · gather · the hover view · publish · public/private · the drawer · the peek** — one word, one meaning, everywhere (code, docs, UI), so final naming is a **find-replace sweep**, never archaeology. *"As long as you're using the same thing everywhere, it'll be very easy for us to find and replace."* New concepts entering the build get their placeholder added HERE first, same pass.
 > ## ⚑ A NAMING PASS IS COMING — do not deepen these words *(owner, 2026-09-04)*
 > The owner is running a naming pass on the composition surface, and it is reaching further
 > than expected: **"inbox" is likely to change, and probably "bit" itself** — *"that's a
