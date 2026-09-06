@@ -21,12 +21,22 @@ you *holding the proof*, not with a script having run.
 
 **2 · Fresh backup** *(~5 min)*
 - Supabase dashboard → Database → Backups → download the newest (or trigger one, then download).
+- **Name it by its MIGRATION POSITION, not just the date** — rename the file to carry the last
+  migration applied at that moment (e.g. `backup-2026-09-06-thru-20260906000001.sql`). *(The
+  composition lane's restore rehearsal was bitten by exactly this: a "pre-migration" July backup
+  actually preceded two same-day migrations, and a calendar-keyed replay restored a broken hybrid
+  until keyed on position.)* If taken mid-sitting: BEFORE the pastes, position = `20260903000002`;
+  after them, `20260906000001`.
 
 **3 · Rehearse the restore — on the copy, never the real thing** *(~10 min)*
 - `verification/rehearse-restore.sh ~/Downloads/<the-backup>.sql`
   → builds a throwaway database from the backup and prints per-table row counts.
   *(Mechanics proven on a synthetic dump 2026-09-05: dump in → rows out, counted.)*
 - **You check:** the counts look like your world (bits ≈ what you'd guess, boards, placements).
+- **Claude checks:** the guest policies are PRESENT in the restored copy —
+  `select count(*) from pg_policies where policyname like '%public%' or roles::text like '%anon%';`
+  (the dump is `--no-privileges` by design, so policy *presence*, not grants, is the assertion —
+  the composition lane's §B0 lesson).
   This is the first time the recovery path will have ever been run. Keep or drop the throwaway
   (the script prints both commands).
 
