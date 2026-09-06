@@ -1,6 +1,6 @@
 # Stage ②a — the detailed breakdown *(v2, adversary-folded 2026-09-04; READY AFTER FIXES → fixes in)*
 > **Read first:** `docs/composition-spec.md` §4 · §6–§8 · §13 · §20.1–20.3 · §31–§32 · `composition-build-plan.md` (②a + the five floor rules + the cross-window contract) · `docs/how-each-piece-gets-built.md`.
-> **Scope:** the composition page + list, the surfaced editor — the low-risk half. ⛔ NOT here: drag/heading-spans/columns/toggles (②b) · pulling things in (③ — **and the `[[` door is GATED OFF on the page until ③**, A3 below) · board postures (⑤).
+> **Scope:** the composition page + list, the surfaced editor — the low-risk half. ⛔ NOT here: block-drag/columns/collapsible containers (②b) *(D-153: the "heading-spans" formerly listed here are **deleted, not deferred** — no stage owns them)* · pulling things in (③ — **and the `[[` door is GATED OFF on the page until ③**, A3 below) · board postures (⑤).
 > **Precondition:** ①a applied. Code lane: new files + the contract touches, with `text-bit.tsx`'s real diff decomposed (A10).
 
 ## 1 · "Done," in the owner's words
