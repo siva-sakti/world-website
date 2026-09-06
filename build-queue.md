@@ -15,10 +15,11 @@
 6 frame), each behind only the gates it stands on; the ledger of flags rides in
 `whats-built-at-this-stage.md` §5b.
 
-**AFTER F (V1's remaining arc, in rough order):** the public/private app layer (§4i) · the naming
+**AFTER F (owner, 2026-09-06: "right after you're done, we'll do composition"):** the
+**composition ping leads** — then, owner-sequenced: the public/private app layer (§4i) · the naming
 pass (§2 — the owner's words land) · **the DESIGN PASS** (owner, 2026-09-05: "we have a whole
 design pass to go" — the look of cards, handles, chrome; owner-led, per the no-aesthetic-decisions
-rule) · the composition ping (held behind F by the owner, D-149) · S3 if still wanted. Then V1 is the thing described in §4e-0.
+rule) · S3 if still wanted. Then V1 is the thing described in §4e-0.
 
 
 **What this is:** the single place that holds (1) the app's surface map + terminology, (2) the reorganize work, and (3) the ordered queue of every feature on deck. **When the owner has a scattered idea-dump, it gets filed HERE and reflected back — this doc absorbs the mess so the owner never has to manage it.** Owner + Claude, 2026-08-20.
