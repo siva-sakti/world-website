@@ -44,6 +44,32 @@ Small pieces, each ending green. Match the surrounding code's style. **No refact
 ## The standing rule over all of it
 **When the spec doesn't answer it: stop and route** — to the spec, then to the owner. Never invent a decision mid-build and record it as settled. *(This project's named failure mode is fluent plausible detail; the guard is citation, never care.)*
 
+## 9 · The loop with the owner — the follow-up procedure *(owner-asked, 2026-09-06: "I want a follow-up procedure. I want to be kept in the loop.")*
+**The principle: she never has to ask "where are we?" — the report arrives on its own, at fixed moments, in the same shape every time.**
+
+**Before a piece — one short paragraph, unprompted:** what I'm about to build · what "done" looks like **from her chair** (§1) · what it could break (§2) · anything I had to assume. She can redirect in one line, or ignore it and I proceed. *(Small pieces inside an approved stage don't each need a yes — this is notice, not a permission request. Anything that changes scope, schema, or a public signature DOES need her word.)*
+
+**During — silence, with exactly three interrupts:** ① the spec doesn't answer something → **stop and route** (never invent) ② an idea arrives → **file-and-price**, her call ③ the approach goes sideways → **stop and re-plan**, don't push a broken approach through.
+
+**After every piece — the report card, always these five, always in this order:**
+1. **What you can now do that you couldn't** — plain language, her chair.
+2. **The proof** — raw output pasted, not summarized. Tests, build, typecheck.
+3. **What I did NOT do** — the deliberate omissions, so absence is never mistaken for oversight.
+4. **What I'm unsure about** — labeled uncertainty, or the word "none."
+5. **Your steps, if it's testable** — numbered, literal, on the real app *("open X, click Y, expect Z")*; **her result is the evidence.** She is the hands; a click is never simulated and a surface is never declared working from reading code.
+
+**After every stage — the checkpoint:** she uses it for something real on her own material (§7) · her snags become the fix list · the receipt lands in `PROGRESS.md` **the same session** (§8) · then, and only then, the next stage starts.
+
+**If a piece takes longer than expected:** say so at the point of noticing, with the reason. A silent overrun is the loop breaking.
+
+### The referencing discipline *(the second half of her ask: "be careful with what you reference")*
+- **Open the file before saying what it says.** Never characterize a document from memory. *(Earned twice over: this project's own sealed line turned out to be a late unwalked swap, and only a grep found it — `PROGRESS.md` D-151.)*
+- **Quote, then interpret** — the words first, the reading second, so she can disagree with the reading.
+- **Cite by name:** doc + section for rulings, `file.ts:line` for code, D-number for decisions. A claim with no citation is an opinion and gets labeled one.
+- **Never assert how another product works** without a fetched source in the same message, or the word "inference" in the same sentence. **Never invent a confidence number.**
+- **Cross-window facts come from the shared docs or a direct message** — never assumed, never inferred from what a lane "probably" did.
+- **Superseded is not deleted:** when something changes, mark what it supersedes in both directions and move the old to `old/` — no silent overwrites of the record.
+
 ---
 ## The norms, hardened by use *(added 2026-09-04 — each earned in this project, none theoretical)*
 - **The adversary pattern is not optional.** Every single adversarial pass in this project found something real — including one RETHINK that stopped a procedure that would have failed on first contact. Brief them SPECIFICALLY ("argue the opposite; check every citation; hunt the seams between late edits"); vague briefs flatter.
