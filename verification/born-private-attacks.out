@@ -1,0 +1,29 @@
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ world  | visibility | count 
+--------+------------+-------
+ BEFORE | private    |     1
+ BEFORE | public     |     2
+(2 rows)
+
+ALTER TABLE
+UPDATE 2
+ world | visibility | count 
+-------+------------+-------
+ AFTER | private    |     3
+(1 row)
+
+INSERT 0 1
+  probe  | visibility 
+---------+------------
+ NEWBORN | private
+(1 row)
+
+    probe    | count 
+-------------+-------
+ PUBLIC LEFT |     0
+(1 row)
+
+psql:/Users/gargoodevi/Documents/world-website/verification/born-private-attacks.sql:16: ERROR:  new row for relation "bit" violates check constraint "bit_visibility_allowed"
+DETAIL:  Failing row contains (a9bfe60d-db4c-4ee1-9da9-d70fb90945c3, text, null, null, <p>x</p>, null, null, null, null, null, null, null, null, null, null, sorta, null, 2026-09-06 12:44:52.212352-07, 2026-09-06 12:44:52.212352-07, x, null, 298fbf29-39c8-4738-96d0-3348f0e59fd0, null, null, bit, null, live, 'x':1).

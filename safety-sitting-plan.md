@@ -35,7 +35,14 @@ you *holding the proof*, not with a script having run.
 - Then paste `supabase/migrations/20260904000001_position_not_null.sql` → run.
 - ⚠ Do **NOT** use `verification/apply-left-at-and-drop-display-size-to-cloud.sql` — that combined
   file contains 006 (`drop display_size`), which stays FOLDED into the future kind/size migration.
-- **You check:** both say success; the app still loads a board and moves a card.
+- **4c · The visibility rider (owner-ruled 2026-09-06 — the sealed model's step ①):** FIRST run
+  the count so you see exactly what flips:
+  `select visibility, count(*) from bit group by visibility;`
+  → then paste `supabase/migrations/20260906000001_born_private.sql` → run the count again:
+  everything private, and every new bit born private. Nothing reachable changes — no publish act
+  exists; storage just stops lying. *(Proven on the full stack 2026-09-06:
+  `verification/run-born-private-native.sh` — 2 public → 0, newborn private, garbage refused.)*
+- **You check:** all three say success; the app still loads a board and moves a card.
 
 **5 · The wall guard** — already landed with this package: `rls-every-table.test.mjs`, green on
 today's schema and **proven red** against a naked table. Nothing for you to do; it now fails the
@@ -50,4 +57,4 @@ today, not remembered green from August. Any red = a finding, handled before ite
 
 ## What this sitting deliberately does NOT do
 006 (owner-ruled: folded, never standalone) · originals-keeping (that's item 0b, next, its own
-small build) · any schema change beyond the two proven pastes.
+small build) · any schema change beyond the three proven pastes.
