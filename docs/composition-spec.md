@@ -568,11 +568,16 @@ Standard undo/redo, **with a bounded history — roughly 15 steps** *(owner: "go
 - 📜 **SUPERSEDED — the "edges test."** Claude proposed that only things with their own edges (image · table · pulled-in block) could drag, and text could not. **That was a correction to a misreading, and it is now void as a drag rule.** *Kept because the distinction it names is still true elsewhere:* things with edges are the ones that **resize and sit beside text** (§9.6.2); flow text does not. *(cite corrected, G20)* Same observation, wrong law.
 - ⚠ **§13.3 needs no re-scoping after all** — its *"hover drag-handle moves a block"* stands as written.
 
-✅ **RESOLVED (owner, 2026-09-02): headings DO drag, and the section comes along.** *"Let's do what Notion does — you drag the headline and the section comes along, yes."* A heading **owns everything beneath it until the next heading of equal or higher level**; that span is what moves. *(The earlier "no headline dragging" remarks were about the table of contents, now confirmed.)*
+📜 **SUPERSEDED 2026-09-06 (D-152) — the span model is dead. The premise it rested on was false.** The 2026-09-02 ruling read: *"headings DO drag, and the section comes along… A heading owns everything beneath it until the next heading of equal or higher level"* — made explicitly on the owner's *"let's do what Notion does."* **Notion does not do that** (owner observation with Notion open, 2026-09-06): a heading is its own block, the text beneath is a separate sibling block, and dragging a heading moves the heading alone. The ruling inherited a false premise and is void.
 
-✅ **This one rule also answers the toggle question** — the owner asked what toggle-dragging even meant. A "toggle" is just a collapsible section, so **a container carries its contents** by exactly the law above. No separate case.
+✅ **RULED 2026-09-06 (D-152) — THE FLAT BLOCK MODEL. A drag moves exactly the block you dragged.** No inferred spans, ever. *(Her words: "if Notion doesn't do that, we don't have to do it either, because that would actually be confusing… span math sounds crazy.")*
+- **The principle, and it is the real lesson from Notion's palette:** *containment is explicit, never inferred.* A block owns only what is literally placed inside it. Nothing on screen tells you where an inferred span ends, so an inferred drag can only ever take more or less than the writer expected.
+- **Why the owner's own evidence settles it:** Notion ships **toggle heading 1/2/3 as distinct block types** — they exist *because* a plain heading owns nothing. Section-dragging is available there by explicitly nesting content inside a container, visibly.
+- ⚠ **What this costs, named:** moving a whole section takes a deliberate act — use a collapsible container, or select the blocks and move them. Accepted eyes-open.
 
-🔵 **The simplification it opens:** if a heading owns a span for *dragging*, let it own the same span for *folding* — **a heading IS the collapsible section**, and there is no separate toggle block type to build or explain. One concept, two operations. *(Satisfies the owner's "I think we should have collapsible sections" without a second mechanism. Not yet ruled.)*
+✅ **The toggle question, re-answered under the flat model:** a container carries the contents **actually nested inside it** — that is a real parent-child relation in the document, not a computed guess. The owner's earlier "what does toggle-dragging even mean" is answered by nesting, not by span law.
+
+⚠ **The dead simplification (was 🔵, now void):** *"a heading IS the collapsible section, no separate toggle block type"* rested entirely on the span. **It falls with it.** Collapsible sections — which the owner does want — therefore need an explicit collapsible container. ⚪ **OPEN, and cheap to settle:** whether that is a toggle block, or headings gain their own explicit fold. *(The owner has Notion open and flagged one thing unverified: whether Notion's plain headings collapse at all. Worth a look before this is ruled — it decides whether fold and drag are allowed to differ.)*
 
 ### 20.5c Headings as destinations *(owner, 2026-09-02: "we definitely need headers, jump to headers, linking to headers" — ⚠ quote-context note (P1-D1): her message trails into "Maybe I don't even—" immediately after; the linking half read firm but not beyond doubt. The weight now rests on §31.6's explicit sections pick, which is beyond doubt.)*
 1. ✅ **Headings** — structure inside the writing (§20.1).
@@ -652,7 +657,7 @@ Four tables name a bit and would each gain a second, exclusive slot — *this ta
   - **The seam already falls in the right place:** the parts of the writing that need their own identity **already have rows** (the gathered things); the owner's own sentences do not need identity and stay in the document. A hybrid already exists, split correctly.
   - **The closer:** every want that a *synced block* would serve, the model answers better — *"I want this paragraph in two compositions"* → then it is not a paragraph, it is **material**: make it a bit and gather it into both.
   - **What copying Notion would cost:** every edit a row write · opening a composition an assembly job · reordering rewrites position keys — **owned by one person, with no team to pay the bill down the way Notion did.**
-- ⚠ **And note what does NOT need blocks:** folding a section · dragging a heading with its section · the table of contents. All are **editor behaviour**, not filing.
+- ⚠ **And note what does NOT need blocks:** folding a section · dragging a block · the table of contents. All are **editor behaviour**, not filing. *(D-152 trimmed this line's middle item — "dragging a heading with its section" is no longer a behaviour that exists.)*
 
 **What the feature list actually demands** — only three lines have teeth:
 
@@ -739,8 +744,8 @@ S-C1 morning pages → nothing minted ✓ · S-C2 the Substack flow (board → d
 
 ## 25 · The moves — the practical inventory *(laid out 2026-09-03 at the owner's ask: "what are the moves, what do we limit, what flexibility might they want — literally")*
 **Markers: ✅ ruled · 🔨 built today · ⚪ open · ⛔ limited on purpose.**
-- **Write:** type/Enter/Shift+Enter 🔨 · bold·italic·quote·lists 🔨 · headings ✅(🔨 unstyled) · checklist ✅ planned · a table you make = writing ✅ · `/` menu (typed `/` only, never re-fires on paste/undo) ✅ · collapsible sections ✅ wanted (⚪ heading-is-the-unit, Claude's lean, vs separate toggles)
-- **Move writing:** cut/copy/paste the main path ✅ · drag block up/down ✅ · heading carries its section ✅ · folded+backspace → unfold first ✅ · undo ~15 ✅
+- **Write:** type/Enter/Shift+Enter 🔨 · bold·italic·quote·lists 🔨 · headings ✅(🔨 unstyled) · checklist ✅ planned · a table you make = writing ✅ · `/` menu (typed `/` only, never re-fires on paste/undo) ✅ · collapsible sections ✅ wanted (⚪ **now narrowed by D-152**: heading-is-the-unit is DEAD with the span; the choice is an explicit toggle block vs headings gaining an explicit fold)
+- **Move writing:** cut/copy/paste the main path ✅ · drag block up/down ✅ · **a drag moves exactly the dragged block — no inferred spans** ✅ *(D-152; the former "heading carries its section" is superseded — see §20.5)* · folded+backspace → unfold first ✅ *(applies to explicit containers)* · undo ~15 ✅
 - **Bring in:** `[[` → chip 🔨 · the drawer — a bits-list panel is 🔨 built today; **what's new** is the tabs (bits · compositions · all) + "in this piece" *(precision, G20)* · block form ✅ ruled ⛔ not built · outside text → paragraph + waiting "make this a bit" ✅ · **paste an image → writing ✅ (§24.3)** · gather a board/source ⚪ parked
 - **Act on a brought-in thing:** chip click → peek ✅ · block click → selects ✅ · resize/align ✅ · presence stored per-tie ✅ (§23.1) · delete → tie dropped on save 🔨 · **edit it here ⚪ window-or-copy**
 - **Get around / meta:** contents (nav only) ✅ · links to headings ✅ · lock ✅ · tag/place/trash inherited ✅

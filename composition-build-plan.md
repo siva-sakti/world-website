@@ -44,7 +44,7 @@ She uses this app daily, so every stage states its own before/after. ⚠ **The d
 | ①a | compositions get their own home in the data, **beside** the old one. **Add-only: writing and gather keep working throughout — TRUE under the split, because nothing is deleted or dropped** *(the one-step version's same claim was false — adversary F2/F5)* | nothing visibly new (the tables sit empty) |
 | ①b *(after ③, gated on her having moved)* | the old surface retired cleanly; the bit table returns to pure material | ⚠ **the dip lands here** — old test pieces deleted (counted, disclosed) · **gather-from-bits ends deliberately** (the flatness law's door closing, disclosed at the checkpoint — never silent) |
 | ②a | ⭐ **the first stage she FEELS** — headings, lists, checklists, tables, the reading lock, the piece's job facts, a sortable list | drag-reorder not there yet |
-| ②b | move blocks; fold sections; columns | — |
+| ②b | move blocks (one block per drag, D-152); fold sections; columns | — |
 | ③ | ⭐ **the promise lands** — everything she has collected is reachable inside her writing | — |
 | ④ | make a bit from a selection; paste images into a piece | — |
 | ⑤ | write beside a board without leaving it | — |
@@ -95,8 +95,9 @@ This half: surface the installed blocks (headings ×2 · lists · quote · divid
 **Accept:** *(+ the five floor rules; this stage introduces the composition page AND the list — the three states apply to both)* the eight musts minus drag · list sort/filter works · a trashed composition restores from the trash room correctly · a save against a just-trashed composition prompts instead of landing silently.
 
 ## Stage ②b · THE EDITOR — STRUCTURAL BLOCKS (the hard half, honestly labeled)
-The two genuinely hard pieces, isolated so their risk can't hide: **drag-reorder with a heading carrying its span** (§20.5 — real ProseMirror structural surgery; drag-handle extension gives the gesture, the span logic is ours; plan: its own mini-spec + tests before code, antagonist-checked) · **the columns block** (custom, §13.9) · the toggle via `extension-details` bent to §13.7 (label-only folded · searchable · auto-unfold on search-hit — the search-hit unfold is ours) · undo ~15 covering pulled-in acts · unfold-before-delete (§20.5b).
-**Accept:** *(+ the five floor rules)* ⚠ **stated honestly per the testing finding — TEST-PROVEN: the span logic as a pure function (which blocks a heading owns), the fold's contents, the search extraction. OWNER-FEEL-TESTED: the gestures themselves (pressing Enter, dragging, the drop indicator).** §13.3's drag must + heading-span proven by tests that try to break the span math · fold/search/unfold end-to-end · columns per §13.9 including phone stacking.
+⚠ **RESIZED 2026-09-06 by D-152 — this stage lost its hardest piece.** The span logic (*a heading carries everything until the next equal-or-higher heading*) is **deleted, not deferred**: the owner ruled the flat block model — **a drag moves exactly the block you dragged, no inferred spans, ever.** What remains here is **drag-reorder of one block** (the drag-handle extension's own gesture — no structural surgery, no span math, no mini-spec, no antagonist pass for it) · **the columns block** (custom, §13.9 — now this stage's hardest piece) · **the collapsible container** via `extension-details` bent to §13.7 (label-only folded · searchable · auto-unfold on search-hit — the search-hit unfold is ours) ⚪ *its exact shape waits on §20.5's open question: a toggle block vs headings gaining an explicit fold* · undo ~15 covering pulled-in acts · unfold-before-delete (§20.5b, now scoped to explicit containers).
+*(Historical, for the record: this stage was written around "drag-reorder with a heading carrying its span (§20.5 — real ProseMirror structural surgery)" as its headline risk. That risk no longer exists.)*
+**Accept:** *(+ the five floor rules)* ⚠ **stated honestly per the testing finding — TEST-PROVEN: the span logic as a pure function (which blocks a heading owns), the fold's contents, the search extraction. OWNER-FEEL-TESTED: the gestures themselves (pressing Enter, dragging, the drop indicator).** §13.3's drag must — **owner-feel-tested only now** (one block moves; there is no span math left to break) · fold/search/unfold end-to-end · columns per §13.9 including phone stacking.
 ## 🔎 RESCUED FROM THE SUPERSEDED DOCS — the merge-check's findings *(2026-09-04)*
 *(The owed "is anything lost?" pass over `old/composition-surface-spec.md` and the two `convergent-surfaces-*` files, done while the adversary ran. Most of their content is carried or superseded — these four are NOT, and three are genuinely useful build knowledge.)*
 1. ⭐⭐ **THE BLOCK IS MOSTLY ALREADY BUILT — it is "the peek, made permanent."** `BitRefView`'s peek **already fetches the target and renders its content** (thumbnails, the glimpse). So block mode ≈ a `display: chip|block` attribute on the existing `BitRef` node, reusing the peek's fetch-and-render. **The verified spec calls the block "ruled, unbuilt" and never says this** — it materially changes stage ③'s size estimate downward. *(Source: `old/composition-surface-spec.md` §4.4.)*
@@ -161,7 +162,7 @@ The **naming session** (the list's route · "gather" still soft · the hover lay
 | §13.7 toggles · §13.9 columns | **②b** |
 | §16 keyboard · §17 responsive/phone | **②a** *(⚠ was unhomed — see the gaps)* |
 | §20.1–20.3 headings · contents · the lock | **②a** *(the `locked_at` column in ①)* |
-| §20.4 undo · §20.5 drag + heading-span · §20.5b the folded-backspace path | **②b** |
+| §20.4 undo · §20.5 drag *(the flat model, D-152 — heading-span deleted)* · §20.5b the folded-backspace path | **②b** |
 | §20.5c + §31.6 heading ids + cross-piece section links | **②a** (ids, via the vendor's unique-id extension) + **③** (the picker's heading-unfold) |
 | §20.6 affordances | **②a/③** per row |
 | §21 + §27 storage · the pointers · the views | **①** |
