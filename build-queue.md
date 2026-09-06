@@ -337,10 +337,10 @@ list 2026-09-05).
 
 ## 4i · PUBLIC / PRIVATE — the sharing layer *(REWRITTEN 2026-09-05: the authority is now `docs/visibility-model.md`, SEALED)*
 
-**The authority:** `docs/visibility-model.md` — owner-sealed 2026-09-05. **One corner REOPENED
-(2026-09-06): the flip-private-while-a-published-piece-quotes-it answer** — composition side ONLY
-(options before the owner: `docs/accounts-session-notes.md` N12–N13). **The board's absence law is
-untouched — item 7 builds the same under any ruling.** Everything here is a
+**The authority:** `docs/visibility-model.md` — owner-sealed 2026-09-05. The one reopened corner
+(flip-private-while-quoted) is **CLOSED — D-151, 2026-09-06:** un-publish with her confirm, plus a
+standing "republish?" state on the piece's page reusing the resolve list. Composition side only;
+**the board's absence law untouched — item 7 exactly as planned.** Everything here is a
 pointer; that doc states the model. The two laws: boards = the **absence model** (a private bit on
 a published board renders absent for visitors, space kept; marked for you) · compositions = the
 **hard rule** (a private bit can never be incorporated into a public piece — prevented at the
