@@ -37,8 +37,10 @@ select count(*) as fixed_read_copies
 
 \echo '--- replay the real duplicate: insert the fixed read into a new board ---'
 insert into board (id, title) values ('00000000-0000-0000-0000-0000000000b2', 'source board copy');
-insert into placement (board_id, target_bit_id, target_board_id, x, y, width, height, z, display_size, locked_at)
-  select '00000000-0000-0000-0000-0000000000b2', target_bit_id, target_board_id, x, y, width, height, z, display_size, locked_at
+-- display_size dropped from this replay 2026-09-06: migration 006 (in the stack, held for
+-- cloud) removes the column; the first fresh suite re-run caught this fixture still writing it.
+insert into placement (board_id, target_bit_id, target_board_id, x, y, width, height, z, locked_at)
+  select '00000000-0000-0000-0000-0000000000b2', target_bit_id, target_board_id, x, y, width, height, z, locked_at
     from board_cards where board_id = '00000000-0000-0000-0000-0000000000b1';
 
 \echo '--- the copy holds exactly the one live card ---'
