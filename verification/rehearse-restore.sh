@@ -9,6 +9,15 @@ DUMP="${1:?usage: rehearse-restore.sh <dump-file>}"
 [ -f "$DUMP" ] || { echo "no such file: $DUMP"; exit 1; }
 DB="restore_rehearsal_$(date +%s)"
 createdb "$DB"
+# The Supabase shape a vanilla Postgres lacks (found by the first real rehearsal,
+# 2026-09-06: every table's owner_id defaults to auth.uid(); without this shim the
+# whole restore cascades — 159 errors from one missing schema).
+psql -q -d "$DB" -c "do \$\$ begin
+  if not exists (select from pg_roles where rolname='anon') then create role anon nologin; end if;
+  if not exists (select from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
+end \$\$;"
+psql -q -d "$DB" -c 'create schema if not exists auth;'
+psql -q -d "$DB" -c "create or replace function auth.uid() returns uuid language sql stable as \$fn\$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid \$fn\$;"
 echo "-- restoring '$DUMP' into throwaway '$DB'..."
 case "$DUMP" in
   *.sql) psql -v ON_ERROR_STOP=0 -q -d "$DB" -f "$DUMP" > /dev/null 2>"$DB.err" || true ;;
