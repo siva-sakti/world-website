@@ -299,7 +299,7 @@ built, and then the frame view as well."*
 
 | | | plan | needs the owner |
 |---|---|---|---|
-| **0** | **THE SAFETY SITTING (ruled 2026-09-05, D-149)** — real export downloaded **+ media fetched inside its hour** · restore rehearsed on a throwaway · fresh backup · paste the THREE proven migrations (005 · position_not_null · the born-private rider, owner-ruled 2026-09-06; 006 stays folded) · the RLS-on-every-table test | Claude preps the package; plan just-in-time | **yes — the sitting is the owner's** |
+| **0** | ✅ **DONE 2026-09-06 (D-152) — THE SAFETY SITTING** — real export downloaded **+ media fetched inside its hour** · restore rehearsed on a throwaway · fresh backup · paste the THREE proven migrations (005 · position_not_null · the born-private rider, owner-ruled 2026-09-06; 006 stays folded) · the RLS-on-every-table test | Claude preps the package; plan just-in-time | **yes — the sitting is the owner's** |
 | **0b** | **KEEP ORIGINALS (ruled 2026-09-05)** — intake stores the full-quality original alongside the display copy, from now on. Slotted right after 0 because every photo added before it lands has no original, forever | plan just-in-time | no |
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
 | **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
