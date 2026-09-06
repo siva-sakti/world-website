@@ -39,8 +39,11 @@ Real history for a composition's body: what did this look like Tuesday, and rest
 ## F-9 · "Write about this" — the steering door *(from the bit↔bit worry, 2026-09-02)*
 From any bit (its page, its card menu): one tap opens a small composition with that bit already pulled in. **The answer to "I want to connect my bits" without breaking flatness** — the impulse gets the right surface instead of a rule. Cheap: an existing create path + one pre-gather. Near-term candidate once compositions land.
 
+## F-10 · Suggestion mode on compositions *(owner-named 2026-09-06, the accounts sitting)*
+Her "feedback" want, precisely: a reader you choose can go into a suggesting mode on a composition — propose edits you accept or reject, Google-Docs-style. Not comments, not co-writing: suggestions. Her sequencing: *"later down the line, not the most priority."* Social era — needs reader identity + the social sitting's rulings first. Filed so the accounts model keeps a door for it.
+
 ## The full cool-ideas list (owner-requested tracker — keep current)
-resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piece (F-7) · version history (F-8) · write-about-this (F-9) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
+resurfacing (V2, F-1) · board-peek on the composition (F-6) · duplicate a piece (F-7) · version history (F-8) · write-about-this (F-9) · suggestion mode (F-10, social era) · journey strip (F-2) · board timeline (F-3) · piece-as-board (F-4) · make-this-a-bit (F-5) · make-board-from-tag (near-term, queued) · hide-pieces toggle (✅ ruled in) · floater+dock (✅ ruled in) · steering on-ramp to the connective note (open in base spec)
 
 ## Near-term, NOT on this shelf
 **"Make this a board" from a tag** — owner wants it soon; lives in `product-concept-queue.md`, code window's lane when slotted.
