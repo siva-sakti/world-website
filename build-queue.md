@@ -295,7 +295,7 @@ built, and then the frame view as well."*
 
 | | | plan | needs the owner |
 |---|---|---|---|
-| **0** | **THE SAFETY SITTING (ruled 2026-09-05, D-149)** — real export downloaded **+ media fetched inside its hour** · restore rehearsed on a throwaway · fresh backup · paste the two safe held migrations (005 + position_not_null — their hold reason expired with D-145/147; 006 stays folded) · the RLS-on-every-table test | Claude preps the package; plan just-in-time | **yes — the sitting is the owner's** |
+| **0** | **THE SAFETY SITTING (ruled 2026-09-05, D-149)** — real export downloaded **+ media fetched inside its hour** · restore rehearsed on a throwaway · fresh backup · paste the THREE proven migrations (005 · position_not_null · the born-private rider, owner-ruled 2026-09-06; 006 stays folded) · the RLS-on-every-table test | Claude preps the package; plan just-in-time | **yes — the sitting is the owner's** |
 | **0b** | **KEEP ORIGINALS (ruled 2026-09-05)** — intake stores the full-quality original alongside the display copy, from now on. Slotted right after 0 because every photo added before it lands has no original, forever | plan just-in-time | no |
 | **1** | **Rotation: the degrees readout** while you turn a card | `rotation-alignment-and-readout-plan.md` §1 | no |
 | **2** | ✅ **BUILT — a rotated card can be ALIGNED** (visual-box maths, tests proven red) | same, §2 | a look at the result |
@@ -353,8 +353,9 @@ boards. Board RLS needs nothing — July's guest door already implements the sea
 **THEIR lane (Stage Ⓥ of `composition-build-plan.md`, gated on ours shipping):** composition
 guest policies · the gather-barrier · piece-publish resolve-first · unpublish · view-as-visitor
 for pieces. Until either half ships, both builds run in an all-private world — nothing entangles.
-**Placement: after Phase F** (unchanged unless the owner moves it). Open rider question: whether
-the legacy flip + default change ride item 0's sitting (safe either way — no publish door exists).
+**Placement: after Phase F** (unchanged unless the owner moves it). **Rider RULED (owner,
+2026-09-06): the legacy flip + default change ride item 0's sitting** — migration written + proven
+(`20260906000001_born_private.sql` · `run-born-private-native.sh`).
 
 ## 4f · THE OWNER'S IDEA DUMP (2026-09-02) — captured, NOT planned
 
