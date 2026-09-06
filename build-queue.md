@@ -8,18 +8,21 @@
 | **O · Organize** | home-as-shelf · notes view · sweep · health check | ✅ **done** — O1 shelf LIVE (the ⛔ cloud-gate line below is stale as of 2026-09-05; migration applied, app shipped) · O2 built (`notes-browser.tsx`) · O4 absorbed by V2's renames · O5 ran (D-140) |
 | **V · Vision build** | desk/cabinet home · kind marker · broom | ✅ **superseded/absorbed** — home revised by S; V2 kind landed with the notes era; V4's broom ran (`lib/dates.ts` exists) |
 | **N · Notes** | the note as a surface | ✅ N1 built (+ its year-late half caught F6, then built) |
-| **S · Home = surfaces** | one home, everything, alive floated | ✅ S1 find/jump · ✅ S2 built (home imports `surfaces` + `desk-alive`) · ⏸ S3 alive-canvas — parked, its own build |
+| **S · Home = surfaces** | one home, everything, alive floated | ✅ S1 find/jump · ✅ S2 built (home imports `surfaces` + `desk-alive`) · ⏸ S3 alive-canvas — folded into the home look-again (2026-09-06) |
 
 **PHASE F · FOUNDATIONS → V1 — NOW.** The hard line + the 2×2 target: §4e-0. The line items:
 §4e-2 (0 safety → 0b originals → 1 readout → 2b card split → 3 modes → 4 checklist → 5 table →
 6 frame), each behind only the gates it stands on; the ledger of flags rides in
 `whats-built-at-this-stage.md` §5b.
 
-**AFTER F (owner, 2026-09-06: "right after you're done, we'll do composition"):** the
-**composition ping leads** — then, owner-sequenced: the public/private app layer (§4i) · the naming
-pass (§2 — the owner's words land) · **the DESIGN PASS** (owner, 2026-09-05: "we have a whole
+**AFTER F (owner-RULED 2026-09-06, the block order):** **compositions lead** (the ping — fully
+unblocked, since item 7 ships the publish act their visibility stage gates on) → **the HOME
+LOOK-AGAIN last** (a P0 from-scratch check of the display level: home + the display surfaces,
+compositions brought onto home in the revamped way; **S3's alive-canvas question is decided
+inside it, not before**). Owner-paced alongside, not blocks: the naming pass (§2 — the owner's
+words land) · **the DESIGN PASS** (owner, 2026-09-05: "we have a whole
 design pass to go" — the look of cards, handles, chrome; owner-led, per the no-aesthetic-decisions
-rule) · S3 if still wanted. Then V1 is the thing described in §4e-0.
+rule). Then V1 is the thing described in §4e-0.
 
 
 **What this is:** the single place that holds (1) the app's surface map + terminology, (2) the reorganize work, and (3) the ordered queue of every feature on deck. **When the owner has a scattered idea-dump, it gets filed HERE and reflected back — this doc absorbs the mess so the owner never has to manage it.** Owner + Claude, 2026-08-20.
@@ -305,6 +308,7 @@ built, and then the frame view as well."*
 | **4** | **Checklist** bit — the shared editor's task list | `editor-formatting-and-file-bit-plan.md` Build 1 | no |
 | **5** | **Table** as its own bit type — cells in `body`, ✅ unblocked | same, Build 3 + the table answer | the cloud paste |
 | **6** | **The frame — a KIND of board, fixed size; completes the 2×2** (frame×arrange + frame×edit, R9) | `frame-spec.md` | the cloud paste |
+| **7** | **THE BOARD'S PUBLIC FACE (ruled 2026-09-06)** — publish act · review screen · the marker · flip notifications · view-as-visitor. The visibility board half's app layer (flip + default already ride item 0); Phase F now ENDS with the board publishable | plan just-in-time; authority: `docs/visibility-model.md` (§5 acts table = the test list) | its plan's opens |
 
 **HOW EACH ITEM LEAVES THE QUEUE — the foundation gates (folded 2026-09-05; the layer model:
 `whats-built-at-this-stage.md` §2b).** An item is gated only by the layers it cuts. Before its build: the
@@ -316,6 +320,8 @@ follows its spec. The gates:
   converged, owner ruled split-before-modes) + L5 input** (+ L6 temporary state, small).
 - **4 checklist · 5 table** — **L7 creation + L8 identity** walkthroughs; the card split (2b)
   precedes them — each new type then arrives as one table row + one content component.
+- **7 public face** — gates: **2b** (the marker is card chrome) + **3 modes** (stable rendering
+  before screens that show boards to visitors). RLS needs nothing (July, proven).
 - **6 frame** — mostly clear already (**L2 plane · L3 camera** walked ✅); remaining: the **L1
   board-data** walkthrough (duplicate must copy kind + size) + the kind/size migration, which
   also drops the dead `frame_x/y/w/h` columns (never a standalone paste).
@@ -354,7 +360,8 @@ boards. Board RLS needs nothing — July's guest door already implements the sea
 **THEIR lane (Stage Ⓥ of `composition-build-plan.md`, gated on ours shipping):** composition
 guest policies · the gather-barrier · piece-publish resolve-first · unpublish · view-as-visitor
 for pieces. Until either half ships, both builds run in an all-private world — nothing entangles.
-**Placement: after Phase F** (unchanged unless the owner moves it). **Rider RULED (owner,
+**Placement: ITEM 7 of Phase F (owner-ruled 2026-09-06)** — the queue's tail; F ends with the
+board publishable. **Rider RULED (owner,
 2026-09-06): the legacy flip + default change ride item 0's sitting** — migration written + proven
 (`20260906000001_born_private.sql` · `run-born-private-native.sh`).
 
